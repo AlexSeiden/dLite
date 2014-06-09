@@ -2,13 +2,13 @@
 # to be disabled / enabled at compile time.
 
 # Debug output from spectrum calculation
-DEFINES += LOG_SPECTRUMANALYSER
+#DEFINES += LOG_SPECTRUMANALYSER
 
 # Debug output from waveform generation
 #DEFINES += LOG_WAVEFORM
 
 # Debug output from engine
-DEFINES += LOG_ENGINE
+#DEFINES += LOG_ENGINE
 
 # Dump input data to spectrum analyer, plus artefact data files
 #DEFINES += DUMP_SPECTRUMANALYSER
@@ -26,10 +26,10 @@ DEFINES += LOG_ENGINE
 static: DEFINES += DISABLE_FFT
 
 # Disables rendering of the waveform
-#DEFINES += DISABLE_WAVEFORM
+DEFINES += DISABLE_WAVEFORM
 
 # If defined, superimpose the progress bar on the waveform
-DEFINES += SUPERIMPOSE_PROGRESS_ON_WAVEFORM
+#DEFINES += SUPERIMPOSE_PROGRESS_ON_WAVEFORM
 
 # Perform spectrum analysis calculation in a separate thread
 DEFINES += SPECTRUM_ANALYSER_SEPARATE_THREAD

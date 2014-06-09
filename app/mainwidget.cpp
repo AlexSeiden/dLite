@@ -1,43 +1,3 @@
-/****************************************************************************
-**
-** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
-**
-** This file is part of the examples of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:BSD$
-** You may use this file under the terms of the BSD license as follows:
-**
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of Digia Plc and its Subsidiary(-ies) nor the names
-**     of its contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
-**
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
-
 #include "engine.h"
 #include "levelmeter.h"
 #include "mainwidget.h"
@@ -45,7 +5,6 @@
 #include "progressbar.h"
 #include "settingsdialog.h"
 #include "spectrograph.h"
-#include "tonegeneratordialog.h"
 #include "utils.h"
 
 #include <QLabel>
@@ -71,7 +30,6 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_spectrograph(new Spectrograph(this))
     ,   m_levelMeter(new LevelMeter(this))
     ,   m_modeButton(new QPushButton(this))
-    ,   m_recordButton(new QPushButton(this))
     ,   m_pauseButton(new QPushButton(this))
     ,   m_playButton(new QPushButton(this))
     ,   m_settingsButton(new QPushButton(this))
@@ -81,11 +39,8 @@ MainWidget::MainWidget(QWidget *parent)
             m_engine->availableAudioInputDevices(),
             m_engine->availableAudioOutputDevices(),
             this))
-    ,   m_toneGeneratorDialog(new ToneGeneratorDialog(this))
     ,   m_modeMenu(new QMenu(this))
     ,   m_loadFileAction(0)
-    ,   m_generateToneAction(0)
-    ,   m_recordAction(0)
 {
     m_spectrograph->setParams(SpectrumNumBands, SpectrumLowFreq, SpectrumHighFreq);
 
@@ -204,35 +159,6 @@ void MainWidget::showSettingsDialog()
     }
 }
 
-void MainWidget::showToneGeneratorDialog()
-{
-    m_toneGeneratorDialog->exec();
-    if (m_toneGeneratorDialog->result() == QDialog::Accepted) {
-        reset();
-        setMode(GenerateToneMode);
-        const qreal amplitude = m_toneGeneratorDialog->amplitude();
-        if (m_toneGeneratorDialog->isFrequencySweepEnabled()) {
-            m_engine->generateSweptTone(amplitude);
-        } else {
-            const qreal frequency = m_toneGeneratorDialog->frequency();
-            const Tone tone(frequency, amplitude);
-            m_engine->generateTone(tone);
-            updateButtonStates();
-        }
-    } else {
-        updateModeMenu();
-    }
-}
-
-void MainWidget::initializeRecord()
-{
-    reset();
-    setMode(RecordMode);
-    if (m_engine->initializeRecord())
-        updateButtonStates();
-}
-
-
 //-----------------------------------------------------------------------------
 // Private functions
 //-----------------------------------------------------------------------------
@@ -249,20 +175,7 @@ void MainWidget::createUi()
     m_infoMessage->setAlignment(Qt::AlignHCenter);
     windowLayout->addWidget(m_infoMessage);
 
-#ifdef SUPERIMPOSE_PROGRESS_ON_WAVEFORM
-    QScopedPointer<QHBoxLayout> waveformLayout(new QHBoxLayout);
-    waveformLayout->addWidget(m_progressBar);
-    m_progressBar->setMinimumHeight(m_waveform->minimumHeight());
-    waveformLayout->setMargin(0);
-    m_waveform->setLayout(waveformLayout.data());
-    waveformLayout.take();
-    windowLayout->addWidget(m_waveform);
-#else
-#ifndef DISABLE_WAVEFORM
-    windowLayout->addWidget(m_waveform);
-#endif // DISABLE_WAVEFORM
     windowLayout->addWidget(m_progressBar);
-#endif // SUPERIMPOSE_PROGRESS_ON_WAVEFORM
 
     // Spectrograph and level meter
 
@@ -277,12 +190,6 @@ void MainWidget::createUi()
     const QSize buttonSize(30, 30);
 
     m_modeButton->setText(tr("Mode"));
-
-    m_recordIcon = QIcon(":/images/record.png");
-    m_recordButton->setIcon(m_recordIcon);
-    m_recordButton->setEnabled(false);
-    m_recordButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    m_recordButton->setMinimumSize(buttonSize);
 
     m_pauseIcon = style()->standardIcon(QStyle::SP_MediaPause);
     m_pauseButton->setIcon(m_pauseIcon);
@@ -305,7 +212,6 @@ void MainWidget::createUi()
     QScopedPointer<QHBoxLayout> buttonPanelLayout(new QHBoxLayout);
     buttonPanelLayout->addStretch();
     buttonPanelLayout->addWidget(m_modeButton);
-    buttonPanelLayout->addWidget(m_recordButton);
     buttonPanelLayout->addWidget(m_pauseButton);
     buttonPanelLayout->addWidget(m_playButton);
     buttonPanelLayout->addWidget(m_settingsButton);
@@ -327,9 +233,6 @@ void MainWidget::createUi()
 
 void MainWidget::connectUi()
 {
-    CHECKED_CONNECT(m_recordButton, SIGNAL(clicked()),
-            m_engine, SLOT(startRecording()));
-
     CHECKED_CONNECT(m_pauseButton, SIGNAL(clicked()),
             m_engine, SLOT(suspend()));
 
@@ -353,14 +256,8 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_engine, SIGNAL(dataLengthChanged(qint64)),
             this, SLOT(updateButtonStates()));
 
-    CHECKED_CONNECT(m_engine, SIGNAL(recordPositionChanged(qint64)),
-            m_progressBar, SLOT(recordPositionChanged(qint64)));
-
     CHECKED_CONNECT(m_engine, SIGNAL(playPositionChanged(qint64)),
             m_progressBar, SLOT(playPositionChanged(qint64)));
-
-    CHECKED_CONNECT(m_engine, SIGNAL(recordPositionChanged(qint64)),
-            this, SLOT(audioPositionChanged(qint64)));
 
     CHECKED_CONNECT(m_engine, SIGNAL(playPositionChanged(qint64)),
             this, SLOT(audioPositionChanged(qint64)));
@@ -390,27 +287,15 @@ void MainWidget::createMenus()
 {
     m_modeButton->setMenu(m_modeMenu);
 
-    m_generateToneAction = m_modeMenu->addAction(tr("Play generated tone"));
-    m_recordAction = m_modeMenu->addAction(tr("Record and play back"));
     m_loadFileAction = m_modeMenu->addAction(tr("Play file"));
 
     m_loadFileAction->setCheckable(true);
-    m_generateToneAction->setCheckable(true);
-    m_recordAction->setCheckable(true);
 
     connect(m_loadFileAction, SIGNAL(triggered(bool)), this, SLOT(showFileDialog()));
-    connect(m_generateToneAction, SIGNAL(triggered(bool)), this, SLOT(showToneGeneratorDialog()));
-    connect(m_recordAction, SIGNAL(triggered(bool)), this, SLOT(initializeRecord()));
 }
 
 void MainWidget::updateButtonStates()
 {
-    const bool recordEnabled = ((QAudio::AudioOutput == m_engine->mode() ||
-                                (QAudio::ActiveState != m_engine->state() &&
-                                 QAudio::IdleState != m_engine->state())) &&
-                                RecordMode == m_mode);
-    m_recordButton->setEnabled(recordEnabled);
-
     const bool pauseEnabled = (QAudio::ActiveState == m_engine->state() ||
                                QAudio::IdleState == m_engine->state());
     m_pauseButton->setEnabled(pauseEnabled);
@@ -442,6 +327,4 @@ void MainWidget::setMode(Mode mode)
 void MainWidget::updateModeMenu()
 {
     m_loadFileAction->setChecked(LoadFileMode == m_mode);
-    m_generateToneAction->setChecked(GenerateToneMode == m_mode);
-    m_recordAction->setChecked(RecordMode == m_mode);
 }

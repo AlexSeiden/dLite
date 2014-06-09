@@ -15,8 +15,6 @@ SOURCES  += main.cpp \
             settingsdialog.cpp \
             spectrograph.cpp \
             spectrumanalyser.cpp \
-            tonegenerator.cpp \
-            tonegeneratordialog.cpp \
             utils.cpp \
             waveform.cpp \
             wavfile.cpp
@@ -30,8 +28,6 @@ HEADERS  += engine.h \
             spectrograph.h \
             spectrum.h \
             spectrumanalyser.h \
-            tonegenerator.h \
-            tonegeneratordialog.h \
             utils.h \
             waveform.h \
             wavfile.h

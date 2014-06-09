@@ -1,43 +1,3 @@
-/****************************************************************************
-**
-** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
-**
-** This file is part of the examples of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:BSD$
-** You may use this file under the terms of the BSD license as follows:
-**
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of Digia Plc and its Subsidiary(-ies) nor the names
-**     of its contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
-**
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
-
 #ifndef ENGINE_H
 #define ENGINE_H
 
@@ -107,27 +67,6 @@ public:
     bool loadFile(const QString &fileName);
 
     /**
-     * Generate tone
-     */
-    bool generateTone(const Tone &tone);
-
-    /**
-     * Generate tone
-     */
-    bool generateSweptTone(qreal amplitude);
-
-    /**
-     * Initialize for recording
-     */
-    bool initializeRecord();
-
-    /**
-     * Position of the audio input device.
-     * \return Position in bytes.
-     */
-    qint64 recordPosition() const { return m_recordPosition; }
-
-    /**
      * RMS level of the most recently processed set of audio samples.
      * \return Level in range (0.0, 1.0)
      */
@@ -163,7 +102,6 @@ public:
     void setWindowFunction(WindowFunction type);
 
 public slots:
-    void startRecording();
     void startPlayback();
     void suspend();
     void setAudioInputDevice(const QAudioDeviceInfo &device);
@@ -198,12 +136,6 @@ signals:
      * \param Length of data in bytes
      */
     void dataLengthChanged(qint64 duration);
-
-    /**
-     * Position of the audio input device has changed.
-     * \param position Position in bytes
-     */
-    void recordPositionChanged(qint64 position);
 
     /**
      * Position of the audio output device has changed.
@@ -244,12 +176,10 @@ private:
     void resetAudioDevices();
     bool initialize();
     bool selectFormat();
-    void stopRecording();
     void stopPlayback();
     void setState(QAudio::State state);
     void setState(QAudio::Mode mode, QAudio::State state);
     void setFormat(const QAudioFormat &format);
-    void setRecordPosition(qint64 position, bool forceEmit = false);
     void setPlayPosition(qint64 position, bool forceEmit = false);
     void calculateLevel(qint64 position, qint64 length);
     void calculateSpectrum(qint64 position);
@@ -282,7 +212,6 @@ private:
     QAudioDeviceInfo    m_audioInputDevice;
     QAudioInput*        m_audioInput;
     QIODevice*          m_audioInputIODevice;
-    qint64              m_recordPosition;
 
     const QList<QAudioDeviceInfo> m_availableAudioOutputDevices;
     QAudioDeviceInfo    m_audioOutputDevice;

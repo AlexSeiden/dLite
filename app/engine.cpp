@@ -1,45 +1,4 @@
-/****************************************************************************
-**
-** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
-**
-** This file is part of the examples of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:BSD$
-** You may use this file under the terms of the BSD license as follows:
-**
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of Digia Plc and its Subsidiary(-ies) nor the names
-**     of its contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
-**
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
-
 #include "engine.h"
-#include "tonegenerator.h"
 #include "utils.h"
 
 #include <math.h>
@@ -71,7 +30,6 @@ Engine::Engine(QObject *parent)
     :   QObject(parent)
     ,   m_mode(QAudio::AudioInput)
     ,   m_state(QAudio::StoppedState)
-    ,   m_generateTone(false)
     ,   m_file(0)
     ,   m_analysisFile(0)
     ,   m_availableAudioInputDevices
@@ -79,7 +37,6 @@ Engine::Engine(QObject *parent)
     ,   m_audioInputDevice(QAudioDeviceInfo::defaultInputDevice())
     ,   m_audioInput(0)
     ,   m_audioInputIODevice(0)
-    ,   m_recordPosition(0)
     ,   m_availableAudioOutputDevices
             (QAudioDeviceInfo::availableDevices(QAudio::AudioOutput))
     ,   m_audioOutputDevice(QAudioDeviceInfo::defaultOutputDevice())
@@ -148,45 +105,6 @@ bool Engine::loadFile(const QString &fileName)
     return result;
 }
 
-bool Engine::generateTone(const Tone &tone)
-{
-    reset();
-    Q_ASSERT(!m_generateTone);
-    Q_ASSERT(!m_file);
-    m_generateTone = true;
-    m_tone = tone;
-    ENGINE_DEBUG << "Engine::generateTone"
-                 << "startFreq" << m_tone.startFreq
-                 << "endFreq" << m_tone.endFreq
-                 << "amp" << m_tone.amplitude;
-    return initialize();
-}
-
-bool Engine::generateSweptTone(qreal amplitude)
-{
-    Q_ASSERT(!m_generateTone);
-    Q_ASSERT(!m_file);
-    m_generateTone = true;
-    m_tone.startFreq = 1;
-    m_tone.endFreq = 0;
-    m_tone.amplitude = amplitude;
-    ENGINE_DEBUG << "Engine::generateSweptTone"
-                 << "startFreq" << m_tone.startFreq
-                 << "amp" << m_tone.amplitude;
-    return initialize();
-}
-
-bool Engine::initializeRecord()
-{
-    reset();
-    ENGINE_DEBUG << "Engine::initializeRecord";
-    Q_ASSERT(!m_generateTone);
-    Q_ASSERT(!m_file);
-    m_generateTone = false;
-    m_tone = SweptTone();
-    return initialize();
-}
-
 qint64 Engine::bufferLength() const
 {
     return m_file ? m_file->size() : m_bufferLength;
@@ -201,34 +119,6 @@ void Engine::setWindowFunction(WindowFunction type)
 //-----------------------------------------------------------------------------
 // Public slots
 //-----------------------------------------------------------------------------
-
-void Engine::startRecording()
-{
-    if (m_audioInput) {
-        if (QAudio::AudioInput == m_mode &&
-            QAudio::SuspendedState == m_state) {
-            m_audioInput->resume();
-        } else {
-            m_spectrumAnalyser.cancelCalculation();
-            spectrumChanged(0, 0, FrequencySpectrum());
-
-            m_buffer.fill(0);
-            setRecordPosition(0, true);
-            stopPlayback();
-            m_mode = QAudio::AudioInput;
-            CHECKED_CONNECT(m_audioInput, SIGNAL(stateChanged(QAudio::State)),
-                            this, SLOT(audioStateChanged(QAudio::State)));
-            CHECKED_CONNECT(m_audioInput, SIGNAL(notify()),
-                            this, SLOT(audioNotify()));
-            m_count = 0;
-            m_dataLength = 0;
-            emit dataLengthChanged(0);
-            m_audioInputIODevice = m_audioInput->start();
-            CHECKED_CONNECT(m_audioInputIODevice, SIGNAL(readyRead()),
-                            this, SLOT(audioDataReady()));
-        }
-    }
-}
 
 void Engine::startPlayback()
 {
@@ -246,7 +136,6 @@ void Engine::startPlayback()
             m_spectrumAnalyser.cancelCalculation();
             spectrumChanged(0, 0, FrequencySpectrum());
             setPlayPosition(0, true);
-            stopRecording();
             m_mode = QAudio::AudioOutput;
             CHECKED_CONNECT(m_audioOutput, SIGNAL(stateChanged(QAudio::State)),
                             this, SLOT(audioStateChanged(QAudio::State)));
@@ -307,19 +196,6 @@ void Engine::setAudioOutputDevice(const QAudioDeviceInfo &device)
 void Engine::audioNotify()
 {
     switch (m_mode) {
-    case QAudio::AudioInput: {
-            const qint64 recordPosition = qMin(m_bufferLength, audioLength(m_format, m_audioInput->processedUSecs()));
-            setRecordPosition(recordPosition);
-            const qint64 levelPosition = m_dataLength - m_levelBufferLength;
-            if (levelPosition >= 0)
-                calculateLevel(levelPosition, m_levelBufferLength);
-            if (m_dataLength >= m_spectrumBufferLength) {
-                const qint64 spectrumPosition = m_dataLength - m_spectrumBufferLength;
-                calculateSpectrum(spectrumPosition);
-            }
-            emit bufferChanged(0, m_dataLength, m_buffer);
-        }
-        break;
     case QAudio::AudioOutput: {
             const qint64 playPosition = audioLength(m_format, m_audioOutput->processedUSecs());
             setPlayPosition(qMin(bufferLength(), playPosition));
@@ -406,8 +282,6 @@ void Engine::audioDataReady()
         emit dataLengthChanged(dataLength());
     }
 
-    if (m_buffer.size() == m_dataLength)
-        stopRecording();
 }
 
 void Engine::spectrumChanged(const FrequencySpectrum &spectrum)
@@ -426,7 +300,6 @@ void Engine::resetAudioDevices()
     delete m_audioInput;
     m_audioInput = 0;
     m_audioInputIODevice = 0;
-    setRecordPosition(0);
     delete m_audioOutput;
     m_audioOutput = 0;
     setPlayPosition(0);
@@ -436,7 +309,6 @@ void Engine::resetAudioDevices()
 
 void Engine::reset()
 {
-    stopRecording();
     stopPlayback();
     setState(QAudio::AudioInput, QAudio::StoppedState);
     setFormat(QAudioFormat());
@@ -462,36 +334,10 @@ bool Engine::initialize()
     if (selectFormat()) {
         if (m_format != format) {
             resetAudioDevices();
-            if (m_file) {
-                emit bufferLengthChanged(bufferLength());
-                emit dataLengthChanged(dataLength());
-                emit bufferChanged(0, 0, m_buffer);
-                setRecordPosition(bufferLength());
-                result = true;
-            } else {
-                m_bufferLength = audioLength(m_format, BufferDurationUs);
-                m_buffer.resize(m_bufferLength);
-                m_buffer.fill(0);
-                emit bufferLengthChanged(bufferLength());
-                if (m_generateTone) {
-                    if (0 == m_tone.endFreq) {
-                        const qreal nyquist = nyquistFrequency(m_format);
-                        m_tone.endFreq = qMin(qreal(SpectrumHighFreq), nyquist);
-                    }
-                    // Call function defined in utils.h, at global scope
-                    ::generateTone(m_tone, m_format, m_buffer);
-                    m_dataLength = m_bufferLength;
-                    emit dataLengthChanged(dataLength());
-                    emit bufferChanged(0, m_dataLength, m_buffer);
-                    setRecordPosition(m_bufferLength);
-                    result = true;
-                } else {
-                    emit bufferChanged(0, 0, m_buffer);
-                    m_audioInput = new QAudioInput(m_audioInputDevice, m_format, this);
-                    m_audioInput->setNotifyInterval(NotifyIntervalMs);
-                    result = true;
-                }
-            }
+            emit bufferLengthChanged(bufferLength());
+            emit dataLengthChanged(dataLength());
+            emit bufferChanged(0, 0, m_buffer);
+            result = true;
             m_audioOutput = new QAudioOutput(m_audioOutputDevice, m_format, this);
             m_audioOutput->setNotifyInterval(NotifyIntervalMs);
         }
@@ -499,10 +345,6 @@ bool Engine::initialize()
         if (m_file)
             emit errorMessage(tr("Audio format not supported"),
                               formatToString(m_format));
-        else if (m_generateTone)
-            emit errorMessage(tr("No suitable format found"), "");
-        else
-            emit errorMessage(tr("No common input / output format found"), "");
     }
 
     ENGINE_DEBUG << "Engine::initialize" << "m_bufferLength" << m_bufferLength;
@@ -585,20 +427,6 @@ bool Engine::selectFormat()
     return foundSupportedFormat;
 }
 
-void Engine::stopRecording()
-{
-    if (m_audioInput) {
-        m_audioInput->stop();
-        QCoreApplication::instance()->processEvents();
-        m_audioInput->disconnect();
-    }
-    m_audioInputIODevice = 0;
-
-#ifdef DUMP_AUDIO
-    dumpData();
-#endif
-}
-
 void Engine::stopPlayback()
 {
     if (m_audioOutput) {
@@ -624,14 +452,6 @@ void Engine::setState(QAudio::Mode mode, QAudio::State state)
     m_state = state;
     if (changed)
         emit stateChanged(m_mode, m_state);
-}
-
-void Engine::setRecordPosition(qint64 position, bool forceEmit)
-{
-    const bool changed = (m_recordPosition != position);
-    m_recordPosition = position;
-    if (changed || forceEmit)
-        emit recordPositionChanged(m_recordPosition);
 }
 
 void Engine::setPlayPosition(qint64 position, bool forceEmit)
