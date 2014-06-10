@@ -1,7 +1,6 @@
 #include "engine.h"
 #include "levelmeter.h"
 #include "mainwidget.h"
-#include "waveform.h"
 #include "progressbar.h"
 #include "settingsdialog.h"
 #include "spectrograph.h"
@@ -21,25 +20,21 @@ const int NullTimerId = -1;
 
 MainWidget::MainWidget(QWidget *parent)
     :   QWidget(parent)
-    ,   m_mode(NoMode)
     ,   m_engine(new Engine(this))
-#ifndef DISABLE_WAVEFORM
-    ,   m_waveform(new Waveform(this))
-#endif
     ,   m_progressBar(new ProgressBar(this))
     ,   m_spectrograph(new Spectrograph(this))
     ,   m_levelMeter(new LevelMeter(this))
-    ,   m_modeButton(new QPushButton(this))
+    ,   m_fileButton(new QPushButton(this))
     ,   m_pauseButton(new QPushButton(this))
     ,   m_playButton(new QPushButton(this))
     ,   m_settingsButton(new QPushButton(this))
-    ,   m_infoMessage(new QLabel(tr("Select a mode to begin"), this))
+    ,   m_infoMessage(new QLabel(tr("Select a file to begin"), this))
     ,   m_infoMessageTimerId(NullTimerId)
     ,   m_settingsDialog(new SettingsDialog(
             m_engine->availableAudioInputDevices(),
             m_engine->availableAudioOutputDevices(),
+            m_engine->interval(),
             this))
-    ,   m_modeMenu(new QMenu(this))
     ,   m_loadFileAction(0)
 {
     m_spectrograph->setParams(SpectrumNumBands, SpectrumLowFreq, SpectrumHighFreq);
@@ -58,10 +53,8 @@ MainWidget::~MainWidget()
 // Public slots
 //-----------------------------------------------------------------------------
 
-void MainWidget::stateChanged(QAudio::Mode mode, QAudio::State state)
+void MainWidget::stateChanged(QAudio::State state)
 {
-    Q_UNUSED(mode);
-
     updateButtonStates();
 
     if (QAudio::ActiveState != state && QAudio::SuspendedState != state) {
@@ -73,13 +66,6 @@ void MainWidget::stateChanged(QAudio::Mode mode, QAudio::State state)
 void MainWidget::formatChanged(const QAudioFormat &format)
 {
    infoMessage(formatToString(format), NullMessageTimeout);
-
-#ifndef DISABLE_WAVEFORM
-    if (QAudioFormat() != format) {
-        m_waveform->initialize(format, WaveformTileLength,
-                               WaveformWindowDuration);
-    }
-#endif
 }
 
 void MainWidget::spectrumChanged(qint64 position, qint64 length,
@@ -118,11 +104,7 @@ void MainWidget::timerEvent(QTimerEvent *event)
 
 void MainWidget::audioPositionChanged(qint64 position)
 {
-#ifndef DISABLE_WAVEFORM
-    m_waveform->audioPositionChanged(position);
-#else
     Q_UNUSED(position)
-#endif
 }
 
 void MainWidget::bufferLengthChanged(qint64 length)
@@ -141,11 +123,8 @@ void MainWidget::showFileDialog()
     const QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open WAV file"), dir, "*.wav");
     if (fileNames.count()) {
         reset();
-        setMode(LoadFileMode);
         m_engine->loadFile(fileNames.front());
         updateButtonStates();
-    } else {
-        updateModeMenu();
     }
 }
 
@@ -156,6 +135,7 @@ void MainWidget::showSettingsDialog()
         m_engine->setAudioInputDevice(m_settingsDialog->inputDevice());
         m_engine->setAudioOutputDevice(m_settingsDialog->outputDevice());
         m_engine->setWindowFunction(m_settingsDialog->windowFunction());
+        m_engine->setInterval(m_settingsDialog->interval());
     }
 }
 
@@ -165,7 +145,7 @@ void MainWidget::showSettingsDialog()
 
 void MainWidget::createUi()
 {
-    createMenus();
+    //createMenus();
 
     setWindowTitle(tr("Spectrum Analyser"));
 
@@ -189,7 +169,7 @@ void MainWidget::createUi()
 
     const QSize buttonSize(30, 30);
 
-    m_modeButton->setText(tr("Mode"));
+    m_fileButton->setText(tr("File..."));
 
     m_pauseIcon = style()->standardIcon(QStyle::SP_MediaPause);
     m_pauseButton->setIcon(m_pauseIcon);
@@ -211,7 +191,7 @@ void MainWidget::createUi()
 
     QScopedPointer<QHBoxLayout> buttonPanelLayout(new QHBoxLayout);
     buttonPanelLayout->addStretch();
-    buttonPanelLayout->addWidget(m_modeButton);
+    buttonPanelLayout->addWidget(m_fileButton);
     buttonPanelLayout->addWidget(m_pauseButton);
     buttonPanelLayout->addWidget(m_playButton);
     buttonPanelLayout->addWidget(m_settingsButton);
@@ -239,11 +219,14 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_playButton, SIGNAL(clicked()),
             m_engine, SLOT(startPlayback()));
 
+    CHECKED_CONNECT(m_fileButton, SIGNAL(clicked()),
+            this, SLOT(showFileDialog()));
+
     CHECKED_CONNECT(m_settingsButton, SIGNAL(clicked()),
             this, SLOT(showSettingsDialog()));
 
-    CHECKED_CONNECT(m_engine, SIGNAL(stateChanged(QAudio::Mode,QAudio::State)),
-            this, SLOT(stateChanged(QAudio::Mode,QAudio::State)));
+    CHECKED_CONNECT(m_engine, SIGNAL(stateChanged(QAudio::State)),
+            this, SLOT(stateChanged(QAudio::State)));
 
     CHECKED_CONNECT(m_engine, SIGNAL(formatChanged(const QAudioFormat &)),
             this, SLOT(formatChanged(const QAudioFormat &)));
@@ -276,23 +259,8 @@ void MainWidget::connectUi()
 
     CHECKED_CONNECT(m_spectrograph, SIGNAL(infoMessage(QString, int)),
             this, SLOT(infoMessage(QString, int)));
-
-#ifndef DISABLE_WAVEFORM
-    CHECKED_CONNECT(m_engine, SIGNAL(bufferChanged(qint64, qint64, const QByteArray &)),
-            m_waveform, SLOT(bufferChanged(qint64, qint64, const QByteArray &)));
-#endif
 }
 
-void MainWidget::createMenus()
-{
-    m_modeButton->setMenu(m_modeMenu);
-
-    m_loadFileAction = m_modeMenu->addAction(tr("Play file"));
-
-    m_loadFileAction->setCheckable(true);
-
-    connect(m_loadFileAction, SIGNAL(triggered(bool)), this, SLOT(showFileDialog()));
-}
 
 void MainWidget::updateButtonStates()
 {
@@ -300,31 +268,15 @@ void MainWidget::updateButtonStates()
                                QAudio::IdleState == m_engine->state());
     m_pauseButton->setEnabled(pauseEnabled);
 
-    const bool playEnabled = (/*m_engine->dataLength() &&*/
-                              (QAudio::AudioOutput != m_engine->mode() ||
-                               (QAudio::ActiveState != m_engine->state() &&
-                                QAudio::IdleState != m_engine->state())));
+    const bool playEnabled = ( (QAudio::ActiveState != m_engine->state() &&
+                                QAudio::IdleState != m_engine->state()));
     m_playButton->setEnabled(playEnabled);
 }
 
 void MainWidget::reset()
 {
-#ifndef DISABLE_WAVEFORM
-    m_waveform->reset();
-#endif
     m_engine->reset();
     m_levelMeter->reset();
     m_spectrograph->reset();
     m_progressBar->reset();
-}
-
-void MainWidget::setMode(Mode mode)
-{
-    m_mode = mode;
-    updateModeMenu();
-}
-
-void MainWidget::updateModeMenu()
-{
-    m_loadFileAction->setChecked(LoadFileMode == m_mode);
 }

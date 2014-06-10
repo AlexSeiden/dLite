@@ -30,6 +30,7 @@ bool isPCM(const QAudioFormat &format);
 bool isPCMS16LE(const QAudioFormat &format);
 
 // Compile-time calculation of powers of two
+// WTF??? How does this work at compile time?
 
 template<int N> class PowerOfTwo
 { public: static const int Result = PowerOfTwo<N-1>::Result * 2; };
@@ -61,12 +62,6 @@ inline NullDebug nullDebug() { return NullDebug(); }
 #   define SPECTRUMANALYSER_DEBUG qDebug()
 #else
 #   define SPECTRUMANALYSER_DEBUG nullDebug()
-#endif
-
-#ifdef LOG_WAVEFORM
-#   define WAVEFORM_DEBUG qDebug()
-#else
-#   define WAVEFORM_DEBUG nullDebug()
 #endif
 
 #endif // UTILS_H

@@ -11,7 +11,6 @@ class LevelMeter;
 class ProgressBar;
 class SettingsDialog;
 class Spectrograph;
-class Waveform;
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -38,7 +37,7 @@ public:
     void timerEvent(QTimerEvent *event);
 
 public slots:
-    void stateChanged(QAudio::Mode mode, QAudio::State state);
+    void stateChanged(QAudio::State state);
     void formatChanged(const QAudioFormat &format);
     void spectrumChanged(qint64 position, qint64 length,
                          const FrequencySpectrum &spectrum);
@@ -50,7 +49,6 @@ public slots:
 private slots:
     void showFileDialog();
     void showSettingsDialog();
-    void updateModeMenu();
     void updateButtonStates();
 
 private:
@@ -59,26 +57,14 @@ private:
     void connectUi();
     void reset();
 
-    enum Mode {
-        NoMode,
-        LoadFileMode
-    };
-
-    void setMode(Mode mode);
-
 private:
-    Mode                    m_mode;
-
     Engine*                 m_engine;
 
-#ifndef DISABLE_WAVEFORM
-    Waveform*               m_waveform;
-#endif
     ProgressBar*            m_progressBar;
     Spectrograph*           m_spectrograph;
     LevelMeter*             m_levelMeter;
 
-    QPushButton*            m_modeButton;
+    QPushButton*            m_fileButton;
     QPushButton*            m_pauseButton;
     QIcon                   m_pauseIcon;
     QPushButton*            m_playButton;
@@ -99,7 +85,6 @@ private:
 
     SettingsDialog*         m_settingsDialog;
 
-    QMenu*                  m_modeMenu;
     QAction*                m_loadFileAction;
 };
 

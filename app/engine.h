@@ -47,8 +47,8 @@ public:
     const QList<QAudioDeviceInfo> &availableAudioOutputDevices() const
                                     { return m_availableAudioOutputDevices; }
 
-    QAudio::Mode mode() const { return m_mode; }
     QAudio::State state() const { return m_state; }
+    int interval() {return m_notifyIntervalMs;}
 
     /**
      * \return Current audio format
@@ -101,6 +101,11 @@ public:
      */
     void setWindowFunction(WindowFunction type);
 
+    /**
+     * Set update interval
+     */
+    void setInterval(int val) {m_notifyIntervalMs = val;}
+
 public slots:
     void startPlayback();
     void suspend();
@@ -108,7 +113,7 @@ public slots:
     void setAudioOutputDevice(const QAudioDeviceInfo &device);
 
 signals:
-    void stateChanged(QAudio::Mode mode, QAudio::State state);
+    void stateChanged(QAudio::State state);
 
     /**
      * Informational message for non-modal display
@@ -178,7 +183,6 @@ private:
     bool selectFormat();
     void stopPlayback();
     void setState(QAudio::State state);
-    void setState(QAudio::Mode mode, QAudio::State state);
     void setFormat(const QAudioFormat &format);
     void setPlayPosition(qint64 position, bool forceEmit = false);
     void calculateLevel(qint64 position, qint64 length);
@@ -195,11 +199,7 @@ private:
 #endif
 
 private:
-    QAudio::Mode        m_mode;
     QAudio::State       m_state;
-
-    bool                m_generateTone;
-    SweptTone           m_tone;
 
     WavFile*            m_file;
     // We need a second file handle via which to read data into m_buffer
@@ -228,12 +228,15 @@ private:
     qreal               m_rmsLevel;
     qreal               m_peakLevel;
 
-    int                 m_spectrumBufferLength;
+    int                 m_spectrumBufferLength;	// in bytes
     QByteArray          m_spectrumBuffer;
     SpectrumAnalyser    m_spectrumAnalyser;
     qint64              m_spectrumPosition;
 
     int                 m_count;
+
+    // Interval in millisecondd between calls that update the spectrum, etc.
+    int    				m_notifyIntervalMs;
 
 #ifdef DUMP_DATA
     QDir                m_outputDir;

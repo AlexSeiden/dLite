@@ -169,7 +169,10 @@ QPair<qreal, qreal> Spectrograph::barRange(int index) const
 
 void Spectrograph::updateBars()
 {
+    // init the vector of bars with empty bars
     m_bars.fill(Bar());
+
+    // loop over all frequencies in the spectrum, and set the value
     FrequencySpectrum::const_iterator i = m_spectrum.begin();
     const FrequencySpectrum::const_iterator end = m_spectrum.end();
     for ( ; i != end; ++i) {

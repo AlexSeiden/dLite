@@ -16,7 +16,6 @@ SOURCES  += main.cpp \
             spectrograph.cpp \
             spectrumanalyser.cpp \
             utils.cpp \
-            waveform.cpp \
             wavfile.cpp
 
 HEADERS  += engine.h \
@@ -29,7 +28,6 @@ HEADERS  += engine.h \
             spectrum.h \
             spectrumanalyser.h \
             utils.h \
-            waveform.h \
             wavfile.h
 
 fftreal_dir = ../3rdparty/fftreal
@@ -39,15 +37,13 @@ INCLUDEPATH += $${fftreal_dir}
 RESOURCES = spectrum.qrc
 
 # Dynamic linkage against FFTReal DLL
-!contains(DEFINES, DISABLE_FFT) {
-    macx {
+macx {
         # Link to fftreal framework
         LIBS += -F$${fftreal_dir}
         LIBS += -framework fftreal
-    } else {
+} else {
         LIBS += -L..$${spectrum_build_dir}
         LIBS += -lfftreal
-    }
 }
 
 target.path = $$[QT_INSTALL_EXAMPLES]/multimedia/spectrum
@@ -57,7 +53,6 @@ INSTALLS += target
 
 DESTDIR = ..$${spectrum_build_dir}
 macx {
-    !contains(DEFINES, DISABLE_FFT) {
         # Relocate fftreal.framework into spectrum.app bundle
         framework_dir = ../spectrum.app/Contents/Frameworks
         framework_name = fftreal.framework/Versions/1/fftreal
@@ -70,7 +65,6 @@ macx {
             install_name_tool -change $${framework_name} \
                                 @executable_path/../Frameworks/$${framework_name} \
                                 ../spectrum.app/Contents/MacOS/spectrum
-    }
 } else {
     linux-g++*: {
         # Provide relative path from application to fftreal library

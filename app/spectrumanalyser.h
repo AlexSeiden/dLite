@@ -5,18 +5,10 @@
 #include <QObject>
 #include <QVector>
 
-#ifdef DUMP_SPECTRUMANALYSER
-#include <QDir>
-#include <QFile>
-#include <QTextStream>
-#endif
-
 #include "frequencyspectrum.h"
 #include "spectrum.h"
 
-#ifndef DISABLE_FFT
 #include "FFTRealFixLenParam.h"
-#endif
 
 QT_FORWARD_DECLARE_CLASS(QAudioFormat)
 QT_FORWARD_DECLARE_CLASS(QThread)
@@ -32,6 +24,8 @@ class SpectrumAnalyserThreadPrivate;
 class SpectrumAnalyserThread : public QObject
 {
     Q_OBJECT
+
+    friend class SpectrumAnalyser;
 
 public:
     SpectrumAnalyserThread(QObject *parent);
@@ -50,19 +44,11 @@ private:
     void calculateWindow();
 
 private:
-#ifndef DISABLE_FFT
     FFTRealWrapper*                             m_fft;
-#endif
-
     const int                                   m_numSamples;
-
     WindowFunction                              m_windowFunction;
 
-#ifdef DISABLE_FFT
-    typedef qreal                               DataType;
-#else
     typedef FFTRealFixLenParam::DataType        DataType;
-#endif
     QVector<DataType>                           m_window;
 
     QVector<DataType>                           m_input;
@@ -86,10 +72,6 @@ class SpectrumAnalyser : public QObject
 public:
     SpectrumAnalyser(QObject *parent = 0);
     ~SpectrumAnalyser();
-
-#ifdef DUMP_SPECTRUMANALYSER
-    void setOutputPath(const QString &outputPath);
-#endif
 
 public:
     /*
@@ -143,13 +125,6 @@ private:
     };
 
     State              m_state;
-
-#ifdef DUMP_SPECTRUMANALYSER
-    QDir                m_outputDir;
-    int                 m_count;
-    QFile               m_textFile;
-    QTextStream         m_textStream;
-#endif
 };
 
 #endif // SPECTRUMANALYSER_H

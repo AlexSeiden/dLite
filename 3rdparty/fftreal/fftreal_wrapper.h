@@ -13,7 +13,7 @@ class FFTRealWrapperPrivate;
 
 // Each pass of the FFT processes 2^X samples, where X is the
 // number below.
-static const int FFTLengthPowerOfTwo = 8;
+static const int FFTLengthPowerOfTwo = 12;
 
 /**
  * Wrapper around the FFTRealFixLen template provided by the FFTReal

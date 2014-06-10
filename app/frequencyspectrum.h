@@ -16,24 +16,16 @@ public:
         :   frequency(0.0), amplitude(0.0), phase(0.0), clipped(false)
         { }
 
-        /**
-         * Frequency in Hertz
-         */
+        /* Frequency in Hertz */
         qreal frequency;
 
-        /**
-         * Amplitude in range [0.0, 1.0]
-         */
+        /* Amplitude in range [0.0, 1.0] */
         qreal amplitude;
 
-        /**
-         * Phase in range [0.0, 2*PI]
-         */
+        /* Phase in range [0.0, 2*PI] */
         qreal phase;
 
-        /**
-         * Indicates whether value has been clipped during spectrum analysis
-         */
+        /* Indicates whether value has been clipped during spectrum analysis */
         bool clipped;
     };
 
@@ -49,6 +41,8 @@ public:
     iterator end();
     const_iterator begin() const;
     const_iterator end() const;
+
+    void printSpectrum();
 
 private:
     QVector<Element> m_elements;
