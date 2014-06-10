@@ -23,9 +23,7 @@ class SettingsDialog : public QDialog
     Q_OBJECT
 
 public:
-    SettingsDialog(const QList<QAudioDeviceInfo> &availableInputDevices,
-                   const QList<QAudioDeviceInfo> &availableOutputDevices,
-                   int interval,
+    SettingsDialog(int interval,
                    QWidget *parent = 0);
     ~SettingsDialog();
 
@@ -45,11 +43,19 @@ private:
     QAudioDeviceInfo m_inputDevice;
     QAudioDeviceInfo m_outputDevice;
     int m_interval;
+    int      				m_spectrumNumBands;
+    int      				m_spectrumLow;
+    int      				m_spectrumHi;
 
     QComboBox *m_inputDeviceComboBox;
     QComboBox *m_outputDeviceComboBox;
     QComboBox *m_windowFunctionComboBox;
     QLineEdit *m_intervalLineEdit;
+
+    QSpinBox*				m_spectrumNumBandsSpinbox;
+    QSpinBox*				m_spectrumLowSpinbox;
+    QSpinBox*				m_spectrumHiSpinbox;
+
 };
 
 #endif // SETTINGSDIALOG_H

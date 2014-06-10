@@ -10,56 +10,22 @@
 #include <QVBoxLayout>
 #include <QLineEdit>
 
-SettingsDialog::SettingsDialog(
-            const QList<QAudioDeviceInfo> &availableInputDevices,
-            const QList<QAudioDeviceInfo> &availableOutputDevices,
-            int interval,
+SettingsDialog::SettingsDialog(int interval,
             QWidget *parent)
     :   QDialog(parent)
     ,   m_windowFunction(DefaultWindowFunction)
     ,   m_interval(interval)
-    ,   m_inputDeviceComboBox(new QComboBox(this))
-    ,   m_outputDeviceComboBox(new QComboBox(this))
     ,   m_windowFunctionComboBox(new QComboBox(this))
     ,   m_intervalLineEdit(new QLineEdit(this))
 {
     QVBoxLayout *dialogLayout = new QVBoxLayout(this);
 
     // Populate combo boxes
-
-    QAudioDeviceInfo device;
-    foreach (device, availableInputDevices)
-        m_inputDeviceComboBox->addItem(device.deviceName(),
-                                       QVariant::fromValue(device));
-    foreach (device, availableOutputDevices)
-        m_outputDeviceComboBox->addItem(device.deviceName(),
-                                       QVariant::fromValue(device));
-
     m_windowFunctionComboBox->addItem(tr("None"), QVariant::fromValue(int(NoWindow)));
     m_windowFunctionComboBox->addItem("Hann", QVariant::fromValue(int(HannWindow)));
     m_windowFunctionComboBox->setCurrentIndex(m_windowFunction);
 
-    // Initialize default devices
-    if (!availableInputDevices.empty())
-        m_inputDevice = availableInputDevices.front();
-    if (!availableOutputDevices.empty())
-        m_outputDevice = availableOutputDevices.front();
-
     // Add widgets to layout
-
-    QScopedPointer<QHBoxLayout> inputDeviceLayout(new QHBoxLayout);
-    QLabel *inputDeviceLabel = new QLabel(tr("Input device"), this);
-    inputDeviceLayout->addWidget(inputDeviceLabel);
-    inputDeviceLayout->addWidget(m_inputDeviceComboBox);
-    dialogLayout->addLayout(inputDeviceLayout.data());
-    inputDeviceLayout.take(); // ownership transferred to dialogLayout
-
-    QScopedPointer<QHBoxLayout> outputDeviceLayout(new QHBoxLayout);
-    QLabel *outputDeviceLabel = new QLabel(tr("Output device"), this);
-    outputDeviceLayout->addWidget(outputDeviceLabel);
-    outputDeviceLayout->addWidget(m_outputDeviceComboBox);
-    dialogLayout->addLayout(outputDeviceLayout.data());
-    outputDeviceLayout.take(); // ownership transferred to dialogLayout
 
     QScopedPointer<QHBoxLayout> windowFunctionLayout(new QHBoxLayout);
     QLabel *windowFunctionLabel = new QLabel(tr("Window function"), this);
@@ -78,10 +44,6 @@ SettingsDialog::SettingsDialog(
     intervalLayout.take(); // ownership transferred to dialogLayout
 
     // Connect
-    CHECKED_CONNECT(m_inputDeviceComboBox, SIGNAL(activated(int)),
-                    this, SLOT(inputDeviceChanged(int)));
-    CHECKED_CONNECT(m_outputDeviceComboBox, SIGNAL(activated(int)),
-                    this, SLOT(outputDeviceChanged(int)));
     CHECKED_CONNECT(m_windowFunctionComboBox, SIGNAL(activated(int)),
                     this, SLOT(windowFunctionChanged(int)));
     CHECKED_CONNECT(m_intervalLineEdit, SIGNAL(textChanged(QString)),

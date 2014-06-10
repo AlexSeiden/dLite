@@ -72,14 +72,6 @@ private:
     QPushButton*            m_settingsButton;
     QIcon                   m_settingsIcon;
 
-    QSpinBox*				m_spectrumNumBandsSpinbox;
-    int      				m_spectrumNumBands;
-    QSpinBox*				m_spectrumLowSpinbox;
-    int      				m_spectrumLow;
-    QSpinBox*				m_spectrumHiSpinbox;
-    int      				m_spectrumHi;
-
-
     QLabel*                 m_infoMessage;
     int                     m_infoMessageTimerId;
 

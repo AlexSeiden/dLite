@@ -31,8 +31,6 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_infoMessage(new QLabel(tr("Select a file to begin"), this))
     ,   m_infoMessageTimerId(NullTimerId)
     ,   m_settingsDialog(new SettingsDialog(
-            m_engine->availableAudioInputDevices(),
-            m_engine->availableAudioOutputDevices(),
             m_engine->interval(),
             this))
     ,   m_loadFileAction(0)
@@ -132,8 +130,8 @@ void MainWidget::showSettingsDialog()
 {
     m_settingsDialog->exec();
     if (m_settingsDialog->result() == QDialog::Accepted) {
-        m_engine->setAudioInputDevice(m_settingsDialog->inputDevice());
-        m_engine->setAudioOutputDevice(m_settingsDialog->outputDevice());
+        //m_engine->setAudioInputDevice(m_settingsDialog->inputDevice());
+        //m_engine->setAudioOutputDevice(m_settingsDialog->outputDevice());
         m_engine->setWindowFunction(m_settingsDialog->windowFunction());
         m_engine->setInterval(m_settingsDialog->interval());
     }
@@ -145,8 +143,6 @@ void MainWidget::showSettingsDialog()
 
 void MainWidget::createUi()
 {
-    //createMenus();
-
     setWindowTitle(tr("Spectrum Analyser"));
 
     QVBoxLayout *windowLayout = new QVBoxLayout(this);

@@ -10,6 +10,7 @@
 //-----------------------------------------------------------------------------
 
 // Number of audio samples used to calculate the frequency spectrum
+// Bizarre hacky way to find 2^FFTLength at compile time.
 const int    SpectrumLengthSamples  = PowerOfTwo<FFTLengthPowerOfTwo>::Result;
 
 // Number of bands in the frequency spectrum
@@ -23,13 +24,6 @@ const qreal  SpectrumHighFreq       = 1000.0; // Hz
 
 // Waveform window size in microseconds
 const qint64 WaveformWindowDuration = 100 * 1000;
-
-// Length of waveform tiles in bytes
-// Ideally, these would match the QAudio*::bufferSize(), but that isn't
-// available until some time after QAudio*::start() has been called, and we
-// need this value in order to initialize the waveform display.
-// We therefore just choose a sensible value.
-// const int   WaveformTileLength      = 4096;
 
 // Fudge factor used to calculate the spectrum bar heights
 const qreal SpectrumAnalyserMultiplier = 0.15;
@@ -63,10 +57,6 @@ const WindowFunction DefaultWindowFunction = HannWindow;
 #define CHECKED_CONNECT(source, signal, receiver, slot) \
     if (!connect(source, signal, receiver, slot)) \
         qt_assert_x(Q_FUNC_INFO, "CHECKED_CONNECT failed", __FILE__, __LINE__);
-
-// Handle some dependencies between macros defined in the .pro file
-
-#undef SUPERIMPOSE_PROGRESS_ON_WAVEFORM
 
 #endif // SPECTRUM_H
 

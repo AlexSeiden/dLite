@@ -41,12 +41,6 @@ public:
     explicit Engine(QObject *parent = 0);
     ~Engine();
 
-    const QList<QAudioDeviceInfo> &availableAudioInputDevices() const
-                                    { return m_availableAudioInputDevices; }
-
-    const QList<QAudioDeviceInfo> &availableAudioOutputDevices() const
-                                    { return m_availableAudioOutputDevices; }
-
     QAudio::State state() const { return m_state; }
     int interval() {return m_notifyIntervalMs;}
 
@@ -101,16 +95,15 @@ public:
      */
     void setWindowFunction(WindowFunction type);
 
-    /**
-     * Set update interval
-     */
-    void setInterval(int val) {m_notifyIntervalMs = val;}
 
 public slots:
     void startPlayback();
     void suspend();
-    void setAudioInputDevice(const QAudioDeviceInfo &device);
     void setAudioOutputDevice(const QAudioDeviceInfo &device);
+    /**
+     * Set update interval
+     */
+    void setInterval(int val);
 
 signals:
     void stateChanged(QAudio::State state);
@@ -174,7 +167,7 @@ signals:
 private slots:
     void audioNotify();
     void audioStateChanged(QAudio::State state);
-    void audioDataReady();
+    //void audioDataReady();
     void spectrumChanged(const FrequencySpectrum &spectrum);
 
 private:
@@ -208,12 +201,6 @@ private:
 
     QAudioFormat        m_format;
 
-    const QList<QAudioDeviceInfo> m_availableAudioInputDevices;
-    QAudioDeviceInfo    m_audioInputDevice;
-    QAudioInput*        m_audioInput;
-    QIODevice*          m_audioInputIODevice;
-
-    const QList<QAudioDeviceInfo> m_availableAudioOutputDevices;
     QAudioDeviceInfo    m_audioOutputDevice;
     QAudioOutput*       m_audioOutput;
     qint64              m_playPosition;
