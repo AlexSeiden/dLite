@@ -29,14 +29,15 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_pauseButton(new QPushButton(this))
     ,   m_playButton(new QPushButton(this))
     ,   m_settingsButton(new QPushButton(this))
-    ,   m_numBandsLineEdit(new QLineEdit(this))
+    ,   m_numBandsSpinBox(new QSpinBox(this))
+    ,   m_specMinSpinBox(new QSpinBox(this))
+    ,   m_specMaxSpinBox(new QSpinBox(this))
     ,   m_infoMessage(new QLabel(tr("Select a file to begin"), this))
     ,   m_infoMessageTimerId(NullTimerId)
-    ,   m_settingsDialog(new SettingsDialog(
-            m_engine->interval(), this))
+    ,   m_settingsDialog(new SettingsDialog(m_engine->interval(), this))
     ,   m_loadFileAction(0)
 {
-    m_spectrograph->setParams(SpectrumNumBands, SpectrumLowFreq, SpectrumHighFreq);
+    m_spectrograph->setParams(20, 10., 1000.);
 
     createUi();
     connectUi();
@@ -131,8 +132,6 @@ void MainWidget::showSettingsDialog()
 {
     m_settingsDialog->exec();
     if (m_settingsDialog->result() == QDialog::Accepted) {
-        //m_engine->setAudioInputDevice(m_settingsDialog->inputDevice());
-        //m_engine->setAudioOutputDevice(m_settingsDialog->outputDevice());
         m_engine->setWindowFunction(m_settingsDialog->windowFunction());
         m_engine->setInterval(m_settingsDialog->interval());
     }
@@ -204,18 +203,44 @@ void MainWidget::createUi()
 
 
     // Options layout
-    m_numBandsLineEdit->setValidator(new QIntValidator(m_numBandsLineEdit));
-    m_numBandsLineEdit->setText(QString::number(20));
     QLabel *numBandsLabel = new QLabel(tr("Number of Bands"), this);
-
+    m_numBandsSpinBox->setMinimum(3);
+    m_numBandsSpinBox->setMaximum(40);
+    m_numBandsSpinBox->setFixedWidth(50);
+    m_numBandsSpinBox->setValue(m_spectrograph->numBars());
     QScopedPointer<QHBoxLayout> numBandsLayout (new QHBoxLayout);
     numBandsLayout->addWidget(numBandsLabel);
-    numBandsLayout->addWidget(m_numBandsLineEdit);
+    numBandsLayout->addWidget(m_numBandsSpinBox);
+    numBandsLayout->addStretch();
+
+    QLabel *specMinLabel = new QLabel(tr("Min Freq"), this);
+    m_specMinSpinBox->setMinimum(0);
+    m_specMinSpinBox->setMaximum(20000);
+    m_specMinSpinBox->setFixedWidth(70);
+    m_specMinSpinBox->setValue(m_spectrograph->freqLo());
+    QScopedPointer<QHBoxLayout> specMinLayout (new QHBoxLayout);
+    specMinLayout->addWidget(specMinLabel);
+    specMinLayout->addWidget(m_specMinSpinBox);
+    specMinLayout->addStretch();
+
+    QLabel *specMaxLabel = new QLabel(tr("Max Freq"), this);
+    m_specMaxSpinBox->setMinimum(0);
+    m_specMaxSpinBox->setMaximum(20000);
+    m_specMaxSpinBox->setFixedWidth(70);
+    m_specMinSpinBox->setValue(m_spectrograph->freqHi());
+    QScopedPointer<QHBoxLayout> specMaxLayout (new QHBoxLayout);
+    specMaxLayout->addWidget(specMaxLabel);
+    specMaxLayout->addWidget(m_specMaxSpinBox);
+    specMaxLayout->addStretch();
 
     QScopedPointer<QHBoxLayout> optionsLayout(new QHBoxLayout);
-    //optionsLayout->addStretch();
     optionsLayout->addLayout(numBandsLayout.data());
-    numBandsLayout.take(); // ownership transferred to options layout
+    optionsLayout->addLayout(specMinLayout.data());
+    optionsLayout->addLayout(specMaxLayout.data());
+    numBandsLayout.take(); 			// ownership transferred to options layout
+    specMinLayout.take(); 			// ownership transferred to options layout
+    specMaxLayout.take(); 			// ownership transferred to options layout
+    //optionsLayout->addStretch();	// Fills empty space rather than stretching out sub-layouts.
 
     windowLayout->addLayout(optionsLayout.data());
     optionsLayout.take(); // ownership transferred to windowLayout
@@ -272,6 +297,15 @@ void MainWidget::connectUi()
 
     CHECKED_CONNECT(m_spectrograph, SIGNAL(infoMessage(QString, int)),
             this, SLOT(infoMessage(QString, int)));
+
+    CHECKED_CONNECT(m_numBandsSpinBox, SIGNAL(valueChanged(int)),
+            m_spectrograph, SLOT(setNumBars(int)));
+
+    CHECKED_CONNECT(m_specMinSpinBox, SIGNAL(valueChanged(int)),
+            m_spectrograph, SLOT(setFreqLo(int)));
+
+    CHECKED_CONNECT(m_specMaxSpinBox, SIGNAL(valueChanged(int)),
+            m_spectrograph, SLOT(setFreqHi(int)));
 }
 
 

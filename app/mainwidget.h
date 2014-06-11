@@ -5,6 +5,7 @@
 #include <QIcon>
 #include <QWidget>
 #include <QIntValidator>
+#include <QSpinBox>
 
 class Engine;
 class FrequencySpectrum;
@@ -74,7 +75,9 @@ private:
     QPushButton*            m_settingsButton;
     QIcon                   m_settingsIcon;
 
-    QLineEdit *				m_numBandsLineEdit;
+    QSpinBox *				m_numBandsSpinBox;
+    QSpinBox *				m_specMinSpinBox;
+    QSpinBox *				m_specMaxSpinBox;
 
     QLabel*                 m_infoMessage;
     int                     m_infoMessageTimerId;
@@ -82,7 +85,6 @@ private:
     SettingsDialog*         m_settingsDialog;
 
     QAction*                m_loadFileAction;
-    int						m_numBands; // TODO move to engine
 };
 
 #endif // MAINWIDGET_H

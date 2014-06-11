@@ -6,10 +6,11 @@
 
 const int NullTimerId = -1;
 const int NullIndex = -1;
-const int BarSelectionInterval = 2000;
+const int BarSelectionInterval = 2000; // Duration a bar remains selected, in ms
 
 Spectrograph::Spectrograph(QWidget *parent)
     :   QWidget(parent)
+    ,   m_numBars(20)
     ,   m_barSelected(NullIndex)
     ,   m_timerId(NullTimerId)
     ,   m_lowFreq(0.0)
@@ -33,6 +34,28 @@ void Spectrograph::setParams(int numBars, qreal lowFreq, qreal highFreq)
     updateBars();
 }
 
+void Spectrograph::setNumBars(int numBars)
+{
+    Q_ASSERT(numBars > 0);
+    m_bars.resize(numBars);
+    updateBars();
+}
+
+void Spectrograph::setFreqLo(int val)
+{
+    m_lowFreq = val; // Note implicit cast of int val to qreal m_lowFreq
+    // TODO verify lo<hi
+    updateBars();
+}
+
+void Spectrograph::setFreqHi(int val)
+{
+    m_highFreq = val; // Note implicit cast of int val to qreal m_highFreq
+    // TODO verify lo<hi
+    updateBars();
+}
+
+// Clear selected bar after timer expires
 void Spectrograph::timerEvent(QTimerEvent *event)
 {
     Q_ASSERT(event->timerId() == m_timerId);
@@ -175,13 +198,33 @@ void Spectrograph::updateBars()
     // loop over all frequencies in the spectrum, and set the value
     FrequencySpectrum::const_iterator i = m_spectrum.begin();
     const FrequencySpectrum::const_iterator end = m_spectrum.end();
+    std::vector<int> sampleCount(m_numBars);
+    int barindex;
     for ( ; i != end; ++i) {
         const FrequencySpectrum::Element e = *i;
         if (e.frequency >= m_lowFreq && e.frequency < m_highFreq) {
-            Bar &bar = m_bars[barIndex(e.frequency)];
+            barindex = barIndex(e.frequency);
+            Bar &bar = m_bars[barindex];
+            // GAHHH SETS MAX VALUE FOR FREQS NOT TOTAL
+#if 0
             bar.value = qMax(bar.value, e.amplitude);
+#else
+            bar.value += e.amplitude;
+            sampleCount[barindex]++;
+#endif
             bar.clipped |= e.clipped;
         }
+    }
+
+    for (int barindex = 0; barindex < m_numBars; ++barindex) {
+        Bar &bar = m_bars[barindex];
+        if (sampleCount[barindex] > 0)
+            bar.value /= sampleCount[barindex];
+        if (bar.value > 1.0) {
+            bar.value = 1.0;
+            bar.clipped = true;
+        }
+
     }
     update();
 }

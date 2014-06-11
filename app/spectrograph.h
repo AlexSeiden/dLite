@@ -26,12 +26,19 @@ public:
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
 
+    int numBars() { return m_numBars; }
+    qreal freqLo() { return m_lowFreq; }
+    qreal freqHi() { return m_highFreq; }
+
 signals:
     void infoMessage(const QString &message, int intervalMs);
 
 public slots:
     void reset();
     void spectrumChanged(const FrequencySpectrum &spectrum);
+    void setNumBars(int numBars);
+    void setFreqLo(int val);
+    void setFreqHi(int val);
 
 private:
     int barIndex(qreal frequency) const;
@@ -42,11 +49,13 @@ private:
 
 private:
     struct Bar {
-        Bar() : value(0.0), clipped(false) { }
+        Bar() : value(0.0), nsamples(0), clipped(false) { }
         qreal   value;
+        int   	nsamples;
         bool    clipped;
     };
 
+    int	        		m_numBars;
     QVector<Bar>        m_bars;
     int                 m_barSelected;
     int                 m_timerId;
