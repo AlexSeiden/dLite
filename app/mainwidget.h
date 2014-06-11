@@ -4,6 +4,7 @@
 #include <QAudio>
 #include <QIcon>
 #include <QWidget>
+#include <QIntValidator>
 
 class Engine;
 class FrequencySpectrum;
@@ -19,6 +20,7 @@ class QLabel;
 class QMenu;
 class QPushButton;
 class QSpinBox;
+class QLineEdit;
 QT_END_NAMESPACE
 
 /**
@@ -72,12 +74,15 @@ private:
     QPushButton*            m_settingsButton;
     QIcon                   m_settingsIcon;
 
+    QLineEdit *				m_numBandsLineEdit;
+
     QLabel*                 m_infoMessage;
     int                     m_infoMessageTimerId;
 
     SettingsDialog*         m_settingsDialog;
 
     QAction*                m_loadFileAction;
+    int						m_numBands; // TODO move to engine
 };
 
 #endif // MAINWIDGET_H

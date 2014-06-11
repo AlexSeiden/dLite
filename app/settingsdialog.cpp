@@ -1,4 +1,3 @@
-
 #include "settingsdialog.h"
 #include <QCheckBox>
 #include <QComboBox>
@@ -63,10 +62,7 @@ SettingsDialog::SettingsDialog(int interval,
     setLayout(dialogLayout);
 }
 
-SettingsDialog::~SettingsDialog()
-{
-
-}
+SettingsDialog::~SettingsDialog() { }
 
 void SettingsDialog::windowFunctionChanged(int index)
 {

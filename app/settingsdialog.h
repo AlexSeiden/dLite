@@ -52,9 +52,11 @@ private:
     QComboBox *m_windowFunctionComboBox;
     QLineEdit *m_intervalLineEdit;
 
+#if 0
     QSpinBox*				m_spectrumNumBandsSpinbox;
     QSpinBox*				m_spectrumLowSpinbox;
     QSpinBox*				m_spectrumHiSpinbox;
+#endif
 
 };
 

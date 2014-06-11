@@ -8,6 +8,7 @@
 
 #include <QLabel>
 #include <QPushButton>
+#include <QLineEdit>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QStyle>
@@ -28,11 +29,11 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_pauseButton(new QPushButton(this))
     ,   m_playButton(new QPushButton(this))
     ,   m_settingsButton(new QPushButton(this))
+    ,   m_numBandsLineEdit(new QLineEdit(this))
     ,   m_infoMessage(new QLabel(tr("Select a file to begin"), this))
     ,   m_infoMessageTimerId(NullTimerId)
     ,   m_settingsDialog(new SettingsDialog(
-            m_engine->interval(),
-            this))
+            m_engine->interval(), this))
     ,   m_loadFileAction(0)
 {
     m_spectrograph->setParams(SpectrumNumBands, SpectrumLowFreq, SpectrumHighFreq);
@@ -162,7 +163,6 @@ void MainWidget::createUi()
     analysisLayout.take();
 
     // Button panel
-
     const QSize buttonSize(30, 30);
 
     m_fileButton->setText(tr("File..."));
@@ -202,8 +202,25 @@ void MainWidget::createUi()
     windowLayout->addLayout(bottomPaneLayout.data());
     bottomPaneLayout.take(); // ownership transferred to windowLayout
 
-    // Apply layout
 
+    // Options layout
+    m_numBandsLineEdit->setValidator(new QIntValidator(m_numBandsLineEdit));
+    m_numBandsLineEdit->setText(QString::number(20));
+    QLabel *numBandsLabel = new QLabel(tr("Number of Bands"), this);
+
+    QScopedPointer<QHBoxLayout> numBandsLayout (new QHBoxLayout);
+    numBandsLayout->addWidget(numBandsLabel);
+    numBandsLayout->addWidget(m_numBandsLineEdit);
+
+    QScopedPointer<QHBoxLayout> optionsLayout(new QHBoxLayout);
+    //optionsLayout->addStretch();
+    optionsLayout->addLayout(numBandsLayout.data());
+    numBandsLayout.take(); // ownership transferred to options layout
+
+    windowLayout->addLayout(optionsLayout.data());
+    optionsLayout.take(); // ownership transferred to windowLayout
+
+    // Apply layout
     setLayout(windowLayout);
 }
 
