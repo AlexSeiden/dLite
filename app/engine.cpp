@@ -72,6 +72,7 @@ Engine::~Engine()
 
 bool Engine::loadFile(const QString &fileName)
 {
+    ENGINE_DEBUG << fileName;
     reset();
     bool result = false;
     Q_ASSERT(!m_file);
@@ -145,15 +146,6 @@ void Engine::suspend()
     }
 }
 
-void Engine::setAudioOutputDevice(const QAudioDeviceInfo &device)
-{
-    if (device.deviceName() != m_audioOutputDevice.deviceName()) {
-        m_audioOutputDevice = device;
-        initialize();
-    }
-}
-
-
 //-----------------------------------------------------------------------------
 // Private slots
 //-----------------------------------------------------------------------------
@@ -201,7 +193,11 @@ void Engine::audioNotify()
     if (spectrumPosition >= 0 && spectrumPosition + m_spectrumBufferLength < m_bufferPosition + m_dataLength)
         calculateSpectrum(spectrumPosition);
     else
-        ENGINE_DEBUG << "Engine::audioNotify [3]" << "buffer confusion";
+        // This seems to happen at the beginning of a song, where there isn't enough buffer to backwards to play
+        ENGINE_DEBUG << "Engine::audioNotify [3]" << "buffer confusion" << "spectrumPosition:" << spectrumPosition
+                        << "m_spectrumBufferLength "<< m_spectrumBufferLength
+                        << "m_bufferPosition "<< m_bufferPosition
+                        << "m_dataLength "<< m_dataLength;
 }
 
 void Engine::audioStateChanged(QAudio::State state)
@@ -225,25 +221,6 @@ void Engine::audioStateChanged(QAudio::State state)
         setState(state);
     }
 }
-
-#if 0
-void Engine::audioDataReady()
-{
-    Q_ASSERT(0 == m_bufferPosition);
-    const qint64 bytesReady = m_audioInput->bytesReady();
-    const qint64 bytesSpace = m_buffer.size() - m_dataLength;
-    const qint64 bytesToRead = qMin(bytesReady, bytesSpace);
-
-    const qint64 bytesRead = m_audioInputIODevice->read(
-                                       m_buffer.data() + m_dataLength,
-                                       bytesToRead);
-
-    if (bytesRead) {
-        m_dataLength += bytesRead;
-        emit dataLengthChanged(dataLength());
-    }
-}
-#endif
 
 void Engine::spectrumChanged(const FrequencySpectrum &spectrum)
 {
@@ -424,6 +401,9 @@ void Engine::setLevel(qreal rmsLevel, qreal peakLevel, int numSamples)
     emit levelChanged(m_rmsLevel, m_peakLevel, numSamples);
 }
 
+/**
+ * Sets interval at which spectrum is updated.
+ */
 void Engine::setInterval(int val)
 {
     m_notifyIntervalMs = val;

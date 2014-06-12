@@ -51,8 +51,16 @@ FrequencySpectrum::const_iterator FrequencySpectrum::end() const
 
 void FrequencySpectrum::printSpectrum()
 {
-    qDebug() << "FrequencySpectrum::print num elements:"
+    qDebug() << "FrequencySpectrum::print\n num elements:"
                            << m_elements.count();
 
+    // loop over all frequencies in the spectrum, and set the value
+    FrequencySpectrum::const_iterator i = this->begin();
+    const FrequencySpectrum::const_iterator end = this->end();
+    for ( int index=0; i != end; ++i, ++index) {
+        const FrequencySpectrum::Element e = *i;
+        qDebug() << "index"<<index << "freq" <<e.frequency << "amp" <<e.amplitude
+                 << "phase" <<e.phase << "clipped" << e.clipped;
 
+    }
 }

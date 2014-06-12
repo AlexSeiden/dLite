@@ -74,6 +74,7 @@ private:
     QIcon                   m_playIcon;
     QPushButton*            m_settingsButton;
     QIcon                   m_settingsIcon;
+    QPushButton*            m_printSpectrum;
 
     QSpinBox *				m_numBandsSpinBox;
     QSpinBox *				m_specMinSpinBox;

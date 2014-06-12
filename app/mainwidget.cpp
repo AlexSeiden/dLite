@@ -29,6 +29,7 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_pauseButton(new QPushButton(this))
     ,   m_playButton(new QPushButton(this))
     ,   m_settingsButton(new QPushButton(this))
+    ,   m_printSpectrum(new QPushButton(this))
     ,   m_numBandsSpinBox(new QSpinBox(this))
     ,   m_specMinSpinBox(new QSpinBox(this))
     ,   m_specMaxSpinBox(new QSpinBox(this))
@@ -41,6 +42,8 @@ MainWidget::MainWidget(QWidget *parent)
 
     createUi();
     connectUi();
+
+    m_engine->loadFile(QString("/Users/alex/Documents/lights/Jam On It/Jam On It.wav"));
 }
 
 MainWidget::~MainWidget()
@@ -165,6 +168,7 @@ void MainWidget::createUi()
     const QSize buttonSize(30, 30);
 
     m_fileButton->setText(tr("File..."));
+    m_printSpectrum->setText(tr("print spectrum"));
 
     m_pauseIcon = style()->standardIcon(QStyle::SP_MediaPause);
     m_pauseButton->setIcon(m_pauseIcon);
@@ -190,6 +194,7 @@ void MainWidget::createUi()
     buttonPanelLayout->addWidget(m_pauseButton);
     buttonPanelLayout->addWidget(m_playButton);
     buttonPanelLayout->addWidget(m_settingsButton);
+    buttonPanelLayout->addWidget(m_printSpectrum);
 
     QWidget *buttonPanel = new QWidget(this);
     buttonPanel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -227,7 +232,7 @@ void MainWidget::createUi()
     m_specMaxSpinBox->setMinimum(0);
     m_specMaxSpinBox->setMaximum(20000);
     m_specMaxSpinBox->setFixedWidth(70);
-    m_specMinSpinBox->setValue(m_spectrograph->freqHi());
+    m_specMaxSpinBox->setValue(m_spectrograph->freqHi());
     QScopedPointer<QHBoxLayout> specMaxLayout (new QHBoxLayout);
     specMaxLayout->addWidget(specMaxLabel);
     specMaxLayout->addWidget(m_specMaxSpinBox);
@@ -251,6 +256,9 @@ void MainWidget::createUi()
 
 void MainWidget::connectUi()
 {
+    CHECKED_CONNECT(m_printSpectrum, SIGNAL(clicked()),
+            m_spectrograph, SLOT(printSpectrum()));
+
     CHECKED_CONNECT(m_pauseButton, SIGNAL(clicked()),
             m_engine, SLOT(suspend()));
 

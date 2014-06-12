@@ -16,7 +16,7 @@ SpectrumAnalyserThread::SpectrumAnalyserThread(QObject *parent)
     ,   m_window(SpectrumLengthSamples, 0.0)
     ,   m_input(SpectrumLengthSamples, 0.0)
     ,   m_output(SpectrumLengthSamples, 0.0)
-    ,   m_spectrum(SpectrumLengthSamples)
+    ,   m_spectrum(SpectrumLengthSamples) // This allocates ~2x more samples than needed
 #ifdef SPECTRUM_ANALYSER_SEPARATE_THREAD
     ,   m_thread(new QThread(this))
 #endif
@@ -96,14 +96,18 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
         m_spectrum[i].frequency = qreal(i * inputFrequency) / (m_numSamples);
 
         const qreal real = m_output[i];
-        qreal imag = m_output[m_numSamples/2 + i];
+        qreal imag = 0.0;
+        if (i>0 && i<m_numSamples/2)
+            imag = m_output[m_numSamples/2 + i];
 
         const qreal magnitude = sqrt(real*real + imag*imag);
         qreal amplitude = SpectrumAnalyserMultiplier * log(magnitude);
+        // log(magnitude) can be < 0
 
         // Bound amplitude to [0.0, 1.0]
         m_spectrum[i].clipped = (amplitude > 1.0);
         amplitude = qMax(qreal(0.0), amplitude);
+
         amplitude = qMin(qreal(1.0), amplitude);
         m_spectrum[i].amplitude = amplitude;
     }

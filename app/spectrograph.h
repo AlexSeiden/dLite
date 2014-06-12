@@ -39,9 +39,12 @@ public slots:
     void setNumBars(int numBars);
     void setFreqLo(int val);
     void setFreqHi(int val);
+    void printSpectrum();
 
 private:
     int barIndex(qreal frequency) const;
+    int barIndexLog(qreal frequency) const;
+    int barIndex(qreal frequency, bool logspace) const;
     QPair<qreal, qreal> barRange(int barIndex) const;
     void updateBars();
 
@@ -55,13 +58,14 @@ private:
         bool    clipped;
     };
 
-    int	        		m_numBars;
+    int	        		m_numBars; // TODO remove this and just use m_bars.count()
     QVector<Bar>        m_bars;
     int                 m_barSelected;
     int                 m_timerId;
     qreal               m_lowFreq;
     qreal               m_highFreq;
     FrequencySpectrum   m_spectrum;
+    bool   				m_printspectrum;
 };
 
 #endif // SPECTROGRAPH_H

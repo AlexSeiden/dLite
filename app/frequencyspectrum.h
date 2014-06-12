@@ -6,6 +6,7 @@
 /**
  * Represents a frequency spectrum as a series of elements, each of which
  * consists of a frequency, an amplitude and a phase.
+ * This is what is returned by the FFT.
  */
 class FrequencySpectrum {
 public:

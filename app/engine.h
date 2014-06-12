@@ -99,7 +99,6 @@ public:
 public slots:
     void startPlayback();
     void suspend();
-    void setAudioOutputDevice(const QAudioDeviceInfo &device);
     /**
      * Set update interval
      */
@@ -167,7 +166,6 @@ signals:
 private slots:
     void audioNotify();
     void audioStateChanged(QAudio::State state);
-    //void audioDataReady();
     void spectrumChanged(const FrequencySpectrum &spectrum);
 
 private:
