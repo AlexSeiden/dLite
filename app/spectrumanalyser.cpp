@@ -41,6 +41,10 @@ void SpectrumAnalyserThread::setWindowFunction(WindowFunction type)
     calculateWindow();
 }
 
+/*
+ * Pre-calculates a weighting window to convolve with the audio
+ * samples prior to fft.
+ */
 void SpectrumAnalyserThread::calculateWindow()
 {
     for (int i=0; i<m_numSamples; ++i) {
@@ -62,7 +66,7 @@ void SpectrumAnalyserThread::calculateWindow()
 }
 
 void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
-                                                int inputFrequency,
+                                                int inputFrequency,	// Samples rate of audio data
                                                 int bytesPerSample)
 {
     Q_ASSERT(buffer.size() == m_numSamples * bytesPerSample);
@@ -86,14 +90,13 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
     m_fft->calculateFFT(m_output.data(), m_input.data());
 
     // Analyze output to obtain amplitude and phase for each frequency
+    // ACTUALLY, phase is skipped
     for (int i=2; i<=m_numSamples/2; ++i) {
         // Calculate frequency of this complex sample
         m_spectrum[i].frequency = qreal(i * inputFrequency) / (m_numSamples);
 
         const qreal real = m_output[i];
-        qreal imag = 0.0;
-        if (i>0 && i<m_numSamples/2)
-            imag = m_output[m_numSamples/2 + i];
+        qreal imag = m_output[m_numSamples/2 + i];
 
         const qreal magnitude = sqrt(real*real + imag*imag);
         qreal amplitude = SpectrumAnalyserMultiplier * log(magnitude);
