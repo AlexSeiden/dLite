@@ -43,9 +43,11 @@ public slots:
 
 private:
     int barIndex(qreal frequency) const;
-    int barIndexLog(qreal frequency) const;
     int barIndex(qreal frequency, bool logspace) const;
+    int barIndexLog(qreal frequency) const;
     QPair<qreal, qreal> barRange(int barIndex) const;
+    QPair<qreal, qreal> barRange(int barIndex, bool logspace) const;
+    QPair<qreal, qreal> barRangeLog(int barIndex) const;
     void updateBars();
 
     void selectBar(int index);

@@ -38,11 +38,14 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_settingsDialog(new SettingsDialog(m_engine->interval(), this))
     ,   m_loadFileAction(0)
 {
+    // numBands, lowfreq, hifreq.
+    // TODO move somewhere else....
     m_spectrograph->setParams(20, 10., 1000.);
 
     createUi();
     connectUi();
 
+    // TODO default to last played.
     m_engine->loadFile(QString("/Users/alex/Documents/lights/Jam On It/Jam On It.wav"));
 }
 
@@ -230,7 +233,7 @@ void MainWidget::createUi()
 
     QLabel *specMaxLabel = new QLabel(tr("Max Freq"), this);
     m_specMaxSpinBox->setMinimum(0);
-    m_specMaxSpinBox->setMaximum(20000);
+    m_specMaxSpinBox->setMaximum(40000);
     m_specMaxSpinBox->setFixedWidth(70);
     m_specMaxSpinBox->setValue(m_spectrograph->freqHi());
     QScopedPointer<QHBoxLayout> specMaxLayout (new QHBoxLayout);
