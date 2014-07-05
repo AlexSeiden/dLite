@@ -36,7 +36,6 @@ public slots:
     void calculateSpectrum(const QByteArray &buffer,
                            int inputFrequency,
                            int bytesPerSample);
-
 signals:
     void calculationComplete(const FrequencySpectrum &spectrum);
 
@@ -48,13 +47,14 @@ private:
     const int                                   m_numSamples;
     WindowFunction                              m_windowFunction;
 
-    typedef FFTRealFixLenParam::DataType        DataType;
+    typedef FFTRealFixLenParam::DataType DataType;
     QVector<DataType>                           m_window;
 
     QVector<DataType>                           m_input;
     QVector<DataType>                           m_output;
 
     FrequencySpectrum                           m_spectrum;
+
 
 #ifdef SPECTRUM_ANALYSER_SEPARATE_THREAD
     QThread*                                    m_thread;

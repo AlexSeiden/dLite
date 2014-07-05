@@ -41,6 +41,17 @@ void SpectrumAnalyserThread::setWindowFunction(WindowFunction type)
     calculateWindow();
 }
 
+#if 0
+void SpectrumAnalyserThread::setSubrange(qreal minFreq, qreal maxFreq, qreal minAmp, qreal maxAmp)
+{
+    minfreq = minFreq;
+    maxfreq = maxFreq;
+    minamp = minAmp;
+    maxamp = maxAmp;
+    subrangeMetering = true;
+}
+#endif
+
 /*
  * Pre-calculates a weighting window to convolve with the audio
  * samples prior to fft.
@@ -89,8 +100,7 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
     // Calculate the FFT
     m_fft->calculateFFT(m_output.data(), m_input.data());
 
-    // Analyze output to obtain amplitude and phase for each frequency
-    // ACTUALLY, phase is skipped
+    // Analyze output to obtain amplitude for each frequency
     for (int i=2; i<=m_numSamples/2; ++i) {
         // Calculate frequency of this complex sample
         m_spectrum[i].frequency = qreal(i * inputFrequency) / (m_numSamples);
@@ -101,8 +111,10 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
             imag = m_output[m_numSamples/2 + i];
 
         const qreal magnitude = sqrt(real*real + imag*imag);
+        // Note that this is log here, but linear in the level meter  TODO
         qreal amplitude = SpectrumAnalyserMultiplier * log(magnitude);
-        // log(magnitude) can be < 0
+        // log(magnitude) can be < 0.
+        // XXX so why are we clamping amplitude to 0??
 
         // Bound amplitude to [0.0, 1.0]
         m_spectrum[i].clipped = (amplitude > 1.0);
@@ -110,6 +122,7 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
 
         amplitude = qMin(qreal(1.0), amplitude);
         m_spectrum[i].amplitude = amplitude;
+
     }
 
     emit calculationComplete(m_spectrum);

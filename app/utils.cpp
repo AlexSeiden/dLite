@@ -90,6 +90,7 @@ const quint16 PCMS16MaxAmplitude =  32768; // because minimum is -32768
 
 qreal pcmToReal(qint16 pcm)
 {
+    // Note this is linear
     return qreal(pcm) / PCMS16MaxAmplitude;
 }
 

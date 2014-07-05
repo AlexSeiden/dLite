@@ -73,6 +73,8 @@ private:
     QColor m_rmsColor;
     QColor m_peakColor;
 
+    const int 		m_RedrawInterval; 			// ms
+    const int 		m_PeakHoldLevelDuration; 	// ms
 };
 
 #endif // LEVELMETER_H

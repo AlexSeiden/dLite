@@ -4,6 +4,7 @@
 #include "frequencyspectrum.h"
 
 #include <QWidget>
+#include <QRubberBand>
 
 /**
  * Widget which displays a spectrograph showing the frequency spectrum
@@ -25,13 +26,16 @@ public:
     // QWidget
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 
-    int numBars() { return m_numBars; }
+    int numBars() { return m_bars.count(); }
     qreal freqLo() { return m_lowFreq; }
     qreal freqHi() { return m_highFreq; }
 
 signals:
     void infoMessage(const QString &message, int intervalMs);
+    void subrangeLevelChanged(const qreal rmsval, const qreal peakval, int numsamples);
 
 public slots:
     void reset();
@@ -49,6 +53,7 @@ private:
     QPair<qreal, qreal> barRange(int barIndex, bool logspace) const;
     QPair<qreal, qreal> barRangeLog(int barIndex) const;
     void updateBars();
+    qreal frac2freq(qreal frac) const;
 
     void selectBar(int index);
 
@@ -60,7 +65,6 @@ private:
         bool    clipped;
     };
 
-    int	        		m_numBars; // TODO remove this and just use m_bars.count()
     QVector<Bar>        m_bars;
     int                 m_barSelected;
     int                 m_timerId;
@@ -68,6 +72,12 @@ private:
     qreal               m_highFreq;
     FrequencySpectrum   m_spectrum;
     bool   				m_printspectrum;
+    bool   				m_isDragging;
+    QPoint				m_dragStart;
+    QRubberBand*		m_rubberBand;
+    bool				subrangeMetering;
+    qreal				subrangeMinfreq, subrangeMaxfreq, subrangeMinamp, subrangeMaxamp;
+
 };
 
 #endif // SPECTROGRAPH_H

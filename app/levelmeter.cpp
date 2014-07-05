@@ -7,29 +7,24 @@
 #include <QTimer>
 #include <QDebug>
 
-
-// Constants
-const int RedrawInterval = 100; // ms
-const qreal PeakDecayRate = 0.001;
-const int PeakHoldLevelDuration = 2000; // ms
-
-
 LevelMeter::LevelMeter(QWidget *parent)
     :   QWidget(parent)
     ,   m_rmsLevel(0.0)
     ,   m_peakLevel(0.0)
     ,   m_decayedPeakLevel(0.0)
-    ,   m_peakDecayRate(PeakDecayRate)
+    ,   m_peakDecayRate(.001)
     ,   m_peakHoldLevel(0.0)
     ,   m_redrawTimer(new QTimer(this))
     ,   m_rmsColor(Qt::red)
     ,   m_peakColor(255, 200, 200, 255)
+    ,   m_RedrawInterval(100)
+    ,   m_PeakHoldLevelDuration(2000)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     setMinimumWidth(30);
 
     connect(m_redrawTimer, SIGNAL(timeout()), this, SLOT(redrawTimerExpired()));
-    m_redrawTimer->start(RedrawInterval);
+    m_redrawTimer->start(m_RedrawInterval);
 }
 
 LevelMeter::~LevelMeter()
@@ -75,7 +70,7 @@ void LevelMeter::redrawTimerExpired()
         m_decayedPeakLevel = 0.0;
 
     // Check whether to clear the peak hold level
-    if (m_peakHoldLevelChanged.elapsed() > PeakHoldLevelDuration)
+    if (m_peakHoldLevelChanged.elapsed() > m_PeakHoldLevelDuration)
         m_peakHoldLevel = 0.0;
 
     update();

@@ -66,6 +66,7 @@ private:
     ProgressBar*            m_progressBar;
     Spectrograph*           m_spectrograph;
     LevelMeter*             m_levelMeter;
+    LevelMeter*             m_subrangeLevelMeter;
 
     QPushButton*            m_fileButton;
     QPushButton*            m_pauseButton;

@@ -25,6 +25,7 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_progressBar(new ProgressBar(this))
     ,   m_spectrograph(new Spectrograph(this))
     ,   m_levelMeter(new LevelMeter(this))
+    ,   m_subrangeLevelMeter(new LevelMeter(this))
     ,   m_fileButton(new QPushButton(this))
     ,   m_pauseButton(new QPushButton(this))
     ,   m_playButton(new QPushButton(this))
@@ -40,7 +41,7 @@ MainWidget::MainWidget(QWidget *parent)
 {
     // numBands, lowfreq, hifreq.
     // TODO move somewhere else....
-    m_spectrograph->setParams(20, 10., 1000.);
+    m_spectrograph->setParams(20, 20., 10000.);
 
     createUi();
     connectUi();
@@ -160,10 +161,10 @@ void MainWidget::createUi()
     windowLayout->addWidget(m_progressBar);
 
     // Spectrograph and level meter
-
     QScopedPointer<QHBoxLayout> analysisLayout(new QHBoxLayout);
     analysisLayout->addWidget(m_spectrograph);
     analysisLayout->addWidget(m_levelMeter);
+    analysisLayout->addWidget(m_subrangeLevelMeter);
     windowLayout->addLayout(analysisLayout.data());
     analysisLayout.take();
 
@@ -297,6 +298,9 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_engine, SIGNAL(levelChanged(qreal, qreal, int)),
             m_levelMeter, SLOT(levelChanged(qreal, qreal, int)));
 
+    CHECKED_CONNECT(m_spectrograph, SIGNAL(subrangeLevelChanged(qreal, qreal, int)),
+            m_subrangeLevelMeter, SLOT(levelChanged(qreal, qreal, int)));
+
     CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
             this, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
 
@@ -312,6 +316,9 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_numBandsSpinBox, SIGNAL(valueChanged(int)),
             m_spectrograph, SLOT(setNumBars(int)));
 
+    // TODO these should only signal when enter is hit or something.
+    // probably shouldn't be spinboxes, or perhaps should increment
+    // geometrically.
     CHECKED_CONNECT(m_specMinSpinBox, SIGNAL(valueChanged(int)),
             m_spectrograph, SLOT(setFreqLo(int)));
 
