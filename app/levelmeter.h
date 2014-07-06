@@ -18,6 +18,7 @@ public:
     ~LevelMeter();
 
     void paintEvent(QPaintEvent *event);
+    void setPeakDecayRate(qreal rate) {m_peakDecayRate = rate;}
 
 public slots:
     void reset();

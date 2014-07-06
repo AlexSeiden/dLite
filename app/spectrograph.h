@@ -2,6 +2,7 @@
 #define SPECTROGRAPH_H
 
 #include "frequencyspectrum.h"
+#include "sublevel.h"
 
 #include <QWidget>
 #include <QRubberBand>
@@ -13,6 +14,8 @@
 class Spectrograph : public QWidget
 {
     Q_OBJECT
+
+    friend class Subrange;
 
 public:
     explicit Spectrograph(QWidget *parent = 0);
@@ -53,9 +56,11 @@ private:
     QPair<qreal, qreal> barRange(int barIndex, bool logspace) const;
     QPair<qreal, qreal> barRangeLog(int barIndex) const;
     void updateBars();
-    qreal frac2freq(qreal frac) const;
 
     void selectBar(int index);
+
+protected:
+    qreal frac2freq(qreal frac) const;
 
 private:
     struct Bar {
@@ -76,7 +81,11 @@ private:
     QPoint				m_dragStart;
     QRubberBand*		m_rubberBand;
     bool				subrangeMetering;
+    Subrange            subrange;
+#if 0
     qreal				subrangeMinfreq, subrangeMaxfreq, subrangeMinamp, subrangeMaxamp;
+    QRectF              subrangeWindow;
+#endif
 
 };
 

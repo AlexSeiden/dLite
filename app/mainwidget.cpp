@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "levelmeter.h"
+#include "sublevel.h"
 #include "mainwidget.h"
 #include "progressbar.h"
 #include "settingsdialog.h"
@@ -25,7 +26,7 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_progressBar(new ProgressBar(this))
     ,   m_spectrograph(new Spectrograph(this))
     ,   m_levelMeter(new LevelMeter(this))
-    ,   m_subrangeLevelMeter(new LevelMeter(this))
+    ,   m_subrangeLevelMeter(new SublevelMeter(this))
     ,   m_fileButton(new QPushButton(this))
     ,   m_pauseButton(new QPushButton(this))
     ,   m_playButton(new QPushButton(this))
@@ -162,8 +163,8 @@ void MainWidget::createUi()
 
     // Spectrograph and level meter
     QScopedPointer<QHBoxLayout> analysisLayout(new QHBoxLayout);
-    analysisLayout->addWidget(m_spectrograph);
     analysisLayout->addWidget(m_levelMeter);
+    analysisLayout->addWidget(m_spectrograph);
     analysisLayout->addWidget(m_subrangeLevelMeter);
     windowLayout->addLayout(analysisLayout.data());
     analysisLayout.take();
@@ -317,7 +318,7 @@ void MainWidget::connectUi()
             m_spectrograph, SLOT(setNumBars(int)));
 
     // TODO these should only signal when enter is hit or something.
-    // probably shouldn't be spinboxes, or perhaps should increment
+    // And they probably shouldn't be spinboxes; or at least should increment
     // geometrically.
     CHECKED_CONNECT(m_specMinSpinBox, SIGNAL(valueChanged(int)),
             m_spectrograph, SLOT(setFreqLo(int)));

@@ -1,4 +1,3 @@
-
 #include "levelmeter.h"
 
 #include <math.h>

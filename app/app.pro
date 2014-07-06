@@ -15,6 +15,7 @@ SOURCES  += main.cpp \
             settingsdialog.cpp \
             spectrograph.cpp \
             spectrumanalyser.cpp \
+            sublevel.cpp \
             utils.cpp \
             wavfile.cpp
 
@@ -27,6 +28,7 @@ HEADERS  += engine.h \
             spectrograph.h \
             spectrum.h \
             spectrumanalyser.h \
+            sublevel.h \
             utils.h \
             wavfile.h
 

@@ -7,7 +7,6 @@
 
 const int NullTimerId = -1;
 const int NullIndex = -1;
-const int BarSelectionInterval = 2000; // Duration a bar remains selected, in ms
 
 Spectrograph::Spectrograph(QWidget *parent)
     :   QWidget(parent)
@@ -117,17 +116,6 @@ void Spectrograph::paintEvent(QPaintEvent *event)
     const int leftPaddingWidth = (paddingWidth + gapWidth) / 2;
     const int barHeight = rect().height() - 2 * gapWidth;
 
-    // Highlight region of selected bar
-    if (m_barSelected != NullIndex) {
-        QRect regionRect = rect();
-        regionRect.setLeft(m_barSelected * rect().width() / numBars);
-        regionRect.setWidth(rect().width() / numBars);
-        QColor regionColor(202, 202, 64);
-        painter.setBrush(Qt::DiagCrossPattern);
-        painter.fillRect(regionRect, regionColor);
-        painter.setBrush(Qt::NoBrush);
-    }
-
     // Draw vertical lines between bars
     line = QLine(rect().topLeft(), rect().bottomLeft());
     line.translate(leftPaddingWidth/2, 0);
@@ -173,6 +161,15 @@ void Spectrograph::paintEvent(QPaintEvent *event)
         painter.drawText(textrect, Qt::AlignBottom|Qt::AlignHCenter, QString::number(centerfreq));
     }
 
+    // Do we have a window?
+    if (subrangeMetering) {
+        QRectF subwin;
+        subwin.setTop(rect().height() * subrange.subrangeWindow.top());
+        subwin.setBottom(rect().height() * subrange.subrangeWindow.bottom());
+        subwin.setLeft(rect().width() * subrange.subrangeWindow.left());
+        subwin.setRight(rect().width() * subrange.subrangeWindow.right());
+        painter.drawRect(subwin);
+    }
 }
 
 void Spectrograph::mousePressEvent(QMouseEvent *event)
@@ -192,32 +189,49 @@ void Spectrograph::mouseMoveEvent(QMouseEvent *event)
 void Spectrograph::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
-    //m_rubberBand->hide();
+
     QRect geo = m_rubberBand->geometry();
     geo = geo.intersected(rect());
+
     // Find sampling window from rubberband rect
-    subrangeMinfreq = float(geo.left())/rect().width();
-    subrangeMinfreq = frac2freq(subrangeMinfreq);
+    subrange.freqMin = float(geo.left())/rect().width();
+    subrange.subrangeWindow.setLeft(subrange.freqMin);  // For drawing
+    subrange.freqMin = frac2freq(subrange.freqMin);     // Actual frequency
 
-    subrangeMaxfreq = float(geo.right())/rect().width();
-    subrangeMaxfreq = frac2freq(subrangeMaxfreq);
+    subrange.freqMax = float(geo.right())/rect().width();
+    subrange.subrangeWindow.setRight(subrange.freqMax);
+    subrange.freqMax = frac2freq(subrange.freqMax);
 
-    subrangeMinamp = 1.0 - float(geo.bottom())/rect().height();
-    subrangeMaxamp = 1.0 - float(geo.top())/rect().height();
+    subrange.ampMin = float(geo.bottom())/rect().height();
+    subrange.ampMax = float(geo.top())/rect().height();
+    subrange.subrangeWindow.setBottom(subrange.ampMin);
+    subrange.subrangeWindow.setTop(subrange.ampMax);
+
+    // Invert range, since window y increases from top to bottom.
+    subrange.ampMin = 1.0 - subrange.ampMin;
+    subrange.ampMax = 1.0 - subrange.ampMax;
 
     subrangeMetering = true;
 
+#if 0
     const QString message = QString("(%1,%2) to (%3, %4)")
-                                .arg(subrangeMinfreq)
-                                .arg(subrangeMinamp)
-                                .arg(subrangeMaxfreq)
-                                .arg(subrangeMaxamp);
-    emit infoMessage(message, 10000);
+                                .arg(subrange.freqMin)
+                                .arg(subrange.ampMin)
+                                .arg(subrange.freqMax)
+                                .arg(subrange.ampMax);
+    const QString m1 = QString("Geo = (%1,%2) to (%3, %4)")
+                                .arg(geo.left()) .arg(geo.top()) .arg(geo.right()) .arg(geo.bottom());
+    const QString m2 = QString("  normal = (%1,%2) to (%3, %4)")
+                                .arg(subrangeWindow.left()) .arg(subrangeWindow.top()) .arg(subrangeWindow.right()) .arg(subrangeWindow.bottom());
+    const QString m3 = QString("  rect = (%1,%2) to (%3, %4)")
+                                .arg(rect().left()) .arg(rect().top()) .arg(rect().right()) .arg(rect().bottom());
+    const QString message = m1+ m2 + m3;
+    emit infoMessage(message, 1000000);
+#endif
+    m_rubberBand->hide();
 
-    // TODO emit update event
-
-    // TODO emit samplewindow event
-
+    // Redraw
+    this->update();
 }
 
 void Spectrograph::reset()
@@ -315,7 +329,7 @@ QPair<qreal, qreal> Spectrograph::barRangeLog(int index) const
 
 qreal Spectrograph::frac2freq(qreal frac) const
 {
-    // Note: it doesn't matter what base you use for the logarhythms
+    // Note: oddly, it doesn't matter what base you use for the logarhythms
     // TODO precompute these
     const qreal log_min = log10(m_lowFreq);
     const qreal log_max = log10(m_highFreq);
@@ -353,11 +367,12 @@ void Spectrograph::updateBars()
             bar.nsamples++;
             bar.clipped |= e.clipped;
         }
+
         // Do we have a window?
         if (subrangeMetering) {
-            if (e.frequency >= subrangeMinfreq && e.frequency < subrangeMaxfreq) {
-                // TODO amplitude window
-                subrangeBar.value += e.amplitude;
+            if (subrange.frequencyWithinWindow(e.frequency)) {
+                // amplitude window
+                subrangeBar.value += subrange.amplitudeWithinWindow(e.amplitude);
                 subrangeBar.nsamples++;
                 subrangeBar.clipped |= e.clipped;
             }
@@ -376,6 +391,9 @@ void Spectrograph::updateBars()
             bar.clipped = true;
         }
     }
+
+
+    // Compute subrange amplitude
     if (subrangeMetering) {
         if (subrangeBar.nsamples > 0)
             subrangeBar.value /= subrangeBar.nsamples;
@@ -391,23 +409,6 @@ void Spectrograph::updateBars()
     update();
 }
 
-
-#if 0
-void Spectrograph::selectBar(int index) {
-    const QPair<qreal, qreal> frequencyRange = barRange(index, true);
-    const QString message = QString("%1 - %2 Hz")
-                                .arg(frequencyRange.first)
-                                .arg(frequencyRange.second);
-    emit infoMessage(message, BarSelectionInterval);
-
-    if (NullTimerId != m_timerId)
-        killTimer(m_timerId);
-    m_timerId = startTimer(BarSelectionInterval);
-
-    m_barSelected = index;
-    update();
-}
-#endif
 
 void Spectrograph::printSpectrum() {
     // print next time it's calculated.  then it'll be cleared.
