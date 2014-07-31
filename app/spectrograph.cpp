@@ -219,13 +219,6 @@ void Spectrograph::mouseReleaseEvent(QMouseEvent *event)
                                 .arg(subrange.ampMin)
                                 .arg(subrange.freqMax)
                                 .arg(subrange.ampMax);
-    const QString m1 = QString("Geo = (%1,%2) to (%3, %4)")
-                                .arg(geo.left()) .arg(geo.top()) .arg(geo.right()) .arg(geo.bottom());
-    const QString m2 = QString("  normal = (%1,%2) to (%3, %4)")
-                                .arg(subrangeWindow.left()) .arg(subrangeWindow.top()) .arg(subrangeWindow.right()) .arg(subrangeWindow.bottom());
-    const QString m3 = QString("  rect = (%1,%2) to (%3, %4)")
-                                .arg(rect().left()) .arg(rect().top()) .arg(rect().right()) .arg(rect().bottom());
-    const QString message = m1+ m2 + m3;
     emit infoMessage(message, 1000000);
 #endif
     m_rubberBand->hide();

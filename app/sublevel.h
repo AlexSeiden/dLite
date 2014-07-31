@@ -20,7 +20,6 @@ public:
 
     double amplitudeWithinWindow(double amp);
     bool frequencyWithinWindow(double freq);
-//    void setWindow(QRect geo, QRect winrect);
 };
 
 /**

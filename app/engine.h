@@ -165,6 +165,7 @@ signals:
 
 private slots:
     void audioNotify();
+    void auxNotify();
     void audioStateChanged(QAudio::State state);
     void spectrumChanged(const FrequencySpectrum &spectrum);
 

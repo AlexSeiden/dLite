@@ -38,32 +38,6 @@ Subrange::frequencyWithinWindow(double freq)
 }
 
 
-#if 0
-void
-Subrange::setWindow(QRect geo, QRect winrect)
-{
-    freqMin = float(geo.left())/winrect.width();
-    subrangeWindow.setLeft(freqMin);  // For drawing
-    freqMin = frac2freq(freqMin);     // Actual frequency
-
-    freqMax = float(geo.right())/winrect.width();
-    subrangeWindow.setRight(freqMax);
-    freqMax = frac2freq(freqMax);
-
-    ampMin = float(geo.bottom())/winrect.height();
-    ampMax = float(geo.top())/winrect.height();
-    subrangeWindow.setBottom(ampMin);
-    subrangeWindow.setTop(ampMax);
-
-    // Invert range, since window y increases from top to bottom.
-    ampMin = 1.0 - ampMin;
-    ampMax = 1.0 - ampMax;
-
-}
-#endif
-
-
-
 SublevelMeter::SublevelMeter(QWidget *parent)
     :   QWidget(parent)
     ,   m_rmsLevel(0.0)
@@ -107,6 +81,7 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
 
     QRect squareRect = rect();
     squareRect.setBottom(rect().top()+ rect().width());
+    squareRect.setRight(rect().right()-1);
     QColor pulseColor;
     pulseColor.setHsvF(0.0, 0.0, m_rmsLevel);
     painter.fillRect(squareRect, pulseColor);

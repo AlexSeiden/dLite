@@ -120,6 +120,8 @@ void Engine::startPlayback()
                         this, SLOT(audioStateChanged(QAudio::State)));
         CHECKED_CONNECT(m_audioOutput, SIGNAL(notify()),
                         this, SLOT(audioNotify()));
+        CHECKED_CONNECT(m_audioOutput, SIGNAL(notify()),
+                        this, SLOT(auxNotify()));
         m_count = 0;
         if (m_file) {
             m_file->seek(0);
@@ -145,6 +147,11 @@ void Engine::suspend()
 //-----------------------------------------------------------------------------
 // Private slots
 //-----------------------------------------------------------------------------
+
+void Engine::auxNotify()
+{
+    ENGINE_DEBUG << "Engine::auxNotify";
+}
 
 void Engine::audioNotify()
 {
@@ -216,6 +223,9 @@ void Engine::audioStateChanged(QAudio::State state)
                 return;
             }
         }
+        // Bug workaround???
+        //CHECKED_CONNECT(m_audioOutput, SIGNAL(notify()), this, SLOT(audioNotify()));
+
         setState(state);
     }
 }
@@ -279,6 +289,7 @@ bool Engine::initialize()
     ENGINE_DEBUG << "Engine::initialize" << "m_bufferLength" << m_bufferLength;
     ENGINE_DEBUG << "Engine::initialize" << "m_dataLength" << m_dataLength;
     ENGINE_DEBUG << "Engine::initialize" << "format" << m_format;
+    // (notify Interval may not be the same as set, if it's not supportable by device)
     //ENGINE_DEBUG << "Engine::initialize" << "actual notify interval" << m_audioOutput->notifyInterval();
 
     return result;
