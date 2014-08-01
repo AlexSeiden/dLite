@@ -13,14 +13,6 @@
 #include <QObject>
 #include <QVector>
 
-#ifdef DUMP_CAPTURED_AUDIO
-#define DUMP_DATA
-#endif
-
-#ifdef DUMP_SPECTRUM
-#define DUMP_DATA
-#endif
-
 class FrequencySpectrum;
 QT_BEGIN_NAMESPACE
 class QAudioInput;
@@ -181,15 +173,6 @@ private:
     void calculateSpectrum(qint64 position);
     void setLevel(qreal rmsLevel, qreal peakLevel, int numSamples);
 
-#ifdef DUMP_DATA
-    void createOutputDir();
-    QString outputPath() const { return m_outputDir.path(); }
-#endif
-
-#ifdef DUMP_CAPTURED_AUDIO
-    void dumpData();
-#endif
-
 private:
     QAudio::State       m_state;
 
@@ -223,11 +206,6 @@ private:
 
     // Interval in millisecondd between calls that update the spectrum, etc.
     int    				m_notifyIntervalMs;
-
-#ifdef DUMP_DATA
-    QDir                m_outputDir;
-#endif
-
 };
 
 #endif // ENGINE_H

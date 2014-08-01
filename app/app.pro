@@ -17,7 +17,11 @@ SOURCES  += main.cpp \
             spectrumanalyser.cpp \
             sublevel.cpp \
             utils.cpp \
-            wavfile.cpp
+            wavfile.cpp \
+    dancefloorwidget.cpp \
+    dancefloormodel.cpp \
+    lightcolor.cpp \
+    dancefloorcontroller.cpp
 
 HEADERS  += engine.h \
             frequencyspectrum.h \
@@ -30,7 +34,11 @@ HEADERS  += engine.h \
             spectrumanalyser.h \
             sublevel.h \
             utils.h \
-            wavfile.h
+            wavfile.h \
+    dancefloorwidget.h \
+    dancefloormodel.h \
+    lightcolor.h \
+    dancefloorcontroller.h
 
 fftreal_dir = ../3rdparty/fftreal
 

@@ -6,6 +6,7 @@
 #include "settingsdialog.h"
 #include "spectrograph.h"
 #include "utils.h"
+#include "dancefloorcontroller.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -39,6 +40,7 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_infoMessageTimerId(NullTimerId)
     ,   m_settingsDialog(new SettingsDialog(m_engine->interval(), this))
     ,   m_loadFileAction(0)
+    ,   m_DancefloorController(new DancefloorController)
 {
     // numBands, lowfreq, hifreq.
     // TODO move somewhere else....

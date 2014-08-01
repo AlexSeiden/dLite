@@ -49,14 +49,6 @@ Engine::Engine(QObject *parent)
                     SIGNAL(spectrumChanged(FrequencySpectrum)),
                     this,
                     SLOT(spectrumChanged(FrequencySpectrum)));
-
-#ifdef DUMP_DATA
-    createOutputDir();
-#endif
-
-#ifdef DUMP_SPECTRUM
-    m_spectrumAnalyser.setOutputPath(outputPath());
-#endif
 }
 
 Engine::~Engine()
