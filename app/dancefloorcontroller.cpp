@@ -4,7 +4,11 @@ DancefloorController::DancefloorController() :
     dfModel(new Dancefloormodel),
     dfw(new Dancefloorwidget)
 {
-    char *layout =  "/Users/alex/src/floorit/layout.csv";
+}
+
+void
+DancefloorController::setup(char *layout)
+{
     dfModel->ImportLayout(layout);
     //dfModel->display();
 

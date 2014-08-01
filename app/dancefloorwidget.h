@@ -33,7 +33,7 @@ private:
     int xsize;
     int ysize;
     bool *active;
-    QColor *lightcolors;
+    QColor *lightqcolors;
 
 
     int cellsize;
@@ -43,7 +43,11 @@ private:
     QColor panelSepColor;
     QColor noCellColor;
 
+#ifdef INLINE
     int _getIndex(int x, int y) {return xsize*y + x;}
+#else
+    int _getIndex(int x, int y);
+#endif
 
 };
 

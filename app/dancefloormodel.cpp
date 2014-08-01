@@ -13,10 +13,12 @@ Dancefloormodel::Dancefloormodel()
 
 Dancefloormodel::~Dancefloormodel()
 {
+#if 0
     if (values)
         delete values;
     if (lightIDs)
         delete lightIDs;
+#endif
 }
 
 bool Dancefloormodel::ImportLayout(char *layoutCsvFile)
@@ -58,6 +60,7 @@ bool Dancefloormodel::ImportLayout(char *layoutCsvFile)
     for (size_t i = 1; i< cells.size(); ++i) {
         if (cells[i].size() != rowSize) {
             printf("WE ARE FUCKED\n");
+            // TODO probably can just use max of all rows...
             return false;
         }
     }

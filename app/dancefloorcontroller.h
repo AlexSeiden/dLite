@@ -12,7 +12,7 @@ class DancefloorController : public QObject
 public:
     DancefloorController();
 
-    void setLayoutFile(char *layout);
+    void setup(char *layout);
 
 private:
     Dancefloormodel *dfModel;

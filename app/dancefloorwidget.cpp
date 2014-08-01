@@ -6,7 +6,7 @@
 #include <math.h>
 
 Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
-    QWidget(parent), active(NULL)
+    QWidget(parent), active(NULL), lightqcolors(NULL)
 {
     bgColor = QColor(30,30,80);
     panelSepColor = QColor(255,255,200);
@@ -18,14 +18,16 @@ Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
 
 Dancefloorwidget::~Dancefloorwidget()
 {
+#if 0
     if (active) {
         delete active;
         active = NULL;
     }
-    if (lightcolors) {
-        delete lightcolors;
-        lightcolors = NULL;
+    if (lightqcolors) {
+        delete lightqcolors;
+        lightqcolors = NULL;
     }
+#endif
 }
 
 void Dancefloorwidget::setGrid(int xs, int ys)
@@ -33,12 +35,12 @@ void Dancefloorwidget::setGrid(int xs, int ys)
     xsize = xs;
     ysize = ys;
     active = new bool[xs*ys];
-    lightcolors = new QColor[xs*ys];
+//    lightqcolors = new QColor[xs*ys];
     for (int y=0; y<xsize; ++y) {
         for (int x=0; x<xsize; ++x) {
             int index = _getIndex(x,y);
             active[index] = false;
-            //lightcolors[index] = Qt::black;
+            //lightqcolors[index] = Qt::black;
         }
     }
 
@@ -92,7 +94,15 @@ bool Dancefloorwidget::cellHasLights(int x, int y) {
 void Dancefloorwidget::setLightcolor(int x, int y, Lightcolor lc)
 {
     int index = _getIndex(x,y);
-    lightcolors[index].setRedF(lc.getRed());
-    lightcolors[index].setGreenF(lc.getGreen());
-    lightcolors[index].setBlueF(lc.getBlue());
+    lightqcolors[index].setRed(lc.getRed());
+    lightqcolors[index].setGreen(lc.getGreen());
+    lightqcolors[index].setBlue(lc.getBlue());
 }
+
+#ifndef INLINE
+int Dancefloorwidget::_getIndex(int x, int y)
+{
+    Q_ASSERT(x >= 0 && x <= xsize && y >= 0 << y <= ysize);
+    return xsize*y + x;
+}
+#endif

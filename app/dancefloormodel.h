@@ -17,8 +17,8 @@ public:
     bool setPixel(int x, int y, Lightcolor rgb);
     void display();
 
-    int getXsize() {return xsize;};
-    int getYsize() {return ysize;};
+    int getXsize() {return xsize;}
+    int getYsize() {return ysize;}
 
 private:
     int xsize, ysize;

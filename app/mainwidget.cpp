@@ -51,6 +51,7 @@ MainWidget::MainWidget(QWidget *parent)
 
     // TODO default to last played.
     m_engine->loadFile(QString("/Users/alex/Documents/lights/Jam On It/Jam On It.wav"));
+    m_DancefloorController->setup("/Users/alex/src/floorit/layout.csv");
 }
 
 MainWidget::~MainWidget()
