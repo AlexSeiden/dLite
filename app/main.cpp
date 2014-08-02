@@ -19,8 +19,5 @@ int main(int argc, char *argv[])
     dfw->setModel(dfModel);
     dfw->show();
 
-    Controlpanel *cp = new Controlpanel();
-    cp->show();
-
     return app.exec();
 }

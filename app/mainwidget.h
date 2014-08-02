@@ -14,7 +14,7 @@ class SublevelMeter;
 class ProgressBar;
 class SettingsDialog;
 class Spectrograph;
-class DancefloorController;
+class Controlpanel;
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -89,6 +89,8 @@ private:
     SettingsDialog*         m_settingsDialog;
 
     QAction*                m_loadFileAction;
+
+    Controlpanel *          m_controlpanel;
 };
 
 #endif // MAINWIDGET_H

@@ -7,8 +7,9 @@
 
 
 
-Controlpanel::Controlpanel(QWidget *parent) :
+Controlpanel::Controlpanel(QWidget *parent, Engine *engine ) :
     QWidget(parent),
+    m_engine(engine),
     numMeters(0)
 {
     createUi();
@@ -29,6 +30,7 @@ void Controlpanel::createUi()
     move(600,50);
 }
 
+
 void Controlpanel::addMeter()
 {
     SublevelMeter *slm = new SublevelMeter(this);
@@ -36,6 +38,9 @@ void Controlpanel::addMeter()
     hLayout->addWidget(slm);
     CHECKED_CONNECT(slm, SIGNAL(iveBeenSelected(SublevelMeter*)),
             this, SLOT(submeterHasBeenSelected(SublevelMeter*)));
+
+    CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
+            slm, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
 
     numMeters++;
     meters.append(slm);
@@ -62,6 +67,9 @@ void Controlpanel::submeterHasBeenSelected(SublevelMeter *chosen)
             slm->setSelection(false);
         }
     }
+
+    // emit signal for others who might care, e.g. spectrograph
+    emit(submeterSelectionChanged(chosen));
 }
 
 void Controlpanel::connectUi()

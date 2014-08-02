@@ -5,13 +5,8 @@
 #include <QTimerEvent>
 #include <math.h>
 
-const int NullTimerId = -1;
-const int NullIndex = -1;
-
 Spectrograph::Spectrograph(QWidget *parent)
     :   QWidget(parent)
-    ,   m_barSelected(NullIndex)
-    ,   m_timerId(NullTimerId)
     ,   m_lowFreq(10.0)
     ,   m_highFreq(1000.0)
     ,   m_printspectrum(false)
@@ -19,6 +14,7 @@ Spectrograph::Spectrograph(QWidget *parent)
     ,   m_dragStart(QPoint(0,0))
     ,   m_rubberBand(NULL)
     ,   subrangeMetering(false)
+    ,   selectedSublevelmeter(NULL)
 {
     setMinimumHeight(100);
 }
@@ -57,17 +53,6 @@ void Spectrograph::setFreqHi(int val)
     m_highFreq = val; // Note implicit cast of int val to qreal m_highFreq
     // TODO verify lo<hi
     updateBars();
-}
-
-// Clear selected bar after timer expires
-void Spectrograph::timerEvent(QTimerEvent *event)
-{
-    Q_ASSERT(event->timerId() == m_timerId);
-    Q_UNUSED(event) // suppress warnings in release builds
-    killTimer(m_timerId);
-    m_timerId = NullTimerId;
-    m_barSelected = NullIndex;
-    update();
 }
 
 void Spectrograph::paintEvent(QPaintEvent *event)
@@ -162,12 +147,18 @@ void Spectrograph::paintEvent(QPaintEvent *event)
     }
 
     // Do we have a window?
-    if (subrangeMetering) {
+    if (subrangeMetering || selectedSublevelmeter) {
+
+        QRectF *subrangewindow;
+        if (selectedSublevelmeter)
+            subrangewindow = &(selectedSublevelmeter->range.subrangeWindow);
+        else
+            subrangewindow = &(subrange.subrangeWindow);
         QRectF subwin;
-        subwin.setTop(rect().height() * subrange.subrangeWindow.top());
-        subwin.setBottom(rect().height() * subrange.subrangeWindow.bottom());
-        subwin.setLeft(rect().width() * subrange.subrangeWindow.left());
-        subwin.setRight(rect().width() * subrange.subrangeWindow.right());
+        subwin.setTop(   rect().height() * subrangewindow->top());
+        subwin.setBottom(rect().height() * subrangewindow->bottom());
+        subwin.setLeft(  rect().width()  * subrangewindow->left());
+        subwin.setRight( rect().width()  * subrangewindow->right());
         painter.drawRect(subwin);
     }
 }
@@ -190,32 +181,39 @@ void Spectrograph::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
 
+    Subrange *dest = &subrange;
+    if (selectedSublevelmeter) {
+        dest = &(selectedSublevelmeter->range);
+        selectedSublevelmeter->setActive(true);
+    }
+    else
+        dest = &subrange;
+
     QRect geo = m_rubberBand->geometry();
     geo = geo.intersected(rect());
 
     // Find sampling window from rubberband rect
-    subrange.freqMin = float(geo.left())/rect().width();
-    subrange.subrangeWindow.setLeft(subrange.freqMin);  // For drawing
-    subrange.freqMin = frac2freq(subrange.freqMin);     // Actual frequency
+    dest->freqMin = float(geo.left())/rect().width();
+    dest->subrangeWindow.setLeft(dest->freqMin);  // For drawing
+    dest->freqMin = frac2freq(dest->freqMin);     // Actual frequency
 
-    subrange.freqMax = float(geo.right())/rect().width();
-    subrange.subrangeWindow.setRight(subrange.freqMax);
-    subrange.freqMax = frac2freq(subrange.freqMax);
+    dest->freqMax = float(geo.right())/rect().width();
+    dest->subrangeWindow.setRight(dest->freqMax);
+    dest->freqMax = frac2freq(dest->freqMax);
 
-    subrange.ampMin = float(geo.bottom())/rect().height();
-    subrange.ampMax = float(geo.top())/rect().height();
-    subrange.subrangeWindow.setBottom(subrange.ampMin);
-    subrange.subrangeWindow.setTop(subrange.ampMax);
+    dest->ampMin = float(geo.bottom())/rect().height();
+    dest->ampMax = float(geo.top())/rect().height();
+    dest->subrangeWindow.setBottom(dest->ampMin);
+    dest->subrangeWindow.setTop(dest->ampMax);
 
     // Invert range, since window y increases from top to bottom.
-    subrange.ampMin = 1.0 - subrange.ampMin;
-    subrange.ampMax = 1.0 - subrange.ampMax;
+    dest->ampMin = 1.0 - dest->ampMin;
+    dest->ampMax = 1.0 - dest->ampMax;
 
     subrangeMetering = true;
 
-    m_rubberBand->hide();
-
     // Redraw
+    m_rubberBand->hide();
     this->update();
 }
 
@@ -326,6 +324,12 @@ qreal Spectrograph::frac2freq(qreal frac) const
     return (freq);
 }
 
+/*
+ * updateBars()
+ *
+ * Loops over the entire spectrum in m_spectrum, which is supplied by the engine.
+ * Computes values for each of the bars displayed in the spectrograph.
+ */
 void Spectrograph::updateBars()
 {
     // init the vector of bars with empty bars
@@ -336,7 +340,7 @@ void Spectrograph::updateBars()
     const FrequencySpectrum::const_iterator end = m_spectrum.end();
     int barindex;
     int index = 0;
-    // TODO:  at least half the bars wasted-- unused
+    // TODO:  at least half the bars wasted--unused
     // Also, could optimize since they are monotonicly increasing
     Bar subrangeBar;
 
@@ -386,16 +390,22 @@ void Spectrograph::updateBars()
             subrangeBar.value = 1.0;
             subrangeBar.clipped = true;
         }
-        emit subrangeLevelChanged(subrangeBar.value, subrangeBar.value, 256);
+        emit subrangeLevelChanged(subrangeBar.value);
     }
+
     if (m_printspectrum) {
+        // We've printed it above, so clear flag
         m_printspectrum = false;
     }
     update();
 }
 
-
 void Spectrograph::printSpectrum() {
     // print next time it's calculated.  then it'll be cleared.
     m_printspectrum = true;
+}
+
+void Spectrograph::submeterSelectionChanged(SublevelMeter *chosen)
+{
+    selectedSublevelmeter = chosen;
 }

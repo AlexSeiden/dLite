@@ -6,7 +6,7 @@
 #include "settingsdialog.h"
 #include "spectrograph.h"
 #include "utils.h"
-#include "dancefloorcontroller.h"
+#include "controlpanel.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -40,10 +40,12 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_infoMessageTimerId(NullTimerId)
     ,   m_settingsDialog(new SettingsDialog(m_engine->interval(), this))
     ,   m_loadFileAction(0)
+    ,   m_controlpanel(NULL)
 {
     // numBands, lowfreq, hifreq.
     // TODO move somewhere else....
     m_spectrograph->setParams(20, 20., 10000.);
+    m_controlpanel = new Controlpanel(NULL, m_engine);
 
     createUi();
     connectUi();
@@ -51,14 +53,15 @@ MainWidget::MainWidget(QWidget *parent)
     setMinimumHeight(400);
     move(10,50);  // TODO restore
 
+    // TODO prob put dancefloormodel & widget here???
+
+    m_controlpanel->show();
+
     // TODO default to last played.
     m_engine->loadFile(QString("/Users/alex/Documents/lights/Jam On It/Jam On It.wav"));
 }
 
-MainWidget::~MainWidget()
-{
-
-}
+MainWidget::~MainWidget() { }
 
 
 //-----------------------------------------------------------------------------
@@ -80,6 +83,7 @@ void MainWidget::formatChanged(const QAudioFormat &format)
    infoMessage(formatToString(format), NullMessageTimeout);
 }
 
+// TODO decouple position & spectrum change???
 void MainWidget::spectrumChanged(qint64 position, qint64 length,
                                  const FrequencySpectrum &spectrum)
 {
@@ -303,8 +307,11 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_engine, SIGNAL(levelChanged(qreal, qreal, int)),
             m_levelMeter, SLOT(levelChanged(qreal, qreal, int)));
 
-    CHECKED_CONNECT(m_spectrograph, SIGNAL(subrangeLevelChanged(qreal, qreal, int)),
-            m_subrangeLevelMeter, SLOT(levelChanged(qreal, qreal, int)));
+    CHECKED_CONNECT(m_spectrograph, SIGNAL(subrangeLevelChanged(qreal)),
+            m_subrangeLevelMeter, SLOT(levelChanged(qreal)));
+
+    CHECKED_CONNECT(m_controlpanel, SIGNAL(submeterSelectionChanged(SublevelMeter *)),
+            m_spectrograph, SLOT(submeterSelectionChanged(SublevelMeter *)));
 
     CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
             this, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));

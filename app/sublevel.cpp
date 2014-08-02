@@ -8,6 +8,9 @@
 #include <QMouseEvent>
 
 
+// -----------------------------------------------------------------------------
+// Subrange
+
 Subrange::Subrange() :
     freqMin(100.0),
     freqMax(200.0),
@@ -18,6 +21,11 @@ Subrange::Subrange() :
 
 Subrange::~Subrange() { }
 
+/*
+ * Returns 0.0 if the given amplitude is below the minimum
+ * threshold for the subrange, 1.0 if it's above it, and
+ * a proportional value in between.
+ */
 double
 Subrange::amplitudeWithinWindow(double amp)
 {
@@ -28,6 +36,10 @@ Subrange::amplitudeWithinWindow(double amp)
     return ((amp-ampMin)/(ampMax-ampMin));
 }
 
+/*
+ * Returns true if a given frequency is within the window
+ * set for this range.
+ */
 bool
 Subrange::frequencyWithinWindow(double freq)
 {
@@ -39,13 +51,17 @@ Subrange::frequencyWithinWindow(double freq)
 }
 
 
+// -----------------------------------------------------------------------------
+// SublevelMeter
+
 SublevelMeter::SublevelMeter(QWidget *parent)
     :   QWidget(parent)
     ,   m_rmsLevel(0.0)
     ,   m_rmsColor(Qt::red)
     ,   m_squareColor(Qt::blue)
-    ,   isSelectable(false)
-    ,   isSelected(false)
+    ,   _active(false)
+    ,   _selectable(false)
+    ,   _selected(false)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     setMinimumWidth(30);
@@ -81,7 +97,7 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
     painter.fillRect(squareRect, pulseColor);
     painter.drawRect(squareRect);
 
-    if (isSelected) {
+    if (_selected) {
         QRect surroundRect = rect();
         surroundRect.setSize(QSize(rect().width()-1, rect().height()-1));
         QPen pen(Qt::blue);
@@ -92,31 +108,36 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
     }
 }
 
+void SublevelMeter::setActive(bool status)
+{
+    _active = status;
+}
+
 void SublevelMeter::setSelectable(bool status)
 {
-    isSelectable = status;
-    if (!isSelectable)
-        isSelected = false;
+    _selectable = status;
+    if (!_selectable)
+        _selected = false;
 }
 
 bool SublevelMeter::setSelection(bool status)
 {
-    if (!isSelectable) {
+    if (!_selectable) {
         return false;
     }
-    isSelected = status;
+    _selected = status;
     update();
     return true;
 }
 
 void SublevelMeter::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (!isSelectable) {
+    if (!_selectable) {
         event->ignore();
         return;
     }
 
-    if (isSelected)
+    if (_selected)
         setSelection(false);
     else {
         setSelection(true);
@@ -124,11 +145,59 @@ void SublevelMeter::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-// TODO remove unused variables
-void SublevelMeter::levelChanged(qreal rmsLevel, qreal peakLevel, int numSamples)
+void SublevelMeter::levelChanged(qreal rmsLevel)
 {
-    Q_UNUSED(numSamples);
-    Q_UNUSED(peakLevel);
     m_rmsLevel = rmsLevel;
     update();
+}
+
+// TODO decouple position & spectrum change???
+void SublevelMeter::spectrumChanged(qint64 position, qint64 length,
+                                 const FrequencySpectrum &spectrum)
+{
+    Q_UNUSED(position);
+    Q_UNUSED(length);
+    m_spectrum = spectrum;
+    if (_active) {
+        updateSubsamples();
+        update();
+    }
+}
+
+void SublevelMeter::updateSubsamples()
+{
+    // loop over all frequencies in the spectrum, and set the value
+    FrequencySpectrum::const_iterator i = m_spectrum.begin();
+    const FrequencySpectrum::const_iterator end = m_spectrum.end();
+    int index = 0;
+
+    float value = 0;
+    int nsamples = 0;
+    bool clipped = false;
+
+    for ( ; i != end; ++i, ++index) {
+        const FrequencySpectrum::Element e = *i;
+
+        // TODO could optimize by skipping straight to start frequency
+        if (range.frequencyWithinWindow(e.frequency)) {
+            // amplitude window
+            value += range.amplitudeWithinWindow(e.amplitude);
+            nsamples++;
+            clipped |= e.clipped;
+        }
+    }
+
+
+    // Compute subrange amplitude
+    if (nsamples > 0)
+        value /= nsamples;
+    if (value > 1.0) {
+        value = 1.0;
+        clipped = true;
+    }
+
+    m_rmsLevel = value;
+    update();
+
+    //emit subrangeLevelChanged(value);
 }

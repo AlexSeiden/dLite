@@ -4,18 +4,23 @@
 #include <QWidget>
 #include <QHBoxLayout>
 #include "sublevel.h"
+#include "engine.h"
 
 class Controlpanel : public QWidget
 {
     Q_OBJECT
 public:
-    explicit Controlpanel(QWidget *parent = 0);
+    explicit Controlpanel(QWidget *parent = 0, Engine *engine = NULL);
 
     // QWidget
     void mouseReleaseEvent(QMouseEvent *event);
 
 public slots:
     void submeterHasBeenSelected(SublevelMeter *chosen);
+
+signals:
+    void submeterSelectionChanged(SublevelMeter *chosen);
+
 
 private:
     void createUi();
@@ -24,6 +29,7 @@ private:
     SublevelMeter *submeterSelected();
 
 
+    Engine  *m_engine;
     QHBoxLayout *hLayout;
     int numMeters;
     QList<SublevelMeter *>  meters;

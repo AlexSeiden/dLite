@@ -23,9 +23,6 @@ public:
 
     void setParams(int numBars, qreal lowFreq, qreal highFreq);
 
-    // QObject
-    void timerEvent(QTimerEvent *event);
-
     // QWidget
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -38,7 +35,7 @@ public:
 
 signals:
     void infoMessage(const QString &message, int intervalMs);
-    void subrangeLevelChanged(const qreal rmsval, const qreal peakval, int numsamples);
+    void subrangeLevelChanged(const qreal rmsval);
 
 public slots:
     void reset();
@@ -47,6 +44,7 @@ public slots:
     void setFreqLo(int val);
     void setFreqHi(int val);
     void printSpectrum();
+    void submeterSelectionChanged(SublevelMeter *chosen);
 
 private:
     int barIndex(qreal frequency) const;
@@ -57,7 +55,7 @@ private:
     QPair<qreal, qreal> barRangeLog(int barIndex) const;
     void updateBars();
 
-    void selectBar(int index);
+    void computeSubrange(Subrange range);
 
 protected:
     qreal frac2freq(qreal frac) const;
@@ -71,17 +69,25 @@ private:
     };
 
     QVector<Bar>        m_bars;
-    int                 m_barSelected;
-    int                 m_timerId;
+
+    // Range of frequencies to display
     qreal               m_lowFreq;
     qreal               m_highFreq;
+
+    // Set by engine
     FrequencySpectrum   m_spectrum;
+
+    // For debugging
     bool   				m_printspectrum;
+
+    // For dragging out subregions
     bool   				m_isDragging;
     QPoint				m_dragStart;
     QRubberBand*		m_rubberBand;
+
     bool				subrangeMetering;
     Subrange            subrange;
+    SublevelMeter *     selectedSublevelmeter;
 
 };
 

@@ -3,6 +3,10 @@
 
 #include <QTime>
 #include <QWidget>
+#include "frequencyspectrum.h"
+
+// -----------------------------------------------------------------------------
+// Subrange
 
 class Subrange
 {
@@ -22,6 +26,10 @@ public:
     bool frequencyWithinWindow(double freq);
 };
 
+
+
+// -----------------------------------------------------------------------------
+// Sublevel meter
 /**
  * Widget which displays a vertical audio level meter, indicating the
  * RMS level of the window of audio samples most recently analyzed
@@ -32,6 +40,8 @@ class SublevelMeter : public QWidget
 {
     Q_OBJECT
 
+    friend class Spectrograph;
+
 public:
     explicit SublevelMeter(QWidget *parent = 0);
     ~SublevelMeter();
@@ -40,8 +50,10 @@ public:
     void paintEvent(QPaintEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
+    void setActive(bool status);
     void setSelectable(bool status);
     bool setSelection(bool status);
+    void updateSubsamples();
 
 signals:
     void iveBeenSelected(SublevelMeter *me);
@@ -49,20 +61,26 @@ signals:
 
 public slots:
     void reset();
-    void levelChanged(qreal rmsLevel, qreal peakLevel, int numSamples);
+    void levelChanged(qreal rmsLevel);
+    void spectrumChanged(qint64 position, qint64 length,
+                         const FrequencySpectrum &spectrum);
 
 private:
-    /**
-     * Height of RMS level bar.
-     * Range 0.0 - 1.0.
-     */
+    // Set by engine
+    FrequencySpectrum   m_spectrum;
+
+    // Height of RMS level bar.
     qreal m_rmsLevel;
 
     QColor m_rmsColor;
     QColor m_squareColor;
 
-    bool isSelectable;
-    bool isSelected;
+    bool _active;
+    bool _selectable;
+    bool _selected;
+
+protected:
+    Subrange    range;
 };
 
 #endif // SUBLEVEL_H
