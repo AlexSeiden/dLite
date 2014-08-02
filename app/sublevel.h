@@ -24,8 +24,9 @@ public:
 
 /**
  * Widget which displays a vertical audio level meter, indicating the
- * RMS and peak levels of the window of audio samples most recently analyzed
+ * RMS level of the window of audio samples most recently analyzed
  * by the Engine.
+ * Also has a pulsing display at the top, proportional to rms level
  */
 class SublevelMeter : public QWidget
 {
@@ -35,7 +36,16 @@ public:
     explicit SublevelMeter(QWidget *parent = 0);
     ~SublevelMeter();
 
+    // QWidget
     void paintEvent(QPaintEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+
+    void setSelectable(bool status);
+    bool setSelection(bool status);
+
+signals:
+    void iveBeenSelected(SublevelMeter *me);
+    // TODO bad form to use custom type in selection?
 
 public slots:
     void reset();
@@ -50,6 +60,9 @@ private:
 
     QColor m_rmsColor;
     QColor m_squareColor;
+
+    bool isSelectable;
+    bool isSelected;
 };
 
 #endif // SUBLEVEL_H

@@ -6,7 +6,7 @@
 #include <math.h>
 
 Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
-    QWidget(parent), lightqcolors(NULL)
+    QWidget(parent)
 {
     bgColor = QColor(30,30,80);
     panelSepColor = QColor(255,255,200);
@@ -18,12 +18,6 @@ Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
 
 Dancefloorwidget::~Dancefloorwidget()
 {
-#if 0
-    if (lightqcolors) {
-        delete lightqcolors;
-        lightqcolors = NULL;
-    }
-#endif
 }
 
 void Dancefloorwidget::setModel(Dancefloormodel *model)
@@ -33,6 +27,11 @@ void Dancefloorwidget::setModel(Dancefloormodel *model)
     ysize = model->getYsize();
     setFixedWidth(xsize*(cellsize+cellspace));
     setFixedHeight(ysize*(cellsize+cellspace));
+
+    // TODO restore from saved & allowed saved layouts
+    // also move to right side of screen?
+    // also, snapping...
+    move(800, 50);
 }
 
 bool Dancefloorwidget::cellHasLights(int x, int y) {
@@ -70,13 +69,6 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
             painter.drawRect(cell);
         }
     }
-}
-void Dancefloorwidget::setLightcolor(int x, int y, Lightcolor lc)
-{
-    int index = _getIndex(x,y);
-    lightqcolors[index].setRed(lc.getRed());
-    lightqcolors[index].setGreen(lc.getGreen());
-    lightqcolors[index].setBlue(lc.getBlue());
 }
 
 #ifndef INLINE

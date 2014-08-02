@@ -48,6 +48,9 @@ MainWidget::MainWidget(QWidget *parent)
     createUi();
     connectUi();
 
+    setMinimumHeight(400);
+    move(10,50);  // TODO restore
+
     // TODO default to last played.
     m_engine->loadFile(QString("/Users/alex/Documents/lights/Jam On It/Jam On It.wav"));
 }

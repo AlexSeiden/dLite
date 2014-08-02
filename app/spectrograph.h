@@ -82,10 +82,6 @@ private:
     QRubberBand*		m_rubberBand;
     bool				subrangeMetering;
     Subrange            subrange;
-#if 0
-    qreal				subrangeMinfreq, subrangeMaxfreq, subrangeMinamp, subrangeMaxamp;
-    QRectF              subrangeWindow;
-#endif
 
 };
 

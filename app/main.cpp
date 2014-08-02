@@ -1,6 +1,7 @@
 #include "mainwidget.h"
 #include "dancefloormodel.h"
 #include "dancefloorwidget.h"
+#include "controlpanel.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
@@ -17,6 +18,9 @@ int main(int argc, char *argv[])
     Dancefloorwidget *dfw = new Dancefloorwidget();
     dfw->setModel(dfModel);
     dfw->show();
+
+    Controlpanel *cp = new Controlpanel();
+    cp->show();
 
     return app.exec();
 }

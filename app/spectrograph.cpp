@@ -213,14 +213,6 @@ void Spectrograph::mouseReleaseEvent(QMouseEvent *event)
 
     subrangeMetering = true;
 
-#if 0
-    const QString message = QString("(%1,%2) to (%3, %4)")
-                                .arg(subrange.freqMin)
-                                .arg(subrange.ampMin)
-                                .arg(subrange.freqMax)
-                                .arg(subrange.ampMax);
-    emit infoMessage(message, 1000000);
-#endif
     m_rubberBand->hide();
 
     // Redraw

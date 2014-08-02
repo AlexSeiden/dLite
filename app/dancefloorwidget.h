@@ -34,8 +34,6 @@ private:
     bool    cellHasLights(int x, int y);
     int xsize;
     int ysize;
-    QColor *lightqcolors;
-
 
     int cellsize;
     int cellspace;
