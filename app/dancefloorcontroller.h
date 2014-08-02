@@ -10,7 +10,8 @@ class DancefloorController : public QObject
    Q_OBJECT
 
 public:
-    DancefloorController();
+    explicit DancefloorController(QObject *parent = 0);
+    ~DancefloorController();
 
     void setup(char *layout);
 

@@ -89,8 +89,6 @@ private:
     SettingsDialog*         m_settingsDialog;
 
     QAction*                m_loadFileAction;
-
-    DancefloorController*   m_DancefloorController;
 };
 
 #endif // MAINWIDGET_H

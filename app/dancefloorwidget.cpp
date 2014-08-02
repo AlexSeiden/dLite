@@ -50,7 +50,12 @@ void Dancefloorwidget::setGrid(int xs, int ys)
 
 void Dancefloorwidget::setHasLights(int x, int y, bool status)
 {
-    active[_getIndex(x,y)] = status;
+    //active[_getIndex(x,y)] = status;
+}
+
+bool Dancefloorwidget::cellHasLights(int x, int y) {
+    int index = _getIndex(x,y);
+    return active[index];
 }
 
 void Dancefloorwidget::reset()
@@ -85,12 +90,6 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
         }
     }
 }
-
-bool Dancefloorwidget::cellHasLights(int x, int y) {
-    int index = _getIndex(x,y);
-    return active[index];
-}
-
 void Dancefloorwidget::setLightcolor(int x, int y, Lightcolor lc)
 {
     int index = _getIndex(x,y);

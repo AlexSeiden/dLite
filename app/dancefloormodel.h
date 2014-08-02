@@ -22,8 +22,8 @@ public:
 
 private:
     int xsize, ysize;
-    Lightcolor *values;
-    int        *lightIDs;
+    Lightcolor * values;
+    int *       lightIDs;
 
     int _getIndex(int x, int y) {return xsize*y + x;}
 };

@@ -40,7 +40,6 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_infoMessageTimerId(NullTimerId)
     ,   m_settingsDialog(new SettingsDialog(m_engine->interval(), this))
     ,   m_loadFileAction(0)
-    ,   m_DancefloorController(new DancefloorController)
 {
     // numBands, lowfreq, hifreq.
     // TODO move somewhere else....
@@ -51,7 +50,6 @@ MainWidget::MainWidget(QWidget *parent)
 
     // TODO default to last played.
     m_engine->loadFile(QString("/Users/alex/Documents/lights/Jam On It/Jam On It.wav"));
-    m_DancefloorController->setup("/Users/alex/src/floorit/layout.csv");
 }
 
 MainWidget::~MainWidget()

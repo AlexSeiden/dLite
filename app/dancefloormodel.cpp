@@ -6,8 +6,12 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <QString>
+#include <QStringList>
 
-Dancefloormodel::Dancefloormodel()
+Dancefloormodel::Dancefloormodel() :
+    values(NULL),
+    lightIDs(NULL)
 {
 }
 
@@ -23,6 +27,7 @@ Dancefloormodel::~Dancefloormodel()
 
 bool Dancefloormodel::ImportLayout(char *layoutCsvFile)
 {
+#if 1
     string line;
     vector< string> lines;
     vector< vector <string> > cells;
@@ -43,12 +48,12 @@ bool Dancefloormodel::ImportLayout(char *layoutCsvFile)
 
     // Break into individual cells
     for (size_t i = 0; i<lines.size(); ++i) {
-        vector <string> row;
         // Split each row into cells
         line = lines[i];
         istringstream ss(line);
         string token;
 
+        vector<string> row;
         while(getline(ss, token, ',')) {
             row.push_back(token);
         }
@@ -57,6 +62,7 @@ bool Dancefloormodel::ImportLayout(char *layoutCsvFile)
 
     // Check that all the rows are the same size
     size_t rowSize = cells[0].size();
+#if 0
     for (size_t i = 1; i< cells.size(); ++i) {
         if (cells[i].size() != rowSize) {
             printf("WE ARE FUCKED\n");
@@ -64,6 +70,8 @@ bool Dancefloormodel::ImportLayout(char *layoutCsvFile)
             return false;
         }
     }
+#endif
+
     xsize = rowSize;
 
     // Now alloc arrays:
@@ -74,9 +82,7 @@ bool Dancefloormodel::ImportLayout(char *layoutCsvFile)
     for (int y=0; y<ysize; ++y){
         for (int x=0; x<xsize; ++x){
             int index = _getIndex(x,y);
-            vector <string> row = cells[y];
-            string cell = row[x];
-//printf("(%d %d): %s\n", x, y, cell.c_str());
+            string cell = cells[y][x];
             if (cell.size() == 0 || cell.compare("X")==0) {
                 lightIDs[index] = 0;
             } else
@@ -86,6 +92,25 @@ bool Dancefloormodel::ImportLayout(char *layoutCsvFile)
     }
 
     return true;
+#else
+    xsize = 24;
+    ysize = 18;
+    // Now alloc arrays:
+    lightIDs = (int*)malloc(sizeof(int)*10*xsize*ysize);
+    //values = new Lightcolor[xsize*ysize];
+
+    for (int y=0; y<ysize; ++y){
+        for (int x=0; x<xsize; ++x){
+            int index = _getIndex(x,y);
+            if (x < 3) {
+                lightIDs[index] = 0;
+            } else
+                lightIDs[index] = x + y*100;
+     //       values[index] = Lightcolor();
+        }
+    }
+    return true;
+#endif
 }
 
 bool
