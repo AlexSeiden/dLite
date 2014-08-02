@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "lightcolor.h"
+#include "dancefloormodel.h"
 
 class Dancefloorwidget : public QWidget
 {
@@ -11,7 +12,7 @@ public:
     explicit Dancefloorwidget(QWidget *parent = 0);
     ~Dancefloorwidget();
 
-    void setGrid(int xsize, int ysize);
+    void setModel(Dancefloormodel *model);
     void setHasLights(int x, int y, bool status);
     void setLightcolor(int x, int y, Lightcolor lc);
 
@@ -29,10 +30,10 @@ public slots:
     void reset();
 
 private:
+    Dancefloormodel *dfModel;
     bool    cellHasLights(int x, int y);
     int xsize;
     int ysize;
-    bool *active;
     QColor *lightqcolors;
 
 

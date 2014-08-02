@@ -6,7 +6,7 @@
 #include <math.h>
 
 Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
-    QWidget(parent), active(NULL), lightqcolors(NULL)
+    QWidget(parent), lightqcolors(NULL)
 {
     bgColor = QColor(30,30,80);
     panelSepColor = QColor(255,255,200);
@@ -19,10 +19,6 @@ Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
 Dancefloorwidget::~Dancefloorwidget()
 {
 #if 0
-    if (active) {
-        delete active;
-        active = NULL;
-    }
     if (lightqcolors) {
         delete lightqcolors;
         lightqcolors = NULL;
@@ -30,32 +26,17 @@ Dancefloorwidget::~Dancefloorwidget()
 #endif
 }
 
-void Dancefloorwidget::setGrid(int xs, int ys)
+void Dancefloorwidget::setModel(Dancefloormodel *model)
 {
-    xsize = xs;
-    ysize = ys;
-    active = new bool[xs*ys];
-//    lightqcolors = new QColor[xs*ys];
-    for (int y=0; y<xsize; ++y) {
-        for (int x=0; x<xsize; ++x) {
-            int index = _getIndex(x,y);
-            active[index] = false;
-            //lightqcolors[index] = Qt::black;
-        }
-    }
-
-    setFixedWidth(xs*(cellsize+cellspace));
-    setFixedHeight(ys*(cellsize+cellspace));
-}
-
-void Dancefloorwidget::setHasLights(int x, int y, bool status)
-{
-    //active[_getIndex(x,y)] = status;
+    dfModel = model;
+    xsize = model->getXsize();
+    ysize = model->getYsize();
+    setFixedWidth(xsize*(cellsize+cellspace));
+    setFixedHeight(ysize*(cellsize+cellspace));
 }
 
 bool Dancefloorwidget::cellHasLights(int x, int y) {
-    int index = _getIndex(x,y);
-    return active[index];
+    return dfModel->hasPixel(x,y);
 }
 
 void Dancefloorwidget::reset()
@@ -101,7 +82,7 @@ void Dancefloorwidget::setLightcolor(int x, int y, Lightcolor lc)
 #ifndef INLINE
 int Dancefloorwidget::_getIndex(int x, int y)
 {
-    Q_ASSERT(x >= 0 && x <= xsize && y >= 0 << y <= ysize);
+    Q_ASSERT(x >= 0 && x < xsize && y >= 0 && y < ysize);
     return xsize*y + x;
 }
 #endif

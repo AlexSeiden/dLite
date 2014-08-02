@@ -13,10 +13,10 @@ int main(int argc, char *argv[])
 
     Dancefloormodel *dfModel = new Dancefloormodel();
     dfModel->ImportLayout("/Users/alex/src/floorit/layout.csv");
-    dfModel->display();
 
-//    Dancefloorwidget *dfw = new Dancefloorwidget();
-//    dfw.setModel(dfModel);
+    Dancefloorwidget *dfw = new Dancefloorwidget();
+    dfw->setModel(dfModel);
+    dfw->show();
 
     return app.exec();
 }
