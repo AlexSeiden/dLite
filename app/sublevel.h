@@ -4,6 +4,7 @@
 #include <QTime>
 #include <QWidget>
 #include "frequencyspectrum.h"
+#include "cue.h"
 
 // -----------------------------------------------------------------------------
 // Subrange
@@ -40,6 +41,7 @@ class SublevelMeter : public QWidget
 {
     Q_OBJECT
 
+    // TODO yuck defriend
     friend class Spectrograph;
 
 public:
@@ -54,14 +56,15 @@ public:
     void setSelectable(bool status);
     bool setSelection(bool status);
     void updateSubsamples();
+    Subrange getRange() {return range;}
+    void setRange(Subrange &range);
 
 signals:
     void iveBeenSelected(SublevelMeter *me);
     // TODO bad form to use custom type in selection?
+    void levelChanged(qreal level);
 
 public slots:
-    void reset();
-    void levelChanged(qreal rmsLevel);
     void spectrumChanged(qint64 position, qint64 length,
                          const FrequencySpectrum &spectrum);
 
@@ -69,15 +72,17 @@ private:
     // Set by engine
     FrequencySpectrum   m_spectrum;
 
-    // Height of RMS level bar.
-    qreal m_rmsLevel;
+    // Height of level bar.
+    qreal m_level;
 
-    QColor m_rmsColor;
+    QColor m_barColor;
     QColor m_squareColor;
 
     bool _active;
     bool _selectable;
     bool _selected;
+
+    Cue * _cue;
 
 protected:
     Subrange    range;

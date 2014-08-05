@@ -21,7 +21,8 @@ SOURCES  += main.cpp \
     dancefloormodel.cpp \
     lightcolor.cpp \
     dancefloorwidget.cpp \
-    controlpanel.cpp
+    controlpanel.cpp \
+    cue.cpp
 
 HEADERS  += engine.h \
             frequencyspectrum.h \
@@ -38,7 +39,8 @@ HEADERS  += engine.h \
     dancefloorwidget.h \
     dancefloormodel.h \
     lightcolor.h \
-    controlpanel.h
+    controlpanel.h \
+    cue.h
 
 fftreal_dir = ../3rdparty/fftreal
 

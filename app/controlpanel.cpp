@@ -6,12 +6,14 @@
 #include <QMouseEvent>
 
 
-
-Controlpanel::Controlpanel(QWidget *parent, Engine *engine ) :
+Controlpanel::Controlpanel(QWidget *parent, Engine *engine, Dancefloormodel *dfmodel) :
     QWidget(parent),
-    m_engine(engine),
-    numMeters(0)
+    numMeters(0),
+    _engine(engine),
+    _dfmodel(dfmodel),
+    _cue(NULL)
 {
+    _cue = new Cue(NULL, _dfmodel);
     createUi();
 }
 
@@ -23,7 +25,11 @@ void Controlpanel::createUi()
     for (int i=0; i<3; ++i)
         addMeter();
 
+    CHECKED_CONNECT(meters[0], SIGNAL(levelChanged(qreal)), _cue, SLOT(levelChanged(qreal)));
+
     setLayout(hLayout);
+
+    // TODO "add control" button
 
     // TODO restore from saved & allowed saved layouts
     setMinimumHeight(300);
@@ -39,7 +45,8 @@ void Controlpanel::addMeter()
     CHECKED_CONNECT(slm, SIGNAL(iveBeenSelected(SublevelMeter*)),
             this, SLOT(submeterHasBeenSelected(SublevelMeter*)));
 
-    CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
+    // TODO use simpler spectrumChanged
+    CHECKED_CONNECT(_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
             slm, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
 
     numMeters++;
@@ -49,8 +56,7 @@ void Controlpanel::addMeter()
 
 void Controlpanel::mouseReleaseEvent(QMouseEvent *event)
 {
-    // TODO
-    // Deselect, since it means that we've clicked outside of all the
+    // TODO Deselect, since it means that we've clicked outside of all the
     // controller windows
     event->ignore();
 }
@@ -70,10 +76,4 @@ void Controlpanel::submeterHasBeenSelected(SublevelMeter *chosen)
 
     // emit signal for others who might care, e.g. spectrograph
     emit(submeterSelectionChanged(chosen));
-}
-
-void Controlpanel::connectUi()
-{
-//    CHECKED_CONNECT(m_printSpectrum, SIGNAL(clicked()),
-//            m_spectrograph, SLOT(printSpectrum()));
 }

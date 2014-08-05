@@ -5,7 +5,7 @@
 #DEFINES += LOG_SPECTRUMANALYSER
 
 # Debug output from engine
-DEFINES += LOG_ENGINE
+#DEFINES += LOG_ENGINE
 
 # Disable calculation of level
 #DEFINES += DISABLE_LEVEL

@@ -55,6 +55,9 @@ void Spectrograph::setFreqHi(int val)
     updateBars();
 }
 
+// -----------------------------------------------------------------------------
+// paintEvent
+
 void Spectrograph::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
@@ -163,6 +166,9 @@ void Spectrograph::paintEvent(QPaintEvent *event)
     }
 }
 
+// -----------------------------------------------------------------------------
+// mouse events
+
 void Spectrograph::mousePressEvent(QMouseEvent *event)
 {
     m_dragStart = event->pos();
@@ -181,36 +187,37 @@ void Spectrograph::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
 
-    Subrange *dest = &subrange;
-    if (selectedSublevelmeter) {
-        dest = &(selectedSublevelmeter->range);
-        selectedSublevelmeter->setActive(true);
-    }
-    else
-        dest = &subrange;
+    Subrange dest;
 
     QRect geo = m_rubberBand->geometry();
     geo = geo.intersected(rect());
 
     // Find sampling window from rubberband rect
-    dest->freqMin = float(geo.left())/rect().width();
-    dest->subrangeWindow.setLeft(dest->freqMin);  // For drawing
-    dest->freqMin = frac2freq(dest->freqMin);     // Actual frequency
+    dest.freqMin = float(geo.left())/rect().width();
+    dest.subrangeWindow.setLeft(dest.freqMin);  // For drawing
+    dest.freqMin = frac2freq(dest.freqMin);     // Actual frequency
 
-    dest->freqMax = float(geo.right())/rect().width();
-    dest->subrangeWindow.setRight(dest->freqMax);
-    dest->freqMax = frac2freq(dest->freqMax);
+    dest.freqMax = float(geo.right())/rect().width();
+    dest.subrangeWindow.setRight(dest.freqMax);
+    dest.freqMax = frac2freq(dest.freqMax);
 
-    dest->ampMin = float(geo.bottom())/rect().height();
-    dest->ampMax = float(geo.top())/rect().height();
-    dest->subrangeWindow.setBottom(dest->ampMin);
-    dest->subrangeWindow.setTop(dest->ampMax);
+    dest.ampMin = float(geo.bottom())/rect().height();
+    dest.ampMax = float(geo.top())/rect().height();
+    dest.subrangeWindow.setBottom(dest.ampMin);
+    dest.subrangeWindow.setTop(dest.ampMax);
 
     // Invert range, since window y increases from top to bottom.
-    dest->ampMin = 1.0 - dest->ampMin;
-    dest->ampMax = 1.0 - dest->ampMax;
+    dest.ampMin = 1.0 - dest.ampMin;
+    dest.ampMax = 1.0 - dest.ampMax;
 
     subrangeMetering = true;
+
+    if (selectedSublevelmeter) {
+        selectedSublevelmeter->setRange(dest);
+        selectedSublevelmeter->setActive(true);
+    }
+    else
+        subrange = dest;
 
     // Redraw
     m_rubberBand->hide();

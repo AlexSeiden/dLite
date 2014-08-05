@@ -1,5 +1,6 @@
 #include "dancefloormodel.h"
 
+#include <QDebug>
 #include <iostream>
 #include <fstream>
 #include <iosfwd>
@@ -9,7 +10,8 @@
 #include <QString>
 #include <QStringList>
 
-Dancefloormodel::Dancefloormodel() :
+Dancefloormodel::Dancefloormodel(QObject *parent) :
+    QObject(parent),
     values(NULL),
     lightIDs(NULL)
 {
@@ -17,17 +19,15 @@ Dancefloormodel::Dancefloormodel() :
 
 Dancefloormodel::~Dancefloormodel()
 {
-#if 0
     if (values)
         delete values;
     if (lightIDs)
         delete lightIDs;
-#endif
 }
 
+// TODO add Foot-squares as well as lights
 bool Dancefloormodel::ImportLayout(char *layoutCsvFile)
 {
-#if 1
     string line;
     vector< string> lines;
     vector< vector <string> > cells;
@@ -92,25 +92,6 @@ bool Dancefloormodel::ImportLayout(char *layoutCsvFile)
     }
 
     return true;
-#else
-    xsize = 24;
-    ysize = 18;
-    // Now alloc arrays:
-    lightIDs = (int*)malloc(sizeof(int)*10*xsize*ysize);
-    //values = new Lightcolor[xsize*ysize];
-
-    for (int y=0; y<ysize; ++y){
-        for (int x=0; x<xsize; ++x){
-            int index = _getIndex(x,y);
-            if (x < 3) {
-                lightIDs[index] = 0;
-            } else
-                lightIDs[index] = x + y*100;
-     //       values[index] = Lightcolor();
-        }
-    }
-    return true;
-#endif
 }
 
 bool
@@ -136,3 +117,28 @@ Dancefloormodel::display()
     }
 }
 
+#ifndef INLINE
+int Dancefloormodel::_getIndex(int x, int y)
+{
+    Q_ASSERT(x >= 0 && x < xsize && y >= 0 && y < ysize);
+    return xsize*y + x;
+}
+#endif
+
+void Dancefloormodel::setPixel(int x, int y, Lightcolor rgb)
+{
+    values[_getIndex(x,y)] = rgb;
+}
+
+
+Lightcolor Dancefloormodel::getPixel(int x, int y)
+{
+    return values[_getIndex(x,y)];
+}
+
+
+void Dancefloormodel::lightChanged(int x, int y, Lightcolor rgb)
+{
+    qDebug() << "light Changed" << x << y << rgb.getRed() << rgb.getGreen() << rgb.getBlue()  ;
+    setPixel(x,y,rgb);
+}

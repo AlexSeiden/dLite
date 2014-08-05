@@ -1,7 +1,9 @@
 #include "dancefloorwidget.h"
+#include "utils.h"
 #include <QDebug>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QTimer>
 #include <QTimerEvent>
 #include <math.h>
 
@@ -14,11 +16,13 @@ Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
     noCellColor = QColor(60,60,60);
     cellsize = 20;
     cellspace = 4;
+
+    timer = new QTimer(this);
+    CHECKED_CONNECT(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start(50);  // TODO make this updatable
 }
 
-Dancefloorwidget::~Dancefloorwidget()
-{
-}
+Dancefloorwidget::~Dancefloorwidget() { }
 
 void Dancefloorwidget::setModel(Dancefloormodel *model)
 {
@@ -38,13 +42,11 @@ bool Dancefloorwidget::cellHasLights(int x, int y) {
     return dfModel->hasPixel(x,y);
 }
 
-void Dancefloorwidget::reset()
-{
-}
-
 void Dancefloorwidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
+
+    //qDebug() << "DFW paint event";
 
     QPainter painter(this);
     painter.fillRect(rect(), bgColor);
@@ -62,13 +64,21 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
         for (int x=0; x<xsize; ++x) {
             cell.moveLeft(cellspace/2 + x*(cellsize+cellspace));
             cell.moveTop(cellspace/2 + y*(cellsize+cellspace));
+            // TODO shouldn't recalc index twice...
             if (cellHasLights(x,y))
-                painter.fillRect(cell, Qt::black);
+                //painter.fillRect(cell, Qt::black);
+                painter.fillRect(cell, cellGetColor(x,y));
             else
                 painter.fillRect(cell, noCellColor);
             painter.drawRect(cell);
         }
     }
+}
+
+QColor Dancefloorwidget::cellGetColor(int x, int y)
+{
+    Lightcolor rgb = dfModel->getPixel(x,y);
+    return QColor(rgb.getRed(),rgb.getBlue(),rgb.getGreen());
 }
 
 #ifndef INLINE

@@ -14,7 +14,6 @@ public:
 
     void setModel(Dancefloormodel *model);
     void setHasLights(int x, int y, bool status);
-    void setLightcolor(int x, int y, Lightcolor lc);
 
 public:
     // QWidget
@@ -26,12 +25,10 @@ public:
 signals:
     void infoMessage(const QString &message, int intervalMs);
 
-public slots:
-    void reset();
-
 private:
     Dancefloormodel *dfModel;
     bool    cellHasLights(int x, int y);
+    QColor  cellGetColor(int x, int y);
     int xsize;
     int ysize;
 
@@ -41,10 +38,12 @@ private:
     QColor cellSepColor;
     QColor panelSepColor;
     QColor noCellColor;
+    QTimer *timer;
 
 #ifdef INLINE
     int _getIndex(int x, int y) {return xsize*y + x;}
 #else
+    // This one has range checking
     int _getIndex(int x, int y);
 #endif
 

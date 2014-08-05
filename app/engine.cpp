@@ -40,8 +40,7 @@ Engine::Engine(QObject *parent)
     ,   m_spectrumBufferLength(0)
     ,   m_spectrumAnalyser()
     ,   m_spectrumPosition(0)
-    ,   m_count(0)
-    ,   m_notifyIntervalMs(50)
+    ,   m_notifyIntervalMs(50)  // TODO MAKE THIS A CHANGABLE SETTING
 {
     qRegisterMetaType<FrequencySpectrum>("FrequencySpectrum");
     qRegisterMetaType<WindowFunction>("WindowFunction");
@@ -114,7 +113,6 @@ void Engine::startPlayback()
                         this, SLOT(audioNotify()));
         CHECKED_CONNECT(m_audioOutput, SIGNAL(notify()),
                         this, SLOT(auxNotify()));
-        m_count = 0;
         if (m_file) {
             m_file->seek(0);
             m_bufferPosition = 0;
@@ -369,7 +367,7 @@ void Engine::calculateSpectrum(qint64 position)
     // QThread::currentThread is marked 'for internal use only', but
     // we're only using it for debug output here, so it's probably OK :)
     ENGINE_DEBUG << "Engine::calculateSpectrum" << QThread::currentThread()
-                 << "count" << m_count << "pos" << position << "len" << m_spectrumBufferLength
+                 << "pos" << position << "len" << m_spectrumBufferLength
                  << "spectrumAnalyser.isReady" << m_spectrumAnalyser.isReady();
 
     if (m_spectrumAnalyser.isReady()) {

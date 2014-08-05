@@ -12,12 +12,6 @@ int main(int argc, char *argv[])
     MainWidget w;
     w.show();
 
-    Dancefloormodel *dfModel = new Dancefloormodel();
-    dfModel->ImportLayout("/Users/alex/src/floorit/layout.csv");
-
-    Dancefloorwidget *dfw = new Dancefloorwidget();
-    dfw->setModel(dfModel);
-    dfw->show();
 
     return app.exec();
 }

@@ -8,13 +8,7 @@ Lightcolor::Lightcolor(int r, int g, int b) : m_r(r), m_g(g), m_b(b)
 {
 }
 
-
-#if 0
-Lightcolor::Lightcolor(float r, float g, float b)
+Lightcolor Lightcolor::LightcolorF(float r, float g, float b)
 {
-    m_r = r*255;
-    m_g = g*255;
-    m_b = b*255;
+    return Lightcolor(r*255, g*255, b*255);
 }
-#endif
-

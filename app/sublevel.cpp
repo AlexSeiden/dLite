@@ -1,4 +1,5 @@
 #include "sublevel.h"
+#include "utils.h"
 
 #include <math.h>
 
@@ -56,24 +57,19 @@ Subrange::frequencyWithinWindow(double freq)
 
 SublevelMeter::SublevelMeter(QWidget *parent)
     :   QWidget(parent)
-    ,   m_rmsLevel(0.0)
-    ,   m_rmsColor(Qt::red)
+    ,   m_level(0.0)
+    ,   m_barColor(Qt::red)
     ,   m_squareColor(Qt::blue)
     ,   _active(false)
     ,   _selectable(false)
     ,   _selected(false)
+    ,   _cue(NULL)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     setMinimumWidth(30);
 }
 
 SublevelMeter::~SublevelMeter() {  }
-
-void SublevelMeter::reset()
-{
-    m_rmsLevel = 0.0;
-    update();
-}
 
 void SublevelMeter::paintEvent(QPaintEvent *event)
 {
@@ -85,15 +81,15 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
 
     // Draw bar
     QRect bar = rect();
-    bar.setTop(rect().top() + (1.0 - m_rmsLevel) * rect().height());
-    painter.fillRect(bar, m_rmsColor);
+    bar.setTop(rect().top() + (1.0 - m_level) * rect().height());
+    painter.fillRect(bar, m_barColor);
 
     // Draw pulsar
     QRect squareRect = rect();
     squareRect.setBottom(rect().top()+ rect().width());
     squareRect.setRight(rect().right()-1);
     QColor pulseColor;
-    pulseColor.setHsvF(0.0, 0.0, m_rmsLevel);
+    pulseColor.setHsvF(0.0, 0.0, m_level);
     painter.fillRect(squareRect, pulseColor);
     painter.drawRect(squareRect);
 
@@ -111,6 +107,13 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
 void SublevelMeter::setActive(bool status)
 {
     _active = status;
+//    if (_active) {
+//        if (!_cue) {
+//            _cue = new Cue(this, );
+//            CHECKED_CONNECT(this, SIGNAL(levelChanged(float)),
+//                _cue, SLOT(levelChanged(float)));
+//        }
+//    }
 }
 
 void SublevelMeter::setSelectable(bool status)
@@ -145,13 +148,7 @@ void SublevelMeter::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-void SublevelMeter::levelChanged(qreal rmsLevel)
-{
-    m_rmsLevel = rmsLevel;
-    update();
-}
-
-// TODO decouple position & spectrum change???
+// TODO decouple position & spectrum change
 void SublevelMeter::spectrumChanged(qint64 position, qint64 length,
                                  const FrequencySpectrum &spectrum)
 {
@@ -160,6 +157,7 @@ void SublevelMeter::spectrumChanged(qint64 position, qint64 length,
     m_spectrum = spectrum;
     if (_active) {
         updateSubsamples();
+        emit levelChanged(m_level);
         update();
     }
 }
@@ -187,7 +185,6 @@ void SublevelMeter::updateSubsamples()
         }
     }
 
-
     // Compute subrange amplitude
     if (nsamples > 0)
         value /= nsamples;
@@ -196,8 +193,13 @@ void SublevelMeter::updateSubsamples()
         clipped = true;
     }
 
-    m_rmsLevel = value;
+    m_level = value;
     update();
 
     //emit subrangeLevelChanged(value);
+}
+
+void SublevelMeter::setRange(Subrange &newrange)
+{
+    range = newrange;
 }

@@ -6,7 +6,7 @@ class Lightcolor
 public:
     Lightcolor();
     Lightcolor(int r, int g, int b);
-//    Lightcolor(float r, float g, float b);
+    static Lightcolor LightcolorF(float r, float g, float b);
 
     int getRed()    {return m_r;};
     int getGreen()  {return m_g;};

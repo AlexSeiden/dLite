@@ -15,6 +15,8 @@ class ProgressBar;
 class SettingsDialog;
 class Spectrograph;
 class Controlpanel;
+class Dancefloorwidget;
+class Dancefloormodel;
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -90,6 +92,8 @@ private:
 
     QAction*                m_loadFileAction;
 
+    Dancefloormodel *       m_dancefloormodel;
+    Dancefloorwidget *      m_dancefloorwidget;
     Controlpanel *          m_controlpanel;
 };
 

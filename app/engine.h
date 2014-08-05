@@ -146,6 +146,7 @@ signals:
      * \param length   Length of window in bytes
      * \param spectrum Resulting frequency spectrum
      */
+    // TODO change this to only pass the spectrum
     void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
 
     /**
@@ -201,8 +202,6 @@ private:
     QByteArray          m_spectrumBuffer;
     SpectrumAnalyser    m_spectrumAnalyser;
     qint64              m_spectrumPosition;
-
-    int                 m_count;
 
     // Interval in millisecondd between calls that update the spectrum, etc.
     int    				m_notifyIntervalMs;
