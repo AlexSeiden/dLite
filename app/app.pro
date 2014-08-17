@@ -22,7 +22,9 @@ SOURCES  += main.cpp \
     lightcolor.cpp \
     dancefloorwidget.cpp \
     controlpanel.cpp \
-    cue.cpp
+    cue.cpp \
+    CueSheet.cpp \
+    CueView.cpp
 
 HEADERS  += engine.h \
             frequencyspectrum.h \
@@ -40,7 +42,9 @@ HEADERS  += engine.h \
     dancefloormodel.h \
     lightcolor.h \
     controlpanel.h \
-    cue.h
+    cue.h \
+    CueSheet.h \
+    CueView.h
 
 fftreal_dir = ../3rdparty/fftreal
 
@@ -83,3 +87,7 @@ macx {
         QMAKE_LFLAGS += -Wl,--rpath=\\\$\$ORIGIN
     }
 }
+
+FORMS += \
+    CueSheet.ui \
+    CueView.ui

@@ -13,15 +13,13 @@ Spectrograph::Spectrograph(QWidget *parent)
     ,   m_isDragging(false)
     ,   m_dragStart(QPoint(0,0))
     ,   m_rubberBand(NULL)
-    ,   subrangeMetering(false)
+//    ,   subrangeMetering(false)
     ,   selectedSublevelmeter(NULL)
 {
     setMinimumHeight(100);
 }
 
-Spectrograph::~Spectrograph()
-{
-}
+Spectrograph::~Spectrograph() { }
 
 void Spectrograph::setParams(int numBars, qreal lowFreq, qreal highFreq)
 {
@@ -150,18 +148,19 @@ void Spectrograph::paintEvent(QPaintEvent *event)
     }
 
     // Do we have a window?
-    if (subrangeMetering || selectedSublevelmeter) {
-
+    if (selectedSublevelmeter) {
         QRectF *subrangewindow;
-        if (selectedSublevelmeter)
-            subrangewindow = &(selectedSublevelmeter->range.subrangeWindow);
-        else
-            subrangewindow = &(subrange.subrangeWindow);
+        subrangewindow = &(selectedSublevelmeter->range.subrangeWindow);
         QRectF subwin;
         subwin.setTop(   rect().height() * subrangewindow->top());
         subwin.setBottom(rect().height() * subrangewindow->bottom());
         subwin.setLeft(  rect().width()  * subrangewindow->left());
         subwin.setRight( rect().width()  * subrangewindow->right());
+        // TODO make this color settable/responsive to current selection
+        QPen pen(Qt::blue);
+        pen.setWidth(2);
+        painter.setPen(pen);
+
         painter.drawRect(subwin);
     }
 }
@@ -210,14 +209,10 @@ void Spectrograph::mouseReleaseEvent(QMouseEvent *event)
     dest.ampMin = 1.0 - dest.ampMin;
     dest.ampMax = 1.0 - dest.ampMax;
 
-    subrangeMetering = true;
-
     if (selectedSublevelmeter) {
         selectedSublevelmeter->setRange(dest);
         selectedSublevelmeter->setActive(true);
     }
-    else
-        subrange = dest;
 
     // Redraw
     m_rubberBand->hide();
@@ -349,7 +344,6 @@ void Spectrograph::updateBars()
     int index = 0;
     // TODO:  at least half the bars wasted--unused
     // Also, could optimize since they are monotonicly increasing
-    Bar subrangeBar;
 
     for ( ; i != end; ++i, ++index) {
         const FrequencySpectrum::Element e = *i;
@@ -364,15 +358,6 @@ void Spectrograph::updateBars()
             bar.clipped |= e.clipped;
         }
 
-        // Do we have a window?
-        if (subrangeMetering) {
-            if (subrange.frequencyWithinWindow(e.frequency)) {
-                // amplitude window
-                subrangeBar.value += subrange.amplitudeWithinWindow(e.amplitude);
-                subrangeBar.nsamples++;
-                subrangeBar.clipped |= e.clipped;
-            }
-        }
     }
 
     // Normalize by number of samples
@@ -386,18 +371,6 @@ void Spectrograph::updateBars()
             bar.value = 1.0;
             bar.clipped = true;
         }
-    }
-
-
-    // Compute subrange amplitude
-    if (subrangeMetering) {
-        if (subrangeBar.nsamples > 0)
-            subrangeBar.value /= subrangeBar.nsamples;
-        if (subrangeBar.value > 1.0) {
-            subrangeBar.value = 1.0;
-            subrangeBar.clipped = true;
-        }
-        emit subrangeLevelChanged(subrangeBar.value);
     }
 
     if (m_printspectrum) {

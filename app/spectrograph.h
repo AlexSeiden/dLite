@@ -35,7 +35,7 @@ public:
 
 signals:
     void infoMessage(const QString &message, int intervalMs);
-    void subrangeLevelChanged(const qreal rmsval);
+//    void subrangeLevelChanged(const qreal rmsval);
 
 public slots:
     void reset();
@@ -55,7 +55,7 @@ private:
     QPair<qreal, qreal> barRangeLog(int barIndex) const;
     void updateBars();
 
-    void computeSubrange(Subrange range);
+//    void computeSubrange(Subrange range);
 
 protected:
     qreal frac2freq(qreal frac) const;
@@ -85,8 +85,8 @@ private:
     QPoint				m_dragStart;
     QRubberBand*		m_rubberBand;
 
-    bool				subrangeMetering;
-    Subrange            subrange;
+//    bool				subrangeMetering;
+//    Subrange            subrange;
     SublevelMeter *     selectedSublevelmeter;
 
 };

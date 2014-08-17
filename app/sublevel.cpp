@@ -94,12 +94,13 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
     painter.drawRect(squareRect);
 
     if (_selected) {
-        QRect surroundRect = rect();
-        surroundRect.setSize(QSize(rect().width()-1, rect().height()-1));
         QPen pen(Qt::blue);
         pen.setWidth(6);
-
         painter.setPen(pen);
+
+        QRect surroundRect = rect();
+        // move in 1 pixel
+        surroundRect.setSize(QSize(rect().width()-1, rect().height()-1));
         painter.drawRect(rect());
     }
 }
@@ -140,8 +141,10 @@ void SublevelMeter::mouseReleaseEvent(QMouseEvent *event)
         return;
     }
 
-    if (_selected)
+    if (_selected) {
         setSelection(false);
+        emit(iveBeenSelected(NULL));
+    }
     else {
         setSelection(true);
         emit(iveBeenSelected(this));

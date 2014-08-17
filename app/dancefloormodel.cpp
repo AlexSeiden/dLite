@@ -60,17 +60,10 @@ bool Dancefloormodel::ImportLayout(char *layoutCsvFile)
         cells.push_back(row);
     }
 
-    // Check that all the rows are the same size
-    size_t rowSize = cells[0].size();
-#if 0
-    for (size_t i = 1; i< cells.size(); ++i) {
-        if (cells[i].size() != rowSize) {
-            printf("WE ARE FUCKED\n");
-            // TODO probably can just use max of all rows...
-            return false;
-        }
-    }
-#endif
+    // Find longest row, use that for x size.
+   size_t rowSize = cells[0].size();
+   for (size_t i = 1; i< cells.size(); ++i)
+        rowSize = max(cells[i].size(),  rowSize);
 
     xsize = rowSize;
 
@@ -139,6 +132,6 @@ Lightcolor Dancefloormodel::getPixel(int x, int y)
 
 void Dancefloormodel::lightChanged(int x, int y, Lightcolor rgb)
 {
-    qDebug() << "light Changed" << x << y << rgb.getRed() << rgb.getGreen() << rgb.getBlue()  ;
+    //qDebug() << "light Changed" << x << y << rgb.getRed() << rgb.getGreen() << rgb.getBlue()  ;
     setPixel(x,y,rgb);
 }

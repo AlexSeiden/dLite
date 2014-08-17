@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QHBoxLayout>
+#include <QIcon>
+#include <QPushButton>
 #include "sublevel.h"
 #include "engine.h"
 #include "cue.h"
@@ -27,8 +29,12 @@ private:
     void addMeter();
     SublevelMeter *submeterSelected();
 
+    QPushButton*            m_addsensorButton;
+    QIcon                   m_addsensorIcon;
 
+    QVBoxLayout               *windowLayout;
     QHBoxLayout               *hLayout;
+    QWidget                   *controlsPanel;
 
     int                       numMeters;
     QList< SublevelMeter * >  meters;

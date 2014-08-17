@@ -70,7 +70,6 @@ private:
     ProgressBar*            m_progressBar;
     Spectrograph*           m_spectrograph;
     LevelMeter*             m_levelMeter;
-    SublevelMeter*          m_subrangeLevelMeter;
 
     QPushButton*            m_fileButton;
     QPushButton*            m_pauseButton;
@@ -79,7 +78,6 @@ private:
     QIcon                   m_playIcon;
     QPushButton*            m_settingsButton;
     QIcon                   m_settingsIcon;
-    QPushButton*            m_printSpectrum;
 
     QSpinBox *				m_numBandsSpinBox;
     QSpinBox *				m_specMinSpinBox;

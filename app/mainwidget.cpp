@@ -8,6 +8,8 @@
 #include "utils.h"
 #include "controlpanel.h"
 #include "dancefloorwidget.h"
+#include "CueSheet.h"
+#include "CueView.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -28,12 +30,10 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_progressBar(new ProgressBar(this))
     ,   m_spectrograph(new Spectrograph(this))
     ,   m_levelMeter(new LevelMeter(this))
-    ,   m_subrangeLevelMeter(new SublevelMeter(this))
     ,   m_fileButton(new QPushButton(this))
     ,   m_pauseButton(new QPushButton(this))
     ,   m_playButton(new QPushButton(this))
     ,   m_settingsButton(new QPushButton(this))
-    ,   m_printSpectrum(new QPushButton(this))
     ,   m_numBandsSpinBox(new QSpinBox(this))
     ,   m_specMinSpinBox(new QSpinBox(this))
     ,   m_specMaxSpinBox(new QSpinBox(this))
@@ -53,8 +53,9 @@ MainWidget::MainWidget(QWidget *parent)
     setMinimumHeight(400);
     move(10,50);  // TODO restore
 
-    // TODO allow setting this
-    m_dancefloormodel->ImportLayout("/Users/alex/src/floorit/layout.csv");
+    // TODO move to settings/prefs  & allow setting this
+    char *layoutFile = "/Users/alex/src/floorit/layout.csv";
+    m_dancefloormodel->ImportLayout(layoutFile);
 
     m_controlpanel = new Controlpanel(NULL, m_engine, m_dancefloormodel);
 
@@ -65,6 +66,9 @@ MainWidget::MainWidget(QWidget *parent)
     m_controlpanel->show();
 
     connectUi();
+
+    CueView *cv = new CueView(NULL);
+    cv->show();
 
     // TODO default to last played.
     m_engine->loadFile(QString("/Users/alex/Documents/lights/Jam On It/Jam On It.wav"));
@@ -183,7 +187,6 @@ void MainWidget::createUi()
     QScopedPointer<QHBoxLayout> analysisLayout(new QHBoxLayout);
     analysisLayout->addWidget(m_levelMeter);
     analysisLayout->addWidget(m_spectrograph);
-    analysisLayout->addWidget(m_subrangeLevelMeter);
     windowLayout->addLayout(analysisLayout.data());
     analysisLayout.take();
 
@@ -191,7 +194,6 @@ void MainWidget::createUi()
     const QSize buttonSize(30, 30);
 
     m_fileButton->setText(tr("File..."));
-    m_printSpectrum->setText(tr("print spectrum"));
 
     m_pauseIcon = style()->standardIcon(QStyle::SP_MediaPause);
     m_pauseButton->setIcon(m_pauseIcon);
@@ -217,7 +219,6 @@ void MainWidget::createUi()
     buttonPanelLayout->addWidget(m_pauseButton);
     buttonPanelLayout->addWidget(m_playButton);
     buttonPanelLayout->addWidget(m_settingsButton);
-    buttonPanelLayout->addWidget(m_printSpectrum);
 
     QWidget *buttonPanel = new QWidget(this);
     buttonPanel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -279,9 +280,6 @@ void MainWidget::createUi()
 
 void MainWidget::connectUi()
 {
-    CHECKED_CONNECT(m_printSpectrum, SIGNAL(clicked()),
-            m_spectrograph, SLOT(printSpectrum()));
-
     CHECKED_CONNECT(m_pauseButton, SIGNAL(clicked()),
             m_engine, SLOT(suspend()));
 
@@ -316,9 +314,6 @@ void MainWidget::connectUi()
 
     CHECKED_CONNECT(m_engine, SIGNAL(levelChanged(qreal, qreal, int)),
             m_levelMeter, SLOT(levelChanged(qreal, qreal, int)));
-
-//    CHECKED_CONNECT(m_spectrograph, SIGNAL(subrangeLevelChanged(qreal)),
-//            m_subrangeLevelMeter, SLOT(levelChanged(qreal)));
 
     CHECKED_CONNECT(m_controlpanel, SIGNAL(submeterSelectionChanged(SublevelMeter *)),
             m_spectrograph, SLOT(submeterSelectionChanged(SublevelMeter *)));

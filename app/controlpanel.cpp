@@ -4,6 +4,7 @@
 #include "utils.h"
 #include <QHBoxLayout>
 #include <QMouseEvent>
+#include <QLabel>
 
 
 Controlpanel::Controlpanel(QWidget *parent, Engine *engine, Dancefloormodel *dfmodel) :
@@ -20,16 +21,30 @@ Controlpanel::Controlpanel(QWidget *parent, Engine *engine, Dancefloormodel *dfm
 void Controlpanel::createUi()
 {
     setWindowTitle(tr("Control Panel"));
-    hLayout = new QHBoxLayout(this);
+
+    windowLayout = new QVBoxLayout(this);
+    hLayout = new QHBoxLayout;
+    controlsPanel = new QWidget(this);
+    controlsPanel->setLayout(hLayout);
+    windowLayout->addWidget(controlsPanel);
 
     for (int i=0; i<3; ++i)
         addMeter();
-
     CHECKED_CONNECT(meters[0], SIGNAL(levelChanged(qreal)), _cue, SLOT(levelChanged(qreal)));
 
-    setLayout(hLayout);
+    // "add control" button
+    m_addsensorButton = new QPushButton(this);
+//    m_addsensorIcon = QIcon(":/images/settings.png");
+//    m_addsensorButton->setIcon(m_addsensorIcon);
+    m_addsensorButton->setText(tr("+"));
+    m_addsensorButton->setEnabled(true);
+    m_addsensorButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    m_addsensorButton->setMinimumSize(30,30);
+    //m_addsensorButton->setLayout(windowLayout);
 
-    // TODO "add control" button
+    windowLayout->addWidget(m_addsensorButton);
+
+    setLayout(windowLayout);
 
     // TODO restore from saved & allowed saved layouts
     setMinimumHeight(300);
@@ -41,13 +56,26 @@ void Controlpanel::addMeter()
 {
     SublevelMeter *slm = new SublevelMeter(this);
     slm->setSelectable(true);
-    hLayout->addWidget(slm);
+
+    QLabel *meterNumber = new QLabel(QString("%1").arg(numMeters), this);
+    meterNumber->setFixedHeight(20);
+    meterNumber->setAlignment(Qt::AlignBottom | Qt::AlignCenter);
+
+    // Make VBox for label, checkbox etc
+    QScopedPointer<QVBoxLayout> vbox(new QVBoxLayout);
+    vbox->addWidget(slm);
+    vbox->addWidget(meterNumber);
+
+    hLayout->addLayout(vbox.data());
+    vbox.take();    // ownership transferred to hLayout
+
     CHECKED_CONNECT(slm, SIGNAL(iveBeenSelected(SublevelMeter*)),
             this, SLOT(submeterHasBeenSelected(SublevelMeter*)));
 
     // TODO use simpler spectrumChanged
     CHECKED_CONNECT(_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
             slm, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
+
 
     numMeters++;
     meters.append(slm);

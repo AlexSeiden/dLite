@@ -18,11 +18,31 @@ public slots:
     void levelChanged(qreal level);
 
 private:
-    //ColorPalette *palette;
+    Dancefloormodel *_floor;
+    bool    _active;
+
     int     xoffset, yoffset;
     float   scale;
-    bool    _active;
-    Dancefloormodel *_model;
+#if 0
+    // Food for thought
+    ColorPalette *palette;
+    int   counter;
+    int   measure;
+    int   beatWithinMeasure;
+#endif
 };
+
+class BoxCue : public Cue
+{
+    Q_OBJECT
+
+public:
+    explicit BoxCue(QObject *parent = 0, Dancefloormodel *dfmodel = 0);
+    
+
+};
+
+
+
 
 #endif // CUE_H
