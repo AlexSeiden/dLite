@@ -4,9 +4,16 @@ TEMPLATE = subdirs
 
 # Ensure that library is built before application
 CONFIG  += ordered
+CONFIG  += c++11
 
 SUBDIRS += 3rdparty/fftreal
 SUBDIRS += app
 
 TARGET = spectrum
 
+
+# mostly for std::function
+QMAKE_CXXFLAGS += -stdlib=libc++
+QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -mmacosx-version-min=10.7
+QMAKE_LFLAGS += -mmacosx-version-min=10.7

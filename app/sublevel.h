@@ -5,13 +5,14 @@
 #include <QWidget>
 #include "frequencyspectrum.h"
 #include "cue.h"
+#include <functional>
 
 // -----------------------------------------------------------------------------
 // Subrange
 
 class Subrange
 {
-    friend class Spectrograph;
+    friend class Spectrograph;  // TODO remove this
 
 protected:
     float freqMin, freqMax;
@@ -34,7 +35,7 @@ public:
 /**
  * Widget which displays a vertical audio level meter, indicating the
  * RMS level of the window of audio samples most recently analyzed
- * by the Engine.
+ * by the Engine within a specfied frequency range and amplitude.
  * Also has a pulsing display at the top, proportional to rms level
  */
 class SublevelMeter : public QWidget
@@ -55,9 +56,12 @@ public:
     void setActive(bool status);
     void setSelectable(bool status);
     bool setSelection(bool status);
-    void updateSubsamples();
+    void calculateLevel();
     Subrange getRange() {return range;}
     void setRange(Subrange &range);
+
+    std::function<void(float&)> createProviderFunctor();
+
 
 signals:
     void iveBeenSelected(SublevelMeter *me);

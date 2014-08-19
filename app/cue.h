@@ -3,46 +3,30 @@
 
 #include "lightcolor.h"
 #include "dancefloormodel.h"
-#include <QObject>
+#include "Param.h"
 
-class Cue : public QObject
+enum compmode_t {SET, ADD, OVER, UNDER};
+
+class Cue
 {
-    Q_OBJECT
 public:
-    explicit Cue(QObject *parent = 0, Dancefloormodel *dfmodel = 0);
+    explicit Cue(Dancefloormodel *dfmodel = 0);
+    void evaluate();
 
-signals:
-    void lightChanged(int x, int y, Lightcolor lights);
-
-public slots:
-    void levelChanged(qreal level);
+    void            setCompMode(compmode_t mode);
+    compmode_t      getCompMode();
 
 private:
     Dancefloormodel *_floor;
-    bool    _active;
+    bool            _active;
+    compmode_t      _compmode;
 
-    int     xoffset, yoffset;
-    float   scale;
-#if 0
-    // Food for thought
-    ColorPalette *palette;
-    int   counter;
-    int   measure;
-    int   beatWithinMeasure;
-#endif
+    ParamInt      _xoffset;
+    ParamInt      _yoffset;
+    ParamFloat    _scale;
+    ParamFloat    _alpha;
+    Lightcolor _color;
 };
-
-class BoxCue : public Cue
-{
-    Q_OBJECT
-
-public:
-    explicit BoxCue(QObject *parent = 0, Dancefloormodel *dfmodel = 0);
-    
-
-};
-
-
 
 
 #endif // CUE_H

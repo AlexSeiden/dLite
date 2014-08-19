@@ -1,5 +1,13 @@
 include(../spectrum.pri)
 
+# mostly for std::function
+CONFIG  += c++11
+QMAKE_CXXFLAGS += -stdlib=libc++
+QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -mmacosx-version-min=10.7
+QMAKE_LFLAGS += -mmacosx-version-min=10.7
+
+
 TEMPLATE = app
 
 TARGET = spectrum
@@ -24,7 +32,8 @@ SOURCES  += main.cpp \
     controlpanel.cpp \
     cue.cpp \
     CueSheet.cpp \
-    CueView.cpp
+    CueView.cpp \
+    Param.cpp
 
 HEADERS  += engine.h \
             frequencyspectrum.h \
@@ -44,7 +53,8 @@ HEADERS  += engine.h \
     controlpanel.h \
     cue.h \
     CueSheet.h \
-    CueView.h
+    CueView.h \
+    Param.h
 
 fftreal_dir = ../3rdparty/fftreal
 
@@ -87,6 +97,7 @@ macx {
         QMAKE_LFLAGS += -Wl,--rpath=\\\$\$ORIGIN
     }
 }
+
 
 FORMS += \
     CueSheet.ui \

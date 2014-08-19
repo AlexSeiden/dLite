@@ -159,13 +159,13 @@ void SublevelMeter::spectrumChanged(qint64 position, qint64 length,
     Q_UNUSED(length);
     m_spectrum = spectrum;
     if (_active) {
-        updateSubsamples();
+        calculateLevel();
         emit levelChanged(m_level);
         update();
     }
 }
 
-void SublevelMeter::updateSubsamples()
+void SublevelMeter::calculateLevel()
 {
     // loop over all frequencies in the spectrum, and set the value
     FrequencySpectrum::const_iterator i = m_spectrum.begin();
@@ -206,3 +206,15 @@ void SublevelMeter::setRange(Subrange &newrange)
 {
     range = newrange;
 }
+
+
+std::function<void(float &)>
+SublevelMeter::createProviderFunctor()
+{
+    // create function object that will set value of level.
+    //auto out = new std::function<void(float&)>;
+    auto lambda = [this] (float &out) {out = m_level;};
+    //out = lambda;
+    return lambda;
+}
+

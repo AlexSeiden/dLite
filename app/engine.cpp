@@ -40,7 +40,7 @@ Engine::Engine(QObject *parent)
     ,   m_spectrumBufferLength(0)
     ,   m_spectrumAnalyser()
     ,   m_spectrumPosition(0)
-    ,   m_notifyIntervalMs(50)  // TODO MAKE THIS A CHANGABLE SETTING
+    ,   m_notifyIntervalMs(50)  // TODO Make this a changable setting
 {
     qRegisterMetaType<FrequencySpectrum>("FrequencySpectrum");
     qRegisterMetaType<WindowFunction>("WindowFunction");

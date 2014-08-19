@@ -14,7 +14,7 @@ Controlpanel::Controlpanel(QWidget *parent, Engine *engine, Dancefloormodel *dfm
     _dfmodel(dfmodel),
     _cue(NULL)
 {
-    _cue = new Cue(NULL, _dfmodel);
+    _cue = new Cue(_dfmodel);
     createUi();
 }
 
@@ -30,7 +30,7 @@ void Controlpanel::createUi()
 
     for (int i=0; i<3; ++i)
         addMeter();
-    CHECKED_CONNECT(meters[0], SIGNAL(levelChanged(qreal)), _cue, SLOT(levelChanged(qreal)));
+    //CHECKED_CONNECT(meters[0], SIGNAL(levelChanged(qreal)), _cue, SLOT(levelChanged(qreal)));
 
     // "add control" button
     m_addsensorButton = new QPushButton(this);
