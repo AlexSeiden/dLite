@@ -208,8 +208,7 @@ void SublevelMeter::setRange(Subrange &newrange)
 }
 
 
-std::function<void(float &)>
-SublevelMeter::createProviderFunctor()
+providerFunctor_t SublevelMeter::createProviderFunctor()
 {
     // create function object that will set value of level.
     //auto out = new std::function<void(float&)>;

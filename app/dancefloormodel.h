@@ -2,10 +2,8 @@
 #define DANCEFLOORMODEL_H
 
 #include <QObject>
-
 #include <string>
 #include "lightcolor.h"
-using namespace std;
 
 class Dancefloormodel : public QObject
 {
@@ -14,7 +12,7 @@ class Dancefloormodel : public QObject
 public:
     explicit Dancefloormodel(QObject *parent = 0);
     ~Dancefloormodel();
-    bool ImportLayout(char *layoutCsvFile);
+    bool ImportLayout(std::string & layoutCsvFile);
 
     bool hasPixel(int x, int y);
     Lightcolor getPixel(int x, int y);
@@ -31,7 +29,6 @@ private:
     int xsize, ysize;
     Lightcolor * values;
     int *       lightIDs;
-
 
 #ifdef INLINE
     int _getIndex(int x, int y) {return xsize*y + x;}

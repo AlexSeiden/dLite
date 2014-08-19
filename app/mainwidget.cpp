@@ -54,8 +54,9 @@ MainWidget::MainWidget(QWidget *parent)
     move(10,50);  // TODO restore
 
     // TODO move to settings/prefs  & allow setting this
-    char *layoutFile = "/Users/alex/src/floorit/layout.csv";
-    m_dancefloormodel->ImportLayout(layoutFile);
+    //char *layoutFile = "/Users/alex/src/floorit/layout.csv";
+    std::string lf = std::string("/Users/alex/src/floorit/layout.csv");
+    m_dancefloormodel->ImportLayout(lf);
 
     m_controlpanel = new Controlpanel(NULL, m_engine, m_dancefloormodel);
 

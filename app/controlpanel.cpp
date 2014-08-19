@@ -15,6 +15,8 @@ Controlpanel::Controlpanel(QWidget *parent, Engine *engine, Dancefloormodel *dfm
     _cue(NULL)
 {
     _cue = new Cue(_dfmodel);
+    _engine->addCue(_cue); // TODO make this part of cue constructor???
+
     createUi();
 }
 
@@ -102,6 +104,8 @@ void Controlpanel::submeterHasBeenSelected(SublevelMeter *chosen)
         }
     }
 
+    auto provider = chosen->createProviderFunctor();
+    _cue->setAlphaProvider(provider);
     // emit signal for others who might care, e.g. spectrograph
     emit(submeterSelectionChanged(chosen));
 }

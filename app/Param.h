@@ -1,6 +1,8 @@
 #ifndef PARAM_H
 #define PARAM_H
 
+#include <functional>
+
 #if 0
 template <typename PT>
 class Param
@@ -17,17 +19,20 @@ private:
 };
 #endif
 
+
+typedef std::function<void(float&)> providerFunctor_t;
+
 class ParamFloat
 {
 public:
     ParamFloat(float value=0.0);
     void getValue(float &value);
 
-    void setProvider();
+    void setProvider(providerFunctor_t &provider);
 
 private:
     float _value;
-    void (*_provider)(float &value);
+    providerFunctor_t _provider;
 };
 
 
@@ -37,7 +42,7 @@ public:
     ParamInt(int value=0);
     void getValue(int &value);
     
-    void setProvider();
+//    void setProvider(providerFunctor_t &provider);
     
 private:
     int _value;

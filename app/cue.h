@@ -16,6 +16,8 @@ public:
     void            setCompMode(compmode_t mode);
     compmode_t      getCompMode();
 
+    void            setAlphaProvider(providerFunctor_t &provider);
+
 private:
     Dancefloormodel *_floor;
     bool            _active;

@@ -1,4 +1,4 @@
-#include "cue.h"
+#include "Cue.h"
 #include "utils.h"
 #include "lightcolor.h"
 #include "dancefloormodel.h"
@@ -31,4 +31,9 @@ void Cue::evaluate()
 
     Lightcolor lightc = Lightcolor::LightcolorF(alpha, alpha, alpha);
     _floor->setPixel(xoffset, yoffset, lightc);
+}
+
+void Cue::setAlphaProvider(providerFunctor_t &provider)
+{
+    _alpha.setProvider(provider);
 }

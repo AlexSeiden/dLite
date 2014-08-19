@@ -5,7 +5,7 @@
 #include <QWidget>
 #include "frequencyspectrum.h"
 #include "cue.h"
-#include <functional>
+#include "Param.h"
 
 // -----------------------------------------------------------------------------
 // Subrange
@@ -60,7 +60,8 @@ public:
     Subrange getRange() {return range;}
     void setRange(Subrange &range);
 
-    std::function<void(float&)> createProviderFunctor();
+    //std::function<void(float&)> createProviderFunctor();
+    providerFunctor_t createProviderFunctor();
 
 
 signals:

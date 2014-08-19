@@ -4,6 +4,7 @@
 #include "spectrum.h"
 #include "spectrumanalyser.h"
 #include "wavfile.h"
+#include "Cue.h"
 
 #include <QAudioDeviceInfo>
 #include <QAudioFormat>
@@ -87,6 +88,8 @@ public:
      */
     void setWindowFunction(WindowFunction type);
 
+    void addCue(Cue *cue);
+    void evaluateAllCues();
 
 public slots:
     void startPlayback();
@@ -205,6 +208,8 @@ private:
 
     // Interval in millisecondd between calls that update the spectrum, etc.
     int    				m_notifyIntervalMs;
+
+    std::vector<Cue *>  _cues;
 };
 
 #endif // ENGINE_H

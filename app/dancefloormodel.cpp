@@ -10,6 +10,8 @@
 #include <QString>
 #include <QStringList>
 
+using namespace std;
+
 Dancefloormodel::Dancefloormodel(QObject *parent) :
     QObject(parent),
     values(NULL),
@@ -26,7 +28,7 @@ Dancefloormodel::~Dancefloormodel()
 }
 
 // TODO add Foot-squares as well as lights
-bool Dancefloormodel::ImportLayout(char *layoutCsvFile)
+bool Dancefloormodel::ImportLayout(string &layoutCsvFile)
 {
     string line;
     vector< string> lines;
