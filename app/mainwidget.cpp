@@ -8,7 +8,6 @@
 #include "utils.h"
 #include "controlpanel.h"
 #include "dancefloorwidget.h"
-#include "CueSheet.h"
 #include "CueView.h"
 
 #include <QLabel>
@@ -37,11 +36,11 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_numBandsSpinBox(new QSpinBox(this))
     ,   m_specMinSpinBox(new QSpinBox(this))
     ,   m_specMaxSpinBox(new QSpinBox(this))
-    ,   m_infoMessage(new QLabel(tr("Select a file to begin"), this))
+    ,   m_infoMessage(new QLabel(tr(""), this))
     ,   m_infoMessageTimerId(NullTimerId)
     ,   m_settingsDialog(new SettingsDialog(m_engine->interval(), this))
     ,   m_loadFileAction(0)
-    ,   m_dancefloormodel(new Dancefloormodel)
+    ,   m_dancefloormodel(new Dancefloormodel)  // TODO should be allocated in main?
     ,   m_controlpanel(NULL)
 {
     // numBands, lowfreq, hifreq.
@@ -54,7 +53,6 @@ MainWidget::MainWidget(QWidget *parent)
     move(10,50);  // TODO restore
 
     // TODO move to settings/prefs  & allow setting this
-    //char *layoutFile = "/Users/alex/src/floorit/layout.csv";
     std::string lf = std::string("/Users/alex/src/floorit/layout.csv");
     m_dancefloormodel->ImportLayout(lf);
 
@@ -90,11 +88,6 @@ void MainWidget::stateChanged(QAudio::State state)
         m_levelMeter->reset();
         m_spectrograph->reset();
     }
-}
-
-void MainWidget::formatChanged(const QAudioFormat &format)
-{
-   infoMessage(formatToString(format), NullMessageTimeout);
 }
 
 // TODO decouple position & spectrum change
@@ -295,9 +288,6 @@ void MainWidget::connectUi()
 
     CHECKED_CONNECT(m_engine, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(stateChanged(QAudio::State)));
-
-    CHECKED_CONNECT(m_engine, SIGNAL(formatChanged(const QAudioFormat &)),
-            this, SLOT(formatChanged(const QAudioFormat &)));
 
     m_progressBar->bufferLengthChanged(m_engine->bufferLength());
 

@@ -4,6 +4,9 @@
 #include <QObject>
 #include <string>
 #include "lightcolor.h"
+#include "Param.h"
+
+using namespace std;
 
 class Dancefloormodel : public QObject
 {
@@ -27,8 +30,11 @@ public slots:
 
 private:
     int xsize, ysize;
-    Lightcolor * values;
-    int *       lightIDs;
+    vector<Lightcolor>   values;
+    vector<Firing*>      firings;
+    vector<int>          lightIDs;
+
+    vector<Light>       _lights;
 
 #ifdef INLINE
     int _getIndex(int x, int y) {return xsize*y + x;}

@@ -42,11 +42,13 @@ public:
     ParamInt(int value=0);
     void getValue(int &value);
     
-//    void setProvider(providerFunctor_t &provider);
+    void setProvider(void (*provider)(int &value));
     
 private:
     int _value;
     void (*_provider)(int &value);
 };
+
+
 
 #endif // PARAM_H

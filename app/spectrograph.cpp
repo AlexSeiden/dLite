@@ -5,6 +5,9 @@
 #include <QTimerEvent>
 #include <math.h>
 
+QColor Spectrograph::barColor = QColor(51, 204, 102);
+QColor Spectrograph::clipColor = QColor(255, 255, 0);
+
 Spectrograph::Spectrograph(QWidget *parent)
     :   QWidget(parent)
     ,   m_lowFreq(10.0)
@@ -13,7 +16,6 @@ Spectrograph::Spectrograph(QWidget *parent)
     ,   m_isDragging(false)
     ,   m_dragStart(QPoint(0,0))
     ,   m_rubberBand(NULL)
-//    ,   subrangeMetering(false)
     ,   selectedSublevelmeter(NULL)
 {
     setMinimumHeight(100);
@@ -65,8 +67,6 @@ void Spectrograph::paintEvent(QPaintEvent *event)
 
     const int numBars = m_bars.count();
 
-    QColor barColor(51, 204, 102);
-    QColor clipColor(255, 255, 0);
 
     // Draw the outline
     const QColor gridColor = barColor.darker();
@@ -110,8 +110,8 @@ void Spectrograph::paintEvent(QPaintEvent *event)
         painter.drawLine(line);
     }
 
-    barColor = barColor.lighter();
-    barColor.setAlphaF(0.75);
+    QColor lineColor = barColor.lighter();
+    lineColor.setAlphaF(0.75);
     clipColor.setAlphaF(0.75);
 
     // Draw the bars
@@ -133,7 +133,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
 
     // Draw the labels
     painter.setPen(QColor(230,230,255));
-    const int textHeight = 50;
+    const int textHeight = 40;
     const int bottomOffset = 10;
     for (int i=0; i<numBars; ++i) {
         QRect textrect = rect();
@@ -147,7 +147,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
         painter.drawText(textrect, Qt::AlignBottom|Qt::AlignHCenter, QString::number(centerfreq));
     }
 
-    // Do we have a window?
+    // Do we have a subrange that should be drawn?
     if (selectedSublevelmeter) {
         QRectF *subrangewindow;
         subrangewindow = &(selectedSublevelmeter->range.subrangeWindow);

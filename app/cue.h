@@ -5,8 +5,6 @@
 #include "dancefloormodel.h"
 #include "Param.h"
 
-enum compmode_t {SET, ADD, OVER, UNDER};
-
 class Cue
 {
 public:

@@ -3,20 +3,27 @@
 
 #include <QWidget>
 
-namespace Ui {
-class CueView;
-}
+QT_BEGIN_NAMESPACE
+class QLabel;
+class QSpinBox;
+QT_END_NAMESPACE
 
 class CueView : public QWidget
 {
     Q_OBJECT
-
 public:
     explicit CueView(QWidget *parent = 0);
-    ~CueView();
+
+signals:
+
+public slots:
 
 private:
-    Ui::CueView *ui;
+    QLabel *alphaLabel;
+    QLabel *xLabel;
+    QLabel *yLabel;
+    QSpinBox *xSpinBox;
+    QSpinBox *ySpinBox;
 };
 
 #endif // CUEVIEW_H

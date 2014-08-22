@@ -15,7 +15,7 @@ class Spectrograph : public QWidget
 {
     Q_OBJECT
 
-    friend class Subrange;
+    friend class Subrange;      // TODO remove
 
 public:
     explicit Spectrograph(QWidget *parent = 0);
@@ -35,7 +35,6 @@ public:
 
 signals:
     void infoMessage(const QString &message, int intervalMs);
-//    void subrangeLevelChanged(const qreal rmsval);
 
 public slots:
     void reset();
@@ -54,8 +53,6 @@ private:
     QPair<qreal, qreal> barRange(int barIndex, bool logspace) const;
     QPair<qreal, qreal> barRangeLog(int barIndex) const;
     void updateBars();
-
-//    void computeSubrange(Subrange range);
 
 protected:
     qreal frac2freq(qreal frac) const;
@@ -85,9 +82,11 @@ private:
     QPoint				m_dragStart;
     QRubberBand*		m_rubberBand;
 
-//    bool				subrangeMetering;
-//    Subrange            subrange;
     SublevelMeter *     selectedSublevelmeter;
+
+    // Colors!
+    static QColor barColor;
+    static QColor clipColor;
 
 };
 

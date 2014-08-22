@@ -13,18 +13,20 @@
 using namespace std;
 
 Dancefloormodel::Dancefloormodel(QObject *parent) :
-    QObject(parent),
-    values(NULL),
-    lightIDs(NULL)
+    QObject(parent)
 {
 }
 
 Dancefloormodel::~Dancefloormodel()
 {
+#if 0
     if (values)
         delete values;
+    if (firings)
+        delete firings;
     if (lightIDs)
         delete lightIDs;
+#endif
 }
 
 // TODO add Foot-squares as well as lights
@@ -70,8 +72,10 @@ bool Dancefloormodel::ImportLayout(string &layoutCsvFile)
     xsize = rowSize;
 
     // Now alloc arrays:
-    lightIDs = new int[xsize*ysize];
-    values = new Lightcolor[xsize*ysize];
+    size_t arraySize = xsize*ysize;
+    lightIDs.resize(arraySize);
+    values.resize(arraySize);
+    firings.resize(arraySize);
 
     // And fill 'em up
     for (int y=0; y<ysize; ++y){
@@ -99,6 +103,9 @@ Dancefloormodel::hasPixel(int x, int y)
         return true;
 }
 
+/*
+ * Test routine to print layout.
+ */
 void
 Dancefloormodel::display()
 {
@@ -134,6 +141,19 @@ Lightcolor Dancefloormodel::getPixel(int x, int y)
 
 void Dancefloormodel::lightChanged(int x, int y, Lightcolor rgb)
 {
-    //qDebug() << "light Changed" << x << y << rgb.getRed() << rgb.getGreen() << rgb.getBlue()  ;
     setPixel(x,y,rgb);
 }
+
+#if 0
+void Dancefloormodel::fireLight(int x, int y, Firing *firing)
+{
+    // TODO will need way to insert the firings correctly into the buffer.
+}
+
+void Dancefloormodel::evaluate()
+{
+    // For every light, get the firing vector:
+        // For every light in the vector, starting with the "frontmost",
+        // accumulate the value, then
+}
+#endif

@@ -212,8 +212,9 @@ providerFunctor_t SublevelMeter::createProviderFunctor()
 {
     // create function object that will set value of level.
     //auto out = new std::function<void(float&)>;
-    auto lambda = [this] (float &out) {out = m_level;};
+    providerFunctor_t out = [this] (float &out) {out = m_level;};
+    //auto lambda = [this] (float &out) {out = m_level;};
     //out = lambda;
-    return lambda;
+    return out;
 }
 

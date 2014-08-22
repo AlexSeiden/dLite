@@ -1,4 +1,4 @@
-include(spectrum.pri)
+include(dLite.pri)
 
 TEMPLATE = subdirs
 

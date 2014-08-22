@@ -1,4 +1,4 @@
-include(../spectrum.pri)
+include(../dLite.pri)
 
 # mostly for std::function
 CONFIG  += c++11
@@ -10,7 +10,7 @@ QMAKE_LFLAGS += -mmacosx-version-min=10.7
 
 TEMPLATE = app
 
-TARGET = spectrum
+TARGET = dLite
 
 QT       += multimedia widgets
 
@@ -30,10 +30,9 @@ SOURCES  += main.cpp \
     lightcolor.cpp \
     dancefloorwidget.cpp \
     controlpanel.cpp \
-    CueSheet.cpp \
-    CueView.cpp \
     Param.cpp \
-    Cue.cpp
+    Cue.cpp \
+    CueView.cpp
 
 HEADERS  += engine.h \
             frequencyspectrum.h \
@@ -51,16 +50,16 @@ HEADERS  += engine.h \
     dancefloormodel.h \
     lightcolor.h \
     controlpanel.h \
-    CueSheet.h \
-    CueView.h \
     Param.h \
-    Cue.h
+    Cue.h \
+    CueView.h
 
 fftreal_dir = ../3rdparty/fftreal
 
 INCLUDEPATH += $${fftreal_dir}
 
-RESOURCES = spectrum.qrc
+RESOURCES = \
+    dLite.qrc
 
 # Dynamic linkage against FFTReal DLL
 macx {
@@ -72,7 +71,7 @@ macx {
         LIBS += -lfftreal
 }
 
-target.path = $$[QT_INSTALL_EXAMPLES]/multimedia/spectrum
+target.path = ../install
 INSTALLS += target
 
 # Deployment
@@ -80,7 +79,7 @@ INSTALLS += target
 DESTDIR = ..$${spectrum_build_dir}
 macx {
         # Relocate fftreal.framework into spectrum.app bundle
-        framework_dir = ../spectrum.app/Contents/Frameworks
+        framework_dir = ../dLite.app/Contents/Frameworks
         framework_name = fftreal.framework/Versions/1/fftreal
         QMAKE_POST_LINK = \
             mkdir -p $${framework_dir} &&\
@@ -90,7 +89,7 @@ macx {
                                 $${framework_dir}/$${framework_name} &&\
             install_name_tool -change $${framework_name} \
                                 @executable_path/../Frameworks/$${framework_name} \
-                                ../spectrum.app/Contents/MacOS/spectrum
+                                ../dLite.app/Contents/MacOS/dLite
 } else {
     linux-g++*: {
         # Provide relative path from application to fftreal library
@@ -99,6 +98,4 @@ macx {
 }
 
 
-FORMS += \
-    CueSheet.ui \
-    CueView.ui
+FORMS +=

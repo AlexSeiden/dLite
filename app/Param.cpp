@@ -41,6 +41,14 @@ ParamFloat::setProvider(providerFunctor_t &provider)
     _provider = provider;
 }
 
+
+void
+ParamInt::setProvider(void (*provider)(int &value))
+{
+    _provider = provider;
+}
+
 // should have destructor destroy provider? or ref count???
+
 
 
