@@ -3,22 +3,29 @@
 
 #include <functional>
 
-#if 0
-template <typename PT>
+#if 1
+template <class PT>
 class Param
 {
 public:
-    Param();
-    const   PT& getValue();
+    Param(PT value=PT()) : _value(value), _provider(nullptr) {}
+    void    getValue(PT &value)  {
+        // update current member value
+        if (_provider)
+            _provider(_value);
 
-    void    setProvider(void (*providerFunc)(PT& value));
+        // Return by reference, for generality with other types.
+        value = _value;
+    }
+    void    setValue(const PT &value) {_value = value;}
+    void    setProvider(std::function<void(PT&)> provider) {_provider = provider;}
 
 private:
     PT      _value;
-    void    (*_provider)(PT &value);
+    std::function<void(PT &value)> _provider;
 };
-#endif
 
+#else
 
 typedef std::function<void(float&)> providerFunctor_t;
 
@@ -49,6 +56,7 @@ private:
     void (*_provider)(int &value);
 };
 
+#endif
 
 
 #endif // PARAM_H

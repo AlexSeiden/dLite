@@ -42,8 +42,7 @@ class SublevelMeter : public QWidget
 {
     Q_OBJECT
 
-    // TODO yuck defriend
-    friend class Spectrograph;
+    friend class Spectrograph; // TODO yuck defriend
 
 public:
     explicit SublevelMeter(QWidget *parent = 0);
@@ -57,16 +56,15 @@ public:
     void setSelectable(bool status);
     bool setSelection(bool status);
     void calculateLevel();
-    Subrange getRange() {return range;}
-    void setRange(Subrange &range);
+    Subrange getRange() {return _range;}
+    void setRange(Subrange &_range);
 
-    //std::function<void(float&)> createProviderFunctor();
-    providerFunctor_t createProviderFunctor();
+    std::function<void(float&)> createProviderFunctor();
+    //providerFunctor_t createProviderFunctor();
 
 
 signals:
     void iveBeenSelected(SublevelMeter *me);
-    // TODO bad form to use custom type in selection?
     void levelChanged(qreal level);
 
 public slots:
@@ -90,7 +88,7 @@ private:
     Cue * _cue;
 
 protected:
-    Subrange    range;
+    Subrange    _range;
 };
 
 #endif // SUBLEVEL_H

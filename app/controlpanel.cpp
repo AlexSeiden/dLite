@@ -94,18 +94,16 @@ void Controlpanel::mouseReleaseEvent(QMouseEvent *event)
 void Controlpanel::submeterHasBeenSelected(SublevelMeter *chosen)
 {
     // Unselect others:
-    // for (SublevelMeter *slm : meters) // C++11 extension.
-    for (int i=0; i<meters.size(); ++i)
-    {
-        SublevelMeter *slm = meters[i];
-
+    for (SublevelMeter *slm : meters)  {
         if (slm != chosen) {
             slm->setSelection(false);
         }
     }
 
+    // XXX testing
     auto provider = chosen->createProviderFunctor();
-    _cue->setAlphaProvider(provider);
+    _cue->_alpha.setProvider(provider);
+
     // emit signal for others who might care, e.g. spectrograph
     emit(submeterSelectionChanged(chosen));
 }

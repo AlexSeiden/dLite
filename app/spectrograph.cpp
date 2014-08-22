@@ -150,7 +150,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
     // Do we have a subrange that should be drawn?
     if (selectedSublevelmeter) {
         QRectF *subrangewindow;
-        subrangewindow = &(selectedSublevelmeter->range.subrangeWindow);
+        subrangewindow = &(selectedSublevelmeter->_range.subrangeWindow);
         QRectF subwin;
         subwin.setTop(   rect().height() * subrangewindow->top());
         subwin.setBottom(rect().height() * subrangewindow->bottom());

@@ -13,7 +13,7 @@ Cue::Cue(Dancefloormodel *dfmodel) :
     _active(true),
     _compmode(SET),
     _xoffset(10),
-    _yoffset(7),
+    _yoffset(8),
     _scale(1.0),
     _alpha(1.0),
     _color(255,255,255)
@@ -43,13 +43,13 @@ void Cue::evaluate()
 
 
 
+#if 0
 void Cue::setAlphaProvider(providerFunctor_t &provider)
 {
     _alpha.setProvider(provider);
 }
 
 
-#if 0
 void Cue::setPropertyProvider(std::string propertyName, providerFunctor_t &provider)
 {
     Param *param = getParam(propertyName);

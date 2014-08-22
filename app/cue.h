@@ -14,17 +14,16 @@ public:
     void            setCompMode(compmode_t mode);
     compmode_t      getCompMode();
 
-    void            setAlphaProvider(providerFunctor_t &provider);
-
 private:
     Dancefloormodel *_floor;
     bool            _active;
     compmode_t      _compmode;
 
-    ParamInt      _xoffset;
-    ParamInt      _yoffset;
-    ParamFloat    _scale;
-    ParamFloat    _alpha;
+public:  // TODO just for testing
+    Param<int>      _xoffset;
+    Param<int>      _yoffset;
+    Param<float>    _scale;
+    Param<float>    _alpha;
     Lightcolor _color;
 };
 

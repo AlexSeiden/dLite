@@ -108,13 +108,6 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
 void SublevelMeter::setActive(bool status)
 {
     _active = status;
-//    if (_active) {
-//        if (!_cue) {
-//            _cue = new Cue(this, );
-//            CHECKED_CONNECT(this, SIGNAL(levelChanged(float)),
-//                _cue, SLOT(levelChanged(float)));
-//        }
-//    }
 }
 
 void SublevelMeter::setSelectable(bool status)
@@ -141,6 +134,7 @@ void SublevelMeter::mouseReleaseEvent(QMouseEvent *event)
         return;
     }
 
+    //If already selected, a second click deselects:
     if (_selected) {
         setSelection(false);
         emit(iveBeenSelected(NULL));
@@ -151,6 +145,7 @@ void SublevelMeter::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
+// TODO this is business logic that shouldn't be in a view class.
 // TODO decouple position & spectrum change
 void SublevelMeter::spectrumChanged(qint64 position, qint64 length,
                                  const FrequencySpectrum &spectrum)
@@ -165,6 +160,7 @@ void SublevelMeter::spectrumChanged(qint64 position, qint64 length,
     }
 }
 
+// TODO this is business logic that shouldn't be in a view class.
 void SublevelMeter::calculateLevel()
 {
     // loop over all frequencies in the spectrum, and set the value
@@ -180,9 +176,9 @@ void SublevelMeter::calculateLevel()
         const FrequencySpectrum::Element e = *i;
 
         // TODO could optimize by skipping straight to start frequency
-        if (range.frequencyWithinWindow(e.frequency)) {
+        if (_range.frequencyWithinWindow(e.frequency)) {
             // amplitude window
-            value += range.amplitudeWithinWindow(e.amplitude);
+            value += _range.amplitudeWithinWindow(e.amplitude);
             nsamples++;
             clipped |= e.clipped;
         }
@@ -204,17 +200,13 @@ void SublevelMeter::calculateLevel()
 
 void SublevelMeter::setRange(Subrange &newrange)
 {
-    range = newrange;
+    _range = newrange;
 }
 
 
-providerFunctor_t SublevelMeter::createProviderFunctor()
+// TODO this is business logic that shouldn't be in a view class.
+std::function<void(float&)> SublevelMeter::createProviderFunctor()
 {
-    // create function object that will set value of level.
-    //auto out = new std::function<void(float&)>;
-    providerFunctor_t out = [this] (float &out) {out = m_level;};
-    //auto lambda = [this] (float &out) {out = m_level;};
-    //out = lambda;
-    return out;
+    return [this] (float &out) {out = m_level;};
 }
 

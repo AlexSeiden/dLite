@@ -1,6 +1,14 @@
 #include "Param.h"
-//#include <QVariant>
 
+#if 1
+//template <class PT>
+//Param<PT>::Param() :
+//    _value(PT()),
+//    _provider(nullptr)
+//{
+//}
+
+#else
 ParamFloat::ParamFloat(float value) :
     _value(value),
     _provider(nullptr)
@@ -49,6 +57,6 @@ ParamInt::setProvider(void (*provider)(int &value))
 }
 
 // should have destructor destroy provider? or ref count???
-
+#endif
 
 
