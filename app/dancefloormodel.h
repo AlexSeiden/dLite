@@ -5,6 +5,9 @@
 #include <string>
 #include "lightcolor.h"
 #include "Param.h"
+#include "Cue.h"
+
+class Cue;
 
 using namespace std;
 
@@ -16,17 +19,22 @@ public:
     explicit Dancefloormodel(QObject *parent = 0);
     ~Dancefloormodel();
     bool ImportLayout(std::string & layoutCsvFile);
+    void printLayout();
 
     bool hasPixel(int x, int y);
     Lightcolor getPixel(int x, int y);
     void setPixel(int x, int y, Lightcolor rgb);
-    void display();
 
     int getXsize() {return xsize;}
     int getYsize() {return ysize;}
 
+    void addCue(Cue *cue);
+    void evaluate();
+    void evaluateAllCues();
+    void fireLight(int x, int y, Firing *f);
+
 public slots:
-    void lightChanged(int x, int y, Lightcolor rgb);
+    void lightChanged(int x, int y, Lightcolor rgb); // XXX probably should go, since we will not be using signals & slots to communicate individual light transitions
 
 private:
     int xsize, ysize;
@@ -35,6 +43,8 @@ private:
     vector<int>          lightIDs;
 
     vector<Light>       _lights;
+
+    std::vector<Cue *>  _cues;
 
 #ifdef INLINE
     int _getIndex(int x, int y) {return xsize*y + x;}

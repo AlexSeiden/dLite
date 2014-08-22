@@ -5,6 +5,8 @@
 #include "dancefloormodel.h"
 #include "Param.h"
 
+class Dancefloormodel;
+
 class Cue
 {
 public:
@@ -19,7 +21,7 @@ private:
     bool            _active;
     compmode_t      _compmode;
 
-public:  // TODO just for testing
+public:  // TODO    just public for testing
     Param<int>      _xoffset;
     Param<int>      _yoffset;
     Param<float>    _scale;

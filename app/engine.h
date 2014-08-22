@@ -15,12 +15,13 @@
 #include <QVector>
 
 class FrequencySpectrum;
+class Dancefloormodel;
 QT_BEGIN_NAMESPACE
 class QAudioInput;
 class QAudioOutput;
 QT_END_NAMESPACE
 
-/**
+/*
  * This class interfaces with the Qt Multimedia audio classes, and also with
  * the SpectrumAnalyser class.  Its role is to manage the capture and playback
  * of audio data, meanwhile performing real-time analysis of the audio level
@@ -88,8 +89,7 @@ public:
      */
     void setWindowFunction(WindowFunction type);
 
-    void addCue(Cue *cue);
-    void evaluateAllCues();
+    void setDancefloormodel(Dancefloormodel *df) {_dfModel = df;}
 
 public slots:
     void startPlayback();
@@ -104,11 +104,13 @@ signals:
 
     /**
      * Informational message for non-modal display
+     * TODO this is a view thing
      */
     void infoMessage(const QString &message, int durationMs);
 
     /**
      * Error message for modal display
+     * TODO this is a view thing
      */
     void errorMessage(const QString &heading, const QString &detail);
 
@@ -161,7 +163,7 @@ signals:
 
 private slots:
     void audioNotify();
-    void auxNotify();
+    void auxNotify();   // XXX for testing
     void audioStateChanged(QAudio::State state);
     void spectrumChanged(const FrequencySpectrum &spectrum);
 
@@ -206,10 +208,10 @@ private:
     SpectrumAnalyser    m_spectrumAnalyser;
     qint64              m_spectrumPosition;
 
-    // Interval in millisecondd between calls that update the spectrum, etc.
+    // Interval in milliseconds between calls that update the spectrum, etc.
     int    				m_notifyIntervalMs;
 
-    std::vector<Cue *>  _cues;
+    Dancefloormodel     *_dfModel;
 };
 
 #endif // ENGINE_H

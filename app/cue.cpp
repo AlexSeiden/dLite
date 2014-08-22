@@ -18,7 +18,7 @@ Cue::Cue(Dancefloormodel *dfmodel) :
     _alpha(1.0),
     _color(255,255,255)
 {
-    _xoffset.setProvider(randLight);
+    _xoffset.setProvider(randLight); // XXX testing
 }
 
 
@@ -36,7 +36,11 @@ void Cue::evaluate()
     _alpha.getValue(alpha);
 
     Lightcolor lightc = Lightcolor::Lightcolor(alpha, alpha, alpha);
-    _floor->setPixel(xoffset, yoffset, lightc);
+    //_floor->setPixel(xoffset, yoffset, lightc);
+
+    Firing *firing = new Firing;
+    firing->_color = lightc;
+    _floor->fireLight(xoffset, yoffset, firing);
 }
 
 
@@ -44,12 +48,6 @@ void Cue::evaluate()
 
 
 #if 0
-void Cue::setAlphaProvider(providerFunctor_t &provider)
-{
-    _alpha.setProvider(provider);
-}
-
-
 void Cue::setPropertyProvider(std::string propertyName, providerFunctor_t &provider)
 {
     Param *param = getParam(propertyName);

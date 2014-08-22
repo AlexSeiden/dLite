@@ -377,7 +377,7 @@ void Engine::calculateSpectrum(qint64 position)
         m_spectrumAnalyser.calculate(m_spectrumBuffer, m_format);
     }
 
-    evaluateAllCues();
+    _dfModel->evaluate(); // TODO move elsewhere--perhaps it's own timer loop
 }
 
 void Engine::setFormat(const QAudioFormat &format)
@@ -405,17 +405,4 @@ void Engine::setInterval(int val)
 {
     m_notifyIntervalMs = val;
     m_audioOutput->setNotifyInterval(m_notifyIntervalMs);
-}
-
-
-void Engine::addCue(Cue *cue)
-{
-    _cues.push_back(cue);
-}
-
-void Engine::evaluateAllCues()
-{
-    for (auto cue : _cues) {
-        cue->evaluate();
-    }
 }

@@ -76,6 +76,7 @@ bool Dancefloormodel::ImportLayout(string &layoutCsvFile)
     lightIDs.resize(arraySize);
     values.resize(arraySize);
     firings.resize(arraySize);
+    _lights.resize(arraySize);
 
     // And fill 'em up
     for (int y=0; y<ysize; ++y){
@@ -83,10 +84,12 @@ bool Dancefloormodel::ImportLayout(string &layoutCsvFile)
             int index = _getIndex(x,y);
             string cell = cells[y][x];
             if (cell.size() == 0 || cell.compare("X")==0) {
-                lightIDs[index] = 0;
+                _lights[index]._lightID = 0;
             } else
-                lightIDs[index] = std::atoi(cell.c_str());
-            values[index] = Lightcolor();
+//                lightIDs[index] = std::atoi(cell.c_str());
+                _lights[index]._lightID = std::atoi(cell.c_str());
+//            values[index] = Lightcolor();
+            _lights[index]._value = Lightcolor();
         }
     }
 
@@ -97,7 +100,7 @@ bool
 Dancefloormodel::hasPixel(int x, int y)
 {
     int index = _getIndex(x,y);
-    if (lightIDs[index]==0)
+    if (_lights[index]._lightID == 0)
         return false;
     else
         return true;
@@ -107,7 +110,7 @@ Dancefloormodel::hasPixel(int x, int y)
  * Test routine to print layout.
  */
 void
-Dancefloormodel::display()
+Dancefloormodel::printLayout()
 {
     for (int y=0; y<ysize; ++y){
         for (int x=0; x<xsize; ++x){
@@ -129,13 +132,13 @@ int Dancefloormodel::_getIndex(int x, int y)
 
 void Dancefloormodel::setPixel(int x, int y, Lightcolor rgb)
 {
-    values[_getIndex(x,y)] = rgb;
+    _lights[_getIndex(x,y)]._value = rgb;
 }
 
 
 Lightcolor Dancefloormodel::getPixel(int x, int y)
 {
-    return values[_getIndex(x,y)];
+    return _lights[_getIndex(x,y)]._value;
 }
 
 
@@ -144,16 +147,51 @@ void Dancefloormodel::lightChanged(int x, int y, Lightcolor rgb)
     setPixel(x,y,rgb);
 }
 
-#if 0
 void Dancefloormodel::fireLight(int x, int y, Firing *firing)
 {
-    // TODO will need way to insert the firings correctly into the buffer.
+    // TODO Need to insert the firings correctly into the buffer,
+    // so that repeat firings by the same cue do the correct thing.
+    Light &light = _lights[_getIndex(x,y)];
+    light._firings.push_back(firing);
 }
+
 
 void Dancefloormodel::evaluate()
 {
+    evaluateAllCues();
+
     // For every light, get the firing vector:
-        // For every light in the vector, starting with the "frontmost",
-        // accumulate the value, then
+    for (auto light = _lights.begin(); light != _lights.end(); ++light) {
+        // For every light in the vector, starting with the "backmost"
+        Lightcolor lightColor(0);
+        auto firing = light->_firings.begin();
+        while (firing != light->_firings.end())  {
+            // Calculate the value of this firing
+            bool keep = (*firing)->evaluate();
+
+            // Comp it over the others
+            //lightColor = (*firing)->compOver(lightColor);
+            lightColor = Lightcolor(255);
+
+            // Remove firing from list if the event is over.
+            if (! keep)
+                firing = light->_firings.erase(firing);
+            else
+                firing++;
+        }
+        light->_value = lightColor;
+    }
 }
-#endif
+
+void Dancefloormodel::addCue(Cue *cue)
+{
+    _cues.push_back(cue);
+}
+
+void Dancefloormodel::evaluateAllCues()
+{
+    for (Cue *cue : _cues) {
+        cue->evaluate();
+    }
+}
+

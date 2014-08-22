@@ -64,6 +64,7 @@ MainWidget::MainWidget(QWidget *parent)
 
     m_controlpanel->show();
 
+    m_engine->setDancefloormodel(m_dancefloormodel);
     connectUi();
 
     CueView *cv = new CueView(NULL);
