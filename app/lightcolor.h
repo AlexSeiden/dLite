@@ -4,7 +4,13 @@
 #include <vector>
 #include <QColor>
 
+// Forward declarations
+class Cue;
+
 enum compmode_t {SET, ADD, OVER, UNDER};
+
+// -----------------------------------------------------------------------------
+// Lightcolor
 
 class Lightcolor
 {
@@ -14,6 +20,7 @@ public:
     Lightcolor(int val);
     explicit Lightcolor(float r, float g, float b);
     explicit Lightcolor(float val);
+    explicit Lightcolor(const QColor &qc);
 
     int getRed()    {return m_r;}
     int getGreen()  {return m_g;}
@@ -42,13 +49,13 @@ class Firing
 {
 public:
     Firing();
-    Firing(Lightcolor color, float alpha, compmode_t compmode, decayfunc_t decayfunc);
+    Firing(Lightcolor color, float alpha, compmode_t compmode, decayfunc_t decayfunc, Cue *cue=nullptr);
 
     bool        evaluate();
     //bool evaluate(long time);  // evaluates for a specific time?
     Lightcolor  getValue() {return _color;}
     float       getAlpha() {return _alpha;}
-    Lightcolor  compOver(Lightcolor &lightcolor);
+    Lightcolor  compOver(const Lightcolor &lightcolor);
 
 
 //private:  //XXX
@@ -56,6 +63,8 @@ public:
     float       _alpha;
     compmode_t  _compMode;
     decayfunc_t _decayfunction;
+    Cue         *_cue; // mainly used when the same cue wants to replace
+                      // a firing in the buffer, rather than add to it.
 };
 
 // -----------------------------------------------------------------------------

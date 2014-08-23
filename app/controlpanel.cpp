@@ -7,16 +7,14 @@
 #include <QLabel>
 
 
-Controlpanel::Controlpanel(QWidget *parent, Engine *engine, Dancefloormodel *dfmodel) :
+Controlpanel::Controlpanel(QWidget *parent,
+                           Engine *engine,
+                           Dancefloormodel *dfmodel) :
     QWidget(parent),
     numMeters(0),
     _engine(engine),
-    _dfmodel(dfmodel),
-    _cue(NULL)
+    _dfModel(dfmodel)
 {
-    _cue = new Cue(_dfmodel);
-    _dfmodel->addCue(_cue); // TODO make this part of cue constructor???
-
     createUi();
 }
 
@@ -31,22 +29,31 @@ void Controlpanel::createUi()
     windowLayout->addWidget(controlsPanel);
 
     for (int i=0; i<3; ++i)
-        addMeter();
-    //CHECKED_CONNECT(meters[0], SIGNAL(levelChanged(qreal)), _cue, SLOT(levelChanged(qreal)));
+        addSensor();
 
     // "add control" button
-    m_addsensorButton = new QPushButton(this);
-//    m_addsensorIcon = QIcon(":/images/settings.png");
-//    m_addsensorButton->setIcon(m_addsensorIcon);
-    m_addsensorButton->setText(tr("+"));
-    m_addsensorButton->setEnabled(true);
-    m_addsensorButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    m_addsensorButton->setMinimumSize(30,30);
-    //m_addsensorButton->setLayout(windowLayout);
+    m_addSensorButton = new QPushButton(this);
+//    m_addSensorIcon = QIcon(":/images/settings.png");
+//    m_addSensorButton->setIcon(m_addsensorIcon);
+    m_addSensorButton->setText(tr("+sensor"));
+    m_addSensorButton->setEnabled(true);
+    m_addSensorButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    m_addSensorButton->setMinimumSize(30,30);
+    windowLayout->addWidget(m_addSensorButton);
 
-    windowLayout->addWidget(m_addsensorButton);
+    m_addCueButton = new QPushButton(this);
+    m_addCueButton->setText(tr("+cue"));
+    m_addCueButton->setEnabled(true);
+    m_addCueButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    m_addCueButton->setMinimumSize(30,30);
+    windowLayout->addWidget(m_addCueButton);
 
     setLayout(windowLayout);
+
+    CHECKED_CONNECT(m_addSensorButton, SIGNAL(clicked()), this, SLOT(addSensor()));
+    CHECKED_CONNECT(m_addCueButton, SIGNAL(clicked()), this, SLOT(addCue()));
+
+
 
     // TODO restore from saved & allowed saved layouts
     setMinimumHeight(300);
@@ -54,7 +61,7 @@ void Controlpanel::createUi()
 }
 
 
-void Controlpanel::addMeter()
+void Controlpanel::addSensor()
 {
     SublevelMeter *slm = new SublevelMeter(this);
     slm->setSelectable(true);
@@ -84,6 +91,13 @@ void Controlpanel::addMeter()
     setMinimumWidth(numMeters*40);
 }
 
+void Controlpanel::addCue()
+{
+    Cue *cue = new Cue(_dfModel);
+    CueView *cv = new CueView(cue, NULL);
+    cv->show();
+}
+
 void Controlpanel::mouseReleaseEvent(QMouseEvent *event)
 {
     // TODO Deselect, since it means that we've clicked outside of all the
@@ -102,7 +116,6 @@ void Controlpanel::submeterHasBeenSelected(SublevelMeter *chosen)
 
     // XXX testing
     auto provider = chosen->createProviderFunctor();
-    _cue->_alpha.setProvider(provider);
 
     // emit signal for others who might care, e.g. spectrograph
     emit(submeterSelectionChanged(chosen));

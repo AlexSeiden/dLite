@@ -15,9 +15,16 @@ Lightcolor::Lightcolor(float r, float g, float b) : m_r(r*255), m_g(g*255), m_b(
 Lightcolor::Lightcolor(float val) : m_r(val*255), m_g(val*255), m_b(val*255)
 { }
 
+Lightcolor::Lightcolor(const QColor &qc) : m_r(qc.red()), m_g(qc.green()), m_b(qc.blue())
+{ }
+
 QColor
 Lightcolor::toQColor() {
-    return QColor(m_r,m_g,m_b);
+    int r = std::min(255, std::max(m_r,0));
+    int g = std::min(255, std::max(m_g,0));
+    int b = std::min(255, std::max(m_b,0));
+
+    return QColor(r,g,b);
 }
 
 // Lightcolor operators
@@ -59,7 +66,7 @@ Lightcolor::operator+=(const Lightcolor &other) {
 // or free functions?  I'm thinking free functions, in that they might
 // be independent of the state of the Firing, but perhaps not....
 bool instantDecay(Firing *f) {
-    f->_color = Lightcolor(0);
+    Q_UNUSED(f);
     return false;
 }
 
@@ -68,11 +75,27 @@ bool noDecay(Firing *f) {
     return true;
 }
 
+bool exponentialDecay(Firing *f) {
+    f->_color *= .9;
+    f->_alpha *= .9;
+    if (f->_alpha < .01)
+        return false;
+    return true;
+}
+
 Firing::Firing() :
     _color(),
     _alpha(0.0),
     _compMode(SET),
-    _decayfunction(instantDecay)
+    _decayfunction(exponentialDecay)
+{ }
+
+Firing::Firing(Lightcolor color, float alpha, compmode_t compmode, decayfunc_t decayfunc, Cue *cue) :
+    _color(color),
+    _alpha(alpha),
+    _compMode(compmode),
+    _decayfunction(decayfunc),
+    _cue(cue)
 { }
 
 bool Firing::evaluate() {
@@ -85,7 +108,7 @@ bool Firing::evaluate() {
     // the list.
 }
 
-Lightcolor Firing::compOver(Lightcolor &lightcolor) {
+Lightcolor Firing::compOver(const Lightcolor &lightcolor) {
     Lightcolor out = lightcolor;
     out *= _alpha;
     out += _color;
@@ -99,5 +122,5 @@ Lightcolor Firing::compOver(Lightcolor &lightcolor) {
 Light::Light() :
     _lightID(0),
     _value(Lightcolor())
-{}
+{ }
 

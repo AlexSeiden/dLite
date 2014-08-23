@@ -17,7 +17,7 @@ public:
     compmode_t      getCompMode();
 
 private:
-    Dancefloormodel *_floor;
+    Dancefloormodel *_dfModel;
     bool            _active;
     compmode_t      _compmode;
 

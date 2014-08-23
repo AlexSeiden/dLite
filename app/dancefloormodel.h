@@ -2,6 +2,7 @@
 #define DANCEFLOORMODEL_H
 
 #include <QObject>
+#include <QColor>
 #include <string>
 #include "lightcolor.h"
 #include "Param.h"
@@ -23,6 +24,7 @@ public:
 
     bool hasPixel(int x, int y);
     Lightcolor getPixel(int x, int y);
+    QColor getQColor(int x, int y);
     void setPixel(int x, int y, Lightcolor rgb);
 
     int getXsize() {return xsize;}
@@ -32,9 +34,6 @@ public:
     void evaluate();
     void evaluateAllCues();
     void fireLight(int x, int y, Firing *f);
-
-public slots:
-    void lightChanged(int x, int y, Lightcolor rgb); // XXX probably should go, since we will not be using signals & slots to communicate individual light transitions
 
 private:
     int xsize, ysize;

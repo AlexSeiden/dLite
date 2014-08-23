@@ -9,7 +9,7 @@ void randLight(int &value)
 }
 
 Cue::Cue(Dancefloormodel *dfmodel) :
-    _floor(dfmodel),
+    _dfModel(dfmodel),
     _active(true),
     _compmode(SET),
     _xoffset(10),
@@ -18,6 +18,7 @@ Cue::Cue(Dancefloormodel *dfmodel) :
     _alpha(1.0),
     _color(255,255,255)
 {
+    _dfModel->addCue(this);
     _xoffset.setProvider(randLight); // XXX testing
 }
 
@@ -32,18 +33,14 @@ void Cue::evaluate()
     _xoffset.getValue(xoffset);
     _yoffset.getValue(yoffset);
 
-    float alpha=0.0;
+    float alpha=1.0;
     _alpha.getValue(alpha);
 
-    Lightcolor lightc = Lightcolor::Lightcolor(alpha, alpha, alpha);
-    //_floor->setPixel(xoffset, yoffset, lightc);
-
     Firing *firing = new Firing;
-    firing->_color = lightc;
-    _floor->fireLight(xoffset, yoffset, firing);
+    firing->_color = _color;
+    firing->_alpha = alpha;
+    _dfModel->fireLight(xoffset, yoffset, firing);
 }
-
-
 
 
 

@@ -46,8 +46,6 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
 
-    //qDebug() << "DFW paint event";
-
     QPainter painter(this);
     painter.fillRect(rect(), bgColor);
 
@@ -67,18 +65,12 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
             // TODO shouldn't recalc index twice...
             if (cellHasLights(x,y))
                 //painter.fillRect(cell, Qt::black);
-                painter.fillRect(cell, cellGetColor(x,y));
+                painter.fillRect(cell, dfModel->getQColor(x,y));
             else
                 painter.fillRect(cell, noCellColor);
             painter.drawRect(cell);
         }
     }
-}
-
-QColor Dancefloorwidget::cellGetColor(int x, int y)
-{
-    Lightcolor rgb = dfModel->getPixel(x,y);
-    return QColor(rgb.getRed(),rgb.getBlue(),rgb.getGreen());
 }
 
 #ifndef INLINE

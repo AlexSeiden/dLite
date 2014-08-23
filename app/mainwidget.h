@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <QIntValidator>
 #include <QSpinBox>
+#include <QRubberBand>
 
 class Engine;
 class FrequencySpectrum;

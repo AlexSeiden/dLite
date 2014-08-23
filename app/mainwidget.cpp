@@ -50,7 +50,7 @@ MainWidget::MainWidget(QWidget *parent)
     createUi();
 
     setMinimumHeight(400);
-    move(10,50);  // TODO restore
+    move(10,50);  // TODO restore from last saved
 
     // TODO move to settings/prefs  & allow setting this
     std::string lf = std::string("/Users/alex/src/floorit/layout.csv");
@@ -66,9 +66,6 @@ MainWidget::MainWidget(QWidget *parent)
 
     m_engine->setDancefloormodel(m_dancefloormodel);
     connectUi();
-
-    CueView *cv = new CueView(NULL);
-    cv->show();
 
     // TODO default to last played.
     m_engine->loadFile(QString("/Users/alex/Documents/lights/Jam On It/Jam On It.wav"));
@@ -333,6 +330,7 @@ void MainWidget::connectUi()
 
     CHECKED_CONNECT(m_specMaxSpinBox, SIGNAL(valueChanged(int)),
             m_spectrograph, SLOT(setFreqHi(int)));
+
 }
 
 

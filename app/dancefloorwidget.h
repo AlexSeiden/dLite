@@ -28,7 +28,6 @@ signals:
 private:
     Dancefloormodel *dfModel;
     bool    cellHasLights(int x, int y);
-    QColor  cellGetColor(int x, int y);
     int xsize;
     int ysize;
 

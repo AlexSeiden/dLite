@@ -96,8 +96,7 @@ bool Dancefloormodel::ImportLayout(string &layoutCsvFile)
     return true;
 }
 
-bool
-Dancefloormodel::hasPixel(int x, int y)
+bool Dancefloormodel::hasPixel(int x, int y)
 {
     int index = _getIndex(x,y);
     if (_lights[index]._lightID == 0)
@@ -130,27 +129,20 @@ int Dancefloormodel::_getIndex(int x, int y)
 }
 #endif
 
-void Dancefloormodel::setPixel(int x, int y, Lightcolor rgb)
-{
-    _lights[_getIndex(x,y)]._value = rgb;
-}
-
-
-Lightcolor Dancefloormodel::getPixel(int x, int y)
-{
+Lightcolor Dancefloormodel::getPixel(int x, int y) {
     return _lights[_getIndex(x,y)]._value;
 }
 
-
-void Dancefloormodel::lightChanged(int x, int y, Lightcolor rgb)
-{
-    setPixel(x,y,rgb);
+QColor Dancefloormodel::getQColor(int x, int y) {
+    return _lights[_getIndex(x,y)]._value.toQColor();
 }
 
 void Dancefloormodel::fireLight(int x, int y, Firing *firing)
 {
     // TODO Need to insert the firings correctly into the buffer,
     // so that repeat firings by the same cue do the correct thing.
+    // Should check firing->cue, and remove old firings from the same
+    // cue, if that is desired behavior.
     Light &light = _lights[_getIndex(x,y)];
     light._firings.push_back(firing);
 }
@@ -162,16 +154,15 @@ void Dancefloormodel::evaluate()
 
     // For every light, get the firing vector:
     for (auto light = _lights.begin(); light != _lights.end(); ++light) {
-        // For every light in the vector, starting with the "backmost"
-        Lightcolor lightColor(0);
+        // For every firing, apply the decay & composite. starting with the "backmost"
+        Lightcolor lightColor(light->_value);
         auto firing = light->_firings.begin();
         while (firing != light->_firings.end())  {
             // Calculate the value of this firing
             bool keep = (*firing)->evaluate();
 
             // Comp it over the others
-            //lightColor = (*firing)->compOver(lightColor);
-            lightColor = Lightcolor(255);
+            lightColor = (*firing)->compOver(lightColor);
 
             // Remove firing from list if the event is over.
             if (! keep)
@@ -183,13 +174,11 @@ void Dancefloormodel::evaluate()
     }
 }
 
-void Dancefloormodel::addCue(Cue *cue)
-{
+void Dancefloormodel::addCue(Cue *cue) {
     _cues.push_back(cue);
 }
 
-void Dancefloormodel::evaluateAllCues()
-{
+void Dancefloormodel::evaluateAllCues() {
     for (Cue *cue : _cues) {
         cue->evaluate();
     }
