@@ -29,7 +29,7 @@ void Controlpanel::createUi()
     windowLayout->addWidget(controlsPanel);
 
     for (int i=0; i<3; ++i)
-        addSensor();
+        newSpectrumSensor();
 
     // "add control" button
     m_addSensorButton = new QPushButton(this);
@@ -50,8 +50,8 @@ void Controlpanel::createUi()
 
     setLayout(windowLayout);
 
-    CHECKED_CONNECT(m_addSensorButton, SIGNAL(clicked()), this, SLOT(addSensor()));
-    CHECKED_CONNECT(m_addCueButton, SIGNAL(clicked()), this, SLOT(addCue()));
+    CHECKED_CONNECT(m_addSensorButton, SIGNAL(clicked()), this, SLOT(newSpectrumSensor()));
+    CHECKED_CONNECT(m_addCueButton, SIGNAL(clicked()), this, SLOT(newCue()));
 
 
 
@@ -61,7 +61,7 @@ void Controlpanel::createUi()
 }
 
 
-void Controlpanel::addSensor()
+void Controlpanel::newSpectrumSensor()
 {
     SublevelMeter *slm = new SublevelMeter(this);
     slm->setSelectable(true);
@@ -71,17 +71,20 @@ void Controlpanel::addSensor()
     meterNumber->setAlignment(Qt::AlignBottom | Qt::AlignCenter);
 
     // Make VBox for label, checkbox etc
-    QScopedPointer<QVBoxLayout> vbox(new QVBoxLayout);
+    QScopedPointer<QVBoxLayout> vbox(new QVBoxLayout); // ??? why is this scoped pointer stuff needed
     vbox->addWidget(slm);
     vbox->addWidget(meterNumber);
 
     hLayout->addLayout(vbox.data());
     vbox.take();    // ownership transferred to hLayout
 
+    // Connect submeter so that when it's selected, the spectrograph
+    // displays its window.
     CHECKED_CONNECT(slm, SIGNAL(iveBeenSelected(SublevelMeter*)),
             this, SLOT(submeterHasBeenSelected(SublevelMeter*)));
 
     // TODO use simpler spectrumChanged
+    // Get the spectrum as they are calculated.
     CHECKED_CONNECT(_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
             slm, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
 
@@ -91,7 +94,7 @@ void Controlpanel::addSensor()
     setMinimumWidth(numMeters*40);
 }
 
-void Controlpanel::addCue()
+void Controlpanel::newCue()
 {
     Cue *cue = new Cue(_dfModel);
     CueView *cv = new CueView(cue, NULL);

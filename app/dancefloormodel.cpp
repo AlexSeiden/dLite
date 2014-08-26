@@ -15,6 +15,9 @@ using namespace std;
 Dancefloormodel::Dancefloormodel(QObject *parent) :
     QObject(parent)
 {
+    _numCues = 0;
+
+    _t.start(); // XXX debugging
 }
 
 Dancefloormodel::~Dancefloormodel()
@@ -150,6 +153,9 @@ void Dancefloormodel::fireLight(int x, int y, Firing *firing)
 
 void Dancefloormodel::evaluate()
 {
+    qDebug("Time elapsed: %d ms", _t.elapsed());
+    _t.restart();
+
     evaluateAllCues();
 
     // For every light, get the firing vector:
@@ -176,6 +182,7 @@ void Dancefloormodel::evaluate()
 
 void Dancefloormodel::addCue(Cue *cue) {
     _cues.push_back(cue);
+    _numCues++;
 }
 
 void Dancefloormodel::evaluateAllCues() {

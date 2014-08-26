@@ -18,6 +18,7 @@ class Spectrograph;
 class Controlpanel;
 class Dancefloorwidget;
 class Dancefloormodel;
+class CueLibView;
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -52,6 +53,7 @@ public slots:
     void errorMessage(const QString &heading, const QString &detail);
     void audioPositionChanged(qint64 position);
     void bufferLengthChanged(qint64 length);
+    void newNodeRequest(QString name);
 
 private slots:
     void showFileDialog();
@@ -93,6 +95,7 @@ private:
     Dancefloormodel *       m_dancefloormodel;
     Dancefloorwidget *      m_dancefloorwidget;
     Controlpanel *          m_controlpanel;
+    CueLibView *            m_cueLibView;
 };
 
 #endif // MAINWIDGET_H

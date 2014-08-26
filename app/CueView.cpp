@@ -6,8 +6,7 @@ CueView::CueView(Cue *cue, QWidget *parent) :
     QWidget(parent),
     _cue(cue)
 {
-
-    this->setWindowFlags(Qt::Tool);
+    //this->setWindowFlags(Qt::Tool);
 
     alphaLabel = new QLabel(tr("alpha"));
     xLabel = new QLabel(tr("x"));
@@ -28,16 +27,7 @@ CueView::CueView(Cue *cue, QWidget *parent) :
     ySpinBox->setRange(1, 10);
     ySpinBox->setSingleStep(1);
 
-#if 0
-    whipButton = new QPushButton(this);
-#else
-    whipButton = new Whip(this);
-#endif
-    whipIcon = QIcon(":/images/settings.png");
-    whipButton->setIcon(whipIcon);
-    whipButton->setEnabled(true);
-    whipButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    whipButton->setMinimumSize(30,30);
+    whipButton = new Whip(&_cue->_alpha, this);  // TODO generalize
 
     QGridLayout *gridLayout = new QGridLayout;
     gridLayout->addWidget(whipButton,   0, 0);
@@ -52,6 +42,8 @@ CueView::CueView(Cue *cue, QWidget *parent) :
     this->setLayout(gridLayout);
 
     CHECKED_CONNECT(colorButton, SIGNAL(clicked()), this, SLOT(setColorDialog()));
+
+    setWindowTitle(_cue->getName());
 }
 
 void CueView::setColorDialog(){
@@ -67,17 +59,3 @@ void CueView::setButtonColor(const QColor &col){
             _cue->_color = Lightcolor(col);
     }
 }
-
-#if 0
-void MainWidget::makeRubberBand()
-{
-    m_rubberband = new QRubberBand(QRubberBand::Line, nullptr);
-    m_rubberband->hide();
-}
-
-void MainWidget::beginWhip(QMouseEvent *event)
-{
-    m_rubberband->setGeometry(QRect((event->pos),QSize()));
-    m_rubberband->show();
-}
-#endif

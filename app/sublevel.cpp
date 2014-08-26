@@ -17,8 +17,7 @@ Subrange::Subrange() :
     freqMax(200.0),
     ampMin(0.0),
     ampMax(1.0)
-{
-}
+{ }
 
 Subrange::~Subrange() { }
 
@@ -63,10 +62,12 @@ SublevelMeter::SublevelMeter(QWidget *parent)
     ,   _active(false)
     ,   _selectable(false)
     ,   _selected(false)
+    ,   _dragTarget(false)
     ,   _cue(NULL)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     setMinimumWidth(30);
+    setAcceptDrops(true);
 }
 
 SublevelMeter::~SublevelMeter() {  }
@@ -95,6 +96,17 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
 
     if (_selected) {
         QPen pen(Qt::blue);
+        pen.setWidth(6);
+        painter.setPen(pen);
+
+        QRect surroundRect = rect();
+        // move in 1 pixel
+        surroundRect.setSize(QSize(rect().width()-1, rect().height()-1));
+        painter.drawRect(rect());
+    }
+
+    if (_dragTarget) {
+        QPen pen(Qt::red);
         pen.setWidth(6);
         painter.setPen(pen);
 
@@ -210,3 +222,42 @@ std::function<void(float&)> SublevelMeter::createProviderFunctor()
     return [this] (float &out) {out = m_level;};
 }
 
+
+// Drag & drop for whip connect
+
+void SublevelMeter::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (! event->mimeData()->hasFormat("whipConnection/float"))
+        return;
+
+    event->acceptProposedAction();
+    _dragTarget = true;
+    update();
+
+}
+
+void SublevelMeter::dragLeaveEvent(QDragLeaveEvent *event)
+{
+    Q_UNUSED(event);
+    _dragTarget = false;
+    update();
+}
+
+void SublevelMeter::dropEvent(QDropEvent *event)
+{
+    if (! event->mimeData()->hasFormat("whipConnection/float"))
+        return;
+
+    event->acceptProposedAction();
+    // TODO emit signal that drop is accepted
+    // create closure for value, and return it.
+    // or is it better to just pass the param handle through mime?
+
+#if 0
+    Param<float> *param = getFromStream();
+    param->setProvider(createProviderFunctor());
+#endif
+
+    _dragTarget = false;
+    update();
+}

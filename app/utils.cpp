@@ -11,7 +11,7 @@ qint64 audioLength(const QAudioFormat &format, qint64 microSeconds)
 {
    qint64 result = (format.sampleRate() * format.channelCount() * (format.sampleSize() / 8))
        * microSeconds / 1000000;
-   result -= result % (format.channelCount() * format.sampleSize());
+   result -= result % (format.channelCount() * format.sampleSize()); // wtf
    return result;
 }
 

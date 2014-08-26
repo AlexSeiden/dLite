@@ -40,7 +40,7 @@ Engine::Engine(QObject *parent)
     ,   m_spectrumBufferLength(0)
     ,   m_spectrumAnalyser()
     ,   m_spectrumPosition(0)
-    ,   m_notifyIntervalMs(50)  // TODO Make this a changable setting
+    ,   m_notifyIntervalMs(25)  // TODO Make this a changable setting
 {
     qRegisterMetaType<FrequencySpectrum>("FrequencySpectrum");
     qRegisterMetaType<WindowFunction>("WindowFunction");
@@ -111,19 +111,10 @@ void Engine::startPlayback()
                         this, SLOT(audioStateChanged(QAudio::State)));
         CHECKED_CONNECT(m_audioOutput, SIGNAL(notify()),
                         this, SLOT(audioNotify()));
-        CHECKED_CONNECT(m_audioOutput, SIGNAL(notify()),
-                        this, SLOT(auxNotify()));
-        if (m_file) {
-            m_file->seek(0);
-            m_bufferPosition = 0;
-            m_dataLength = 0;
-            m_audioOutput->start(m_file);
-        } else {
-            m_audioOutputIODevice.close();
-            m_audioOutputIODevice.setBuffer(&m_buffer);
-            m_audioOutputIODevice.open(QIODevice::ReadOnly);
-            m_audioOutput->start(&m_audioOutputIODevice);
-        }
+        m_file->seek(0);
+        m_bufferPosition = 0;
+        m_dataLength = 0;
+        m_audioOutput->start(m_file);
     }
 }
 
@@ -138,17 +129,13 @@ void Engine::suspend()
 // Private slots
 //-----------------------------------------------------------------------------
 
-void Engine::auxNotify()
-{
-    ENGINE_DEBUG << "Engine::auxNotify";
-}
-
 void Engine::audioNotify()
 {
-    // Find current playPosition in seconds
+    // Find current playPosition in seconds XXX dunno what units these are,
+    // but they are certainly not seconds.
     const qint64 playPosition = audioLength(m_format, m_audioOutput->processedUSecs());
     setPlayPosition(qMin(bufferLength(), playPosition));
-
+    
     // Look backwards from the playPosition when computing the level and the spectrum
     const qint64 levelPosition = playPosition - m_levelBufferLength;
     const qint64 spectrumPosition = playPosition - m_spectrumBufferLength;
@@ -177,6 +164,7 @@ void Engine::audioNotify()
 
         emit bufferChanged(m_bufferPosition, m_dataLength, m_buffer);
     }
+
     if (levelPosition >= 0 && levelPosition + m_levelBufferLength < m_bufferPosition + m_dataLength)
         calculateLevel(levelPosition, m_levelBufferLength);
     if (spectrumPosition >= 0 && spectrumPosition + m_spectrumBufferLength < m_bufferPosition + m_dataLength)
@@ -188,7 +176,10 @@ void Engine::audioNotify()
                         << "m_bufferPosition "<< m_bufferPosition
                         << "m_dataLength "<< m_dataLength;
     }
+
+    _dfModel->evaluate(); // TODO move elsewhere--perhaps it's own timer loop
 }
+
 
 void Engine::audioStateChanged(QAudio::State state)
 {
@@ -213,7 +204,8 @@ void Engine::audioStateChanged(QAudio::State state)
                 return;
             }
         }
-        // Bug workaround???
+
+        // Bug workaround attempt...
         //CHECKED_CONNECT(m_audioOutput, SIGNAL(notify()), this, SLOT(audioNotify()));
 
         setState(state);
@@ -332,6 +324,7 @@ void Engine::setPlayPosition(qint64 position, bool forceEmit)
         emit playPositionChanged(m_playPosition);
 }
 
+// XXX may be able to nix this
 void Engine::calculateLevel(qint64 position, qint64 length)
 {
     Q_ASSERT(position + length <= m_bufferPosition + m_dataLength);
@@ -361,8 +354,6 @@ void Engine::calculateLevel(qint64 position, qint64 length)
 void Engine::calculateSpectrum(qint64 position)
 {
     Q_ASSERT(position + m_spectrumBufferLength <= m_bufferPosition + m_dataLength);
-    // Umm, I think this assertion is wrong; don't we want to assert that this is a power of two?
-    Q_ASSERT(0 == m_spectrumBufferLength % 2); // constraint of FFT algorithm
 
     // QThread::currentThread is marked 'for internal use only', but
     // we're only using it for debug output here, so it's probably OK :)
@@ -377,7 +368,6 @@ void Engine::calculateSpectrum(qint64 position)
         m_spectrumAnalyser.calculate(m_spectrumBuffer, m_format);
     }
 
-    _dfModel->evaluate(); // TODO move elsewhere--perhaps it's own timer loop
 }
 
 void Engine::setFormat(const QAudioFormat &format)

@@ -23,8 +23,8 @@ public:
 
 public slots:
     void submeterHasBeenSelected(SublevelMeter *chosen);
-    void addSensor();
-    void addCue();
+    void newSpectrumSensor();
+    void newCue();
 
 signals:
     void submeterSelectionChanged(SublevelMeter *chosen);
@@ -39,7 +39,7 @@ private:
 
     QVBoxLayout               *windowLayout;
     QHBoxLayout               *hLayout;
-    QWidget                   *controlsPanel;
+    QWidget                   *controlsPanel;// ??? why do I need this???
 
     int                       numMeters;
     QList< SublevelMeter * >  meters;

@@ -1,4 +1,4 @@
-include(../../spectrum.pri)
+include(../../dLite.pri)
 
 static: error(This library cannot be built for static linkage)
 

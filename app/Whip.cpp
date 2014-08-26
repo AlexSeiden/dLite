@@ -1,36 +1,36 @@
 #include "Whip.h"
 #include <QDebug>
 
-Whip::Whip(QWidget *parent) :
-    QPushButton(parent)
+Whip::Whip(Param<float> *param, QWidget *parent) : // TODO extend to other datatypes
+    QToolButton(parent),
+    m_destination(param)
 {
-    m_rubberBand = nullptr;
+    setAcceptDrops(true);
+    m_pixmap = QPixmap(":/images/record.png");
+    setIcon(QIcon(":/images/record.png"));
+    setEnabled(true);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setMinimumSize(30,30);
 }
 
 void
 Whip::mousePressEvent(QMouseEvent *event)
 {
-    m_dragStart = event->pos();
-    qDebug() << m_dragStart;
-    if (!m_rubberBand)
-        m_rubberBand = new QRubberBand(QRubberBand::Line, NULL);
-    m_rubberBand->setGeometry(QRect(m_dragStart, QSize()));
-    m_rubberBand->show();
-}
-
-void Whip::mouseMoveEvent(QMouseEvent *event)
-{
-    //m_rubberBand->setGeometry(QRect(m_dragStart, event->pos()).normalized());
-}
-
-void Whip::mouseReleaseEvent(QMouseEvent *event)
-{
     Q_UNUSED(event);
+    QDrag *drag = new QDrag(this);
+    drag->setPixmap(m_pixmap);
 
-    QRect geo = m_rubberBand->geometry();
-    geo = geo.intersected(rect());
+    QByteArray itemData;
+    QDataStream dataStream(&itemData, QIODevice::WriteOnly);
+    dataStream << m_destination;  // TODO register this with moc
 
-    // Redraw
-    m_rubberBand->hide();
-    this->update();
+    QMimeData *mimeData = new QMimeData;
+    mimeData->setData("whipConnection/float", itemData);
+    drag->setMimeData(mimeData);
+
+    Qt::DropAction dropAction = drag->exec();
+    Q_UNUSED(dropAction);
+
+    // TODO connect to receive signal from whoever gets drop--
+    // or is it better to just pass the param handle through mime?
 }

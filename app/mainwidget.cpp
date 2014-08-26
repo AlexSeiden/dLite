@@ -9,6 +9,7 @@
 #include "controlpanel.h"
 #include "dancefloorwidget.h"
 #include "CueView.h"
+#include "CueLibView.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -42,6 +43,7 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_loadFileAction(0)
     ,   m_dancefloormodel(new Dancefloormodel)  // TODO should be allocated in main?
     ,   m_controlpanel(NULL)
+    ,   m_cueLibView(NULL)
 {
     // numBands, lowfreq, hifreq.
     // TODO move somewhere else....
@@ -57,12 +59,17 @@ MainWidget::MainWidget(QWidget *parent)
     m_dancefloormodel->ImportLayout(lf);
 
     m_controlpanel = new Controlpanel(NULL, m_engine, m_dancefloormodel);
+    m_cueLibView = new CueLibView(NULL);
 
     m_dancefloorwidget = new Dancefloorwidget();
     m_dancefloorwidget->setModel(m_dancefloormodel);
     m_dancefloorwidget->show();
 
     m_controlpanel->show();
+    m_cueLibView->show();
+    CHECKED_CONNECT(m_cueLibView, SIGNAL(newNodeRequest(QString)),
+                    this, SLOT(newNodeRequest(QString)));
+
 
     m_engine->setDancefloormodel(m_dancefloormodel);
     connectUi();
@@ -351,4 +358,18 @@ void MainWidget::reset()
     m_levelMeter->reset();
     m_spectrograph->reset();
     m_progressBar->reset();
+}
+
+void MainWidget::newNodeRequest(QString name)
+{
+    qDebug() << "new Node Request" << name;
+    // TODO generate this list from a single place, where all cues are listed,
+    // and the same place is used for the CueLib
+    if (name == tr("Box cue")) {
+        m_controlpanel->newCue();
+    } else if (name == tr("Spectrum range")) {
+        m_controlpanel->newSpectrumSensor();
+    } else if (name == tr("Random")) {
+        m_controlpanel->newCue();
+    }
 }

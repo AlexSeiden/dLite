@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QColor>
 #include <string>
+#include <QTime>
 #include "lightcolor.h"
 #include "Param.h"
 #include "Cue.h"
@@ -31,6 +32,9 @@ public:
     int getYsize() {return ysize;}
 
     void addCue(Cue *cue);
+    int getNumCues() {return _numCues;}
+
+public slots:
     void evaluate();
     void evaluateAllCues();
     void fireLight(int x, int y, Firing *f);
@@ -44,6 +48,9 @@ private:
     vector<Light>       _lights;
 
     std::vector<Cue *>  _cues;
+    QTime               _t;
+    int                 _numCues;
+
 
 #ifdef INLINE
     int _getIndex(int x, int y) {return xsize*y + x;}

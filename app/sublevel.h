@@ -3,6 +3,7 @@
 
 #include <QTime>
 #include <QWidget>
+#include <QMimeData>
 #include "frequencyspectrum.h"
 #include "cue.h"
 #include "Param.h"
@@ -51,6 +52,9 @@ public:
     // QWidget
     void paintEvent(QPaintEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dragLeaveEvent(QDragLeaveEvent *event);
+    void dropEvent(QDropEvent *event);
 
     void setActive(bool status);
     void setSelectable(bool status);
@@ -84,8 +88,10 @@ private:
     bool _active;
     bool _selectable;
     bool _selected;
+    bool _dragTarget;
 
     Cue * _cue;
+
 
 protected:
     Subrange    _range;

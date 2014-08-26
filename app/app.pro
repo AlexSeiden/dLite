@@ -33,7 +33,8 @@ SOURCES  += main.cpp \
     Param.cpp \
     Cue.cpp \
     CueView.cpp \
-    Whip.cpp
+    Whip.cpp \
+    CueLibView.cpp
 
 HEADERS  += engine.h \
             frequencyspectrum.h \
@@ -54,7 +55,8 @@ HEADERS  += engine.h \
     Param.h \
     Cue.h \
     CueView.h \
-    Whip.h
+    Whip.h \
+    CueLibView.h
 
 fftreal_dir = ../3rdparty/fftreal
 

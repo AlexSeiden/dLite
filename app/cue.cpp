@@ -18,8 +18,13 @@ Cue::Cue(Dancefloormodel *dfmodel) :
     _alpha(1.0),
     _color(255,255,255)
 {
+    // Add this to list of cues the model knows about.
     _dfModel->addCue(this);
+    int numCues = _dfModel->getNumCues();
+    _name = QString("BoxCue%1").arg(numCues);
+
     _xoffset.setProvider(randLight); // XXX testing
+    _yoffset.setProvider(randLight); // XXX testing
 }
 
 
