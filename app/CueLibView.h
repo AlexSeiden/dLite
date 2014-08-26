@@ -17,9 +17,6 @@ public:
 signals:
     void newNodeRequest(QString name);
 
-public slots:
-    //void buttonClick();
-
 private:
     void    createUi();
     void    createCuesGroup();
@@ -30,7 +27,6 @@ private:
     QGroupBox *cuesGroupBox;
     QGroupBox *floatsGroupBox;
     QGroupBox *colorsGroupBox;
-    const int NumButtons = 3;
     QList<QPushButton *> buttons;
 
     QHBoxLayout *mainLayout;

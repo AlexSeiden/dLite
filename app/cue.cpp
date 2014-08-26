@@ -55,10 +55,4 @@ void Cue::setPropertyProvider(std::string propertyName, providerFunctor_t &provi
     Param *param = getParam(propertyName);
     param.setProvider(provider);
 }
-
-Param *
-Cue::getParam(std::string propertyName)
-{
-
-}
 #endif

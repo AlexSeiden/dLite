@@ -6,7 +6,7 @@ CueView::CueView(Cue *cue, QWidget *parent) :
     QWidget(parent),
     _cue(cue)
 {
-    //this->setWindowFlags(Qt::Tool);
+    setWindowFlags(Qt::Tool);
 
     alphaLabel = new QLabel(tr("alpha"));
     xLabel = new QLabel(tr("x"));

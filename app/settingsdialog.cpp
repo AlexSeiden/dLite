@@ -70,11 +70,6 @@ void SettingsDialog::windowFunctionChanged(int index)
             m_windowFunctionComboBox->itemData(index).value<int>());
 }
 
-void SettingsDialog::inputDeviceChanged(int index)
-{
-    m_inputDevice = m_inputDeviceComboBox->itemData(index).value<QAudioDeviceInfo>();
-}
-
 void SettingsDialog::outputDeviceChanged(int index)
 {
     m_outputDevice = m_outputDeviceComboBox->itemData(index).value<QAudioDeviceInfo>();

@@ -31,10 +31,10 @@ SOURCES  += main.cpp \
     dancefloorwidget.cpp \
     controlpanel.cpp \
     Param.cpp \
-    Cue.cpp \
     CueView.cpp \
     Whip.cpp \
-    CueLibView.cpp
+    CueLibView.cpp \
+    Cue.cpp
 
 HEADERS  += engine.h \
             frequencyspectrum.h \
@@ -53,10 +53,10 @@ HEADERS  += engine.h \
     lightcolor.h \
     controlpanel.h \
     Param.h \
-    Cue.h \
     CueView.h \
     Whip.h \
-    CueLibView.h
+    CueLibView.h \
+    Cue.h
 
 fftreal_dir = ../3rdparty/fftreal
 

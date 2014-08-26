@@ -7,6 +7,7 @@
 
 class Dancefloormodel;
 
+
 class Cue
 {
 public:
