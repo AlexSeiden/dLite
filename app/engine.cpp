@@ -40,7 +40,7 @@ Engine::Engine(QObject *parent)
     ,   m_spectrumBufferLength(0)
     ,   m_spectrumAnalyser()
     ,   m_spectrumPosition(0)
-    ,   m_notifyIntervalMs(25)  // TODO Make this a changable setting
+    ,   m_notifyIntervalMs(25)
 {
     qRegisterMetaType<FrequencySpectrum>("FrequencySpectrum");
     qRegisterMetaType<WindowFunction>("WindowFunction");
@@ -50,9 +50,7 @@ Engine::Engine(QObject *parent)
                     SLOT(spectrumChanged(FrequencySpectrum)));
 }
 
-Engine::~Engine()
-{
-}
+Engine::~Engine() { }
 
 //-----------------------------------------------------------------------------
 // Public functions
@@ -131,11 +129,13 @@ void Engine::suspend()
 
 void Engine::audioNotify()
 {
-    // Find current playPosition in seconds XXX dunno what units these are,
-    // but they are certainly not seconds.
-    const qint64 playPosition = audioLength(m_format, m_audioOutput->processedUSecs());
+    // Find current playPosition in bytes
+
+    const qint64 uSecs = m_audioOutput->processedUSecs();
+    const qint64 playPosition = audioLength(m_format, uSecs);
     setPlayPosition(qMin(bufferLength(), playPosition));
-    
+    setCurrentTime(uSecs);
+
     // Look backwards from the playPosition when computing the level and the spectrum
     const qint64 levelPosition = playPosition - m_levelBufferLength;
     const qint64 spectrumPosition = playPosition - m_spectrumBufferLength;
@@ -268,11 +268,15 @@ bool Engine::initialize()
             emit errorMessage(tr("Audio format not supported"), formatToString(m_format));
     }
 
+    // (notify Interval may not be the same as set, if it's not supportable by device)
+    if (m_notifyIntervalMs != m_audioOutput->notifyInterval()) {
+        qDebug() << "Engine::initialize" << "requested notify interval" << m_notifyIntervalMs;
+        qDebug() << "                  " << "actual    notify interval" << m_audioOutput->notifyInterval();
+    }
+
     ENGINE_DEBUG << "Engine::initialize" << "m_bufferLength" << m_bufferLength;
     ENGINE_DEBUG << "Engine::initialize" << "m_dataLength" << m_dataLength;
     ENGINE_DEBUG << "Engine::initialize" << "format" << m_format;
-    // (notify Interval may not be the same as set, if it's not supportable by device)
-    //ENGINE_DEBUG << "Engine::initialize" << "actual notify interval" << m_audioOutput->notifyInterval();
 
     return result;
 }
@@ -390,6 +394,8 @@ void Engine::setLevel(qreal rmsLevel, qreal peakLevel, int numSamples)
 
 /**
  * Sets interval at which spectrum is updated.
+ * TODO:  this is also the interval at which the whole floor is
+ * updated, and the two should probably be decoupled.
  */
 void Engine::setInterval(int val)
 {

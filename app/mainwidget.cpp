@@ -35,7 +35,7 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_playButton(new QPushButton(this))
     ,   m_settingsButton(new QPushButton(this))
     ,   m_numBandsSpinBox(new QSpinBox(this))
-    ,   m_secMinSpinBox(new QSpinBox(this))
+    ,   m_specMinSpinBox(new QSpinBox(this))
     ,   m_specMaxSpinBox(new QSpinBox(this))
     ,   m_infoMessage(new QLabel(tr(""), this))
     ,   m_infoMessageTimerId(NullTimerId)
@@ -67,6 +67,8 @@ MainWidget::MainWidget(QWidget *parent)
 
     m_controlpanel->show();
     m_cueLibView->show();
+    // Listen for new node requests from the CueLibView.
+    // The newNodeRequest slot here will dispatch them appropriately.
     CHECKED_CONNECT(m_cueLibView, SIGNAL(newNodeRequest(QString)),
                     this, SLOT(newNodeRequest(QString)));
 
@@ -362,9 +364,9 @@ void MainWidget::reset()
 
 void MainWidget::newNodeRequest(QString name)
 {
-    qDebug() << "new Node Request" << name;
     // TODO generate this list from a single place, where all cues are listed,
     // and the same place is used for the CueLib
+    // TODO dunno why m_controlpanel has all the newWhatever methods; might be a better place for them.
     if (name == tr("Box cue")) {
         m_controlpanel->newCue();
     } else if (name == tr("Spectrum range")) {

@@ -63,6 +63,7 @@ void Controlpanel::createUi()
 
 void Controlpanel::newSpectrumSensor()
 {
+    // TODO disentangle the spectrum view logic from the "business" logic
     SublevelMeter *slm = new SublevelMeter(this);
     slm->setSelectable(true);
 
@@ -96,10 +97,19 @@ void Controlpanel::newSpectrumSensor()
 
 void Controlpanel::newCue()
 {
-    Cue *cue = new Cue(_dfModel);
+    CueBox *cue = new CueBox(_dfModel);
+    CueBoxView *cv = new CueBoxView(cue, NULL);
+    cv->show();
+}
+
+#if 0
+void Controlpanel::newRandomNode()
+{
+    Cue *cue = new CueBox(_dfModel);
     CueView *cv = new CueView(cue, NULL);
     cv->show();
 }
+#endif
 
 void Controlpanel::mouseReleaseEvent(QMouseEvent *event)
 {
@@ -118,7 +128,7 @@ void Controlpanel::submeterHasBeenSelected(SublevelMeter *chosen)
     }
 
     // XXX testing
-    auto provider = chosen->createProviderFunctor();
+    //auto provider = chosen->createProviderClosure();
 
     // emit signal for others who might care, e.g. spectrograph
     emit(submeterSelectionChanged(chosen));

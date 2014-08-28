@@ -89,9 +89,7 @@ bool Dancefloormodel::ImportLayout(string &layoutCsvFile)
             if (cell.size() == 0 || cell.compare("X")==0) {
                 _lights[index]._lightID = 0;
             } else
-//                lightIDs[index] = std::atoi(cell.c_str());
                 _lights[index]._lightID = std::atoi(cell.c_str());
-//            values[index] = Lightcolor();
             _lights[index]._value = Lightcolor();
         }
     }

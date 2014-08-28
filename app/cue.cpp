@@ -11,48 +11,60 @@ void randLight(int &value)
 Cue::Cue(Dancefloormodel *dfmodel) :
     _dfModel(dfmodel),
     _active(true),
-    _compmode(SET),
-    _xoffset(10),
-    _yoffset(8),
-    _scale(1.0),
-    _alpha(1.0),
-    _color(255,255,255)
+    _compmode(SET)
 {
     // Add this to list of cues the model knows about.
     _dfModel->addCue(this);
-    int numCues = _dfModel->getNumCues();
-    _name = QString("BoxCue%1").arg(numCues);
-
-    _xoffset.setProvider(randLight); // XXX testing
-    _yoffset.setProvider(randLight); // XXX testing
 }
 
 
 void Cue::evaluate()
 {
     if (!_active) return;
-
-    // Evaluate all attachable params:
-    int xoffset=0;
-    int yoffset=0;
-    _xoffset.getValue(xoffset);
-    _yoffset.getValue(yoffset);
-
-    float alpha=1.0;
-    _alpha.getValue(alpha);
-
-    Firing *firing = new Firing;
-    firing->_color = _color;
-    firing->_alpha = alpha;
-    _dfModel->fireLight(xoffset, yoffset, firing);
 }
 
 
+void
+TriggerEvery::operator ()(bool &value){
+    if (getCurrentTime() > _nextRefresh) {
+       _value = true;
+       _lastRefresh = _nextRefresh;
+       _nextRefresh += _interval;
+    }
+    value = _value;
 
-#if 0
-void Cue::setPropertyProvider(std::string propertyName, providerFunctor_t &provider)
+    // XXX This assumes that this node is only connected to one output
+    _value = false;
+}
+
+
+RandomNode::RandomNode() :
+    _value(0.0),
+    _min(0.0),
+    _max(1.0)
 {
-    Param *param = getParam(propertyName);
-    param.setProvider(provider);
+    setRandomEngine();
 }
-#endif
+
+void
+RandomNode::setRandomEngine()
+{
+    std::random_device rd;
+    // Seed the "Mersenne Twister" random number generator from random_device
+    _randGenerator = new std::mt19937(rd());
+    // Initialize the distrubution on the range [_min, _max)
+    _distribution = new std::uniform_real_distribution<float>(_min, _max);
+}
+
+
+void
+RandomNode::operator ()(float &value){
+    // First, check to see if it's time for a new number
+    bool trigVal;
+    _trigger(trigVal);
+    if (trigVal) {
+        _value =  (*_distribution)(*_randGenerator);
+    }
+
+    value = _value;
+}

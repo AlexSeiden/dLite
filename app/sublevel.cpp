@@ -217,7 +217,9 @@ void SublevelMeter::setRange(Subrange &newrange)
 
 
 // TODO this is business logic that shouldn't be in a view class.
-std::function<void(float&)> SublevelMeter::createProviderFunctor()
+//std::function<void(float&)> SublevelMeter::createProviderFunctor()
+template<class PT>
+std::function<void(PT&)> SublevelMeter::createProviderClosure()
 {
     return [this] (float &out) {out = m_level;};
 }
@@ -255,7 +257,7 @@ void SublevelMeter::dropEvent(QDropEvent *event)
 
 #if 0
     Param<float> *param = getFromStream();
-    param->setProvider(createProviderFunctor());
+    param->setProvider(createProviderClosure());
 #endif
 
     _dragTarget = false;

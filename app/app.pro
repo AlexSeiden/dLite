@@ -2,6 +2,7 @@ include(../dLite.pri)
 
 # mostly for std::function
 CONFIG  += c++11
+CONFIG  += rtti
 QMAKE_CXXFLAGS += -stdlib=libc++
 QMAKE_CXXFLAGS += -std=c++11
 QMAKE_CXXFLAGS += -mmacosx-version-min=10.7
@@ -34,7 +35,9 @@ SOURCES  += main.cpp \
     CueView.cpp \
     Whip.cpp \
     CueLibView.cpp \
-    Cue.cpp
+    Cue.cpp \
+    CueBox.cpp \
+    BeatFiles.cpp
 
 HEADERS  += engine.h \
             frequencyspectrum.h \
@@ -56,7 +59,9 @@ HEADERS  += engine.h \
     CueView.h \
     Whip.h \
     CueLibView.h \
-    Cue.h
+    Cue.h \
+    CueBox.h \
+    BeatFiles.h
 
 fftreal_dir = ../3rdparty/fftreal
 

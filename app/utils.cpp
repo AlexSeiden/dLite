@@ -7,11 +7,14 @@ qint64 audioDuration(const QAudioFormat &format, qint64 bytes)
         (format.sampleRate() * format.channelCount() * (format.sampleSize() / 8));
 }
 
+// Returns position in bytes, given position in microSeconds.
 qint64 audioLength(const QAudioFormat &format, qint64 microSeconds)
 {
+    // format.sampleRate() is in Hz, format.sampleSize() in bits
    qint64 result = (format.sampleRate() * format.channelCount() * (format.sampleSize() / 8))
        * microSeconds / 1000000;
-   result -= result % (format.channelCount() * format.sampleSize()); // wtf
+   // Round off to start of the channel 0.
+   result -= result % (format.channelCount() * format.sampleSize());
    return result;
 }
 
@@ -97,4 +100,16 @@ qreal pcmToReal(qint16 pcm)
 qint16 realToPcm(qreal real)
 {
     return real * PCMS16MaxValue;
+}
+
+static qint64 _currentTimeInMS = 0;
+
+qint64 getCurrentTime()
+{
+    return _currentTimeInMS;
+}
+
+void setCurrentTime(qint64 uSecs)
+{
+    _currentTimeInMS = uSecs/1000;
 }

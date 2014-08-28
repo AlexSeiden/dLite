@@ -104,13 +104,11 @@ signals:
 
     /**
      * Informational message for non-modal display
-     * TODO this is a view thing
      */
     void infoMessage(const QString &message, int durationMs);
 
     /**
      * Error message for modal display
-     * TODO this is a view thing
      */
     void errorMessage(const QString &heading, const QString &detail);
 
@@ -191,7 +189,6 @@ private:
     QAudioDeviceInfo    m_audioOutputDevice;
     QAudioOutput*       m_audioOutput;
     qint64              m_playPosition;
-    QBuffer             m_audioOutputIODevice;
 
     QByteArray          m_buffer;
     qint64              m_bufferPosition;

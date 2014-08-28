@@ -63,8 +63,11 @@ public:
     Subrange getRange() {return _range;}
     void setRange(Subrange &_range);
 
-    std::function<void(float&)> createProviderFunctor();
-    //providerFunctor_t createProviderFunctor();
+
+    template<class PT>
+    std::function<void(PT&)> createProviderClosure();
+
+  //  std::function<void(float&)> createProviderClosure();
 
 
 signals:
@@ -80,7 +83,7 @@ private:
     FrequencySpectrum   m_spectrum;
 
     // Height of level bar.
-    qreal m_level;
+    float  m_level;
 
     QColor m_barColor;
     QColor m_squareColor;

@@ -29,9 +29,13 @@ bool isPCM(const QAudioFormat &format);
 // Check whether the audio format is signed, little-endian, 16-bit PCM
 bool isPCMS16LE(const QAudioFormat &format);
 
-// Compile-time calculation of powers of two
-// WTF??? How does this work at compile time?
+// Return global time in milliseconds
+qint64  getCurrentTime();
+// set global time in *micro*seconds  ???
+void    setCurrentTime(qint64 uSecs);
 
+// Compile-time calculation of powers of two
+// WTF How does this work at compile time?
 template<int N> class PowerOfTwo
 { public: static const int Result = PowerOfTwo<N-1>::Result * 2; };
 

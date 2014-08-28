@@ -1,16 +1,16 @@
 #include "Whip.h"
 #include <QDebug>
 
-Whip::Whip(Param<float> *param, QWidget *parent) : // TODO extend to other datatypes
+Whip::Whip(ParamBase *param, QWidget *parent) : // TODO extend to other datatypes
     QToolButton(parent),
     m_destination(param)
 {
     setAcceptDrops(true);
-    m_pixmap = QPixmap(":/images/record.png");
-    setIcon(QIcon(":/images/record.png"));
+    m_pixmap = QPixmap(":/images/whip3.png");
+    setIcon(QIcon(":/images/whip3.png"));
     setEnabled(true);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    setMinimumSize(30,30);
+    setFixedSize(16,16);
 }
 
 void

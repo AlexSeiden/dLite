@@ -9,6 +9,7 @@
 #include "engine.h"
 #include "Cue.h"
 #include "CueView.h"
+#include "CueBox.h"
 
 class Controlpanel : public QWidget
 {

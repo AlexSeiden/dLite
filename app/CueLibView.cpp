@@ -27,6 +27,8 @@ void CueLibView::createUi()
 
     setWindowTitle(tr("Cue Library"));
 
+    // Note that the newNodeRequsest "Slot" is actually a signal, which will
+    // be handled by the mainwidget.
     CHECKED_CONNECT(signalMapper, SIGNAL(mapped(QString)),
                     this, SIGNAL(newNodeRequest(QString)));
 
@@ -75,8 +77,6 @@ CueLibView::addButtonToUi(QLayout *layout, QString buttonName) {
     QPushButton *butt = new QPushButton(buttonName);
     buttons.push_back(butt);
     layout->addWidget(butt);
-    // Note that the newNodeRequsest "Slot" is actually a signal, which will
-    // be handled by the mainwidget.
     signalMapper->setMapping(butt, buttonName);
     CHECKED_CONNECT(butt, SIGNAL(clicked()), signalMapper, SLOT(map()));
 }
