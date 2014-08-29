@@ -66,7 +66,6 @@ public:
 
     template<class PT>
     std::function<void(PT&)> createProviderClosure();
-
   //  std::function<void(float&)> createProviderClosure();
 
 

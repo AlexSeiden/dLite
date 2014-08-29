@@ -15,14 +15,19 @@ public:
     explicit Whip(ParamBase *param, QWidget *parent = 0);  // TODO extend to other datatypes
 
     void mousePressEvent(QMouseEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dragLeaveEvent(QDragLeaveEvent *event);
+    void dropEvent(QDropEvent *event);
 
 signals:
 
 public slots:
 
 private:
-    QPixmap          m_pixmap;
-    ParamBase*    m_destination;
+    QPixmap         _pixmap;
+    ParamBase*      _param;
+    const std::type_info & _paramType;
+    bool            _dragTarget;
 };
 
 #endif // WHIP_H

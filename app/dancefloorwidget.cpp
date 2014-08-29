@@ -32,6 +32,8 @@ void Dancefloorwidget::setModel(Dancefloormodel *model)
     setFixedWidth(xsize*(cellsize+cellspace));
     setFixedHeight(ysize*(cellsize+cellspace));
 
+    // TODO turn off "Full screen"
+
     // TODO restore from saved & allowed saved layouts
     // also move to right side of screen?
     // also, snapping...

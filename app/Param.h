@@ -1,20 +1,24 @@
 #ifndef PARAM_H
 #define PARAM_H
 
-#include <functional>
 #include <QString>
+#include <functional>
 #include <typeinfo>
 
-class ParamBase {
+class ParamBase
+{
 public:
     ParamBase() {}
     // make this virtual to allow RTTI (???)
     virtual ~ParamBase() {}
 };
 
+
+
 template <class PT>
 class Param : public ParamBase
 {
+
 public:
     Param(PT value=PT()) : _value(value), _provider(nullptr) {}
     ~Param() {} // Override to allow RTTI
@@ -29,11 +33,11 @@ public:
     QString &   getName()               {return &_name;}
     void        setName(QString &name)  {_name = name;}
 
-    // ??? Should this automatically disable a _provider functor, if there
-    // is one?
+    void        setProvider(std::function<void(PT&)> provider) {_provider = provider;}
+
+    // ??? Should this automatically disable a _provider functor, if there is one?
     void    setValue(const PT &value) {_value = value;}
 
-    void    setProvider(std::function<void(PT&)> provider) {_provider = provider;}
 
 private:
     PT      _value;
@@ -41,4 +45,7 @@ private:
     std::function<void(PT &value)> _provider;
 };
 
+extern const std::type_info & paramTypeFloat;
+extern const std::type_info & paramTypeInt;
+extern const std::type_info & paramTypeLcolor;
 #endif // PARAM_H

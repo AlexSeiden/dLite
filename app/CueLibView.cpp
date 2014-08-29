@@ -17,12 +17,17 @@ void CueLibView::createUi()
     createCuesGroup();
     createFloatsGroup();
     createColorsGroup();
+    createBeatsGroup();
 
     mainLayout = new QHBoxLayout;
+    mainLayout->setMargin(2);
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(4,4,4,4);
 
     mainLayout->addWidget(cuesGroupBox);
     mainLayout->addWidget(floatsGroupBox);
     mainLayout->addWidget(colorsGroupBox);
+    mainLayout->addWidget(beatsGroupBox);
     setLayout(mainLayout);
 
     setWindowTitle(tr("Cue Library"));
@@ -38,6 +43,7 @@ void CueLibView::createCuesGroup()
 {
     cuesGroupBox = new QGroupBox(tr("Cues"));
     QVBoxLayout *layout = new QVBoxLayout;
+    layout->setSpacing(0);
 
     addButtonToUi(layout, tr("Box cue"));
 
@@ -50,6 +56,7 @@ void CueLibView::createFloatsGroup()
 {
     floatsGroupBox = new QGroupBox(tr("Floats"));
     QVBoxLayout *layout = new QVBoxLayout;
+    layout->setSpacing(0);
 
     addButtonToUi(layout, tr("Spectrum range"));
     addButtonToUi(layout, tr("Random"));
@@ -63,12 +70,28 @@ void CueLibView::createColorsGroup()
 {
     colorsGroupBox = new QGroupBox(tr("Colors"));
     QVBoxLayout *layout = new QVBoxLayout;
+    layout->setSpacing(0);
 
     addButtonToUi(layout, tr("Spline"));
     addButtonToUi(layout, tr("Palette"));
 
     layout->addStretch();
     colorsGroupBox->setLayout(layout);
+}
+
+
+void CueLibView::createBeatsGroup()
+{
+    beatsGroupBox = new QGroupBox(tr("Beats"));
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setSpacing(0);
+
+    addButtonToUi(layout, tr("Bar"));
+    addButtonToUi(layout, tr("Beat"));
+    addButtonToUi(layout, tr("Onset"));
+
+    layout->addStretch();
+    beatsGroupBox->setLayout(layout);
 }
 
 

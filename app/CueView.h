@@ -16,22 +16,30 @@ class QSpinBox;
 class QDoubleSpinBox;
 QT_END_NAMESPACE
 
-#if 1
+void setButtonColor(QToolButton *colorButton, const QColor &col);
+
 class ParamView : public QWidget
 {
     Q_OBJECT
 public:
     ParamView(QWidget *parent, QString name, ParamBase *param);
 
+public slots:
+    void setValue(double val);
+    void setValue(int val);
+    void setValue(Lightcolor val);
+
+    void launchColorDialog();
+
 private:
-    Whip            *_whipButton;
     QString         _name;
     ParamBase       *_param;
+
+    Whip            *_whipButton;
     QLabel          *_label;
     QWidget         *_genericEditorWidget;
-    QHBoxLayout     *_layout;
+    QHBoxLayout     *_layout;       // XXX might not need to save this.
 };
-#endif
 
 class CueView : public QWidget
 {
@@ -42,24 +50,11 @@ public:
 signals:
 
 public slots:
-#if 0
-    void launchColorDialog();
-#endif
 
 protected:
     Cue     *_cue;
 
 private:
-    QLabel *alphaLabel;
-    QLabel *xLabel;
-    QLabel *yLabel;
-    QLabel *colorLabel;
-    QDoubleSpinBox *alphaSpinBox;
-    QSpinBox *xSpinBox;
-    QSpinBox *ySpinBox;
-    QToolButton *colorButton;
-    Whip    *whipButton;
-
     void    addFloatParam(QString name);
 
     void setButtonColor(QToolButton &colorButton, const QColor &col);

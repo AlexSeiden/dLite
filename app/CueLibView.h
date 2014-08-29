@@ -22,11 +22,13 @@ private:
     void    createCuesGroup();
     void    createFloatsGroup();
     void    createColorsGroup();
+    void    createBeatsGroup();
     void    addButtonToUi(QLayout *layout, QString buttonName);
 
     QGroupBox *cuesGroupBox;
     QGroupBox *floatsGroupBox;
     QGroupBox *colorsGroupBox;
+    QGroupBox *beatsGroupBox;
     QList<QPushButton *> buttons;
 
     QHBoxLayout *mainLayout;

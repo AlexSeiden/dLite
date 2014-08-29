@@ -1,8 +1,8 @@
 #include "sublevel.h"
 #include "utils.h"
+#include "Param.h"
 
 #include <math.h>
-
 #include <QPainter>
 #include <QTimer>
 #include <QDebug>
@@ -229,7 +229,7 @@ std::function<void(PT&)> SublevelMeter::createProviderClosure()
 
 void SublevelMeter::dragEnterEvent(QDragEnterEvent *event)
 {
-    if (! event->mimeData()->hasFormat("whipConnection/float"))
+    if (! event->mimeData()->hasFormat(paramTypeFloat.name()))
         return;
 
     event->acceptProposedAction();
@@ -247,7 +247,7 @@ void SublevelMeter::dragLeaveEvent(QDragLeaveEvent *event)
 
 void SublevelMeter::dropEvent(QDropEvent *event)
 {
-    if (! event->mimeData()->hasFormat("whipConnection/float"))
+    if (! event->mimeData()->hasFormat(paramTypeFloat.name()))
         return;
 
     event->acceptProposedAction();
@@ -261,5 +261,7 @@ void SublevelMeter::dropEvent(QDropEvent *event)
 #endif
 
     _dragTarget = false;
+    // TODO this meter
+
     update();
 }

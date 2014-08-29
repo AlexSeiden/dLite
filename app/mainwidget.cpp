@@ -59,13 +59,13 @@ MainWidget::MainWidget(QWidget *parent)
     m_dancefloormodel->ImportLayout(lf);
 
     m_controlpanel = new Controlpanel(NULL, m_engine, m_dancefloormodel);
+    m_controlpanel->show();
     m_cueLibView = new CueLibView(NULL);
 
     m_dancefloorwidget = new Dancefloorwidget();
     m_dancefloorwidget->setModel(m_dancefloormodel);
     m_dancefloorwidget->show();
 
-    m_controlpanel->show();
     m_cueLibView->show();
     // Listen for new node requests from the CueLibView.
     // The newNodeRequest slot here will dispatch them appropriately.
