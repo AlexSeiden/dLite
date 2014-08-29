@@ -32,6 +32,7 @@ void Controlpanel::createUi()
         newSpectrumSensor();
 
     // "add control" button
+#if 0
     m_addSensorButton = new QPushButton(this);
 //    m_addSensorIcon = QIcon(":/images/settings.png");
 //    m_addSensorButton->setIcon(m_addsensorIcon);
@@ -48,18 +49,17 @@ void Controlpanel::createUi()
     m_addCueButton->setMinimumSize(30,30);
     windowLayout->addWidget(m_addCueButton);
 
-    setLayout(windowLayout);
-
     CHECKED_CONNECT(m_addSensorButton, SIGNAL(clicked()), this, SLOT(newSpectrumSensor()));
     CHECKED_CONNECT(m_addCueButton, SIGNAL(clicked()), this, SLOT(newCue()));
 
+#endif
 
+    setLayout(windowLayout);
 
     // TODO restore from saved & allowed saved layouts
     setMinimumHeight(300);
     move(600,50);
 }
-
 
 void Controlpanel::newSpectrumSensor()
 {
@@ -84,38 +84,14 @@ void Controlpanel::newSpectrumSensor()
     CHECKED_CONNECT(slm, SIGNAL(iveBeenSelected(SublevelMeter*)),
             this, SLOT(submeterHasBeenSelected(SublevelMeter*)));
 
-    // TODO use simpler spectrumChanged
     // Get the spectrum as they are calculated.
+    // TODO use simpler spectrumChanged
     CHECKED_CONNECT(_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
             slm, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
-
 
     numMeters++;
     meters.append(slm);
     setMinimumWidth(numMeters*40);
-}
-
-void Controlpanel::newCue()
-{
-    CueBox *cue = new CueBox(_dfModel);
-    CueBoxView *cv = new CueBoxView(cue, NULL);
-    cv->show();
-}
-
-#if 0
-void Controlpanel::newRandomNode()
-{
-    Cue *cue = new CueBox(_dfModel);
-    CueView *cv = new CueView(cue, NULL);
-    cv->show();
-}
-#endif
-
-void Controlpanel::mouseReleaseEvent(QMouseEvent *event)
-{
-    // TODO Deselect, since it means that we've clicked outside of all the
-    // controller windows
-    event->ignore();
 }
 
 void Controlpanel::submeterHasBeenSelected(SublevelMeter *chosen)
@@ -132,4 +108,20 @@ void Controlpanel::submeterHasBeenSelected(SublevelMeter *chosen)
 
     // emit signal for others who might care, e.g. spectrograph
     emit(submeterSelectionChanged(chosen));
+}
+
+void Controlpanel::mouseReleaseEvent(QMouseEvent *event)
+{
+    // TODO Deselect, since it means that we've clicked outside of all the
+    // controller windows
+    event->ignore();
+}
+
+
+// TODO move this somewhere else.
+void Controlpanel::newCue()
+{
+    CueBox *cue = new CueBox(_dfModel);
+    CueBoxView *cv = new CueBoxView(cue, NULL);
+    cv->show();
 }

@@ -26,7 +26,7 @@ public:
     ~Subrange();
 
     double amplitudeWithinWindow(double amp);
-    bool frequencyWithinWindow(double freq);
+    bool isFrequencyWithinWindow(double freq);
 };
 
 
@@ -49,24 +49,22 @@ public:
     explicit SublevelMeter(QWidget *parent = 0);
     ~SublevelMeter();
 
-    // QWidget
     void paintEvent(QPaintEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
     void dragLeaveEvent(QDragLeaveEvent *event);
     void dropEvent(QDropEvent *event);
 
-    void setActive(bool status);
     void setSelectable(bool status);
     bool setSelection(bool status);
     void calculateLevel();
+
+    void setActive(bool status) { _active = status; }
     Subrange getRange() {return _range;}
-    void setRange(Subrange &_range);
+    void setRange(Subrange &newrange) { _range = newrange; }
 
-
-    template<class PT>
-    std::function<void(PT&)> createProviderClosure();
-  //  std::function<void(float&)> createProviderClosure();
+//    template<class PT> std::function<void(PT&)> createProviderClosure();
+    std::function<void(float&)> createProviderClosure();
 
 
 signals:

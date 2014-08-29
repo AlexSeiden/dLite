@@ -2,13 +2,17 @@
 #include "CueView.h"
 #include "utils.h"
 
-CueView::CueView(Cue *cue, QWidget *parent) :
-    QWidget(parent),
-    _cue(cue)
-{
-    setWindowFlags(Qt::Tool);
-    setWindowTitle(_cue->getName());
+
+// Utility function
+void setButtonColor(QToolButton *colorButton, const QColor &col){
+    if(col.isValid()) {
+        // I grabbed this bit of black magic code from StackOverflow...
+        // seems like the only way to set the color of the button.
+        QString qss = QString("background-color: %1").arg(col.name());
+        colorButton->setStyleSheet(qss);
+    }
 }
+
 
 CueBoxView::CueBoxView(CueBox *cue, QWidget *parent) :
     QWidget(parent),
@@ -30,24 +34,8 @@ CueBoxView::CueBoxView(CueBox *cue, QWidget *parent) :
     layout->addStretch();
 
     this->setLayout(layout);
+    // TODO: for some reason, the widgets are still resizable.
     this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    this->updateGeometry();
-
-}
-
-
-
-void setButtonColor(QToolButton *colorButton, const QColor &col){
-    if(col.isValid()) {
-        // I grabbed this bit of black magic code from StackOverflow...
-        // seems like the only way to set the color of the button.
-        QString qss = QString("background-color: %1").arg(col.name());
-        colorButton->setStyleSheet(qss);
-#if 0
-        if (_cue)       // XXX should assert(_cue)
-            _cue->_color = Lightcolor(col);
-#endif
-    }
 }
 
 ParamView::ParamView(QWidget *parent, QString name, ParamBase *param) :
@@ -128,20 +116,27 @@ void ParamView::launchColorDialog() {
     setButtonColor(colorButton, outcol);
 }
 
-void ParamView::setValue(double val){
+// It would be nice to template these, but that won't work with QObject
+// derived classes and the Qt moc.
+void ParamView::setValue(double val) {
    Param<float> *p = dynamic_cast<Param<float> *>(this->_param);
    Q_ASSERT(p);
    p->setValue(val);
 }
 
-void ParamView::setValue(int val){
+void ParamView::setValue(int val) {
    Param<int> *p = dynamic_cast<Param<int> *>(this->_param);
    Q_ASSERT(p);
    p->setValue(val);
 }
 
-void ParamView::setValue(Lightcolor val){
+void ParamView::setValue(Lightcolor val) {
    Param<Lightcolor> *p = dynamic_cast<Param<Lightcolor> *>(this->_param);
    Q_ASSERT(p);
    p->setValue(val);
+}
+
+void ParamView::setProvider(std::function<void(float&)> closure) {
+   Param<float> *p = dynamic_cast<Param<float> *>(this->_param);
+   p->setProvider(closure);
 }

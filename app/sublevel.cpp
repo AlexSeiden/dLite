@@ -1,6 +1,7 @@
 #include "sublevel.h"
 #include "utils.h"
 #include "Param.h"
+#include "CueView.h"
 
 #include <math.h>
 #include <QPainter>
@@ -26,8 +27,7 @@ Subrange::~Subrange() { }
  * threshold for the subrange, 1.0 if it's above it, and
  * a proportional value in between.
  */
-double
-Subrange::amplitudeWithinWindow(double amp)
+double Subrange::amplitudeWithinWindow(double amp)
 {
     if (amp < ampMin)
         return 0.0;
@@ -40,8 +40,7 @@ Subrange::amplitudeWithinWindow(double amp)
  * Returns true if a given frequency is within the window
  * set for this range.
  */
-bool
-Subrange::frequencyWithinWindow(double freq)
+bool Subrange::isFrequencyWithinWindow(double freq)
 {
     if (freq < freqMin)
         return false;
@@ -71,6 +70,23 @@ SublevelMeter::SublevelMeter(QWidget *parent)
 }
 
 SublevelMeter::~SublevelMeter() {  }
+
+void SublevelMeter::setSelectable(bool status)
+{
+    _selectable = status;
+    if (!_selectable)
+        _selected = false;
+}
+
+bool SublevelMeter::setSelection(bool status)
+{
+    if (!_selectable) {
+        return false;
+    }
+    _selected = status;
+    update();
+    return true;
+}
 
 void SublevelMeter::paintEvent(QPaintEvent *event)
 {
@@ -117,28 +133,6 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
     }
 }
 
-void SublevelMeter::setActive(bool status)
-{
-    _active = status;
-}
-
-void SublevelMeter::setSelectable(bool status)
-{
-    _selectable = status;
-    if (!_selectable)
-        _selected = false;
-}
-
-bool SublevelMeter::setSelection(bool status)
-{
-    if (!_selectable) {
-        return false;
-    }
-    _selected = status;
-    update();
-    return true;
-}
-
 void SublevelMeter::mouseReleaseEvent(QMouseEvent *event)
 {
     if (!_selectable) {
@@ -156,6 +150,53 @@ void SublevelMeter::mouseReleaseEvent(QMouseEvent *event)
         emit(iveBeenSelected(this));
     }
 }
+
+// Drag & drop for whip connect
+void SublevelMeter::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (! event->mimeData()->hasFormat(paramTypeFloat.name()))
+        return;
+
+    event->acceptProposedAction();
+    _dragTarget = true;
+    update();
+
+}
+
+void SublevelMeter::dragLeaveEvent(QDragLeaveEvent *event)
+{
+    Q_UNUSED(event);
+    _dragTarget = false;
+    update();
+}
+
+void SublevelMeter::dropEvent(QDropEvent *event)
+{
+    if (! event->mimeData()->hasFormat(paramTypeFloat.name()))
+        return;
+
+    event->acceptProposedAction();
+
+    // TODO emit signal that drop is accepted
+    // create closure for value, and return it.
+    // or is it better to just pass the param handle through mime?
+
+    QObject *eventSrc = event->source();
+    ParamView *paramView = qobject_cast<ParamView *>(eventSrc->parent());
+    Q_ASSERT(paramView);
+
+    auto closure = createProviderClosure();
+    paramView->setProvider(closure);
+
+    _dragTarget = false;
+
+    // select this meter
+    this->setSelection(true);
+    emit(iveBeenSelected(this));
+
+    update();
+}
+
 
 // TODO this is business logic that shouldn't be in a view class.
 // TODO decouple position & spectrum change
@@ -188,7 +229,7 @@ void SublevelMeter::calculateLevel()
         const FrequencySpectrum::Element e = *i;
 
         // TODO could optimize by skipping straight to start frequency
-        if (_range.frequencyWithinWindow(e.frequency)) {
+        if (_range.isFrequencyWithinWindow(e.frequency)) {
             // amplitude window
             value += _range.amplitudeWithinWindow(e.amplitude);
             nsamples++;
@@ -210,58 +251,10 @@ void SublevelMeter::calculateLevel()
     //emit subrangeLevelChanged(value);
 }
 
-void SublevelMeter::setRange(Subrange &newrange)
-{
-    _range = newrange;
-}
-
-
 // TODO this is business logic that shouldn't be in a view class.
-//std::function<void(float&)> SublevelMeter::createProviderFunctor()
-template<class PT>
-std::function<void(PT&)> SublevelMeter::createProviderClosure()
+//template<class PT> std::function<void(PT&)> SublevelMeter::createProviderClosure()
+std::function<void(float&)> SublevelMeter::createProviderClosure()
 {
     return [this] (float &out) {out = m_level;};
 }
 
-
-// Drag & drop for whip connect
-
-void SublevelMeter::dragEnterEvent(QDragEnterEvent *event)
-{
-    if (! event->mimeData()->hasFormat(paramTypeFloat.name()))
-        return;
-
-    event->acceptProposedAction();
-    _dragTarget = true;
-    update();
-
-}
-
-void SublevelMeter::dragLeaveEvent(QDragLeaveEvent *event)
-{
-    Q_UNUSED(event);
-    _dragTarget = false;
-    update();
-}
-
-void SublevelMeter::dropEvent(QDropEvent *event)
-{
-    if (! event->mimeData()->hasFormat(paramTypeFloat.name()))
-        return;
-
-    event->acceptProposedAction();
-    // TODO emit signal that drop is accepted
-    // create closure for value, and return it.
-    // or is it better to just pass the param handle through mime?
-
-#if 0
-    Param<float> *param = getFromStream();
-    param->setProvider(createProviderClosure());
-#endif
-
-    _dragTarget = false;
-    // TODO this meter
-
-    update();
-}

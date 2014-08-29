@@ -20,7 +20,7 @@ public:
     const QString & getName() const {return _name;}
     void            setName(const QString& name) {_name = name;}
 
-    void evaluate();
+    virtual void evaluate();
 
 protected:
     Dancefloormodel *_dfModel;

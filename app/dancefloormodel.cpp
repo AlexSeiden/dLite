@@ -186,6 +186,9 @@ void Dancefloormodel::addCue(Cue *cue) {
 void Dancefloormodel::evaluateAllCues() {
     for (Cue *cue : _cues) {
         cue->evaluate();
+        // XXX problem is that here we call the evaluate
+        // method for the base Cue class--not the actual
+        // method on the CueBox class.
     }
 }
 

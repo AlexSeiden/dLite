@@ -13,8 +13,6 @@ public:
     virtual ~ParamBase() {}
 };
 
-
-
 template <class PT>
 class Param : public ParamBase
 {
@@ -45,6 +43,7 @@ private:
     std::function<void(PT &value)> _provider;
 };
 
+// For convinience & speed when doing RTTI
 extern const std::type_info & paramTypeFloat;
 extern const std::type_info & paramTypeInt;
 extern const std::type_info & paramTypeLcolor;

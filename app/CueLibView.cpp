@@ -51,7 +51,6 @@ void CueLibView::createCuesGroup()
     cuesGroupBox->setLayout(layout);
 }
 
-
 void CueLibView::createFloatsGroup()
 {
     floatsGroupBox = new QGroupBox(tr("Floats"));
@@ -65,7 +64,6 @@ void CueLibView::createFloatsGroup()
     floatsGroupBox->setLayout(layout);
 }
 
-
 void CueLibView::createColorsGroup()
 {
     colorsGroupBox = new QGroupBox(tr("Colors"));
@@ -78,7 +76,6 @@ void CueLibView::createColorsGroup()
     layout->addStretch();
     colorsGroupBox->setLayout(layout);
 }
-
 
 void CueLibView::createBeatsGroup()
 {
@@ -95,8 +92,8 @@ void CueLibView::createBeatsGroup()
 }
 
 
-void
-CueLibView::addButtonToUi(QLayout *layout, QString buttonName) {
+// Convienence function
+void CueLibView::addButtonToUi(QLayout *layout, QString buttonName) {
     QPushButton *butt = new QPushButton(buttonName);
     buttons.push_back(butt);
     layout->addWidget(butt);

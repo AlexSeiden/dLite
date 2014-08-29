@@ -1,6 +1,11 @@
 #include "Whip.h"
 #include <QDebug>
 
+/*
+ * The "Whip" is the little icon you can use to connect parameters to drivers,
+ * like the whip used in Adobe After Effects.
+ */
+
 Whip::Whip(ParamBase *param, QWidget *parent) :
     QToolButton(parent),
     _param(param),
@@ -15,11 +20,8 @@ Whip::Whip(ParamBase *param, QWidget *parent) :
     setFixedSize(16,16);
 }
 
-/*
- * Start drag event on mouse press.
- */
-void
-Whip::mousePressEvent(QMouseEvent *event)
+// Start drag event on mouse press.
+void Whip::mousePressEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
     QDrag *drag = new QDrag(this);
@@ -39,10 +41,12 @@ Whip::mousePressEvent(QMouseEvent *event)
 
     // TODO connect to receive signal from whoever gets drop--
     // or is it better to just pass the param handle through mime?
+    // Or pass the current drag/drop initiator up to the controller,
+    // since by definition THERE CAN BE ONLY ONE.
 }
 
-// Drag & drop from other connections, to this connection:
 
+// Process Drag/drops intiated by other connections, to this connection:
 void Whip::dragEnterEvent(QDragEnterEvent *event)
 {
     if (! event->mimeData()->hasFormat(_paramType.name()))
