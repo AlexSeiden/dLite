@@ -53,12 +53,18 @@ public slots:
     void errorMessage(const QString &heading, const QString &detail);
     void audioPositionChanged(qint64 position);
     void bufferLengthChanged(qint64 length);
+
+    // XXX This is more of a "model" or "controller" issue than a view/widget one.
     void newNodeRequest(QString name);
 
 private slots:
     void showFileDialog();
     void showSettingsDialog();
     void updateButtonStates();
+
+    // XXX Again, these are more of a "model" or "controller" issue than a view/widget one.
+    void newCue();
+    void newRandomNode();
 
 private:
     void createUi();

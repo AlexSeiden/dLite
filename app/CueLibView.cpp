@@ -31,11 +31,13 @@ void CueLibView::createUi()
     setLayout(mainLayout);
 
     setWindowTitle(tr("Cue Library"));
+    setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+                   Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
 
-    // Note that the newNodeRequsest "Slot" is actually a signal, which will
-    // be handled by the mainwidget.
     CHECKED_CONNECT(signalMapper, SIGNAL(mapped(QString)),
                     this, SIGNAL(newNodeRequest(QString)));
+    // The newNodeRequest signal from here is monitored by mainwidget,
+    // who does the bulk of the dispatching.
 
 }
 
@@ -90,7 +92,6 @@ void CueLibView::createBeatsGroup()
     layout->addStretch();
     beatsGroupBox->setLayout(layout);
 }
-
 
 // Convienence function
 void CueLibView::addButtonToUi(QLayout *layout, QString buttonName) {

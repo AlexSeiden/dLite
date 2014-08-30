@@ -24,8 +24,9 @@ public:
 
 public slots:
     void submeterHasBeenSelected(SublevelMeter *chosen);
+
+    // TODO Need to consolidate the "newXXXX" node stuff somewhere.
     void newSpectrumSensor();
-    void newCue();
 
 signals:
     void submeterSelectionChanged(SublevelMeter *chosen);

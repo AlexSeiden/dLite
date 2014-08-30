@@ -9,7 +9,9 @@ public:
     explicit CueBox(Dancefloormodel *dfmodel = 0);
     void evaluate();
 
-public:  // TODO    just public for testing
+    friend class CueBoxView;
+
+protected:
     Param<int>      _xoffset;
     Param<int>      _yoffset;
     Param<float>    _scale;

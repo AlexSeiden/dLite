@@ -16,8 +16,8 @@ public:
     void setHasLights(int x, int y, bool status);
 
 public:
-    // QWidget
     void paintEvent(QPaintEvent *event);
+    // We'll need these when implementing path & region selection
 //    void mousePressEvent(QMouseEvent *event);
 //    void mouseMoveEvent(QMouseEvent *event);
 //    void mouseReleaseEvent(QMouseEvent *event);
@@ -28,16 +28,16 @@ signals:
 private:
     Dancefloormodel *dfModel;
     bool    cellHasLights(int x, int y);
-    int xsize;
-    int ysize;
+    int     xsize;
+    int     ysize;
 
-    int cellsize;
-    int cellspace;
-    QColor bgColor;
-    QColor cellSepColor;
-    QColor panelSepColor;
-    QColor noCellColor;
-    QTimer *timer;
+    int     cellsize;
+    int     cellspace;
+    QColor  bgColor;
+    QColor  cellSepColor;
+    QColor  panelSepColor;
+    QColor  noCellColor;
+//    QTimer  *timer; //  XXX is this still needed?
 
 #ifdef INLINE
     int _getIndex(int x, int y) {return xsize*y + x;}

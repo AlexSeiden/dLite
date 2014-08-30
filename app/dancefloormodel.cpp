@@ -9,6 +9,7 @@
 #include <vector>
 #include <QString>
 #include <QStringList>
+#include "dancefloorwidget.h"
 
 using namespace std;
 
@@ -20,17 +21,7 @@ Dancefloormodel::Dancefloormodel(QObject *parent) :
     _t.start(); // XXX debugging
 }
 
-Dancefloormodel::~Dancefloormodel()
-{
-#if 0
-    if (values)
-        delete values;
-    if (firings)
-        delete firings;
-    if (lightIDs)
-        delete lightIDs;
-#endif
-}
+Dancefloormodel::~Dancefloormodel() { }
 
 // TODO add Foot-squares as well as lights
 bool Dancefloormodel::ImportLayout(string &layoutCsvFile)
@@ -151,7 +142,7 @@ void Dancefloormodel::fireLight(int x, int y, Firing *firing)
 
 void Dancefloormodel::evaluate()
 {
-    qDebug("Time elapsed: %d ms", _t.elapsed());
+    //qDebug("Time elapsed: %d ms", _t.elapsed());
     _t.restart();
 
     evaluateAllCues();
@@ -176,6 +167,8 @@ void Dancefloormodel::evaluate()
         }
         light->_value = lightColor;
     }
+
+    _dfWidget->update();
 }
 
 void Dancefloormodel::addCue(Cue *cue) {

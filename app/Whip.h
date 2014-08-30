@@ -7,12 +7,13 @@
 #include <QMimeData>
 #include <QMouseEvent>
 
+// TODO extend whip to other datatypes
 class Whip : public QToolButton
 {
     Q_OBJECT
 
 public:
-    explicit Whip(ParamBase *param, QWidget *parent = 0);  // TODO extend to other datatypes
+    explicit Whip(ParamBase *param, QWidget *parent = 0, bool inputConnection=true);
 
     void mousePressEvent(QMouseEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
@@ -24,10 +25,17 @@ signals:
 public slots:
 
 private:
-    QPixmap         _pixmap;
+    static QPixmap  *whipDisconnectedPixmap;
+    static QIcon    *whipDisconnectedIcon;
+    static QPixmap  *whipConnectedPixmap;
+    static QIcon    *whipConnectedIcon;
+    static void     initIcons();
+
+    QPixmap         *_pixmap;
     ParamBase*      _param;
     const std::type_info & _paramType;
     bool            _dragTarget;
+    bool            _inputConnection;
 };
 
 #endif // WHIP_H

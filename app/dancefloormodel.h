@@ -9,9 +9,11 @@
 #include "Param.h"
 #include "Cue.h"
 
-class Cue;
 
 using namespace std;
+
+class Cue;
+class Dancefloorwidget;
 
 class Dancefloormodel : public QObject
 {
@@ -34,6 +36,8 @@ public:
     void addCue(Cue *cue);
     int getNumCues() {return _numCues;}
 
+    void setView(Dancefloorwidget *dfwidget) { _dfWidget = dfwidget;}
+
 public slots:
     void evaluate();
     void evaluateAllCues();
@@ -49,6 +53,7 @@ private:
 
     std::vector<Cue *>  _cues;
     QTime               _t;
+    Dancefloorwidget    *_dfWidget;
     int                 _numCues;
 
 

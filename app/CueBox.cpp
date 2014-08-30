@@ -19,7 +19,6 @@ CueBox::CueBox(Dancefloormodel *dfmodel) :
 }
 
 
-
 void CueBox::evaluate()
 {
     if (!_active) return;
@@ -35,7 +34,7 @@ void CueBox::evaluate()
     float alpha=1.0;
     _alpha.getValue(alpha);
 
-    // "Fire" the light with the corret parameters
+    // "Fire" the light with the correct parameters
     Firing *firing = new Firing;
     firing->_color = color;
     firing->_alpha = alpha;

@@ -37,7 +37,9 @@ SOURCES  += main.cpp \
     CueLibView.cpp \
     Cue.cpp \
     CueBox.cpp \
-    BeatFiles.cpp
+    BeatFiles.cpp \
+    Node.cpp \
+    ParamView.cpp
 
 HEADERS  += engine.h \
             frequencyspectrum.h \
@@ -61,7 +63,9 @@ HEADERS  += engine.h \
     CueLibView.h \
     Cue.h \
     CueBox.h \
-    BeatFiles.h
+    BeatFiles.h \
+    Node.h \
+    ParamView.h
 
 fftreal_dir = ../3rdparty/fftreal
 

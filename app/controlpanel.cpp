@@ -20,39 +20,21 @@ Controlpanel::Controlpanel(QWidget *parent,
 
 void Controlpanel::createUi()
 {
+    setWindowFlags(Qt::Tool | Qt::WindowTitleHint  |
+                   Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
     setWindowTitle(tr("Control Panel"));
 
     windowLayout = new QVBoxLayout(this);
+    windowLayout->setSpacing(0);
+    windowLayout->setContentsMargins(0,0,0,0);
+
     hLayout = new QHBoxLayout;
     controlsPanel = new QWidget(this);
     controlsPanel->setLayout(hLayout);
     windowLayout->addWidget(controlsPanel);
 
-    for (int i=0; i<3; ++i)
+    for (int i=0; i<3; ++i)  // XXX arbitrary, for debugging
         newSpectrumSensor();
-
-    // "add control" button
-#if 0
-    m_addSensorButton = new QPushButton(this);
-//    m_addSensorIcon = QIcon(":/images/settings.png");
-//    m_addSensorButton->setIcon(m_addsensorIcon);
-    m_addSensorButton->setText(tr("+sensor"));
-    m_addSensorButton->setEnabled(true);
-    m_addSensorButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    m_addSensorButton->setMinimumSize(30,30);
-    windowLayout->addWidget(m_addSensorButton);
-
-    m_addCueButton = new QPushButton(this);
-    m_addCueButton->setText(tr("+cue"));
-    m_addCueButton->setEnabled(true);
-    m_addCueButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    m_addCueButton->setMinimumSize(30,30);
-    windowLayout->addWidget(m_addCueButton);
-
-    CHECKED_CONNECT(m_addSensorButton, SIGNAL(clicked()), this, SLOT(newSpectrumSensor()));
-    CHECKED_CONNECT(m_addCueButton, SIGNAL(clicked()), this, SLOT(newCue()));
-
-#endif
 
     setLayout(windowLayout);
 
@@ -115,13 +97,4 @@ void Controlpanel::mouseReleaseEvent(QMouseEvent *event)
     // TODO Deselect, since it means that we've clicked outside of all the
     // controller windows
     event->ignore();
-}
-
-
-// TODO move this somewhere else.
-void Controlpanel::newCue()
-{
-    CueBox *cue = new CueBox(_dfModel);
-    CueBoxView *cv = new CueBoxView(cue, NULL);
-    cv->show();
 }

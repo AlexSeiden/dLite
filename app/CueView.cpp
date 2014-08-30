@@ -18,15 +18,16 @@ CueBoxView::CueBoxView(CueBox *cue, QWidget *parent) :
     QWidget(parent),
     _cue(cue)
 {
-    setWindowFlags(Qt::Tool);
+    setWindowFlags(Qt::Tool | Qt::WindowTitleHint  |
+                   Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
     setWindowTitle(_cue->getName());
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(8);
-    _alphaParamVu = new ParamView(this, tr("alpha"), &cue->_alpha);
-    _xParamVu = new ParamView(this, tr("x"), &cue->_xoffset);
-    _yParamVu = new ParamView(this, tr("y"), &cue->_yoffset);
-    _colorParamVu = new ParamView(this, tr("color"), &cue->_color);
+    _alphaParamVu = new ParamView(this, tr("alpha"), &_cue->_alpha);
+    _xParamVu = new ParamView(this, tr("x"), &_cue->_xoffset);
+    _yParamVu = new ParamView(this, tr("y"), &_cue->_yoffset);
+    _colorParamVu = new ParamView(this, tr("color"), &_cue->_color);
     layout->addWidget(_alphaParamVu);
     layout->addWidget(_xParamVu);
     layout->addWidget(_yParamVu);
@@ -34,109 +35,28 @@ CueBoxView::CueBoxView(CueBox *cue, QWidget *parent) :
     layout->addStretch();
 
     this->setLayout(layout);
-    // TODO: for some reason, the widgets are still resizable.
+    // XXX: for some reason, the widgets are still resizable.
     this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
-ParamView::ParamView(QWidget *parent, QString name, ParamBase *param) :
+// ------------------------------------------------------------------------------
+
+RandomNodeView::RandomNodeView(RandomNode *randomNode, QWidget *parent) :
     QWidget(parent),
-    _name(name),
-    _param(param)
+    _node(randomNode)
 {
-    _layout = new QHBoxLayout;
-    _whipButton = new Whip(_param, this);
-    _label = new QLabel(_name);
-    _label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    _label->setMinimumSize(50,20);
-    _label->setContentsMargins(5,0,5,0);
-    const std::type_info & paramType = typeid(*param);
-    if (paramType == paramTypeFloat) {
-        Param<float> * floatParam = dynamic_cast<Param<float> *>(_param);
-        QDoubleSpinBox *editorWidget = new QDoubleSpinBox;
-        editorWidget->setRange(0, 1.0);
-        editorWidget->setSingleStep(.01);
-        _genericEditorWidget = editorWidget;
-        float val = 0.0;
-        floatParam->getValue(val);
-        editorWidget->setValue(val);
-        _genericEditorWidget->setFixedSize(60,22);
+    setWindowFlags(Qt::Tool | Qt::WindowTitleHint  |
+                   Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
+    setWindowTitle(_node->getName());
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(8);
 
-        CHECKED_CONNECT(editorWidget, SIGNAL(valueChanged(double)), this, SLOT(setValue(double)));
-    }
-    else if (paramType == paramTypeInt){
-        Param<int> * intParam = dynamic_cast<Param<int> *>(_param);
-        QSpinBox *editorWidget = new QSpinBox;
-        editorWidget->setRange(1, 10);
-        editorWidget->setSingleStep(1);
-        _genericEditorWidget = editorWidget;
-        _genericEditorWidget->setFixedSize(60,22);
-        int val = 0;
-        intParam->getValue(val);
-        editorWidget->setValue(val);
-        CHECKED_CONNECT(editorWidget, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
-    }
-    else if (paramType == paramTypeLcolor) {
-        Param<Lightcolor> * colorParam = dynamic_cast<Param<Lightcolor> *>(_param);
-        QToolButton *editorWidget =  new QToolButton(this);
-        _genericEditorWidget = editorWidget;
-        Lightcolor val;
-        colorParam->getValue(val);
-        QColor qc = val.toQColor();
-        setButtonColor(editorWidget, qc);
-
-        CHECKED_CONNECT(editorWidget, SIGNAL(clicked()), this, SLOT(launchColorDialog()));
-    }
-    else
-        qDebug() << "ERROR: could not match typeid(param)";
-        // TODO handle error better
-
-    _genericEditorWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-    _layout->setSpacing(0);
-    _layout->setContentsMargins(8,0,8,0);
-    _layout->addWidget(_whipButton);
-    _layout->addWidget(_label);
-    _layout->addWidget(_genericEditorWidget);
-    _layout->addStretch();
-    this->setLayout(_layout);
-}
-
-void ParamView::launchColorDialog() {
-    QToolButton *colorButton = qobject_cast<QToolButton *>(this->_genericEditorWidget);
-    Param<Lightcolor> * colorParam = dynamic_cast<Param<Lightcolor> *>(_param);
-    Lightcolor val;
-    colorParam->getValue(val);
-    QColor qc = val.toQColor();
-    QColor outcol = QColorDialog::getColor(qc, NULL);
-    if (! outcol.isValid())
-        return;
-
-    val = Lightcolor(outcol);
-    emit setValue(val);
-    setButtonColor(colorButton, outcol);
-}
-
-// It would be nice to template these, but that won't work with QObject
-// derived classes and the Qt moc.
-void ParamView::setValue(double val) {
-   Param<float> *p = dynamic_cast<Param<float> *>(this->_param);
-   Q_ASSERT(p);
-   p->setValue(val);
-}
-
-void ParamView::setValue(int val) {
-   Param<int> *p = dynamic_cast<Param<int> *>(this->_param);
-   Q_ASSERT(p);
-   p->setValue(val);
-}
-
-void ParamView::setValue(Lightcolor val) {
-   Param<Lightcolor> *p = dynamic_cast<Param<Lightcolor> *>(this->_param);
-   Q_ASSERT(p);
-   p->setValue(val);
-}
-
-void ParamView::setProvider(std::function<void(float&)> closure) {
-   Param<float> *p = dynamic_cast<Param<float> *>(this->_param);
-   p->setProvider(closure);
+    _outParamVu = new ParamView(this, tr("Output"), &_node->_min, false);
+    _minParamVu = new ParamView(this, tr("min"), &_node->_min);
+    _maxParamVu = new ParamView(this, tr("max"), &_node->_max);
+    layout->addWidget(_outParamVu);
+    layout->addWidget(_minParamVu);
+    layout->addWidget(_maxParamVu);
+    layout->addStretch();
+    this->setLayout(layout);
 }

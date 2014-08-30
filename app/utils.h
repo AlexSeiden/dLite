@@ -31,7 +31,7 @@ bool isPCMS16LE(const QAudioFormat &format);
 
 // Return global time in milliseconds
 qint64  getCurrentTime();
-// set global time in *micro*seconds  ???
+// set global time in *micro*seconds
 void    setCurrentTime(qint64 uSecs);
 
 // Compile-time calculation of powers of two

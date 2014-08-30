@@ -15,7 +15,7 @@ public:
     CueLibView(QWidget *parent = 0);
 
 signals:
-    void newNodeRequest(QString name);
+    void    newNodeRequest(QString name);
 
 private:
     void    createUi();

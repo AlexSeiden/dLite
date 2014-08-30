@@ -17,9 +17,16 @@ Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
     cellsize = 20;
     cellspace = 4;
 
+#if 0
+    // I think all of this is unneeded now, because the model tells the view when to update.
     timer = new QTimer(this);
     CHECKED_CONNECT(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start(50);  // TODO make this updatable
+    timer->start(50);
+#endif
+
+    setWindowTitle(tr("dLite floor"));
+    setWindowFlags(Qt::Tool | Qt::WindowTitleHint  |
+                   Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
 }
 
 Dancefloorwidget::~Dancefloorwidget() { }
@@ -32,12 +39,10 @@ void Dancefloorwidget::setModel(Dancefloormodel *model)
     setFixedWidth(xsize*(cellsize+cellspace));
     setFixedHeight(ysize*(cellsize+cellspace));
 
-    // TODO turn off "Full screen"
-
     // TODO restore from saved & allowed saved layouts
     // also move to right side of screen?
     // also, snapping...
-    move(800, 50);
+    move(1100, 50);
 }
 
 bool Dancefloorwidget::cellHasLights(int x, int y) {
@@ -64,9 +69,8 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
         for (int x=0; x<xsize; ++x) {
             cell.moveLeft(cellspace/2 + x*(cellsize+cellspace));
             cell.moveTop(cellspace/2 + y*(cellsize+cellspace));
-            // TODO shouldn't recalc index twice...
+
             if (cellHasLights(x,y))
-                //painter.fillRect(cell, Qt::black);
                 painter.fillRect(cell, dfModel->getQColor(x,y));
             else
                 painter.fillRect(cell, noCellColor);

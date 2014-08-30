@@ -45,6 +45,7 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_controlpanel(NULL)
     ,   m_cueLibView(NULL)
 {
+
     // numBands, lowfreq, hifreq.
     // TODO move somewhere else....
     m_spectrograph->setParams(20, 20., 10000.);
@@ -55,25 +56,22 @@ MainWidget::MainWidget(QWidget *parent)
     move(10,50);  // TODO restore from last saved
 
     // TODO move to settings/prefs  & allow setting this
-    std::string lf = std::string("/Users/alex/src/floorit/layout.csv");
-    m_dancefloormodel->ImportLayout(lf);
-
-    m_controlpanel = new Controlpanel(NULL, m_engine, m_dancefloormodel);
-    m_controlpanel->show();
-    m_cueLibView = new CueLibView(NULL);
+    std::string layoutfile = std::string("/Users/alex/src/floorit/layout.csv");
+    m_dancefloormodel->ImportLayout(layoutfile);
 
     m_dancefloorwidget = new Dancefloorwidget();
     m_dancefloorwidget->setModel(m_dancefloormodel);
+    m_dancefloormodel->setView(m_dancefloorwidget);  // XXX This seems like bad form
     m_dancefloorwidget->show();
 
-    m_cueLibView->show();
-    // Listen for new node requests from the CueLibView.
-    // The newNodeRequest slot here will dispatch them appropriately.
-    CHECKED_CONNECT(m_cueLibView, SIGNAL(newNodeRequest(QString)),
-                    this, SLOT(newNodeRequest(QString)));
-
-
     m_engine->setDancefloormodel(m_dancefloormodel);
+
+    m_controlpanel = new Controlpanel(NULL, m_engine, m_dancefloormodel);
+    m_controlpanel->show();
+
+    m_cueLibView = new CueLibView(NULL);
+    m_cueLibView->show();
+
     connectUi();
 
     // TODO default to last played.
@@ -340,8 +338,11 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_specMaxSpinBox, SIGNAL(valueChanged(int)),
             m_spectrograph, SLOT(setFreqHi(int)));
 
-}
+    CHECKED_CONNECT(m_cueLibView, SIGNAL(newNodeRequest(QString)),
+                    this, SLOT(newNodeRequest(QString)));
 
+
+}
 
 void MainWidget::updateButtonStates()
 {
@@ -362,16 +363,35 @@ void MainWidget::reset()
     m_progressBar->reset();
 }
 
+//-----------------------------------------------------------------------------
+// New node slots
+//-----------------------------------------------------------------------------
 void MainWidget::newNodeRequest(QString name)
 {
     // TODO generate this list from a single place, where all cues are listed,
     // and the same place is used for the CueLib
-    // TODO dunno why m_controlpanel has all the newWhatever methods; might be a better place for them.
     if (name == tr("Box cue")) {
-        m_controlpanel->newCue();
+        this->newCue();
     } else if (name == tr("Spectrum range")) {
+        // XXX this should be consistent with the others.
         m_controlpanel->newSpectrumSensor();
     } else if (name == tr("Random")) {
-        m_controlpanel->newCue();
+        this->newRandomNode();
+    } else {
+        qDebug() << "New Node request for " << name;
     }
+}
+
+void MainWidget::newCue()
+{
+    CueBox *cue = new CueBox(m_dancefloormodel);
+    CueBoxView *cv = new CueBoxView(cue, NULL);
+    cv->show();
+}
+
+void MainWidget::newRandomNode()
+{
+    RandomNode *node = new RandomNode();
+    RandomNodeView *rv = new RandomNodeView(node, NULL);
+    rv->show();
 }
