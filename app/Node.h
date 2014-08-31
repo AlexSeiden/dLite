@@ -2,20 +2,29 @@
 #define NODE_H
 #include "Param.h"
 #include <random>
+#include <QStringList>
+#include <QList>
 
 // Abstract base class for all Nodes:
 class Node
 {
 public:
     Node();
+    virtual ~Node();
 
     const QString & getName() const {return _name;}
-    void            setName(const QString& name) {_name = name;}
+    void            setName(const QString name) {_name = name;}
+    QList<ParamBase *>    getParams()        {return _paramList;}
+
+    bool            isActive() {return _active;}
+    void            setActive(bool active) {_active = active;}
 
     //virtual void operator() (bool &value) = 0;
 
 protected:
-    QString         _name;
+    QString               _name;
+    bool                  _active;
+    QList<ParamBase *>    _paramList;       // Could be static
 };
 
 
@@ -28,14 +37,15 @@ public:
     void setTriggerInterval(int interval) {_interval = interval;}
     void operator() (bool &value);
 
-    void    reset() {_value = false;}   // ??? should this be private?
-
 private:
+    void    reset() {_value = false;}
+
     bool    _value;
+
     // These are in milliseconds
     // Parameters
     int     _interval;
-    int     _refreshOffset; // TODO
+    //int     _refreshOffset; // TODO
 
     // Internal timekeepers
     int     _lastRefresh;
@@ -56,9 +66,10 @@ public:
     float   _value;
 
     // Parameters
+    Param<float> _output;
     Param<float> _min;
     Param<float> _max;
-    TriggerEvery _trigger;
+//    TriggerEvery _trigger;
 
 private:
     void  setRandomEngine();

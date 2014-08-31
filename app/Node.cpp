@@ -1,7 +1,12 @@
 #include "Node.h"
 #include "utils.h"
 
-Node::Node() { }
+Node::Node() :
+    _active(true)
+{ }
+
+Node::~Node() {}
+
 
 // ------------------------------------------------------------------------------
 //  TriggerEvery
@@ -28,11 +33,25 @@ void TriggerEvery::operator ()(bool &value)
 
 RandomNode::RandomNode() :
     _value(0.0),
+    _output(0.0),
     _min(0.0),
     _max(1.0)
 {
     setRandomEngine();
     setName("RandomFloat");
+    _output.setName("out");
+    _output.setOutput(true);
+    _output.setConnectable(true);
+
+    _min.setName("min");
+    _min.setOutput(false);
+    _min.setConnectable(true);
+
+    _max.setName("max");
+    _max.setOutput(false);
+    _max.setConnectable(true);
+
+    _paramList << &_output << &_min << &_max;
 }
 
 void RandomNode::setRandomEngine()
@@ -54,8 +73,8 @@ void RandomNode::setRandomEngine()
 void RandomNode::operator ()(float &value)
 {
     // First, check the trigger to see if it's time for a new number
-    bool trigVal;
-    _trigger(trigVal);
+    bool trigVal = true;
+    //XXX _trigger(trigVal);
     if (trigVal) {
         _value =  (*_distribution)(*_randGenerator);
     }

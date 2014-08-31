@@ -6,14 +6,14 @@
 class CueBox : public Cue
 {
 public:
-    explicit CueBox(Dancefloormodel *dfmodel = 0);
+    CueBox(Dancefloormodel *dfmodel);
     void evaluate();
 
     friend class CueBoxView;
 
 protected:
-    Param<int>      _xoffset;
-    Param<int>      _yoffset;
+    Param<int>      _x;
+    Param<int>      _y;
     Param<float>    _scale;
     Param<float>    _alpha;
     Param<Lightcolor>      _color;

@@ -19,6 +19,7 @@ class Controlpanel;
 class Dancefloorwidget;
 class Dancefloormodel;
 class CueLibView;
+class GraphWidget;
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -102,6 +103,7 @@ private:
     Dancefloorwidget *      m_dancefloorwidget;
     Controlpanel *          m_controlpanel;
     CueLibView *            m_cueLibView;
+    GraphWidget *           m_graphWidget;
 };
 
 #endif // MAINWIDGET_H

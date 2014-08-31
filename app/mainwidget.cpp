@@ -10,6 +10,7 @@
 #include "dancefloorwidget.h"
 #include "CueView.h"
 #include "CueLibView.h"
+#include "GraphWidget.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -67,10 +68,13 @@ MainWidget::MainWidget(QWidget *parent)
     m_engine->setDancefloormodel(m_dancefloormodel);
 
     m_controlpanel = new Controlpanel(NULL, m_engine, m_dancefloormodel);
-    m_controlpanel->show();
+//    m_controlpanel->show();
 
     m_cueLibView = new CueLibView(NULL);
     m_cueLibView->show();
+
+    m_graphWidget = new GraphWidget(NULL);
+    m_graphWidget->show();
 
     connectUi();
 
@@ -392,6 +396,8 @@ void MainWidget::newCue()
 void MainWidget::newRandomNode()
 {
     RandomNode *node = new RandomNode();
-    RandomNodeView *rv = new RandomNodeView(node, NULL);
-    rv->show();
+    m_graphWidget->addNode(node);
+//    RandomNodeView *rv = new RandomNodeView(node, NULL);
+//    rv->show();
+
 }

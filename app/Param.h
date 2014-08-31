@@ -1,6 +1,7 @@
 #ifndef PARAM_H
 #define PARAM_H
 
+#include <QList>
 #include <QString>
 #include <functional>
 #include <typeinfo>
@@ -8,16 +9,21 @@
 class ParamBase
 {
 public:
-    ParamBase() {}
-    // make this virtual to allow RTTI (???)
+    ParamBase() : _isOutput(false), _isConnectable(true) {}
+    // make this virtual to allow RTTI
     virtual ~ParamBase() {}
 
     QString getName()               {return _name;}
     void    setName(QString name)   {_name = name;}
-    bool    isAnimatable();
+    bool    isOutput()              {return _isOutput;}
+    bool    isConnectable()         {return _isConnectable;}
+    void    setOutput(bool status)             {_isOutput = status;}
+    void    setConnectable(bool status)        {_isConnectable = status;}
 
 private:
     QString _name;
+    bool _isOutput;
+    bool _isConnectable;
 };
 
 template <class PT>

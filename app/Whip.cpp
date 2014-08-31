@@ -82,6 +82,8 @@ void Whip::dragEnterEvent(QDragEnterEvent *event)
         return;
 
     // Don't accept drag from yourself!
+    // Of course, once we have source/sink discrimination, this won't be
+    // an issue.
     if (event->source() == this)
         return;
 
