@@ -27,8 +27,8 @@
     // Position
     //      Paths
 // playback controller
-// Need way of recalling instantiated nodes that have had their views closed
 // Hardware interface!
+// Need way of recalling instantiated nodes that have had their views closed
 
 
 // ------------------------------------------------------------------------------

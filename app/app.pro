@@ -42,6 +42,8 @@ SOURCES  += main.cpp \
     ParamView.cpp \
     Cuesheet.cpp \
     GraphWidget.cpp \
+    CuesheetScene.cpp \
+    GuiColors.cpp \
     NodeItem.cpp
 
 HEADERS  += engine.h \
@@ -71,6 +73,8 @@ HEADERS  += engine.h \
     ParamView.h \
     Cuesheet.h \
     GraphWidget.h \
+    CuesheetScene.h \
+    GuiColors.h  \
     NodeItem.h
 
 fftreal_dir = ../3rdparty/fftreal
