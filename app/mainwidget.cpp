@@ -182,7 +182,7 @@ void MainWidget::createUi()
 
     m_infoMessage->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     m_infoMessage->setAlignment(Qt::AlignHCenter);
-    windowLayout->addWidget(m_infoMessage);
+    //windowLayout->addWidget(m_infoMessage);
 
     windowLayout->addWidget(m_progressBar);
 
@@ -389,8 +389,9 @@ void MainWidget::newNodeRequest(QString name)
 void MainWidget::newCue()
 {
     CueBox *cue = new CueBox(m_dancefloormodel);
-    CueBoxView *cv = new CueBoxView(cue, NULL);
-    cv->show();
+    m_graphWidget->addNode(cue);
+//    CueBoxView *cv = new CueBoxView(cue, NULL);
+//    cv->show();
 }
 
 void MainWidget::newRandomNode()

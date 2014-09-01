@@ -4,6 +4,8 @@
 #ifndef QT_NO_WHEELEVENT
 void GraphicsView::wheelEvent(QWheelEvent *e)
 {
+    // This is only here to help implement zooming with wheel events.
+    // TODO make pinch-to-zoom work.
     if (e->modifiers() & Qt::ControlModifier) {
         if (e->delta() > 0)
             view->zoomIn(6);
@@ -16,14 +18,19 @@ void GraphicsView::wheelEvent(QWheelEvent *e)
 }
 #endif
 
-Cuesheet::Cuesheet(const QString &name, QWidget *parent)
+Cuesheet::Cuesheet(QWidget *parent)
     : QFrame(parent)
 {
     setFrameStyle(Sunken | StyledPanel);
     graphicsView = new GraphicsView(this);
     graphicsView->setRenderHint(QPainter::Antialiasing, true);
+#if 0
     graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
     graphicsView->setInteractive(false);
+#else
+    graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
+    graphicsView->setInteractive(true);
+#endif
     graphicsView->setOptimizationFlags(QGraphicsView::DontSavePainterState);
     graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
     graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -49,20 +56,20 @@ Cuesheet::Cuesheet(const QString &name, QWidget *parent)
     zoomSlider->setValue(250);
     zoomSlider->setTickPosition(QSlider::TicksRight);
 
+    resetButton = new QToolButton;
+    resetButton->setText(tr("0"));
+    resetButton->setEnabled(true);
+
     // Zoom slider layout
     QVBoxLayout *zoomSliderLayout = new QVBoxLayout;
     zoomSliderLayout->addWidget(zoomInIcon);
     zoomSliderLayout->addWidget(zoomSlider);
     zoomSliderLayout->addWidget(zoomOutIcon);
-
-    resetButton = new QToolButton;
-    resetButton->setText(tr("0"));
-    resetButton->setEnabled(true);
+    zoomSliderLayout->addWidget(resetButton);
 
     QGridLayout *topLayout = new QGridLayout;
     topLayout->addWidget(graphicsView, 1, 0);
     topLayout->addLayout(zoomSliderLayout, 1, 1);
-    topLayout->addWidget(resetButton, 2, 1);
     setLayout(topLayout);
 
     connect(resetButton, SIGNAL(clicked()), this, SLOT(resetView()));
@@ -75,6 +82,8 @@ Cuesheet::Cuesheet(const QString &name, QWidget *parent)
 
 QGraphicsView *Cuesheet::view() const
 {
+    // This is only here to help implement zooming with wheel events.
+    // TODO make pinch-to-zoom work.
     return static_cast<QGraphicsView *>(graphicsView);
 }
 

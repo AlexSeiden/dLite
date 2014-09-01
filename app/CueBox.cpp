@@ -13,6 +13,28 @@ CueBox::CueBox(Dancefloormodel *dfmodel) :
     int numCues = _dfModel->getNumCues();
     setName(QString("BoxCue%1").arg(numCues));
 
+    _x.setName("x");
+    _x.setOutput(false);
+    _x.setConnectable(true);
+
+    _y.setName("y");
+    _y.setOutput(false);
+    _y.setConnectable(true);
+
+    _scale.setName("scale");
+    _scale.setOutput(false);
+    _scale.setConnectable(true);
+
+    _alpha.setName("alpha");
+    _alpha.setOutput(false);
+    _alpha.setConnectable(true);
+
+    _color.setName("color");
+    _color.setOutput(false);
+    _color.setConnectable(true);
+
+    _paramList << &_x <<&_y <<&_scale << &_alpha << &_color;
+
     _x.setProvider(randLight); // XXX testing
     _y.setProvider(randLight); // XXX testing
 }

@@ -19,7 +19,6 @@ public slots:
     void addNode(Node *node);
 
 private:
-    void populateScene();
     QGraphicsScene *_scene;
 
     static int _numNodeItems;

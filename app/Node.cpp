@@ -39,6 +39,9 @@ RandomNode::RandomNode() :
 {
     setRandomEngine();
     setName("RandomFloat");
+
+    // Declare params.
+    // TODO this could be factored out into static members.
     _output.setName("out");
     _output.setOutput(true);
     _output.setConnectable(true);

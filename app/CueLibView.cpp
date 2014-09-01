@@ -7,6 +7,7 @@ CueLibView::CueLibView(QWidget *parent) :
     QWidget(parent)
 {
     createUi();
+    move(500, 50);
 }
 
 void CueLibView::createUi()

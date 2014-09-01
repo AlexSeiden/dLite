@@ -31,7 +31,7 @@ class Cuesheet : public QFrame
 {
     Q_OBJECT
 public:
-    explicit Cuesheet(const QString &name, QWidget *parent = 0);
+    explicit Cuesheet(QWidget *parent = 0);
 
     QGraphicsView *view() const;
 

@@ -21,22 +21,41 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
-signals:
-
-public slots:
-
+    static const int s_width=100;
+    static const int s_height=25;
 protected:
+#if 0
     void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
     void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
     void dropEvent(QGraphicsSceneDragDropEvent *event);
+#endif
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
     bool dragOver;
     QColor  color;
 
 private:
     Node    *_node;
+    QVector<QPointF> stuff; // XXX from chip
+};
+
+
+class ParamItem : public QGraphicsObject
+{
+    Q_OBJECT
+public:
+    explicit ParamItem(ParamBase *param, QGraphicsItem *parent);
+
+    QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+
     static const int s_width=100;
     static const int s_height=25;
+
+private:
+    ParamBase    *_param;
 };
 
 #endif // NODEITEM_H
