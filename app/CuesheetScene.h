@@ -4,6 +4,9 @@
 #include <QGraphicsScene>
 #include <QGraphicsLineItem>
 
+// Subclasses QGraphicsScene, for viewing a Cuesheet.
+class SocketItem;
+
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
 class QPointF;
@@ -16,12 +19,13 @@ class CuesheetScene : public QGraphicsScene
     Q_OBJECT
 public:
     explicit CuesheetScene(QObject *parent = 0);
+    SocketItem  *getSocket(QGraphicsItem *item);
 
 
 public slots:
     void setConnecting(bool status=true) {_isConnecting = status;}
     void setStartPoint(QPointF startPoint) {_startPoint = startPoint;}
-    void startLine(QGraphicsSceneMouseEvent *mouseEvent);
+    void startLine(QGraphicsSceneMouseEvent *mouseEvent, SocketItem *srcItem);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
@@ -29,6 +33,8 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
 private:
+    QGraphicsItem *findFirstReleventItem(QList<QGraphicsItem *> &endItems);
+    SocketItem  *_sourceSocket;
     QPointF _startPoint;
     QGraphicsLineItem *_line;
     bool    _isConnecting;

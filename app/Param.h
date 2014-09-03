@@ -6,6 +6,11 @@
 #include <functional>
 #include <typeinfo>
 
+// Classes that encapsulate individual parameters on Nodes & Cues.
+
+// ParamBase
+//      An abstract base class.
+
 class ParamBase
 {
 public:
@@ -26,6 +31,15 @@ private:
     bool _isConnectable;
 };
 
+// templated Param class
+//      Instatiated with the following types:
+//          float
+//          int
+//          Lightcolor
+//          bool (for triggers)
+//          positions
+//          regions
+
 template <class PT>
 class Param : public ParamBase
 {
@@ -38,7 +52,8 @@ public:
         if (_provider)
             _provider(_value);
 
-        // Return by reference, for generality with all types.
+        // All values are returned by reference, even for fundamental types like ints and
+        // floats, for generality with all types, such as Lightcolor & regions.
         value = _value;
     }
 

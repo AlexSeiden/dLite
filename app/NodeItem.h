@@ -12,6 +12,9 @@ QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
 
+// Forward declarations
+class SocketItem;
+
 class NodeItem : public QGraphicsObject
 {
     Q_OBJECT
@@ -23,12 +26,11 @@ public:
 
     static const int s_width=100;
     static const int s_height=25;
+    
+signals:
+    void nodeMovedEventSignal();
+
 protected:
-#if 0
-    void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
-    void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
-    void dropEvent(QGraphicsSceneDragDropEvent *event);
-#endif
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
@@ -46,7 +48,7 @@ class ParamItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    explicit ParamItem(ParamBase *param, QGraphicsItem *parent);
+    explicit ParamItem(ParamBase *param, QGraphicsObject *parent);
 
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
@@ -55,11 +57,16 @@ public:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
+    void setSocket(SocketItem *sock) {_socket = sock;}
+    SocketItem *getSocket() {return _socket;}
+
     static const int s_width=100;
     static const int s_height=25;
 
 private:
     ParamBase    *_param;
+    SocketItem   *_socket;
+
 };
 
 
@@ -67,17 +74,18 @@ class SocketItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    explicit SocketItem(ParamBase *param, QGraphicsItem *parent);
+    explicit SocketItem(ParamBase *param, QGraphicsObject *parent);
 
     QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    void   paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    ParamBase *getParam() {return _param;}
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
-    static const int s_width=10;
-
+    static const int s_width=16;
+    
 private:
     ParamBase    *_param;
 };
@@ -87,14 +95,21 @@ class ConnectorItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    explicit ConnectorItem(ParamBase *param, QGraphicsItem *parent);
+    explicit  ConnectorItem(SocketItem *sourceSocket, SocketItem *targetSocket, QGraphicsItem *parent = 0);
 
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    void updatePath();
+
+public slots:
+    void gotMoved();
 
 private:
-    QPointF      _startPos;
-    ParamBase    *_param;
+    SocketItem    *_sourceSocket;
+    SocketItem    *_targetSocket;
+    QPointF        _pStart;
+    QPointF        _pEnd;
+    QPainterPath  *_path;
 };
 
 

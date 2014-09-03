@@ -1,6 +1,11 @@
 #include "NodeItem.h"
 #include "CuesheetScene.h"
+#include "GuiColors.h"
+#include "utils.h"
 #include <QtWidgets>
+#include <QPainterPath>
+
+// Classes for drawing the graph view representation of all the nodes.
 
 //-----------------------------------------------------------------------------
 // NodeItem
@@ -17,34 +22,6 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     setFlags(ItemIsSelectable | ItemIsMovable);
 //    setAcceptHoverEvents(true);  do we want these? it was in chip.cpp
 }
-
-#if 0
-void NodeItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
-{
-    if (event->mimeData()->hasColor()) {
-        event->setAccepted(true);
-        dragOver = true;
-        update();
-    } else {
-        event->setAccepted(false);
-    }
-}
-
-void NodeItem::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
-{
-    Q_UNUSED(event);
-    dragOver = false;
-    update();
-}
-
-void NodeItem::dropEvent(QGraphicsSceneDragDropEvent *event)
-{
-    dragOver = false;
-    if (event->mimeData()->hasColor())
-        color = qvariant_cast<QColor>(event->mimeData()->colorData());
-    update();
-}
-#endif
 
 QRectF NodeItem::boundingRect() const
 {
@@ -105,12 +82,7 @@ void NodeItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void NodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     qDebug() << "Node Item move Event";
-    if (event->modifiers() & Qt::ShiftModifier) {
-        // XXX don't really need this stuff....leftover from chip.
-        stuff << event->pos();
-        update();
-        return;
-    }
+    emit nodeMovedEventSignal();
     QGraphicsItem::mouseMoveEvent(event);
 }
 
@@ -124,9 +96,11 @@ void NodeItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 //-----------------------------------------------------------------------------
 // ParamItem
 
-ParamItem::ParamItem(ParamBase *param, QGraphicsItem *parent) :
+ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
     QGraphicsObject(parent),
-    _param(param)
+    _param(param),
+    _socket(nullptr)
+
 { }
 
 QRectF ParamItem::boundingRect() const
@@ -153,22 +127,6 @@ void ParamItem::paint(QPainter *painter,
     painter->setPen(Qt::white);
     rr.translate(25, 5);
     painter->drawText(rr,_param->getName());
-
-#if 0
-    if (_param->isConnectable()) {
-        // Draw connector socket
-        painter->save();
-        painter->setBrush(Qt::red);
-        if (_param->isOutput())
-            // Draw output socket on right
-            painter->drawEllipse(s_width-10, 10, 7, 7);
-        else
-            // Draw output socket on left
-            painter->drawEllipse(10, 10, 7, 7);
-        painter->restore();
-    }
-#endif
-
     painter->restore();
 }
 
@@ -196,7 +154,7 @@ void ParamItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 //-----------------------------------------------------------------------------
 // SocketItem
 
-SocketItem::SocketItem(ParamBase *param, QGraphicsItem *parent) :
+SocketItem::SocketItem(ParamBase *param, QGraphicsObject *parent) :
     QGraphicsObject(parent),
     _param(param)
 { }
@@ -223,8 +181,7 @@ void SocketItem::paint(QPainter *painter,
 void SocketItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     qDebug() << "Socket Item Press Event";
-    qobject_cast<CuesheetScene*>(scene())->startLine(event);
-    //QGraphicsItem::mousePressEvent(event);
+    qobject_cast<CuesheetScene*>(scene())->startLine(event, this);
     update();
 }
 
@@ -243,54 +200,76 @@ void SocketItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 }
 
 
+
 //-----------------------------------------------------------------------------
 // ConnectorItem
 
-ConnectorItem::ConnectorItem(ParamBase *param, QGraphicsItem *parent) :
+ConnectorItem::ConnectorItem(SocketItem *sourceSocket, SocketItem *targetSocket, QGraphicsItem *parent) :
     QGraphicsObject(parent),
-    _param(param)
-{ }
+    _sourceSocket(sourceSocket),
+    _targetSocket(targetSocket),
+    _path(nullptr)
+{
+    // Connection arrows are always in back
+    setZValue(1000.0);
+// TODO     setPen(QPen(myColor, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    updatePath();
+    CHECKED_CONNECT(sourceSocket->parentObject()->parentObject(),
+                    SIGNAL(nodeMovedEventSignal()), this, SLOT(gotMoved()));
+    CHECKED_CONNECT(targetSocket->parentObject()->parentObject(),
+                    SIGNAL(nodeMovedEventSignal()), this, SLOT(gotMoved()));
+
+}
+
+void ConnectorItem::gotMoved()
+{
+    updatePath();
+    update();
+}
 
 QRectF ConnectorItem::boundingRect() const
 {
-    return QRectF(-1, -1, 25+3, 12+3);
+    qreal extra = 20.; // XXX kinda arbitrary
+    QPointF nStart = _sourceSocket->scenePos();
+    QPointF nEnd = _targetSocket->scenePos();
+
+    QRectF bbox(_pStart, QSizeF(_pEnd.x() - _pStart.x(), _pEnd.y() - _pStart.y()));
+    bbox = bbox.normalized();
+
+    QRectF nbox(_pStart, QSizeF(nEnd.x() - nStart.x(), nEnd.y() - nStart.y()));
+    nbox = nbox.normalized();
+
+    bbox = bbox.united(nbox);
+
+    bbox = bbox.adjusted(-extra, -extra, extra, extra);
+    return bbox;
+}
+
+void ConnectorItem::updatePath()
+{
+    _pStart = _sourceSocket->scenePos() + QPointF(SocketItem::s_width/2., SocketItem::s_width/2.);
+    _pEnd   = _targetSocket->scenePos() + QPointF(SocketItem::s_width/2., SocketItem::s_width/2.);
+
+    if (_path)
+        delete _path;
+
+    _path = new QPainterPath();
+    _path->moveTo(_pStart);
+    _path->cubicTo(_pStart+QPointF(100,0), _pEnd+QPointF(-100,0), _pEnd);
 }
 
 void ConnectorItem::paint(QPainter *painter,
            const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    painter->save();
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    // Draw connector socket
-    painter->setBrush(Qt::red);
-    painter->drawEllipse(0, 0, 25, 10);
-
+    painter->save();
+    QPen pen(GuiColors::connectorColor);
+    pen.setWidth(2);
+    painter->setPen(pen);
+    painter->setBrush(Qt::NoBrush);
+    if (_path)
+        painter->drawPath(*_path);
     painter->restore();
 }
-
-#if 0
-void ConnectorItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug() << "Connector Item Press Event";
-    qobject_cast<CuesheetScene*>(scene())->setConnecting(true);
-    qobject_cast<CuesheetScene*>(scene())->setStartPoint(event->pos());
-    //QGraphicsItem::mousePressEvent(event);
-    update();
-}
-
-void ConnectorItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug() << "Connector Item Drag Event";
-    QGraphicsItem::mouseMoveEvent(event);
-    update();
-}
-
-void ConnectorItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug() << "Connector Item Release Event";
-    QGraphicsItem::mouseReleaseEvent(event);
-    update();
-}
-#endif

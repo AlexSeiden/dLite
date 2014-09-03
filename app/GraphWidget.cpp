@@ -24,18 +24,19 @@ GraphWidget::GraphWidget(QWidget *parent) :
 
 void GraphWidget::addNode(Node *node)
 {
-    NodeItem *item = new NodeItem(node);
-    item->setPos(_numNodeItems*130.,-200.);
+    NodeItem *nodeItem = new NodeItem(node);
+    nodeItem->setPos(_numNodeItems*130.,-200.);
     _numNodeItems++;
-    _scene->addItem(item);
+    _scene->addItem(nodeItem);
 
     int y = 0;
     int yOffset = NodeItem::s_height/2 - SocketItem::s_width/2;
     for (ParamBase *param : node->getParams()) {
         y+=NodeItem::s_height;
-        ParamItem *parItem = new ParamItem(param, item);
+        ParamItem *parItem = new ParamItem(param, nodeItem);
         parItem->setPos(0,y);
         SocketItem *sockItem = new SocketItem(param, parItem);
+        parItem->setSocket(sockItem);     // XXX kinda gross that we're doing this here...
         if (param->isOutput())
             sockItem->setPos(NodeItem::s_width-10,yOffset);
         else

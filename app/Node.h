@@ -6,18 +6,19 @@
 #include <QList>
 
 // Abstract base class for all Nodes:
+// A Node is an object that generates parameters for Cues.
 class Node
 {
 public:
     Node();
     virtual ~Node();
 
-    const QString & getName() const {return _name;}
-    void            setName(const QString name) {_name = name;}
-    QList<ParamBase *>    getParams()        {return _paramList;}
+    const QString &     getName() const {return _name;}
+    void                setName(const QString name) {_name = name;}
+    QList<ParamBase *>  getParams()        {return _paramList;}
 
-    bool            isActive() {return _active;}
-    void            setActive(bool active) {_active = active;}
+    bool                isActive() {return _active;}
+    void                setActive(bool active) {_active = active;}
 
     //virtual void operator() (bool &value) = 0;
 
