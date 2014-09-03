@@ -1,6 +1,9 @@
 #ifndef PARAMVIEW_H
 #define PARAMVIEW_H
 
+// ParamView.h
+//  A widget that displays a single param.
+
 #include <QWidget>
 #include <QHBoxLayout>
 #include "Cue.h"

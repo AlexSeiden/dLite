@@ -61,11 +61,19 @@ QGraphicsItem *CuesheetScene::findFirstReleventItem(QList<QGraphicsItem *> &endI
             continue;
 
         // Can't connect to ourselves
-        QGraphicsItem *sourceSock =  dynamic_cast<QGraphicsItem *>(_sourceSocket);
         if (out == dynamic_cast<QGraphicsItem *>(_sourceSocket))
+            // Return nullptr rather than continue, because we've actually
+            // hit something--ourselves--that's invalid.  We could check to see
+            // if there's a *valid* hit behind us, but that's probably more confusing
+            // than just making the user drag to what's visible.
             return nullptr;
 
-        // TODO could test further for type compatability, source & sink, etc.
+        SocketItem *targetSocket = getSocket(out);
+        // Test for type compatability, source & sink, etc.
+        if (! _sourceSocket->getParam()->isConnectableTo(targetSocket->getParam()))
+            // Same return logic as above
+            return nullptr;
+
 
         // OK, nothing wrong with this one.
         return out;
@@ -78,22 +86,20 @@ QGraphicsItem *CuesheetScene::findFirstReleventItem(QList<QGraphicsItem *> &endI
 void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     qDebug() << "CuesheetScene release Event";
-    if (_isConnecting && _line) { // XXX if _isConnecting xor _line, then we have some internal inconsistancy...
+    // XXX nb:  if only one  of "_isConnecting" and "_line" are true, then
+    // we have some internal inconsistancy.
+    if (_isConnecting && _line) {
         // Find the QGraphicsItems that's underneath the release position.
         QList<QGraphicsItem *> endItems = items(mouseEvent->scenePos());
         QGraphicsItem *targetItem = findFirstReleventItem(endItems);
-        if (endItems.count() && endItems.first() == _line)
-            endItems.removeFirst();
 
         // Delete the temporary line we've been dragging out,
         // because soon we'll replace it with the real connector.
         removeItem(_line);
-//        delete _line;
+//        delete _line;  XXX this seems to cause crashes.  but is it now leaking mem?
         _line = nullptr;
 
-        //if (endItems.count() > 0 && endItems.first() != _sourceSocket) {
         if (targetItem) {
-
             // The target item could be a socket, param, or node.
             SocketItem *targetSocket = getSocket(targetItem);
 
@@ -124,10 +130,10 @@ SocketItem *CuesheetScene::getSocket(QGraphicsItem *item)
         return sock;
 
     // OK, that didn't work.  Let's try a param.
-    ParamItem *param;
-    param = dynamic_cast<ParamItem *>(item);
-    if (param) {
-        return param->getSocket();
+    ParamItem *paramItem;
+    paramItem = dynamic_cast<ParamItem *>(item);
+    if (paramItem) {
+        return paramItem->getSocket();
     }
 
 #if 0

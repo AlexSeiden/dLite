@@ -25,6 +25,8 @@ public:
     void    setOutput(bool status)             {_isOutput = status;}
     void    setConnectable(bool status)        {_isConnectable = status;}
 
+    bool    isConnectableTo(ParamBase *otherParam);
+
 private:
     QString _name;
     bool _isOutput;

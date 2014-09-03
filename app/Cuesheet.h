@@ -1,6 +1,9 @@
 #ifndef CUESHEET_H
 #define CUESHEET_H
 
+// The graph display widget, where Nodes & Cues are viewed &
+// connected.
+
 #include <QFrame>
 #include <QGraphicsView>
 

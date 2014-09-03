@@ -1,6 +1,7 @@
 include(../dLite.pri)
+include(Viewing.pri)
 
-# mostly for std::function
+# mostly for std::function, and other C++11 features.  And RTTI.
 CONFIG  += c++11
 CONFIG  += rtti
 QMAKE_CXXFLAGS += -stdlib=libc++
@@ -15,67 +16,35 @@ TARGET = dLite
 
 QT       += multimedia widgets
 
-SOURCES  += main.cpp \
-            engine.cpp \
-            frequencyspectrum.cpp \
-            levelmeter.cpp \
-            mainwidget.cpp \
-            progressbar.cpp \
-            settingsdialog.cpp \
-            spectrograph.cpp \
-            spectrumanalyser.cpp \
-            sublevel.cpp \
-            utils.cpp \
-            wavfile.cpp \
-    dancefloormodel.cpp \
+SOURCES  += \
+    main.cpp \
+    engine.cpp \
+    frequencyspectrum.cpp \
+    spectrumanalyser.cpp \
+    utils.cpp \
+    wavfile.cpp \
     lightcolor.cpp \
-    dancefloorwidget.cpp \
-    controlpanel.cpp \
+    dancefloormodel.cpp \
     Param.cpp \
-    CueView.cpp \
-    Whip.cpp \
-    CueLibView.cpp \
     Cue.cpp \
     CueBox.cpp \
     BeatFiles.cpp \
-    Node.cpp \
-    ParamView.cpp \
-    Cuesheet.cpp \
-    GraphWidget.cpp \
-    CuesheetScene.cpp \
-    GuiColors.cpp \
-    NodeItem.cpp
+    Node.cpp
 
-HEADERS  += engine.h \
-            frequencyspectrum.h \
-            levelmeter.h \
-            mainwidget.h \
-            progressbar.h \
-            settingsdialog.h \
-            spectrograph.h \
-            spectrum.h \
-            spectrumanalyser.h \
-            sublevel.h \
-            utils.h \
-            wavfile.h \
-    dancefloorwidget.h \
+HEADERS  += \
+    engine.h \
+    frequencyspectrum.h \
+    spectrum.h \
+    spectrumanalyser.h \
+    utils.h \
+    wavfile.h \
     dancefloormodel.h \
     lightcolor.h \
-    controlpanel.h \
     Param.h \
-    CueView.h \
-    Whip.h \
-    CueLibView.h \
     Cue.h \
     CueBox.h \
     BeatFiles.h \
-    Node.h \
-    ParamView.h \
-    Cuesheet.h \
-    GraphWidget.h \
-    CuesheetScene.h \
-    GuiColors.h  \
-    NodeItem.h
+    Node.h
 
 fftreal_dir = ../3rdparty/fftreal
 

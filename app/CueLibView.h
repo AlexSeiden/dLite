@@ -8,6 +8,9 @@
 #include <QLabel>
 #include <QSignalMapper>
 
+// The "Cue Library" view widget.
+// Displays all cues & nodes that can be instantiated.
+
 class CueLibView : public QWidget
 {
     Q_OBJECT
