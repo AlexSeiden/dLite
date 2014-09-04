@@ -35,8 +35,8 @@ CueBox::CueBox(Dancefloormodel *dfmodel) :
 
     _paramList << &_x <<&_y <<&_scale << &_alpha << &_color;
 
-    _x.setProvider(randLight); // XXX testing
-    _y.setProvider(randLight); // XXX testing
+//    _x.setProvider(randLight); // XXX testing
+//    _y.setProvider(randLight); // XXX testing
 }
 
 

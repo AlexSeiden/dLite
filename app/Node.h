@@ -2,30 +2,37 @@
 #define NODE_H
 #include "Param.h"
 #include <random>
-#include <QStringList>
 #include <QList>
+#include <QString>
+#include <QStringList>
+#include <QMap>
+#include <functional>
+
 
 // Abstract base class for all Nodes:
 // A Node is an object that generates parameters for Cues.
 class Node
 {
 public:
+    enum node_t {CUE, FLOAT, INT, COLOR, IMPULSE, POSITION, UNDEFINED};
+
     Node();
     virtual ~Node();
 
     const QString &     getName() const {return _name;}
     void                setName(const QString name) {_name = name;}
-    QList<ParamBase *>  getParams()        {return _paramList;}
 
     bool                isActive() {return _active;}
     void                setActive(bool active) {_active = active;}
 
-    //virtual void operator() (bool &value) = 0;
+    virtual node_t      getType();
+    QList<ParamBase *>  getParams()        {return _paramList;}
 
 protected:
     QString               _name;
     bool                  _active;
     QList<ParamBase *>    _paramList;       // Could be static
+    node_t                _type;
 };
 
 
@@ -53,11 +60,33 @@ private:
     int     _nextRefresh;
 };
 
-
-class RandomNode : public Node
+class ColorRamp : public Node
 {
 public:
-    RandomNode();
+    ColorRamp();
+
+    // Functor that provides closure over instance object,
+    // and allows downstream clients to evaluate.
+    void operator() (Lightcolor &value);
+
+//private:  // XXX
+    Lightcolor   _value;
+
+    // Parameters
+    Param<Lightcolor> _output;
+    Param<Lightcolor> _c0;
+    Param<Lightcolor> _c1;
+    Param<float> _mix;
+
+private:
+
+};
+
+
+class RandomFloat : public Node
+{
+public:
+    RandomFloat();
 
     // Functor that provides closure over instance object,
     // and allows downstream clients to evaluate.
@@ -79,5 +108,73 @@ private:
     std::mt19937 *_randGenerator;
     std::uniform_real_distribution<float> *_distribution;
 };
+
+class RandomInt : public Node
+{
+public:
+    RandomInt();
+
+    // Functor that provides closure over instance object,
+    // and allows downstream clients to evaluate.
+    void operator() (float &value);
+
+//private:  // XXX
+    float   _value;
+
+    // Parameters
+    Param<int> _output;
+    Param<int> _min;
+    Param<int> _max;
+//    TriggerEvery _trigger;
+
+private:
+    void  setRandomEngine();
+
+    // Random number generator
+    std::mt19937 *_randGenerator;
+    std::uniform_int_distribution<int> *_distribution;
+};
+
+// NodePrototypes
+// Singleton class to hold exemplar instantiations
+// of each node class, to be used by node library etc.
+class NodeFactory
+{
+public:
+    NodeFactory();
+
+    typedef  std::function<Node*(void)> NodeInstatiator_t;
+
+    std::shared_ptr<Node> instatiateNode(QString name);
+    void registerNodetype(QString name, Node::node_t typeInfo, NodeInstatiator_t instantiatorFunction);
+
+#if 0
+    void  getNodesOfType(QList<Node *> &out, Node::node_t type);
+#else
+    const QStringList & getNodesOfType(Node::node_t typeInfo);
+#endif
+
+//    void  registerNode(Node *node);
+//    RandomInt    _randomInt;
+//    RandomFloat  _randomFloat;
+
+private:
+    // Registry
+    QMap<QString, NodeInstatiator_t>  _registry;
+    QMap<Node::node_t, QStringList> _registryByType;
+};
+
+extern NodeFactory NodeRegistry;
+
+template<class T>
+class Registrar {
+public:
+    Registrar(QString className, Node::node_t nodeType) {
+        // register the class factory function
+        NodeRegistry.registerNodetype(className, nodeType,
+                                      [](void) -> Node * { return new T();});
+    }
+};
+
 
 #endif // NODE_H

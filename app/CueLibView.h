@@ -8,6 +8,8 @@
 #include <QLabel>
 #include <QSignalMapper>
 
+#include "Node.h"
+
 // The "Cue Library" view widget.
 // Displays all cues & nodes that can be instantiated.
 
@@ -27,6 +29,7 @@ private:
     void    createColorsGroup();
     void    createBeatsGroup();
     void    addButtonToUi(QLayout *layout, QString buttonName);
+
 
     QGroupBox *cuesGroupBox;
     QGroupBox *floatsGroupBox;

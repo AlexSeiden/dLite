@@ -253,6 +253,7 @@ void SublevelMeter::calculateLevel()
 
 // TODO this is business logic that shouldn't be in a view class.
 //template<class PT> std::function<void(PT&)> SublevelMeter::createProviderClosure()
+// TODO could use a functor instead.
 std::function<void(float&)> SublevelMeter::createProviderClosure()
 {
     return [this] (float &out) {out = m_level;};

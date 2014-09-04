@@ -26,9 +26,13 @@ public:
     int getGreen()  {return m_g;}
     int getBlue()   {return m_b;}
 
-    Lightcolor  & operator+=(const Lightcolor &other);
-    Lightcolor  & operator*=(const Lightcolor &other);
+    Lightcolor  & operator+=(const Lightcolor &rhs);
+    Lightcolor  & operator*=(const Lightcolor &rhs);
     Lightcolor  & operator*=(float scalar);
+
+    const Lightcolor  operator*(float rhs);
+    const Lightcolor  operator*(const Lightcolor &rhs);
+    const Lightcolor  operator+(const Lightcolor &rhs);
 
     QColor toQColor();
 
@@ -36,8 +40,6 @@ private:
     int m_r, m_g, m_b;
 };
 
-Lightcolor  operator+(const Lightcolor lhs, const Lightcolor &rhs);
-Lightcolor  operator*(const Lightcolor lhs, float rhs);
 
 // -----------------------------------------------------------------------------
 // Firing

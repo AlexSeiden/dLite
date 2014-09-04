@@ -115,15 +115,18 @@ void ParamView::setValue(Lightcolor val) {
 
 void ParamView::setProvider(std::function<void(float&)> closure) {
    Param<float> *p = dynamic_cast<Param<float> *>(this->_param);
+   Q_ASSERT(p);
    p->setProvider(closure);
 }
 
 void ParamView::setProvider(std::function<void(int&)> closure) {
    Param<int> *p = dynamic_cast<Param<int> *>(this->_param);
+   Q_ASSERT(p);
    p->setProvider(closure);
 }
 
 void ParamView::setProvider(std::function<void(Lightcolor&)> closure) {
    Param<Lightcolor> *p = dynamic_cast<Param<Lightcolor> *>(this->_param);
+   Q_ASSERT(p);
    p->setProvider(closure);
 }

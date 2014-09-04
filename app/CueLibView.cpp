@@ -60,8 +60,16 @@ void CueLibView::createFloatsGroup()
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
 
-    addButtonToUi(layout, tr("Spectrum range"));
-    addButtonToUi(layout, tr("Random"));
+    QStringList allFloats;
+    allFloats = NodeRegistry.getNodesOfType(Node::FLOAT);
+
+
+    foreach (QString nodename, allFloats) {
+        addButtonToUi(layout, nodename);
+    }
+
+//    addButtonToUi(layout, tr("Spectrum range"));
+//    addButtonToUi(layout, tr("Random"));
 
     layout->addStretch();
     floatsGroupBox->setLayout(layout);

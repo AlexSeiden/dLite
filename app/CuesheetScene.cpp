@@ -14,14 +14,9 @@ CuesheetScene::CuesheetScene(QObject *parent) :
 
 void CuesheetScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-//    qDebug() << "CuesheetScene Press Event";
-
     if (_isConnecting) {
-//        qDebug() << "CuesheetScene press is connecting";
         startLine(mouseEvent, _sourceSocket);
     }
-//    else
-//        qDebug() << "CuesheetScene press not connecting";
     QGraphicsScene::mousePressEvent(mouseEvent);
 }
 
@@ -36,7 +31,6 @@ void CuesheetScene::startLine(QGraphicsSceneMouseEvent *mouseEvent, SocketItem *
 
 void CuesheetScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-//    qDebug() << "CuesheetScene move Event";
     if (_isConnecting && _line) {
         // If we are in the middle of making a connection, update the
         // line position
@@ -85,7 +79,6 @@ QGraphicsItem *CuesheetScene::findFirstReleventItem(QList<QGraphicsItem *> &endI
 
 void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    qDebug() << "CuesheetScene release Event";
     // XXX nb:  if only one  of "_isConnecting" and "_line" are true, then
     // we have some internal inconsistancy.
     if (_isConnecting && _line) {
@@ -105,7 +98,19 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
             if (targetSocket) {
                 // Create the actual connection object
-                ConnectorItem *connection = new ConnectorItem(_sourceSocket, targetSocket);
+                SocketItem *server, *client;
+                // This assumes that _sourceSocket and targetSocket have already
+                // been verified as being compatable:  i.e., one's an input, the
+                // other an output; they have the same type; etc.  This is done
+                // when findFirstReleventItem() calls isConnectableTo()
+                if (_sourceSocket->getParam()->isOutput()) {
+                    server = _sourceSocket;
+                    client = targetSocket;
+                } else {
+                    server = targetSocket;
+                    client = _sourceSocket;
+                }
+                ConnectorItem *connection = new ConnectorItem(server, client);
                 addItem(connection);
                 // TODO Tell the sockets about the connection, so they can update them with the position.
                 // Or, should sockets just broadcast their positions via signals, and connections listen via slots?
@@ -137,7 +142,7 @@ SocketItem *CuesheetScene::getSocket(QGraphicsItem *item)
     }
 
 #if 0
-    // That didn't work either.  Pehaps it's a node--look for it's output connection:
+    // TODO That didn't work either.  Pehaps it's a node--look for it's output connection:
     NodeItem *node;
     node = dynamic_cast<NodeItem *>(item);
     if (node) {

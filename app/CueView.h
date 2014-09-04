@@ -32,10 +32,10 @@ class RandomNodeView : public QWidget
 {
     Q_OBJECT
 public:
-    explicit RandomNodeView(RandomNode *randomNode, QWidget *parent = 0);
+    explicit RandomNodeView(RandomFloat *randomNode, QWidget *parent = 0);
 
 private:
-    RandomNode *_node;  // ??? should inherit from NodeView base class?
+    RandomFloat *_node;  // ??? should inherit from NodeView base class?
     ParamView *_outParamVu;
     ParamView *_minParamVu;
     ParamView *_maxParamVu;

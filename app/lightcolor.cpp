@@ -1,25 +1,18 @@
 #include "lightcolor.h"
 
-Lightcolor::Lightcolor() : m_r(0), m_g(0), m_b(0)
-{ }
+Lightcolor::Lightcolor() : m_r(0), m_g(0), m_b(0) { }
 
-Lightcolor::Lightcolor(int r, int g, int b) : m_r(r), m_g(g), m_b(b)
-{ }
+Lightcolor::Lightcolor(int r, int g, int b) : m_r(r), m_g(g), m_b(b) { }
 
-Lightcolor::Lightcolor(int val) : m_r(val), m_g(val), m_b(val)
-{ }
+Lightcolor::Lightcolor(int val) : m_r(val), m_g(val), m_b(val) { }
 
-Lightcolor::Lightcolor(float r, float g, float b) : m_r(r*255), m_g(g*255), m_b(b*255)
-{ }
+Lightcolor::Lightcolor(float r, float g, float b) : m_r(r*255), m_g(g*255), m_b(b*255) { }
 
-Lightcolor::Lightcolor(float val) : m_r(val*255), m_g(val*255), m_b(val*255)
-{ }
+Lightcolor::Lightcolor(float val) : m_r(val*255), m_g(val*255), m_b(val*255) { }
 
-Lightcolor::Lightcolor(const QColor &qc) : m_r(qc.red()), m_g(qc.green()), m_b(qc.blue())
-{ }
+Lightcolor::Lightcolor(const QColor &qc) : m_r(qc.red()), m_g(qc.green()), m_b(qc.blue()) { }
 
-QColor
-Lightcolor::toQColor() {
+QColor Lightcolor::toQColor() {
     int r = std::min(255, std::max(m_r,0));
     int g = std::min(255, std::max(m_g,0));
     int b = std::min(255, std::max(m_b,0));
@@ -28,40 +21,55 @@ Lightcolor::toQColor() {
 }
 
 // Lightcolor operators
-Lightcolor &
-Lightcolor::operator*=(float scalar) {
+Lightcolor & Lightcolor::operator*=(float scalar) {
     this->m_r *= scalar;
     this->m_g *= scalar;
     this->m_b *= scalar;
     return *this;
 }
 
-inline Lightcolor
-operator+(Lightcolor lhs, const Lightcolor& rhs)
-{
-  lhs += rhs;
-  return lhs;
-}
-
-inline Lightcolor
-operator*(Lightcolor lhs, float rhs)
-{
-  lhs *= rhs;
-  return lhs;
-}
-
-Lightcolor &
-Lightcolor::operator+=(const Lightcolor &other) {
-    this->m_r += other.m_r;
-    this->m_g += other.m_g;
-    this->m_b += other.m_b;
+Lightcolor & Lightcolor::operator*=(const Lightcolor &rhs) {
+    this->m_r *= rhs.m_r;
+    this->m_g *= rhs.m_g;
+    this->m_b *= rhs.m_b;
+    // Normalize
+    this->m_r /= (255*255);
+    this->m_g /= (255*255);
+    this->m_b /= (255*255);
     return *this;
 }
+
+Lightcolor & Lightcolor::operator+=(const Lightcolor &rhs) {
+    this->m_r += rhs.m_r;
+    this->m_g += rhs.m_g;
+    this->m_b += rhs.m_b;
+    return *this;
+}
+
+const Lightcolor Lightcolor::operator*(float rhs) {
+    Lightcolor result = *this;
+    result *= rhs;
+    return result;
+}
+
+const Lightcolor Lightcolor::operator*(const Lightcolor &rhs) {
+    Lightcolor result = *this;
+    result *= rhs;
+    return result;
+}
+
+const Lightcolor Lightcolor::operator+(const Lightcolor& rhs) {
+    Lightcolor result = *this;
+    result += rhs;
+    return result;
+}
+
+
 
 
 // -----------------------------------------------------------------------------
 // Firing
-
+// TODO move firing to its own .h & .cpp?
 // ??? do the decay functions want to be member functions of Firing,
 // or free functions?  I'm thinking free functions, in that they might
 // be independent of the state of the Firing, but perhaps not....

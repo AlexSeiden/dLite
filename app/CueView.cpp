@@ -41,7 +41,7 @@ CueBoxView::CueBoxView(CueBox *cue, QWidget *parent) :
 
 // ------------------------------------------------------------------------------
 
-RandomNodeView::RandomNodeView(RandomNode *randomNode, QWidget *parent) :
+RandomNodeView::RandomNodeView(RandomFloat *randomNode, QWidget *parent) :
     QWidget(parent),
     _node(randomNode)
 {

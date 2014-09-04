@@ -31,9 +31,7 @@ signals:
     void nodeMovedEventSignal();
 
 protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
     bool dragOver;
     QColor  color;
@@ -52,10 +50,6 @@ public:
 
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
-
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
     void setSocket(SocketItem *sock) {_socket = sock;}
     SocketItem *getSocket() {return _socket;}
@@ -81,8 +75,6 @@ public:
     ParamBase *getParam() {return _param;}
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
     static const int s_width=16;
     
@@ -95,7 +87,7 @@ class ConnectorItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    explicit  ConnectorItem(SocketItem *sourceSocket, SocketItem *targetSocket, QGraphicsItem *parent = 0);
+    explicit  ConnectorItem(SocketItem *serverSocket, SocketItem *clientSocket, QGraphicsItem *parent = 0);
 
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
@@ -105,8 +97,8 @@ public slots:
     void gotMoved();
 
 private:
-    SocketItem    *_sourceSocket;
-    SocketItem    *_targetSocket;
+    SocketItem    *_serverSocket;
+    SocketItem    *_clientSocket;
     QPointF        _pStart;
     QPointF        _pEnd;
     QPainterPath  *_path;

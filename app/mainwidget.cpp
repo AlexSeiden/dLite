@@ -379,7 +379,7 @@ void MainWidget::newNodeRequest(QString name)
     } else if (name == tr("Spectrum range")) {
         // XXX this should be consistent with the others.
         m_controlpanel->newSpectrumSensor();
-    } else if (name == tr("Random")) {
+    } else if (name == tr("RandomFloat")) {
         this->newRandomNode();
     } else {
         qDebug() << "New Node request for " << name;
@@ -396,7 +396,7 @@ void MainWidget::newCue()
 
 void MainWidget::newRandomNode()
 {
-    RandomNode *node = new RandomNode();
+    RandomFloat *node = new RandomFloat();
     m_graphWidget->addNode(node);
 //    RandomNodeView *rv = new RandomNodeView(node, NULL);
 //    rv->show();

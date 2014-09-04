@@ -60,6 +60,7 @@ void Whip::mousePressEvent(QMouseEvent *event)
 
     // This will be the widget that accepted the drag:
     QObject *target = drag->target();
+    Q_UNUSED(target);
 
     this->setIcon(*whipConnectedIcon);
     this->_pixmap = whipConnectedPixmap;

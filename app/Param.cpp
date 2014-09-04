@@ -22,7 +22,27 @@ bool ParamBase::isConnectableTo(ParamBase *otherParam)
     if (this->isOutput() == otherParam->isOutput())
         return false;
 
+    // LATER allow for auto type promotion/conversion
+
+    // LATER check for cycles :-P
+
     // Everything looks OK!
     return true;
+}
+
+void ParamBase::connectParams(ParamBase *server, ParamBase *client)
+{
+    // This assumes that server and client have already
+    // been verified as being compatable:  i.e., server is an output,
+    // client is an input; they have the same type; etc.
+
+   Param<int> *s = dynamic_cast<Param<int> *>(server);
+   Param<int> *c = dynamic_cast<Param<int> *>(client);
+   if (s && c) {
+       c->setProvider(s->getProvider());
+       return;
+   }
+
+   //qDebug() << "ERROR";
 
 }

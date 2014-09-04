@@ -5,6 +5,7 @@
 #include <QString>
 #include <functional>
 #include <typeinfo>
+#include "lightcolor.h"
 
 // Classes that encapsulate individual parameters on Nodes & Cues.
 
@@ -15,8 +16,10 @@ class ParamBase
 {
 public:
     ParamBase() : _isOutput(false), _isConnectable(true) {}
-    // make this virtual to allow RTTI
     virtual ~ParamBase() {}
+
+//    virtual void setProvider(std::function<void(void *)> provider) = 0;
+//    virtual std::function<void(void *)> getProvider() = 0;
 
     QString getName()               {return _name;}
     void    setName(QString name)   {_name = name;}
@@ -26,14 +29,20 @@ public:
     void    setConnectable(bool status)        {_isConnectable = status;}
 
     bool    isConnectableTo(ParamBase *otherParam);
+    void    connectParams(ParamBase *server, ParamBase *client);
+
+    // Would it be useful to maintain a linked list of connections here?
+    // Both for inputs and outputs?  Would that break modularity?
+    //QList<ParamBase *>  getConnections();
 
 private:
     QString _name;
     bool _isOutput;
     bool _isConnectable;
+
 };
 
-// templated Param class
+// Templated Param class
 //      Instatiated with the following types:
 //          float
 //          int
@@ -47,9 +56,11 @@ class Param : public ParamBase
 {
 public:
     Param(PT value=PT()) : _value(value), _provider(nullptr) {}
-    virtual ~Param() {} // Override to allow RTTI
+    virtual ~Param() {}
 
-    void getValue(PT &value)  {
+    virtual void operator() (PT &value) {value = _value;}
+
+    virtual void getValue(PT &value)  {
         // update current member value, if provider is connected
         if (_provider)
             _provider(_value);
@@ -59,16 +70,26 @@ public:
         value = _value;
     }
 
+    // This applies to input parameters only: it sets the provider "function"
+    // that is excuted to compute the value of this parameter.
     void setProvider(std::function<void(PT&)> provider) {_provider = provider;}
 
+    // This applies to output parameters only:  it returns a provider "function"
+    // that can be executed by a client to compute the value the client uses.
+    std::function<void(PT&)> getProvider() {
+        // Assumes this implements operator() to create closure/functor.
+        return [this](PT &val) {(*this)(val);};
+    }
+
     // ??? Should this automatically disable a _provider functor, if there is one?
-    // or should it be disabled when there is a provider?
+    // Or should setValue be disabled when there is a provider?
     void setValue(const PT &value) {_value = value;}
 
 private:
     PT _value;
     std::function<void(PT &value)> _provider;
 };
+
 
 // For convinience & speed when doing RTTI
 extern const std::type_info & paramTypeFloat;

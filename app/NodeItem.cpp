@@ -72,25 +72,10 @@ void NodeItem::paint(QPainter *painter,
 
 }
 
-void NodeItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug() << "Node Item Press Event";
-    QGraphicsItem::mousePressEvent(event);
-    update();
-}
-
 void NodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << "Node Item move Event";
     emit nodeMovedEventSignal();
     QGraphicsItem::mouseMoveEvent(event);
-}
-
-void NodeItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug() << "Node Item release Event";
-    QGraphicsItem::mouseReleaseEvent(event);
-    update();
 }
 
 //-----------------------------------------------------------------------------
@@ -130,27 +115,6 @@ void ParamItem::paint(QPainter *painter,
     painter->restore();
 }
 
-void ParamItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug() << "Param Item Press Event";
-    QGraphicsItem::mousePressEvent(event);
-    update();
-}
-
-void ParamItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug() << "Param Item move Event";
-    QGraphicsItem::mouseMoveEvent(event);
-    update();
-}
-
-void ParamItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug() << "Param Item Release Event";
-    QGraphicsItem::mouseReleaseEvent(event);
-    update();
-}
-
 //-----------------------------------------------------------------------------
 // SocketItem
 
@@ -159,8 +123,7 @@ SocketItem::SocketItem(ParamBase *param, QGraphicsObject *parent) :
     _param(param)
 { }
 
-QRectF SocketItem::boundingRect() const
-{
+QRectF SocketItem::boundingRect() const {
     return QRectF(-1, -1, s_width+3, s_width+3);
 }
 
@@ -180,43 +143,29 @@ void SocketItem::paint(QPainter *painter,
 
 void SocketItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << "Socket Item Press Event";
     qobject_cast<CuesheetScene*>(scene())->startLine(event, this);
     update();
 }
-
-void SocketItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug() << "Socket Item move Event";
-    QGraphicsItem::mouseMoveEvent(event);
-    update();
-}
-
-void SocketItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug() << "Socket Item Release Event";
-    QGraphicsItem::mouseReleaseEvent(event);
-    update();
-}
-
 
 
 //-----------------------------------------------------------------------------
 // ConnectorItem
 
-ConnectorItem::ConnectorItem(SocketItem *sourceSocket, SocketItem *targetSocket, QGraphicsItem *parent) :
+ConnectorItem::ConnectorItem(SocketItem *serverSocket, SocketItem *clientSocket,
+                             QGraphicsItem *parent) :
     QGraphicsObject(parent),
-    _sourceSocket(sourceSocket),
-    _targetSocket(targetSocket),
+    _serverSocket(serverSocket),
+    _clientSocket(clientSocket),
     _path(nullptr)
 {
     // Connection arrows are always in back
     setZValue(1000.0);
 // TODO     setPen(QPen(myColor, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     updatePath();
-    CHECKED_CONNECT(sourceSocket->parentObject()->parentObject(),
+
+    CHECKED_CONNECT(_serverSocket->parentObject()->parentObject(),
                     SIGNAL(nodeMovedEventSignal()), this, SLOT(gotMoved()));
-    CHECKED_CONNECT(targetSocket->parentObject()->parentObject(),
+    CHECKED_CONNECT(_clientSocket->parentObject()->parentObject(),
                     SIGNAL(nodeMovedEventSignal()), this, SLOT(gotMoved()));
 
 }
@@ -230,8 +179,8 @@ void ConnectorItem::gotMoved()
 QRectF ConnectorItem::boundingRect() const
 {
     qreal extra = 20.; // XXX kinda arbitrary
-    QPointF nStart = _sourceSocket->scenePos();
-    QPointF nEnd = _targetSocket->scenePos();
+    QPointF nStart = _serverSocket->scenePos();
+    QPointF nEnd = _clientSocket->scenePos();
 
     QRectF bbox(_pStart, QSizeF(_pEnd.x() - _pStart.x(), _pEnd.y() - _pStart.y()));
     bbox = bbox.normalized();
@@ -247,8 +196,8 @@ QRectF ConnectorItem::boundingRect() const
 
 void ConnectorItem::updatePath()
 {
-    _pStart = _sourceSocket->scenePos() + QPointF(SocketItem::s_width/2., SocketItem::s_width/2.);
-    _pEnd   = _targetSocket->scenePos() + QPointF(SocketItem::s_width/2., SocketItem::s_width/2.);
+    _pStart = _serverSocket->scenePos() + QPointF(SocketItem::s_width/2., SocketItem::s_width/2.);
+    _pEnd   = _clientSocket->scenePos() + QPointF(SocketItem::s_width/2., SocketItem::s_width/2.);
 
     if (_path)
         delete _path;
