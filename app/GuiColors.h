@@ -4,6 +4,11 @@
 #include <QObject>
 #include <QColor>
 
+QT_BEGIN_NAMESPACE
+class QToolButton;
+QT_END_NAMESPACE
+
+
 // Singleton class to maintain color values for the UI.
 // Derived from QObject so we can used signals & slots
 class GuiColors : public QObject

@@ -123,7 +123,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
         bar.setTop(rect().top() + gapWidth + (1.0 - value) * barHeight);
         bar.setBottom(rect().bottom() - gapWidth);
 
-        QColor color = barColor;
+        QColor color = GuiColors::sg_barColor;
         if (m_bars[i].clipped)
             color = clipColor;
 

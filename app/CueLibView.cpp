@@ -43,7 +43,7 @@ QGroupBox *CueLibView::createGroup(QString typeName, Node::node_t nodeType)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
 
-    QStringList allNodenames = NodeRegistry.getNodesOfType(nodeType);
+    QStringList allNodenames = NodeFactory::Singleton()->getNodesOfType(nodeType);
 
     foreach (QString nodename, allNodenames) {
         addButtonToUi(layout, nodename);

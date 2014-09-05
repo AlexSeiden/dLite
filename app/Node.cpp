@@ -222,7 +222,7 @@ void NodeFactory::registerNodetype(QString name, Node::node_t typeInfo,
 {
     // register the class factory function
     _registry[name.toStdString()] = instantiatorFunction;
-//    _registryByType[typeInfo] << name;
+    _registryByType[typeInfo] << name;
 
 }
 
@@ -252,12 +252,18 @@ Node * NodeFactory::instatiateNode(QString name)
 #endif
 }
 
+NodeFactory * NodeFactory::Singleton() {
+    // We need this--rather than just using a single instance of NodeFactory--
+    // so that we get the right order of initialization, and the Registrar
+    // won't be trying to access an uninitialized factory.
+    static NodeFactory factory;
+    return &factory;
+}
+
 const QStringList & NodeFactory::getNodesOfType(Node::node_t typeInfo) {
     return _registryByType[typeInfo];
 }
 
-
-NodeFactory NodeRegistry;
 
 static Registrar<RandomFloat>   registrar("RandomFloat", Node::FLOAT);
 static Registrar<RandomInt>     registrar2("RandomInt", Node::INT);

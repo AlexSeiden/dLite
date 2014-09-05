@@ -1,4 +1,5 @@
 #include "GuiColors.h"
+#include <QToolButton>
 
 QColor  GuiColors::connectorColor       = QColor(20,20,80);
 QColor  GuiColors::nodeBGColor          = QColor(120,100,60);
@@ -12,9 +13,9 @@ QColor  GuiColors::df_cellSepColor      = QColor(100,100,100);
 QColor  GuiColors::df_noCellColor       = QColor(60,60,60);
 
 QColor  GuiColors::sg_barColor          = QColor(51, 204, 102);
-QColor  GuiColors::sg_lineColor         = GuiColors::lineColor.lighter();
+QColor  GuiColors::sg_lineColor         = GuiColors::sg_barColor.lighter();
 QColor  GuiColors::sg_clipColor         = QColor(255, 255, 0);
-QColor  GuiColors::sg_gridColor         = GuiColors::barColor.darker();
+QColor  GuiColors::sg_gridColor         = GuiColors::sg_barColor.darker();
 QColor  GuiColors::sg_bg                = QColor(0,0,0);
 QColor  GuiColors::sg_textColor         = QColor(230,230,255);
 QColor  GuiColors::sg_sublevelRegion    = QColor(20,20,255);

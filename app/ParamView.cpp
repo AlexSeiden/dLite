@@ -1,5 +1,5 @@
 #include "ParamView.h"
-#include "CueView.h"  // For setButtonColor
+#include "GuiColors.h"
 #include <QtWidgets>
 #include "utils.h"
 

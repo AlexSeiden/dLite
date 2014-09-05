@@ -70,7 +70,7 @@ public:
     void operator() (Lightcolor &value);
 
 //private:  // XXX
-    Lightcolor   _value;
+    Lightcolor   _value; // XXX is this now redundant to "output"?
 
     // Parameters
     Param<Lightcolor> _output;
@@ -153,23 +153,22 @@ public:
 
     const QStringList & getNodesOfType(Node::node_t typeInfo);
 
+    static NodeFactory *Singleton();
+
 private:
     // Registry
     std::map<std::string, NodeInstatiator_t>  _registry;
     QMap<Node::node_t, QStringList> _registryByType;
 };
 
-extern NodeFactory NodeRegistry;
-
 template<class T>
 class Registrar {
 public:
     Registrar(QString className, Node::node_t nodeType) {
         // register the class factory function
-        NodeRegistry.registerNodetype(className, nodeType,
+        NodeFactory::Singleton()->registerNodetype(className, nodeType,
                                       [](void) -> Node * { return new T();});
     }
 };
-
 
 #endif // NODE_H

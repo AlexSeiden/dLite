@@ -16,6 +16,13 @@ public:
     int     getNextBeat(int sample);
 
     void    loadFile(std::string filename);
+
+    Param<bool> _output;
+
+    Param<int> _offset;
+
+    // May want to define a "file" param for input file.
+    // Could be auto-filled to look in standard locations.
 private:
     std::vector<int> _onsets;
 };

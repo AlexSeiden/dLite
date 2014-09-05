@@ -37,7 +37,20 @@
 //      Loads "onset" info from precomputed file.
 
 NodeOnset::NodeOnset() : Node()
-{ }
+{
+    setName("NodeOnset");
+    _type = BEAT;
+
+    _output.setName("out");
+    _output.setOutput(true);
+    _output.setConnectable(true);
+
+    _offset.setName("offset");
+    _offset.setOutput(false);
+    _offset.setConnectable(true);
+
+    _paramList << &_output << &_offset;
+}
 
 void NodeOnset::loadFile(std::string filename)
 {

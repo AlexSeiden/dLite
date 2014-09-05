@@ -377,7 +377,7 @@ void MainWidget::newNodeRequest(QString name)
     // and the same place is used for the CueLib
     Node *newNode;
 
-    newNode = NodeRegistry.instatiateNode(name);
+    newNode = NodeFactory::Singleton()->instatiateNode(name);
     if (newNode) {
         m_graphWidget->addNode(newNode);
     } else if (name == tr("Box cue")) {
