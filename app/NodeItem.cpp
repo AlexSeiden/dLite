@@ -13,7 +13,6 @@
 NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     QGraphicsObject(parent),
     dragOver(false),
-    color(QColor(120,100,60)),
     _node(node)
 {
 //    setAcceptDrops(true);
@@ -37,11 +36,11 @@ void NodeItem::paint(QPainter *painter,
     Q_UNUSED(widget);
     painter->save();
 
-    painter->setBrush(dragOver ? color.light(130) : color); // XXX handle color differently
+    //painter->setBrush(dragOver ? color.light(130) : GuiColors::nodeBGColor); // XXX handle color differently
+    painter->setBrush(GuiColors::nodeBGColor); // XXX handle color differently
+
     QBrush b = painter->brush();
     QPen p = painter->pen();
-
-    painter->drawEllipse(-5, -5, 10, 10);
 
     QRect bigrect(0,0,s_width,s_height*(_node->getParams().size()+1));
     painter->setBrush(Qt::blue);
@@ -50,8 +49,8 @@ void NodeItem::paint(QPainter *painter,
     if (isSelected()) {
         painter->save();
         painter->setBrush(QBrush());
-        QPen selectedPen = QPen(Qt::red);
-        selectedPen.setWidth(2);
+        QPen selectedPen = QPen(GuiColors::selectedNodePenColor);
+        selectedPen.setWidth(GuiColors::selectedNodePenWidth);
         painter->setPen(selectedPen);
         QRect biggerRect = bigrect.adjusted(-2,-2,2,2);
         painter->drawRect(biggerRect);
@@ -63,7 +62,7 @@ void NodeItem::paint(QPainter *painter,
     // Draw node name
     QRect rr(0,y,s_width,s_height);
     y+=s_height;
-    painter->setPen(Qt::white);
+    painter->setPen(GuiColors::nodeTextColor);
     rr.translate(5, 5);
     painter->drawText(rr,_node->getName());
     painter->setPen(p);

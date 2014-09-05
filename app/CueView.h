@@ -11,9 +11,6 @@
 #include "mainwidget.h"
 #include "ParamView.h"
 
-// Free function proto
-void setButtonColor(QToolButton *colorButton, const QColor &col);
-
 class CueBoxView : public QWidget
 {
     Q_OBJECT

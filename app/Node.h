@@ -14,7 +14,7 @@
 class Node
 {
 public:
-    enum node_t {CUE, FLOAT, INT, COLOR, IMPULSE, POSITION, UNDEFINED};
+    enum node_t {CUE, FLOAT, INT, COLOR, BEAT, POSITION, UNDEFINED};
 
     Node();
     virtual ~Node();
@@ -82,7 +82,6 @@ private:
 
 };
 
-
 class RandomFloat : public Node
 {
 public:
@@ -135,9 +134,8 @@ private:
     std::uniform_int_distribution<int> *_distribution;
 };
 
-// NodePrototypes
-// Singleton class to hold exemplar instantiations
-// of each node class, to be used by node library etc.
+// NodeFactory
+// Singleton class to list & instantiate all available nodes.
 class NodeFactory
 {
 public:
@@ -145,22 +143,19 @@ public:
 
     typedef  std::function<Node*(void)> NodeInstatiator_t;
 
-    std::shared_ptr<Node> instatiateNode(QString name);
-    void registerNodetype(QString name, Node::node_t typeInfo, NodeInstatiator_t instantiatorFunction);
-
 #if 0
-    void  getNodesOfType(QList<Node *> &out, Node::node_t type);
+    std::shared_ptr<Node> instatiateNode(QString name);
 #else
-    const QStringList & getNodesOfType(Node::node_t typeInfo);
+    Node *instatiateNode(QString name);
 #endif
 
-//    void  registerNode(Node *node);
-//    RandomInt    _randomInt;
-//    RandomFloat  _randomFloat;
+    void registerNodetype(QString name, Node::node_t typeInfo, NodeInstatiator_t instantiatorFunction);
+
+    const QStringList & getNodesOfType(Node::node_t typeInfo);
 
 private:
     // Registry
-    QMap<QString, NodeInstatiator_t>  _registry;
+    std::map<std::string, NodeInstatiator_t>  _registry;
     QMap<Node::node_t, QStringList> _registryByType;
 };
 

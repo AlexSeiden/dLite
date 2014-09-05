@@ -6,7 +6,7 @@
 class CueBox : public Cue
 {
 public:
-    CueBox(Dancefloormodel *dfmodel);
+    CueBox();
     void evaluate();
 
     friend class CueBoxView;

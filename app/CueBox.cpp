@@ -1,9 +1,11 @@
 #include "CueBox.h"
+#include "dancefloormodel.h"
 
 void randLight(int &value); // XXX
+Dancefloormodel *Cue::_dfModel = nullptr;
 
-CueBox::CueBox(Dancefloormodel *dfmodel) :
-    Cue(dfmodel),
+CueBox::CueBox() :
+    Cue(),
     _x(10),
     _y(8),
     _scale(1.0),
@@ -60,3 +62,6 @@ void CueBox::evaluate()
     firing->_alpha = alpha;
     _dfModel->fireLight(x, y, firing);
 }
+
+
+static Registrar<CueBox>     registrar("BoxCue", Node::CUE);

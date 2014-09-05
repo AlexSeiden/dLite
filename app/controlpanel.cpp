@@ -89,7 +89,7 @@ void Controlpanel::submeterHasBeenSelected(SublevelMeter *chosen)
     //auto provider = chosen->createProviderClosure();
 
     // emit signal for others who might care, e.g. spectrograph
-    emit(submeterSelectionChanged(chosen));
+    emit submeterSelectionChanged(chosen);
 }
 
 void Controlpanel::mouseReleaseEvent(QMouseEvent *event)

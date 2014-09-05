@@ -1,18 +1,7 @@
 #include <QtWidgets>
 #include "CueView.h"
+#include "GuiColors.h"
 #include "utils.h"
-
-
-// Utility function
-void setButtonColor(QToolButton *colorButton, const QColor &col){
-    if(col.isValid()) {
-        // I grabbed this bit of black magic code from StackOverflow...
-        // seems like the only way to set the color of the button.
-        QString qss = QString("background-color: %1").arg(col.name());
-        colorButton->setStyleSheet(qss);
-    }
-}
-
 
 CueBoxView::CueBoxView(CueBox *cue, QWidget *parent) :
     QWidget(parent),

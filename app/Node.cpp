@@ -214,17 +214,6 @@ void RandomInt::operator ()(float &value)
 // ------------------------------------------------------------------------------
 //  NodePrototypes
 
-//NodeFactory::NodeFactory()
-//{
-//    registerNode(&_randomInt);
-//    registerNode(&_randomFloat);
-//    registerNode(&_colorRamp);
-//}
-
-//void NodeFactory::registerNode(Node *node) {
-//    _allNodes << node;
-//}
-
 NodeFactory::NodeFactory() {}
 
 
@@ -232,43 +221,44 @@ void NodeFactory::registerNodetype(QString name, Node::node_t typeInfo,
         NodeInstatiator_t instantiatorFunction)
 {
     // register the class factory function
-    _registry[name] = instantiatorFunction;
-    _registryByType[typeInfo] << name;
+    _registry[name.toStdString()] = instantiatorFunction;
+//    _registryByType[typeInfo] << name;
 
 }
 
+#if 0
 std::shared_ptr<Node> NodeFactory::instatiateNode(QString name)
+#else
+Node * NodeFactory::instatiateNode(QString name)
+#endif
 {
     Node *instance = nullptr;
 
     // find name in the registry and call factory method.
-    NodeInstatiator_t instancer = _registry[name];
+    NodeInstatiator_t instancer = _registry[name.toStdString()];
     if (instancer)
         instance = instancer();
+        // TODO error
 
+#if 0
     // wrap instance in a shared ptr and return
+    // XXX not sure if I'm handling the shared_ptr stuff correctly
     if (instance != nullptr)
         return std::shared_ptr<Node>(instance);
     else
         return nullptr;
+#else
+    return instance;
+#endif
 }
 
-#if 0
-void NodeFactory::getNodesOfType(QList<Node *> &out, Node::node_t type) {
-    Node *node;
-    foreach (node, _allNodes) {
-        if (node->getType() == type)
-            out << node;
-    }
-}
-#else
 const QStringList & NodeFactory::getNodesOfType(Node::node_t typeInfo) {
     return _registryByType[typeInfo];
 }
-#endif
 
 
 NodeFactory NodeRegistry;
 
 static Registrar<RandomFloat>   registrar("RandomFloat", Node::FLOAT);
 static Registrar<RandomInt>     registrar2("RandomInt", Node::INT);
+static Registrar<ColorRamp>     registrar3("ColorRamp", Node::COLOR);

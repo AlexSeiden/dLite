@@ -24,17 +24,24 @@ signals:
 
 private:
     void    createUi();
+#if 0
     void    createCuesGroup();
     void    createFloatsGroup();
     void    createColorsGroup();
     void    createBeatsGroup();
+#endif
+
+    QGroupBox   *createGroup(QString typeName, Node::node_t nodeType);
     void    addButtonToUi(QLayout *layout, QString buttonName);
 
 
+#if 0
     QGroupBox *cuesGroupBox;
     QGroupBox *floatsGroupBox;
     QGroupBox *colorsGroupBox;
     QGroupBox *beatsGroupBox;
+#endif
+
     QList<QPushButton *> buttons;
 
     QHBoxLayout *mainLayout;

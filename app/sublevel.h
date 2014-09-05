@@ -82,9 +82,6 @@ private:
     // Height of level bar.
     float  m_level;
 
-    QColor m_barColor;
-    QColor m_squareColor;
-
     bool _active;
     bool _selectable;
     bool _selected;

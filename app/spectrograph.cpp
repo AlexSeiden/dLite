@@ -1,12 +1,11 @@
 #include "spectrograph.h"
+#include "GuiColors.h"
 #include <QDebug>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QTimerEvent>
 #include <math.h>
 
-QColor Spectrograph::barColor = QColor(51, 204, 102);
-QColor Spectrograph::clipColor = QColor(255, 255, 0);
 
 Spectrograph::Spectrograph(QWidget *parent)
     :   QWidget(parent)
@@ -63,14 +62,13 @@ void Spectrograph::paintEvent(QPaintEvent *event)
     Q_UNUSED(event)
 
     QPainter painter(this);
-    painter.fillRect(rect(), Qt::black);
+    painter.fillRect(rect(), GuiColors::sg_bg);
 
     const int numBars = m_bars.count();
 
 
     // Draw the outline
-    const QColor gridColor = barColor.darker();
-    QPen gridPen(gridColor);
+    QPen gridPen(GuiColors::sg_gridColor);
     painter.setPen(gridPen);
     painter.drawLine(rect().topLeft(), rect().topRight());
     painter.drawLine(rect().topRight(), rect().bottomRight());
@@ -110,8 +108,9 @@ void Spectrograph::paintEvent(QPaintEvent *event)
         painter.drawLine(line);
     }
 
-    QColor lineColor = barColor.lighter();
+    QColor lineColor = GuiColors::sg_lineColor;
     lineColor.setAlphaF(0.75);
+    QColor clipColor = GuiColors::sg_clipColor;
     clipColor.setAlphaF(0.75);
 
     // Draw the bars
@@ -132,7 +131,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
     }
 
     // Draw the labels
-    painter.setPen(QColor(230,230,255));
+    painter.setPen(GuiColors::sg_textColor);
     const int textHeight = 40;
     const int bottomOffset = 10;
     for (int i=0; i<numBars; ++i) {
@@ -157,7 +156,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
         subwin.setLeft(  rect().width()  * subrangewindow->left());
         subwin.setRight( rect().width()  * subrangewindow->right());
         // TODO make this color settable/responsive to current selection
-        QPen pen(Qt::blue);
+        QPen pen(GuiColors::sg_sublevelRegion);
         pen.setWidth(2);
         painter.setPen(pen);
 

@@ -1,4 +1,5 @@
 #include "sublevel.h"
+#include "GuiColors.h"
 #include "utils.h"
 #include "Param.h"
 #include "CueView.h"
@@ -56,8 +57,6 @@ bool Subrange::isFrequencyWithinWindow(double freq)
 SublevelMeter::SublevelMeter(QWidget *parent)
     :   QWidget(parent)
     ,   m_level(0.0)
-    ,   m_barColor(Qt::red)
-    ,   m_squareColor(Qt::blue)
     ,   _active(false)
     ,   _selectable(false)
     ,   _selected(false)
@@ -93,13 +92,12 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
     Q_UNUSED(event)
 
     QPainter painter(this);
-    // TODO make colors configurable
-    painter.fillRect(rect(), Qt::black);
+    painter.fillRect(rect(), GuiColors::sl_bgColor);
 
     // Draw bar
     QRect bar = rect();
     bar.setTop(rect().top() + (1.0 - m_level) * rect().height());
-    painter.fillRect(bar, m_barColor);
+    painter.fillRect(bar, GuiColors::sl_barColor);
 
     // Draw pulsar
     QRect squareRect = rect();
@@ -111,7 +109,7 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
     painter.drawRect(squareRect);
 
     if (_selected) {
-        QPen pen(Qt::blue);
+        QPen pen(GuiColors::sl_selectedColor);
         pen.setWidth(6);
         painter.setPen(pen);
 
@@ -122,7 +120,7 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
     }
 
     if (_dragTarget) {
-        QPen pen(Qt::red);
+        QPen pen(GuiColors::sl_dragTarget);
         pen.setWidth(6);
         painter.setPen(pen);
 

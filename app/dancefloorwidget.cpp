@@ -6,14 +6,11 @@
 #include <QTimer>
 #include <QTimerEvent>
 #include <math.h>
+#include "GuiColors.h"
 
 Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
     QWidget(parent)
 {
-    bgColor = QColor(30,30,80);
-    panelSepColor = QColor(255,255,200);
-    cellSepColor = QColor(100,100,100);
-    noCellColor = QColor(60,60,60);
     cellsize = 20;
     cellspace = 4;
 
@@ -54,10 +51,10 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
     Q_UNUSED(event)
 
     QPainter painter(this);
-    painter.fillRect(rect(), bgColor);
+    painter.fillRect(rect(), GuiColors::df_bgColor);
 
     // Draw the outline
-    QPen cellPen(cellSepColor);
+    QPen cellPen(GuiColors::df_cellSepColor);
     painter.setPen(cellPen);
 //    painter.drawLine(rect().topLeft(), rect().topRight());
 //    painter.drawLine(rect().topRight(), rect().bottomRight());
@@ -73,7 +70,7 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
             if (cellHasLights(x,y))
                 painter.fillRect(cell, dfModel->getQColor(x,y));
             else
-                painter.fillRect(cell, noCellColor);
+                painter.fillRect(cell, GuiColors::df_noCellColor);
             painter.drawRect(cell);
         }
     }

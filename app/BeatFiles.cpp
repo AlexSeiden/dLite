@@ -1,4 +1,5 @@
 #include "BeatFiles.h"
+#include "Node.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -35,7 +36,8 @@
 // NodeOnset
 //      Loads "onset" info from precomputed file.
 
-NodeOnset::NodeOnset() { }
+NodeOnset::NodeOnset() : Node()
+{ }
 
 void NodeOnset::loadFile(std::string filename)
 {
@@ -57,7 +59,8 @@ void NodeOnset::loadFile(std::string filename)
 // NodeBar
 //      Loads bar (measure) info from precomputed file.
 
-NodeBar::NodeBar() { }
+NodeBar::NodeBar() : Node()
+{ }
 
 void NodeBar::loadFile(std::string filename)
 {
@@ -78,3 +81,6 @@ void NodeBar::loadFile(std::string filename)
     }
     filestream.close();
 }
+
+static Registrar<NodeOnset>     registrar("Onset", Node::BEAT);
+static Registrar<NodeBar>       registrar2("Bar", Node::BEAT);

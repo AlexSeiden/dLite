@@ -59,6 +59,7 @@ MainWidget::MainWidget(QWidget *parent)
     // TODO move to settings/prefs  & allow setting this
     std::string layoutfile = std::string("/Users/alex/src/floorit/layout.csv");
     m_dancefloormodel->ImportLayout(layoutfile);
+    Cue::setDancefloormodel(m_dancefloormodel);
 
     m_dancefloorwidget = new Dancefloorwidget();
     m_dancefloorwidget->setModel(m_dancefloormodel);
@@ -374,7 +375,12 @@ void MainWidget::newNodeRequest(QString name)
 {
     // TODO generate this list from a single place, where all cues are listed,
     // and the same place is used for the CueLib
-    if (name == tr("Box cue")) {
+    Node *newNode;
+
+    newNode = NodeRegistry.instatiateNode(name);
+    if (newNode) {
+        m_graphWidget->addNode(newNode);
+    } else if (name == tr("Box cue")) {
         this->newCue();
     } else if (name == tr("Spectrum range")) {
         // XXX this should be consistent with the others.
@@ -388,7 +394,7 @@ void MainWidget::newNodeRequest(QString name)
 
 void MainWidget::newCue()
 {
-    CueBox *cue = new CueBox(m_dancefloormodel);
+    CueBox *cue = new CueBox();
     m_graphWidget->addNode(cue);
 //    CueBoxView *cv = new CueBoxView(cue, NULL);
 //    cv->show();

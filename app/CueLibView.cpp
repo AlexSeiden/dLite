@@ -14,21 +14,15 @@ void CueLibView::createUi()
 {
     signalMapper = new QSignalMapper(this);
 
-    // TODO generate these from a single place, where all cues are listed.
-    createCuesGroup();
-    createFloatsGroup();
-    createColorsGroup();
-    createBeatsGroup();
-
     mainLayout = new QHBoxLayout;
     mainLayout->setMargin(2);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(4,4,4,4);
 
-    mainLayout->addWidget(cuesGroupBox);
-    mainLayout->addWidget(floatsGroupBox);
-    mainLayout->addWidget(colorsGroupBox);
-    mainLayout->addWidget(beatsGroupBox);
+    mainLayout->addWidget(createGroup("Cues", Node::CUE));
+    mainLayout->addWidget(createGroup("Floats", Node::FLOAT));
+    mainLayout->addWidget(createGroup("Colors", Node::COLOR));
+    mainLayout->addWidget(createGroup("Beats", Node::BEAT));
     setLayout(mainLayout);
 
     setWindowTitle(tr("Cue Library"));
@@ -42,6 +36,26 @@ void CueLibView::createUi()
 
 }
 
+
+QGroupBox *CueLibView::createGroup(QString typeName, Node::node_t nodeType)
+{
+    QGroupBox *groupBox = new QGroupBox(typeName);
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setSpacing(0);
+
+    QStringList allNodenames = NodeRegistry.getNodesOfType(nodeType);
+
+    foreach (QString nodename, allNodenames) {
+        addButtonToUi(layout, nodename);
+    }
+
+    layout->addStretch();
+    groupBox->setLayout(layout);
+    return groupBox;
+}
+
+
+#if 0
 void CueLibView::createCuesGroup()
 {
     cuesGroupBox = new QGroupBox(tr("Cues"));
@@ -60,16 +74,11 @@ void CueLibView::createFloatsGroup()
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
 
-    QStringList allFloats;
-    allFloats = NodeRegistry.getNodesOfType(Node::FLOAT);
+    QStringList allNodenames = NodeRegistry.getNodesOfType(Node::FLOAT);
 
-
-    foreach (QString nodename, allFloats) {
+    foreach (QString nodename, allNodenames) {
         addButtonToUi(layout, nodename);
     }
-
-//    addButtonToUi(layout, tr("Spectrum range"));
-//    addButtonToUi(layout, tr("Random"));
 
     layout->addStretch();
     floatsGroupBox->setLayout(layout);
@@ -101,6 +110,7 @@ void CueLibView::createBeatsGroup()
     layout->addStretch();
     beatsGroupBox->setLayout(layout);
 }
+#endif
 
 // Convienence function
 void CueLibView::addButtonToUi(QLayout *layout, QString buttonName) {

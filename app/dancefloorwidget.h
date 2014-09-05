@@ -33,10 +33,6 @@ private:
 
     int     cellsize;
     int     cellspace;
-    QColor  bgColor;
-    QColor  cellSepColor;
-    QColor  panelSepColor;
-    QColor  noCellColor;
 //    QTimer  *timer; //  XXX is this still needed?
 
 #ifdef INLINE

@@ -10,11 +10,11 @@ void randLight(int &value) // XXX
 //  Cue
 //  Abstract base class
 
-Cue::Cue(Dancefloormodel *dfmodel) :
+Cue::Cue() :
     Node(),
-    _dfModel(dfmodel),
     _compmode(SET)
 {
     // Add this to list of cues the model knows about.
-    _dfModel->addCue(this);
+    if (Cue::_dfModel)
+        Cue::_dfModel->addCue(this);
 }

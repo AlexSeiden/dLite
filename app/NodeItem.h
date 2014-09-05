@@ -34,7 +34,6 @@ protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 
     bool dragOver;
-    QColor  color;
 
 private:
     Node    *_node;
