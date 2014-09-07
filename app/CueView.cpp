@@ -40,7 +40,7 @@ RandomNodeView::RandomNodeView(RandomFloat *randomNode, QWidget *parent) :
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(8);
 
-    _outParamVu = new ParamView(this, tr("Output"), &_node->_min, false);
+    _outParamVu = new ParamView(this, tr("Output"), &_node->_min);
     _minParamVu = new ParamView(this, tr("min"), &_node->_min);
     _maxParamVu = new ParamView(this, tr("max"), &_node->_max);
     layout->addWidget(_outParamVu);

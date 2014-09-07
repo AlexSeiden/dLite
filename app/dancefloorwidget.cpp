@@ -51,10 +51,10 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
     Q_UNUSED(event)
 
     QPainter painter(this);
-    painter.fillRect(rect(), GuiColors::df_bgColor);
+    painter.fillRect(rect(), GuiSettings::df_bgColor);
 
     // Draw the outline
-    QPen cellPen(GuiColors::df_cellSepColor);
+    QPen cellPen(GuiSettings::df_cellSepColor);
     painter.setPen(cellPen);
 //    painter.drawLine(rect().topLeft(), rect().topRight());
 //    painter.drawLine(rect().topRight(), rect().bottomRight());
@@ -70,7 +70,7 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
             if (cellHasLights(x,y))
                 painter.fillRect(cell, dfModel->getQColor(x,y));
             else
-                painter.fillRect(cell, GuiColors::df_noCellColor);
+                painter.fillRect(cell, GuiSettings::df_noCellColor);
             painter.drawRect(cell);
         }
     }

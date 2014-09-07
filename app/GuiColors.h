@@ -6,22 +6,33 @@
 
 QT_BEGIN_NAMESPACE
 class QToolButton;
+class QPen;
 QT_END_NAMESPACE
 
 
 // Singleton class to maintain color values for the UI.
 // Derived from QObject so we can used signals & slots
-class GuiColors : public QObject
+class GuiSettings : public QObject
 {
     Q_OBJECT
 public:
-    explicit GuiColors(QObject *parent = 0);
+    explicit GuiSettings(QObject *parent = 0);
     // Graph widget
     static QColor   connectorColor;
+    static QColor   nodeNameColor;
     static QColor   nodeBGColor;
     static QColor   nodeTextColor;
+    static int      nodeWidth;
     static QColor   selectedNodePenColor;
     static int      selectedNodePenWidth;
+    static QColor   socketFillColor;
+    static QColor   socketOutlineColor;
+    static QColor   paramFillColor;
+    static QColor   paramTextColor;
+    static int      socketWidth;
+    static int      paramHeight;
+    static QPen     socketOutlinePen;
+    static QPen     connectorPen;
 
     // Dance floor widget
     static QColor  df_cellSepColor;
@@ -37,6 +48,9 @@ public:
     static QColor  sg_bg;
     static QColor  sg_textColor;
     static QColor  sg_sublevelRegion;
+    static int     sg_textHeight;
+    static int     sg_textOffset;
+
 
     // Sublevel meter
     static QColor  sl_bgColor;

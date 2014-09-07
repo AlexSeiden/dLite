@@ -25,7 +25,7 @@ void CuesheetScene::startLine(QGraphicsSceneMouseEvent *mouseEvent, SocketItem *
     _sourceSocket = srcItem;
     _startPoint = mouseEvent->scenePos();
     _line = new QGraphicsLineItem(QLineF(_startPoint, _startPoint));
-    _line->setPen(QPen(GuiColors::connectorColor, 2));
+    _line->setPen(QPen(GuiSettings::connectorColor, 2));
     addItem(_line);
 }
 
@@ -112,8 +112,10 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 }
                 ConnectorItem *connection = new ConnectorItem(server, client);
                 addItem(connection);
+
                 // TODO Tell the sockets about the connection, so they can update them with the position.
                 // Or, should sockets just broadcast their positions via signals, and connections listen via slots?
+                client->getParam()->connectTo(server->getParam());
     //            _sourceSocket->addConnection(connection);
     //            targetSocket->addConnection(connection);
             }

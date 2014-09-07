@@ -1,36 +1,49 @@
 #include "GuiColors.h"
 #include <QToolButton>
+#include <QPen>
 
-QColor  GuiColors::connectorColor       = QColor(20,20,80);
-QColor  GuiColors::nodeBGColor          = QColor(120,100,60);
-QColor  GuiColors::nodeTextColor        = QColor(255,255,255);
-QColor  GuiColors::selectedNodePenColor = QColor(255,100,100);
-int     GuiColors::selectedNodePenWidth = 2;
+QColor  GuiSettings::socketFillColor      = QColor(255,20,80);
+QColor  GuiSettings::socketOutlineColor   = QColor(255,255,255);
+QColor  GuiSettings::connectorColor       = QColor(20,20,80);
+QColor  GuiSettings::nodeNameColor        = QColor(55,55,255);
+QColor  GuiSettings::nodeBGColor          = QColor(120,100,60);
+QColor  GuiSettings::nodeTextColor        = QColor(255,255,255);
+QColor  GuiSettings::paramTextColor       = QColor(255,255,255);
+QColor  GuiSettings::paramFillColor       = QColor(120,100,60);
+int     GuiSettings::nodeWidth            = 200;                 // Width of the entire node
+int     GuiSettings::socketWidth          = 16;                 // Width of the socket connector rectangle
+int     GuiSettings::paramHeight          = 25;                 // Height of each param
+QColor  GuiSettings::selectedNodePenColor = QColor(255,100,100);
+int     GuiSettings::selectedNodePenWidth = 2;
+QPen    GuiSettings::socketOutlinePen   = QPen(GuiSettings::socketOutlineColor, 2, Qt::SolidLine);
+QPen    GuiSettings::connectorPen       = QPen(GuiSettings::connectorColor, 2, Qt::SolidLine);
 
-QColor  GuiColors::df_bgColor           = QColor(30,30,80);
-QColor  GuiColors::df_panelSepColor     = QColor(255,255,200);
-QColor  GuiColors::df_cellSepColor      = QColor(100,100,100);
-QColor  GuiColors::df_noCellColor       = QColor(60,60,60);
+QColor  GuiSettings::df_bgColor           = QColor(30,30,80);
+QColor  GuiSettings::df_panelSepColor     = QColor(255,255,200);
+QColor  GuiSettings::df_cellSepColor      = QColor(100,100,100);
+QColor  GuiSettings::df_noCellColor       = QColor(60,60,60);
 
-QColor  GuiColors::sg_barColor          = QColor(51, 204, 102);
-QColor  GuiColors::sg_lineColor         = GuiColors::sg_barColor.lighter();
-QColor  GuiColors::sg_clipColor         = QColor(255, 255, 0);
-QColor  GuiColors::sg_gridColor         = GuiColors::sg_barColor.darker();
-QColor  GuiColors::sg_bg                = QColor(0,0,0);
-QColor  GuiColors::sg_textColor         = QColor(230,230,255);
-QColor  GuiColors::sg_sublevelRegion    = QColor(20,20,255);
+QColor  GuiSettings::sg_barColor          = QColor(51, 204, 102);
+QColor  GuiSettings::sg_lineColor         = GuiSettings::sg_barColor.lighter();
+QColor  GuiSettings::sg_clipColor         = QColor(255, 255, 0);
+QColor  GuiSettings::sg_gridColor         = GuiSettings::sg_barColor.darker();
+QColor  GuiSettings::sg_bg                = QColor(0,0,0);
+QColor  GuiSettings::sg_textColor         = QColor(230,230,255);
+QColor  GuiSettings::sg_sublevelRegion    = QColor(20,20,255);
+int     GuiSettings::sg_textHeight        = 20;
+int     GuiSettings::sg_textOffset        = GuiSettings::sg_textHeight/4;
 
-QColor  GuiColors::sl_bgColor           = QColor(0,0,0);
-QColor  GuiColors::sl_barColor          = GuiColors::sg_barColor;
-QColor  GuiColors::sl_squareColor       = QColor(0,0,255);
-QColor  GuiColors::sl_selectedColor     = GuiColors::sg_sublevelRegion;
-QColor  GuiColors::sl_dragTarget        = QColor(255,20,20);
+QColor  GuiSettings::sl_bgColor           = QColor(0,0,0);
+QColor  GuiSettings::sl_barColor          = GuiSettings::sg_barColor;
+QColor  GuiSettings::sl_squareColor       = QColor(0,0,255);
+QColor  GuiSettings::sl_selectedColor     = GuiSettings::sg_sublevelRegion;
+QColor  GuiSettings::sl_dragTarget        = QColor(255,20,20);
 
-GuiColors::GuiColors(QObject *parent) :
+GuiSettings::GuiSettings(QObject *parent) :
     QObject(parent)
 { }
 
-void    GuiColors::editGuiColorsDialog(QObject *parent)
+void    GuiSettings::editGuiColorsDialog(QObject *parent)
 {
     //TODO void    GuiColors::editGuiColorsDialog()
 }

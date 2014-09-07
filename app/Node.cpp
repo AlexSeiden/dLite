@@ -18,12 +18,21 @@ Node::node_t Node::getType()
 
 Node::~Node() {}
 
+// XXX gross.  at least, should be a better way to init this.
+// should be a better way to find out without having to maintain this.
+// kinda breaks encapsulation to have it in the first place.
+void Node::setParamParent()
+{
+    foreach (ParamBase *p, _paramList) {
+        p->_parentNode = this;
+    }
+}
 
 // ------------------------------------------------------------------------------
 //  TriggerEvery
 //  Impulse class
 
-void TriggerEvery::operator ()(bool &value)
+void TriggerEvery::operator()(bool &value)
 {
     if (getCurrentTime() > _nextRefresh) {
        _value = true;
@@ -69,7 +78,7 @@ ColorRamp::ColorRamp() :
     _paramList << &_output << &_c0 << &_c1 << &_mix;
 }
 
-void ColorRamp::operator ()(Lightcolor &value)
+void ColorRamp::operator()(Lightcolor &value)
 {
     Lightcolor c0, c1;
     _c0.getValue(c0);
@@ -137,7 +146,7 @@ void RandomFloat::setRandomEngine()
 }
 
 
-void RandomFloat::operator ()(float &value)
+void RandomFloat::operator()(float &value)
 {
     // First, check the trigger to see if it's time for a new number
     bool trigVal = true;
@@ -145,6 +154,8 @@ void RandomFloat::operator ()(float &value)
     if (trigVal) {
         _value =  (*_distribution)(*_randGenerator);
     }
+
+    qDebug() << _value;
 
     value = _value;
 }
@@ -177,6 +188,7 @@ RandomInt::RandomInt() :
     _max.setConnectable(true);
 
     _paramList << &_output << &_min << &_max;
+    setParamParent();
 }
 
 
@@ -198,14 +210,17 @@ void RandomInt::setRandomEngine()
 }
 
 
-void RandomInt::operator ()(float &value)
+void RandomInt::operator()(int &value)
 {
+    // XXX TODO:  ALL OPERATOR()s need to only exec once per 'frame'!
+
     // First, check the trigger to see if it's time for a new number
     bool trigVal = true;
     //XXX _trigger(trigVal);
     if (trigVal) {
         _value =  (*_distribution)(*_randGenerator);
     }
+    qDebug () << "randint" << _value;
 
     value = _value;
 }

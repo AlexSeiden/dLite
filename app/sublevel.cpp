@@ -92,12 +92,12 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
     Q_UNUSED(event)
 
     QPainter painter(this);
-    painter.fillRect(rect(), GuiColors::sl_bgColor);
+    painter.fillRect(rect(), GuiSettings::sl_bgColor);
 
     // Draw bar
     QRect bar = rect();
     bar.setTop(rect().top() + (1.0 - m_level) * rect().height());
-    painter.fillRect(bar, GuiColors::sl_barColor);
+    painter.fillRect(bar, GuiSettings::sl_barColor);
 
     // Draw pulsar
     QRect squareRect = rect();
@@ -109,7 +109,7 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
     painter.drawRect(squareRect);
 
     if (_selected) {
-        QPen pen(GuiColors::sl_selectedColor);
+        QPen pen(GuiSettings::sl_selectedColor);
         pen.setWidth(6);
         painter.setPen(pen);
 
@@ -120,7 +120,7 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
     }
 
     if (_dragTarget) {
-        QPen pen(GuiColors::sl_dragTarget);
+        QPen pen(GuiSettings::sl_dragTarget);
         pen.setWidth(6);
         painter.setPen(pen);
 

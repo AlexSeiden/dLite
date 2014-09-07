@@ -12,10 +12,12 @@
 // ParamBase
 //      An abstract base class.
 
+class Node;
+
 class ParamBase
 {
 public:
-    ParamBase() : _isOutput(false), _isConnectable(true) {}
+    ParamBase() : _isOutput(false), _isConnectable(true) , _type(typeid(this)) {}
     virtual ~ParamBase() {}
 
 //    virtual void setProvider(std::function<void(void *)> provider) = 0;
@@ -30,17 +32,31 @@ public:
 
     bool    isConnectableTo(ParamBase *otherParam);
     void    connectParams(ParamBase *server, ParamBase *client);
+    void    connectTo(ParamBase *server);
+
+    virtual const std::type_info & getType() {return _type;}
 
     // Would it be useful to maintain a linked list of connections here?
     // Both for inputs and outputs?  Would that break modularity?
     //QList<ParamBase *>  getConnections();
 
-private:
+    Node *getParent() {return _parentNode;}
+
+    // Valid only for input nodes
+    Node *getServer() {return _connectedNode;}
+
+    // Valid only for output nodes
+    Node *getClients() {return _connectedNode;}
+
+    Node *_connectedNode;
+    Node *_parentNode;
+protected:
     QString _name;
     bool _isOutput;
     bool _isConnectable;
-
+    const std::type_info & _type;
 };
+
 
 // Templated Param class
 //      Instatiated with the following types:
@@ -55,7 +71,11 @@ template <class PT>
 class Param : public ParamBase
 {
 public:
-    Param(PT value=PT()) : _value(value), _provider(nullptr) {}
+    Param(PT value=PT()) :
+        _value(value),
+        _provider(nullptr) {}
+
+
     virtual ~Param() {}
 
     virtual void operator() (PT &value) {value = _value;}
@@ -77,13 +97,16 @@ public:
     // This applies to output parameters only:  it returns a provider "function"
     // that can be executed by a client to compute the value the client uses.
     std::function<void(PT&)> getProvider() {
-        // Assumes this implements operator() to create closure/functor.
-        return [this](PT &val) {(*this)(val);};
+        // Assumes that the node implements operator() to create closure/functor.
+        return [this](PT &val) {(*this->_parentNode)(val);};
+//        return [this](PT &val) {(*this)(val);};
     }
 
     // ??? Should this automatically disable a _provider functor, if there is one?
     // Or should setValue be disabled when there is a provider?
     void setValue(const PT &value) {_value = value;}
+
+    virtual const std::type_info & getType() {return typeid(this);}
 
 private:
     PT _value;

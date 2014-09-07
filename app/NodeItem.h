@@ -24,9 +24,6 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
-    static const int s_width=100;
-    static const int s_height=25;
-    
 signals:
     void nodeMovedEventSignal();
 
@@ -53,9 +50,6 @@ public:
     void setSocket(SocketItem *sock) {_socket = sock;}
     SocketItem *getSocket() {return _socket;}
 
-    static const int s_width=100;
-    static const int s_height=25;
-
 private:
     ParamBase    *_param;
     SocketItem   *_socket;
@@ -75,8 +69,6 @@ public:
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
-    static const int s_width=16;
-    
 private:
     ParamBase    *_param;
 };

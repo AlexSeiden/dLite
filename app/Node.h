@@ -28,6 +28,9 @@ public:
     virtual node_t      getType();
     QList<ParamBase *>  getParams()        {return _paramList;}
 
+    void                setParamParent();
+
+
 protected:
     QString               _name;
     bool                  _active;
@@ -69,7 +72,7 @@ public:
     // and allows downstream clients to evaluate.
     void operator() (Lightcolor &value);
 
-//private:  // XXX
+private:
     Lightcolor   _value; // XXX is this now redundant to "output"?
 
     // Parameters
@@ -115,10 +118,10 @@ public:
 
     // Functor that provides closure over instance object,
     // and allows downstream clients to evaluate.
-    void operator() (float &value);
+    void operator() (int &value);
 
 //private:  // XXX
-    float   _value;
+    int   _value;
 
     // Parameters
     Param<int> _output;

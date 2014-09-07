@@ -58,7 +58,8 @@ public:
     Lightcolor  getValue() {return _color;}
     float       getAlpha() {return _alpha;}
     Lightcolor  compOver(const Lightcolor &lightcolor);
-
+    void        setDecay(decayfunc_t dfunk) {_decayfunction = dfunk;}
+    void        setDecay(int i);
 
 //private:  //XXX
     Lightcolor  _color;

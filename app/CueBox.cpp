@@ -1,7 +1,8 @@
 #include "CueBox.h"
 #include "dancefloormodel.h"
+#include <QDebug>
+#include "Node.h"
 
-void randLight(int &value); // XXX
 Dancefloormodel *Cue::_dfModel = nullptr;
 
 CueBox::CueBox() :
@@ -36,9 +37,6 @@ CueBox::CueBox() :
     _color.setConnectable(true);
 
     _paramList << &_x <<&_y <<&_scale << &_alpha << &_color;
-
-//    _x.setProvider(randLight); // XXX testing
-//    _y.setProvider(randLight); // XXX testing
 }
 
 
@@ -52,14 +50,31 @@ void CueBox::evaluate()
     Lightcolor color;
     float alpha=1.0;
     _x.getValue(x);
+    qDebug() << "x getvalue " << x;
+
+//    int otherx;
+//    std::function<void(int &value)> lp = _x.getProvider();
+//    lp(otherx);
+//    qDebug() << "other x    " << otherx;
+//    (*_x._connectedNode)(otherx);
+
+    RandomInt *rn = dynamic_cast<RandomInt *>(_x._connectedNode);
+    int rnx = -1;
+    (*rn)(rnx);
+    qDebug() << "rnx        " << rnx;
+
+
+
     _y.getValue(y);
     _color.getValue(color);
     _alpha.getValue(alpha);
+    color *= alpha;
 
     // "Fire" the light with the correct parameters
     Firing *firing = new Firing;
     firing->_color = color;
     firing->_alpha = alpha;
+    firing->setDecay(1);
     _dfModel->fireLight(x, y, firing);
 }
 

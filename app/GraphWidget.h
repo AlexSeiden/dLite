@@ -17,6 +17,7 @@ signals:
 
 public slots:
     void addNode(Node *node);
+    void buttclick();
 
 private:
     QGraphicsScene *_scene;

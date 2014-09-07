@@ -1,9 +1,15 @@
 #include "GraphWidget.h"
 #include "NodeItem.h"
-#include <QHBoxLayout>
-#include <QGraphicsObject>
 #include "Node.h"
 #include "CuesheetScene.h"
+#include "GuiColors.h"
+#include "utils.h"
+#include "ParamView.h"
+#include <QHBoxLayout>
+#include <QGraphicsObject>
+#include <QGraphicsProxyWidget>
+
+#include <QPushButton>
 
 int GraphWidget::_numNodeItems = 0;
 
@@ -25,21 +31,42 @@ GraphWidget::GraphWidget(QWidget *parent) :
 void GraphWidget::addNode(Node *node)
 {
     NodeItem *nodeItem = new NodeItem(node);
-    nodeItem->setPos(_numNodeItems*130.,-200.);
+    nodeItem->setPos(_numNodeItems*GuiSettings::nodeWidth*1.3,-200.);
     _numNodeItems++;
     _scene->addItem(nodeItem);
 
     int y = 0;
-    int yOffset = NodeItem::s_height/2 - SocketItem::s_width/2;
+    int yOffset = GuiSettings::paramHeight/2;
+    // XXX it seems kinda gross that we're doing this here...
     for (ParamBase *param : node->getParams()) {
-        y+=NodeItem::s_height;
+        y+=GuiSettings::paramHeight;
         ParamItem *parItem = new ParamItem(param, nodeItem);
         parItem->setPos(0,y);
+
         SocketItem *sockItem = new SocketItem(param, parItem);
-        parItem->setSocket(sockItem);     // XXX kinda gross that we're doing this here...
+        parItem->setSocket(sockItem);
         if (param->isOutput())
-            sockItem->setPos(NodeItem::s_width-10,yOffset);
+            sockItem->setPos(GuiSettings::nodeWidth - GuiSettings::socketWidth, yOffset);
         else
-            sockItem->setPos(10,yOffset);
+            sockItem->setPos(GuiSettings::socketWidth,yOffset);
+
+        // Testing
+#if 0
+        QPushButton *toolbutt = new QPushButton(QString::number(y));
+        QGraphicsProxyWidget *proxy = _scene->addWidget(toolbutt);
+        proxy->setParentItem(parItem);
+        proxy->setPos(GuiSettings::socketWidth * 2 +10, 0);
+        CHECKED_CONNECT(toolbutt, SIGNAL(clicked()), this, SLOT(buttclick()));
+#else
+        ParamView *pv = new ParamView(nullptr, param);
+        QGraphicsProxyWidget *proxy = _scene->addWidget(pv);
+        proxy->setParentItem(parItem);
+        proxy->setPos(GuiSettings::socketWidth * 2 +50, 0);
+#endif
     }
+}
+
+void GraphWidget::buttclick()
+{
+    qDebug() << "buttclick";
 }

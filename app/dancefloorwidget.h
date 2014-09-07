@@ -33,7 +33,6 @@ private:
 
     int     cellsize;
     int     cellspace;
-//    QTimer  *timer; //  XXX is this still needed?
 
 #ifdef INLINE
     int _getIndex(int x, int y) {return xsize*y + x;}

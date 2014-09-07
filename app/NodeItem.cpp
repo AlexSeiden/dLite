@@ -24,9 +24,8 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
 
 QRectF NodeItem::boundingRect() const
 {
-    int hh = _node->getParams().size();
-    hh++;
-    return QRectF(-5, -5, s_width+9, s_height*hh+9);
+    int hh = _node->getParams().size() + 1;  // + 1 for the node name
+    return QRectF(-5, -5, GuiSettings::nodeWidth+9, GuiSettings::paramHeight*hh+9);
 }
 
 void NodeItem::paint(QPainter *painter,
@@ -37,20 +36,20 @@ void NodeItem::paint(QPainter *painter,
     painter->save();
 
     //painter->setBrush(dragOver ? color.light(130) : GuiColors::nodeBGColor); // XXX handle color differently
-    painter->setBrush(GuiColors::nodeBGColor); // XXX handle color differently
+    painter->setBrush(GuiSettings::nodeBGColor); // TODO color by type
 
     QBrush b = painter->brush();
     QPen p = painter->pen();
 
-    QRect bigrect(0,0,s_width,s_height*(_node->getParams().size()+1));
-    painter->setBrush(Qt::blue);
+    QRect bigrect(0,0,GuiSettings::nodeWidth,GuiSettings::paramHeight*(_node->getParams().size()+1));
+    painter->setBrush(GuiSettings::nodeNameColor);
     painter->drawRect(bigrect);
     painter->setBrush(b);
     if (isSelected()) {
         painter->save();
         painter->setBrush(QBrush());
-        QPen selectedPen = QPen(GuiColors::selectedNodePenColor);
-        selectedPen.setWidth(GuiColors::selectedNodePenWidth);
+        QPen selectedPen = QPen(GuiSettings::selectedNodePenColor);
+        selectedPen.setWidth(GuiSettings::selectedNodePenWidth);
         painter->setPen(selectedPen);
         QRect biggerRect = bigrect.adjusted(-2,-2,2,2);
         painter->drawRect(biggerRect);
@@ -60,9 +59,9 @@ void NodeItem::paint(QPainter *painter,
 
     int y = 0;
     // Draw node name
-    QRect rr(0,y,s_width,s_height);
-    y+=s_height;
-    painter->setPen(GuiColors::nodeTextColor);
+    QRect rr(0,y,GuiSettings::nodeWidth,GuiSettings::paramHeight);
+    y+=GuiSettings::paramHeight;
+    painter->setPen(GuiSettings::nodeTextColor);
     rr.translate(5, 5);
     painter->drawText(rr,_node->getName());
     painter->setPen(p);
@@ -89,7 +88,7 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
 
 QRectF ParamItem::boundingRect() const
 {
-    return QRectF(-5, -5, s_width+9, s_height+9);
+    return QRectF(-5, -5, GuiSettings::nodeWidth+9, GuiSettings::paramHeight+9);
 }
 
 void ParamItem::paint(QPainter *painter,
@@ -100,16 +99,16 @@ void ParamItem::paint(QPainter *painter,
     Q_UNUSED(widget);
 
     // Set box for this param
-    painter->setBrush(QColor(120,100,60));
-    QRect rr(0,0,s_width,s_height);
+    painter->setBrush(GuiSettings::paramFillColor);
+    QRect rr(0,0,GuiSettings::nodeWidth,GuiSettings::paramHeight);
 
     // Draw rectangle
     painter->setPen(Qt::black);
     painter->drawRoundedRect(rr, 10, 10);
 
     // Draw name
-    painter->setPen(Qt::white);
-    rr.translate(25, 5);
+    painter->setPen(GuiSettings::paramTextColor);
+    rr.translate(GuiSettings::socketWidth*2 + 20, 5);
     painter->drawText(rr,_param->getName());
     painter->restore();
 }
@@ -123,7 +122,10 @@ SocketItem::SocketItem(ParamBase *param, QGraphicsObject *parent) :
 { }
 
 QRectF SocketItem::boundingRect() const {
-    return QRectF(-1, -1, s_width+3, s_width+3);
+    QRectF out = QRectF(-GuiSettings::socketWidth/2, -GuiSettings::socketWidth/2,
+                         GuiSettings::socketWidth,  GuiSettings::socketWidth);
+    out.adjust(-2,-2,2,2);
+    return out;
 }
 
 void SocketItem::paint(QPainter *painter,
@@ -134,8 +136,11 @@ void SocketItem::paint(QPainter *painter,
     Q_UNUSED(widget);
 
     // Draw connector socket
-    painter->setBrush(Qt::red);
-    painter->drawEllipse(0, 0, s_width, s_width);
+    painter->setBrush(GuiSettings::socketFillColor);
+    painter->setPen(GuiSettings::socketOutlinePen);
+//    painter->drawEllipse(0, 0, GuiSettings::socketWidth, GuiSettings::socketWidth);
+    painter->drawRect(-GuiSettings::socketWidth/2, -GuiSettings::socketWidth/2,
+                      GuiSettings::socketWidth, GuiSettings::socketWidth);
 
     painter->restore();
 }
@@ -159,7 +164,6 @@ ConnectorItem::ConnectorItem(SocketItem *serverSocket, SocketItem *clientSocket,
 {
     // Connection arrows are always in back
     setZValue(1000.0);
-// TODO     setPen(QPen(myColor, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     updatePath();
 
     CHECKED_CONNECT(_serverSocket->parentObject()->parentObject(),
@@ -177,6 +181,8 @@ void ConnectorItem::gotMoved()
 
 QRectF ConnectorItem::boundingRect() const
 {
+    // XXX doesn't correctly handle the cubic.
+
     qreal extra = 20.; // XXX kinda arbitrary
     QPointF nStart = _serverSocket->scenePos();
     QPointF nEnd = _clientSocket->scenePos();
@@ -195,8 +201,8 @@ QRectF ConnectorItem::boundingRect() const
 
 void ConnectorItem::updatePath()
 {
-    _pStart = _serverSocket->scenePos() + QPointF(SocketItem::s_width/2., SocketItem::s_width/2.);
-    _pEnd   = _clientSocket->scenePos() + QPointF(SocketItem::s_width/2., SocketItem::s_width/2.);
+    _pStart = _serverSocket->scenePos(); // + QPointF(GuiSettings::socketWidth/2., GuiSettings::socketWidth/2.);
+    _pEnd   = _clientSocket->scenePos(); // + QPointF(GuiSettings::socketWidth/2., GuiSettings::socketWidth/2.);
 
     if (_path)
         delete _path;
@@ -213,11 +219,13 @@ void ConnectorItem::paint(QPainter *painter,
     Q_UNUSED(widget);
 
     painter->save();
-    QPen pen(GuiColors::connectorColor);
-    pen.setWidth(2);
-    painter->setPen(pen);
+    painter->setPen(GuiSettings::connectorPen);
     painter->setBrush(Qt::NoBrush);
     if (_path)
         painter->drawPath(*_path);
+
+    // TODO set ellipse pen brush & size
+    painter->drawEllipse(0,0,5,5);
+
     painter->restore();
 }

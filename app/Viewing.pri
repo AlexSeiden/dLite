@@ -17,7 +17,8 @@ SOURCES += \
     CueView.cpp \
     Whip.cpp \
     CueLibView.cpp \
-    settingsdialog.cpp
+    settingsdialog.cpp \
+    $$PWD/ColorButton.cpp
 
 HEADERS += \
     mainwidget.h \
@@ -36,4 +37,5 @@ HEADERS += \
     CueView.h \
     Whip.h \
     CueLibView.h \
-    settingsdialog.h
+    settingsdialog.h \
+    $$PWD/ColorButton.h

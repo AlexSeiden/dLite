@@ -2,7 +2,6 @@
 #define CUE_H
 
 #include "lightcolor.h"
-//#include "dancefloormodel.h"
 #include "Node.h"
 
 // Need forward class declaration, since both Cue.h and dancefloormodel.h include each other

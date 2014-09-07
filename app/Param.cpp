@@ -1,5 +1,6 @@
 #include "Param.h"
 #include "lightcolor.h"
+#include <QDebug>
 
 // These constants defined for convinience & speed when doing type checks.
 const std::type_info & paramTypeFloat = typeid(Param<float>);
@@ -15,7 +16,7 @@ bool ParamBase::isConnectableTo(ParamBase *otherParam)
         return false;
 
     // Check that the types match
-    if (typeid(this) != typeid(otherParam))
+    if (typeid(*this) != typeid(*otherParam))
         return false;
 
     // Make sure one is an input param and one is an output param
@@ -43,6 +44,58 @@ void ParamBase::connectParams(ParamBase *server, ParamBase *client)
        return;
    }
 
-   //qDebug() << "ERROR";
+   qDebug() << "ERROR--connectParams";
+}
+
+
+void ParamBase::connectTo(ParamBase *server)
+{
+    // This assumes that server and client have already
+    // been verified as being compatable:  i.e., server is an output,
+    // client is an input; they have the same type; etc.
+
+    this->_connectedNode = server->getParent();
+    // XXX theres got to be a better way to do this.
+    {
+    Param<int> *s = dynamic_cast<Param<int> *>(server);
+    Param<int> *c = dynamic_cast<Param<int> *>(this);
+    if (s && c) {
+        c->setProvider(s->getProvider());
+        return;
+    }
+    }
+
+    {
+    Param<float> *s = dynamic_cast<Param<float> *>(server);
+    Param<float> *c = dynamic_cast<Param<float> *>(this);
+    if (s && c) {
+        c->setProvider(s->getProvider());
+        return;
+    }
+    }
+
+    {
+    Param<Lightcolor> *s = dynamic_cast<Param<Lightcolor> *>(server);
+    Param<Lightcolor> *c = dynamic_cast<Param<Lightcolor> *>(this);
+    if (s && c) {
+        c->setProvider(s->getProvider());
+        return;
+    }
+    }
+
+    qDebug() << "ERROR--connectTo";
+
+    qDebug() << "as per typeid(*this/server):";
+    qDebug() << "thisType    " << typeid(*this).name();
+    qDebug() << "serverType  " << typeid(*server).name() << endl;
+
+    qDebug() << "as per _type:";
+    qDebug() << "thisType    " << this->_type.name();
+    qDebug() << "serverType  " << server->_type.name() << endl;
+
+    qDebug() << "as per getType:";
+    qDebug() << "thisType    " << this->getType().name();
+    qDebug() << "serverType  " << server->getType().name() << endl;
+
 
 }

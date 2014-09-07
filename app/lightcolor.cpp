@@ -1,4 +1,5 @@
 #include "lightcolor.h"
+#include <QDebug>
 
 Lightcolor::Lightcolor() : m_r(0), m_g(0), m_b(0) { }
 
@@ -105,6 +106,18 @@ Firing::Firing(Lightcolor color, float alpha, compmode_t compmode, decayfunc_t d
     _decayfunction(decayfunc),
     _cue(cue)
 { }
+
+void Firing::setDecay(int i) // TODO gross!
+{
+    if (i == 0)
+        _decayfunction = noDecay;
+    else if (i == 1)
+        _decayfunction = instantDecay;
+    else if (i == 2)
+        _decayfunction = exponentialDecay;
+    else
+        qDebug() << "setDecay called with bad arg " << i;
+}
 
 bool Firing::evaluate() {
     bool keep = true;

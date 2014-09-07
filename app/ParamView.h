@@ -20,7 +20,8 @@ class ParamView : public QWidget
 {
     Q_OBJECT
 public:
-    ParamView(QWidget *parent, QString name, ParamBase *param, bool inputConnection=true);
+    ParamView(QWidget *parent, QString name, ParamBase *param);
+    ParamView(QWidget *parent, ParamBase *param);
 
 public slots:
     // It would be nice to template these, but that won't work with QObject
@@ -43,7 +44,6 @@ private:
     QLabel          *_label;
     QWidget         *_genericEditorWidget;
     QHBoxLayout     *_layout;       // XXX might not need to save this.
-    bool            _inputConnection; // Stores whether this is an input or output connection
 };
 
 #endif // PARAMVIEW_H
