@@ -31,6 +31,9 @@
 // Hardware interface!
 // Need way of recalling instantiated nodes that have had their views closed
 
+// Cleaning:
+//      Remnants of original spectrum audio recording stuff in buffer length and
+//      window changed things
 
 // ------------------------------------------------------------------------------
 // NodeOnset

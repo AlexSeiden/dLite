@@ -8,21 +8,35 @@ SublevelNode::SublevelNode(QObject *parent) :
     QObject(parent),
     Node()
 {
-    _type = INT;
+    setName(QString("SublevelNode%1").arg(_nodeCount));
+    _type = FLOAT;
+
+    _output.setName("out");
+    _output.setConnectable(true);
+    _output.setOutput(true);
+
+    _paramList << &_output;
+    setParamParent();
+
     // TODO must connect
 //    CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(const FrequencySpectrum &)),
 //            this, SLOT(spectrumChanged(const FrequencySpectrum &)));
 }
 
 
-void SublevelNode::spectrumChanged(const FrequencySpectrum &spectrum)
+
+//void SublevelNode::spectrumChanged(const FrequencySpectrum &spectrum)
+void SublevelNode::spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum)
 {
+    Q_UNUSED(position)
+    Q_UNUSED(length)
+
     _spectrum = spectrum;
     if (_active) {
         calculateLevel();
         // TODO make sure levelChanged signal is connected to appropriate slot
         // in any subrangemeter widgets.
-        emit levelChanged(_level);
+        emit levelChanged(_output._value);
     }
 }
 
@@ -57,9 +71,28 @@ void SublevelNode::calculateLevel()
         clipped = true;
     }
 
-    _level = value;
-    emit levelChanged(_level);
+    _output._value = value;
+    emit levelChanged(_output._value);
 }
+
+void SublevelNode::operator()()
+{
+    // XXX TODO:  ALL OPERATOR()s need to only exec once per 'frame'!
+    // ??? could evaluate here, "pull" style:
+    // calculateLevel();
+    // rather than running whenever the spectrum is updated??
+
+    _output._qvOutput = _output._value;
+}
+
+void SublevelNode::beenSelected()
+{
+    // Tells the spectrograph to display the current subrange.
+    emit displayThisSubrange(_range);
+    emit iveBeenSelected(this);
+}
+
+static Registrar<SublevelNode>   registrar("SublevelNode", Node::FLOAT);
 
 #ifdef NUKEME
 // TODO

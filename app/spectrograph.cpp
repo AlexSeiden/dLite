@@ -14,7 +14,7 @@ Spectrograph::Spectrograph(QWidget *parent)
     ,   m_isDragging(false)
     ,   m_dragStart(QPoint(0,0))
     ,   m_rubberBand(NULL)
-    ,   selectedSublevelmeter(nullptr)
+    ,   _selectedSublevelNode(nullptr)
     ,   _showSubrange(false)
 {
     setMinimumHeight(100);
@@ -217,7 +217,9 @@ void Spectrograph::mouseReleaseEvent(QMouseEvent *event)
     _subrange.setWin(subrect);
 
     // TODO make sure appropriate subrange meter & node are listening!
-    emit subrangeHasChanged(&_subrange);
+//    emit subrangeHasChanged(&_subrange);
+    if (_selectedSublevelNode)
+        _selectedSublevelNode->setSubrange(_subrange);
 
     // Cleanup & redraw.
     m_rubberBand->hide();
@@ -393,9 +395,9 @@ void Spectrograph::printSpectrum() {
     m_printspectrum = true;
 }
 
-void Spectrograph::submeterSelectionChanged(SublevelMeter *chosen)
+void Spectrograph::submeterSelectionChanged(SublevelNode *chosen)
 {
-    selectedSublevelmeter = chosen;
+    _selectedSublevelNode = chosen;
 }
 
 void Spectrograph::displayThisSubrange(Subrange *subrange)

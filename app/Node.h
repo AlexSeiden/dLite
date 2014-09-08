@@ -36,8 +36,10 @@ public:
     QList<ParamBase *>  getParams()        {return _paramList;}
 
     void                setParamParent();
+    virtual void        beenSelected();
 
     static  int         _nodeCount;
+
 
 protected:
     void                evalAllInputs();
@@ -93,6 +95,9 @@ private:
     // Registry
     std::map<std::string, NodeInstatiator_t>  _registry;
     QMap<Node::node_t, QStringList> _registryByType;
+
+    // Inventory
+    QList<Node *>   _allNodes;
 };
 
 template<class T>

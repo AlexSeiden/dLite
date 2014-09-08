@@ -9,28 +9,9 @@
 
 // Nodes that interact with custom view widgets and/or get info
 // sent to them from the engine (and this does both) need to inherit from both
-//   "Node" (so they can be used by Cues)
 //   "QObject" (so they can have signals & slots)
-#if 0
-class SublevelAdaptor : public QObject
-{
-    Q_OBJECT
-
-public:
-    SublevelAdaptor();
-
-
-public slots:
-    void spectrumChanged(const FrequencySpectrum &spectrum);
-
-signals:
-    // used by SublevelMeter widget:
-    void levelChanged(qreal level);
-    // used by Spectrograph widget:
-    void showSubrange(const Subrange &subrange);
-
-};
-#endif
+//   "Node" (so they can be used by Cues)
+// Note that QObject must come first, as per Qt.
 
 class SublevelNode : public QObject, public Node
 {
@@ -38,26 +19,30 @@ class SublevelNode : public QObject, public Node
 
 public:
     SublevelNode(QObject *parent = 0);
-    void calculateLevel();
+    void operator() ();
+    void beenSelected();
 
+    void setSubrange(Subrange &range) {_range = range;}
 
 public slots:
-    void spectrumChanged(const FrequencySpectrum &spectrum);
+//    void spectrumChanged(const FrequencySpectrum &spectrum);
+    void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
 
 signals:
     // used by SublevelMeter widget:
     void levelChanged(qreal level);
     // used by Spectrograph widget:
-    void showSubrange(const Subrange &subrange);
+    void displayThisSubrange(const Subrange &subrange);
+    void iveBeenSelected(SublevelNode *me);
 
 private:
+    void calculateLevel();
+
     // Calculated by engine
     FrequencySpectrum   _spectrum;
 
-    // Height of level bar.
-    float       _level;
-
-    Subrange    _range;
+    Param<float>        _output;
+    Subrange            _range;
 };
 
 #endif // SUBLEVELNODE_H

@@ -103,6 +103,7 @@ void MainWidget::stateChanged(QAudio::State state)
 void MainWidget::spectrumChanged(qint64 position, qint64 length,
                                  const FrequencySpectrum &spectrum)
 {
+    // ??? Why don't we send signals to m_spectrograph & m_progressBar?
     m_progressBar->windowChanged(position, length);
     m_spectrograph->spectrumChanged(spectrum);
 }
@@ -311,8 +312,11 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_engine, SIGNAL(playPositionChanged(qint64)),
             this, SLOT(audioPositionChanged(qint64)));
 
-    CHECKED_CONNECT(m_controlpanel, SIGNAL(submeterSelectionChanged(SublevelMeter *)),
-            m_spectrograph, SLOT(submeterSelectionChanged(SublevelMeter *)));
+//    CHECKED_CONNECT(m_controlpanel, SIGNAL(submeterSelectionChanged(SublevelMeter *)),
+//            m_spectrograph, SLOT(submeterSelectionChanged(SublevelMeter *)));
+
+    CHECKED_CONNECT(m_spectrograph, SIGNAL(subrangeHasChanged(Subrange*)),
+            m_graphWidget, SLOT(subrangeHasChanged(Subrange*)));
 
     CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
             this, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));

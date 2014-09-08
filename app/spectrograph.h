@@ -4,6 +4,7 @@
 #include "frequencyspectrum.h"
 #include "Subrange.h"
 #include "sublevel.h"
+#include "SublevelNode.h"
 
 #include <QWidget>
 #include <QRubberBand>
@@ -43,7 +44,7 @@ public slots:
     void setFreqLo(int val);
     void setFreqHi(int val);
     void printSpectrum();
-    void submeterSelectionChanged(SublevelMeter *chosen);
+    void submeterSelectionChanged(SublevelNode *chosen);
     void displayThisSubrange(Subrange *subrange);
 
 private:
@@ -83,13 +84,9 @@ private:
     QPoint				m_dragStart;
     QRubberBand*		m_rubberBand;
 
-    SublevelMeter *     selectedSublevelmeter;
+    SublevelNode *      _selectedSublevelNode;
     bool                _showSubrange;
     Subrange            _subrange;
-
-    // Colors!
-    static QColor barColor;
-    static QColor clipColor;
 
 };
 

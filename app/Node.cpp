@@ -22,6 +22,8 @@ Node::node_t Node::getType()
 
 Node::~Node() {}
 
+void Node::beenSelected() {}
+
 // XXX gross.  at least, should be a better way to init this.
 // should be a better way to find out without having to maintain this.
 // kinda breaks encapsulation to have it in the first place.
@@ -110,9 +112,12 @@ Node * NodeFactory::instatiateNode(QString name)
 
     // find name in the registry and call factory method.
     NodeInstatiator_t instancer = _registry[name.toStdString()];
-    if (instancer)
-        instance = instancer();
+    if (! instancer)
+        return nullptr;
         // TODO error
+
+    instance = instancer();
+    _allNodes.append(instance); // XXX Hmmm, this might be a good place to use a weak ptr.
 
 #if 0
     // wrap instance in a shared ptr and return

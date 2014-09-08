@@ -6,6 +6,7 @@
 #include "Cuesheet.h"
 
 class Node;
+class Subrange;
 
 class GraphWidget : public QWidget
 {
@@ -17,6 +18,8 @@ signals:
 
 public slots:
     void addNode(Node *node);
+    void subrangeHasChanged(Subrange *subrange);
+    void selectionChanged();
     void buttclick();
 
 private:

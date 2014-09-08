@@ -22,8 +22,8 @@ SublevelMeter::SublevelMeter(QWidget *parent)
     ,   _selected(false)
     ,   _dragTarget(false)
 {
-    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    setMinimumWidth(30);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setFixedSize(30,100); // GUI
     setAcceptDrops(true);
 }
 

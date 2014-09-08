@@ -93,12 +93,10 @@ RandomInt::RandomInt() :
     _min(0),
     _max(20)
 {
-    setRandomEngine();
     setName(QString("RandomInt%1").arg(_nodeCount));
     _type = INT;
 
     // Declare params.
-    // TODO this could be factored out into static members.
     _output.setName("out");
     _output.setConnectable(true);
     _output.setOutput(true);
@@ -115,6 +113,9 @@ RandomInt::RandomInt() :
 
     _paramList << &_output << &_min << &_max;
     setParamParent();
+
+    // Specialized init for this node.  Will re-rerun if params edited.
+    setRandomEngine();
 }
 
 void RandomInt::paramHasBeenEdited()

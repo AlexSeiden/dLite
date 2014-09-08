@@ -24,6 +24,8 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
+    virtual void beenSelected();
+
 signals:
     void nodeMovedEventSignal();
 
@@ -34,7 +36,6 @@ protected:
 
 private:
     Node    *_node;
-    QVector<QPointF> stuff; // XXX from chip
 };
 
 

@@ -4,6 +4,8 @@
 #include "utils.h"
 #include <QtWidgets>
 #include <QPainterPath>
+#include "ParamView.h"
+#include <QGraphicsProxyWidget>
 
 // Classes for drawing the graph view representation of all the nodes.
 
@@ -19,7 +21,28 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     //setZValue((x + y) % 2); // TODO
 
     setFlags(ItemIsSelectable | ItemIsMovable);
-//    setAcceptHoverEvents(true);  do we want these? it was in chip.cpp
+
+    // Build ParamItems within node
+    int y = 0;
+    int yOffset = GuiSettings::paramHeight/2;
+    for (ParamBase *param : node->getParams()) {
+        y+=GuiSettings::paramHeight;
+        ParamItem *parItem = new ParamItem(param, this);
+        parItem->setPos(0,y);
+
+        // And build socket items within each param.
+        SocketItem *sockItem = new SocketItem(param, parItem);
+        parItem->setSocket(sockItem);
+        if (param->isOutput())
+            sockItem->setPos(GuiSettings::nodeWidth - GuiSettings::socketWidth, yOffset);
+        else
+            sockItem->setPos(GuiSettings::socketWidth,yOffset);
+
+        ParamView *pv = new ParamView(nullptr, param);
+        QGraphicsProxyWidget *proxy = this->scene()->addWidget(pv);
+        proxy->setParentItem(parItem);
+        proxy->setPos(GuiSettings::socketWidth * 2 +70, 0);
+    }
 }
 
 QRectF NodeItem::boundingRect() const
@@ -72,8 +95,17 @@ void NodeItem::paint(QPainter *painter,
 
 void NodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
+    // Used for updating any attached connectors.
     emit nodeMovedEventSignal();
     QGraphicsItem::mouseMoveEvent(event);
+}
+
+void NodeItem::beenSelected()
+{
+    // Forward selection to node, in case there's anything special to do
+    // (e.g. Sublevel nodes need to interact with the spectrograph;
+    //  path nodes will interact with the floor display.)
+    _node->beenSelected();
 }
 
 //-----------------------------------------------------------------------------

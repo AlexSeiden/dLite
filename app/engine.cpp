@@ -55,7 +55,7 @@ Engine::~Engine() { }
 
 void Engine::bungholio(int nDogs)
 {
-    qDebug() << "fakkck";
+    qDebug() << "fakkck" << nDogs;
 //    emit spectrumChanged(spectrum);
 }
 
