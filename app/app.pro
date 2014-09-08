@@ -33,7 +33,8 @@ SOURCES  += \
     SublevelNode.cpp \
     Subrange.cpp \
     RandomNode.cpp \
-    OKCupid.cpp
+    OKCupid.cpp \
+    SublevelNodeItem.cpp
 
 HEADERS  += \
     engine.h \
@@ -52,7 +53,8 @@ HEADERS  += \
     SublevelNode.h \
     Subrange.h \
     RandomNode.h \
-    OKCupid.h
+    OKCupid.h \
+    SublevelNodeItem.h
 
 fftreal_dir = ../3rdparty/fftreal
 

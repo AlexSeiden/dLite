@@ -15,3 +15,8 @@ void OKCupid::outputSeeksInput(ParamBase *param)
 {
 
 }
+
+OKCupid * OKCupid::Singleton() {
+    static OKCupid  _singleton;
+    return &_singleton;
+}

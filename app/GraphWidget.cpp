@@ -10,6 +10,7 @@
 #include <QGraphicsProxyWidget>
 
 #include "SublevelNode.h"
+#include "SublevelNodeItem.h"
 #include "sublevel.h"
 #include <QPushButton>
 
@@ -33,7 +34,8 @@ GraphWidget::GraphWidget(QWidget *parent) :
 
 void GraphWidget::selectionChanged()
 {
-    QList<QGraphicsItem *> selection = _scene->selectedItems();
+   QList<QGraphicsItem *> selection = _scene->selectedItems();
+    qDebug() << "selectionChanged" << selection;
     foreach (QGraphicsItem *item, selection) {
         NodeItem *nodeItem = dynamic_cast<NodeItem *>(item);
         if (nodeItem){
@@ -45,11 +47,13 @@ void GraphWidget::selectionChanged()
 void GraphWidget::subrangeHasChanged(Subrange *subrange)
 {
     QList<QGraphicsItem *> selection = _scene->selectedItems();
+    qDebug() << Q_FUNC_INFO << subrange;
 #if 0  // XXX
     foreach (QGraphicsItem *item, selection) {
         SublevelNodeItem *nodeItem = dynamic_cast<SublevelNodeItem *>(item);
-        if (nodeItem){
-            nodeItem->setRange(subrange);
+        if (nodeItem) {
+            SublevelNode *node= dynamic_cast<SublevelNode *>(nodeItem->getNode());
+            node->setSubrange(subrange);
         }
     }
 #endif
@@ -57,48 +61,18 @@ void GraphWidget::subrangeHasChanged(Subrange *subrange)
 
 void GraphWidget::addNode(Node *node)
 {
-    NodeItem *nodeItem = new NodeItem(node);
-    // XXX it seems kinda gross that we're doing this here...
-
+    NodeItem *nodeItem;
+    // GROSS
+    SublevelNode *sln = dynamic_cast<SublevelNode *>(node);
+    if (sln)
+        nodeItem = new SublevelNodeItem(node);
+    else
+        nodeItem = new NodeItem(node);
 
     // TODO better positioning.
     nodeItem->setPos(_numNodeItems*GuiSettings::nodeWidth*1.3,-200.);
     _numNodeItems++;
     _scene->addItem(nodeItem);
-
-#if 0
-    // Build ParamItems within node
-    int y = 0;
-    int yOffset = GuiSettings::paramHeight/2;
-    for (ParamBase *param : node->getParams()) {
-        y+=GuiSettings::paramHeight;
-        ParamItem *parItem = new ParamItem(param, nodeItem);
-        parItem->setPos(0,y);
-
-        // And build socket items within each param.
-        SocketItem *sockItem = new SocketItem(param, parItem);
-        parItem->setSocket(sockItem);
-        if (param->isOutput())
-            sockItem->setPos(GuiSettings::nodeWidth - GuiSettings::socketWidth, yOffset);
-        else
-            sockItem->setPos(GuiSettings::socketWidth,yOffset);
-
-        ParamView *pv = new ParamView(nullptr, param);
-        QGraphicsProxyWidget *proxy = _scene->addWidget(pv);
-        proxy->setParentItem(parItem);
-        proxy->setPos(GuiSettings::socketWidth * 2 +70, 0);
-    }
-#endif
-
-    // XXX
-    SublevelNode *sln = dynamic_cast<SublevelNode *>(node);
-    if (sln) {
-        SublevelMeter *slm = new SublevelMeter();
-        QGraphicsProxyWidget *proxy = _scene->addWidget(slm);
-        proxy->setParentItem(nodeItem);
-        proxy->setPos(GuiSettings::nodeWidth+2, 0);
-    }
-
 }
 
 void GraphWidget::buttclick()

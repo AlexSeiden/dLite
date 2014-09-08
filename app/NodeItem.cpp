@@ -22,7 +22,7 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
 
     setFlags(ItemIsSelectable | ItemIsMovable);
 
-    // Build ParamItems within node
+    // Make a ParamItem for every param in the node:
     int y = 0;
     int yOffset = GuiSettings::paramHeight/2;
     for (ParamBase *param : node->getParams()) {

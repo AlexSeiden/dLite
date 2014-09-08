@@ -1,5 +1,7 @@
 #include "SublevelNode.h"
 #include "utils.h"
+#include "OKCupid.h"
+#include "engine.h"
 
 // Sublevel node is unusual, since its Parameters are really the subrange
 // it operates on.  As such, it doesn't have "Params" like most other nodes
@@ -18,9 +20,18 @@ SublevelNode::SublevelNode(QObject *parent) :
     _paramList << &_output;
     setParamParent();
 
-    // TODO must connect
-//    CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(const FrequencySpectrum &)),
-//            this, SLOT(spectrumChanged(const FrequencySpectrum &)));
+    CHECKED_CONNECT(OKCupid::Singleton()->getEngine(),
+                    SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
+                    this,
+                    SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
+    CHECKED_CONNECT(OKCupid::Singleton()->getSpectrograph(),
+                    SIGNAL(subrangeHasChanged(Subrange *)),
+                    this,
+                    SLOT(setSubrange(Subrange *)));
+    CHECKED_CONNECT(this,
+                    SIGNAL(iveBeenSelected(SublevelNode*)),
+                    OKCupid::Singleton()->getSpectrograph(),
+                    SLOT(submeterSelectionChanged(SublevelNode *)));
 }
 
 

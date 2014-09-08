@@ -22,11 +22,12 @@ public:
     void operator() ();
     void beenSelected();
 
-    void setSubrange(Subrange &range) {_range = range;}
+    Subrange *getSubrange() {return &_range;}
+
 
 public slots:
-//    void spectrumChanged(const FrequencySpectrum &spectrum);
     void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
+    void setSubrange(Subrange *range) {_range = *range;}
 
 signals:
     // used by SublevelMeter widget:

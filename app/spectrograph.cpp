@@ -217,9 +217,9 @@ void Spectrograph::mouseReleaseEvent(QMouseEvent *event)
     _subrange.setWin(subrect);
 
     // TODO make sure appropriate subrange meter & node are listening!
-//    emit subrangeHasChanged(&_subrange);
-    if (_selectedSublevelNode)
-        _selectedSublevelNode->setSubrange(_subrange);
+    emit subrangeHasChanged(&_subrange);
+//    if (_selectedSublevelNode)
+//        _selectedSublevelNode->setSubrange(_subrange);
 
     // Cleanup & redraw.
     m_rubberBand->hide();
@@ -398,6 +398,7 @@ void Spectrograph::printSpectrum() {
 void Spectrograph::submeterSelectionChanged(SublevelNode *chosen)
 {
     _selectedSublevelNode = chosen;
+    displayThisSubrange(chosen->getSubrange());
 }
 
 void Spectrograph::displayThisSubrange(Subrange *subrange)

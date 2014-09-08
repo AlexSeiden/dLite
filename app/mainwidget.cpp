@@ -11,6 +11,7 @@
 #include "CueLibView.h"
 #include "GraphWidget.h"
 #include "RandomNode.h"
+#include "OKCupid.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -80,6 +81,12 @@ MainWidget::MainWidget(QWidget *parent)
 
     // TODO default to last played.
     m_engine->loadFile(QString("/Users/alex/Documents/lights/Jam On It/Jam On It.wav"));
+
+
+    // OK, these are essentially globals:  GROSS
+    OKCupid::Singleton()->setSpectrograph(m_spectrograph);
+    OKCupid::Singleton()->setDancefloormodel(m_dancefloormodel);
+    OKCupid::Singleton()->setEngine(m_engine);
 }
 
 MainWidget::~MainWidget() { }
