@@ -67,6 +67,13 @@ void NodeOnset::loadFile(std::string filename)
     filestream.close();
 }
 
+void NodeOnset::operator()()
+{
+    // XXX TODO:  ALL OPERATOR()s need to only exec once per 'frame'!
+
+    // TODO implement operator
+    _output._value = true;
+}
 
 // ------------------------------------------------------------------------------
 // NodeBar
@@ -95,5 +102,15 @@ void NodeBar::loadFile(std::string filename)
     filestream.close();
 }
 
+void NodeBar::operator()() {
+    // XXX TODO:  ALL OPERATOR()s need to only exec once per 'frame'!
+
+    // TODO implement operator
+//    _output._value = true;
+}
+
+
+// ------------------------------------------------------------------------------
+// Register
 static Registrar<NodeOnset>     registrar("Onset", Node::BEAT);
 static Registrar<NodeBar>       registrar2("Bar", Node::BEAT);

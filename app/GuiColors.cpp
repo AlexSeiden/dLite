@@ -10,7 +10,7 @@ QColor  GuiSettings::nodeBGColor          = QColor(120,100,60);
 QColor  GuiSettings::nodeTextColor        = QColor(255,255,255);
 QColor  GuiSettings::paramTextColor       = QColor(255,255,255);
 QColor  GuiSettings::paramFillColor       = QColor(120,100,60);
-int     GuiSettings::nodeWidth            = 200;                 // Width of the entire node
+int     GuiSettings::nodeWidth            = 230;                 // Width of the entire node
 int     GuiSettings::socketWidth          = 16;                 // Width of the socket connector rectangle
 int     GuiSettings::paramHeight          = 25;                 // Height of each param
 QColor  GuiSettings::selectedNodePenColor = QColor(255,100,100);
@@ -23,6 +23,7 @@ QColor  GuiSettings::df_panelSepColor     = QColor(255,255,200);
 QColor  GuiSettings::df_cellSepColor      = QColor(100,100,100);
 QColor  GuiSettings::df_noCellColor       = QColor(60,60,60);
 
+// Spectrograph
 QColor  GuiSettings::sg_barColor          = QColor(51, 204, 102);
 QColor  GuiSettings::sg_lineColor         = GuiSettings::sg_barColor.lighter();
 QColor  GuiSettings::sg_clipColor         = QColor(255, 255, 0);
@@ -30,6 +31,7 @@ QColor  GuiSettings::sg_gridColor         = GuiSettings::sg_barColor.darker();
 QColor  GuiSettings::sg_bg                = QColor(0,0,0);
 QColor  GuiSettings::sg_textColor         = QColor(230,230,255);
 QColor  GuiSettings::sg_sublevelRegion    = QColor(20,20,255);
+int     GuiSettings::sg_sublevelPenwidth  = 2;
 int     GuiSettings::sg_textHeight        = 20;
 int     GuiSettings::sg_textOffset        = GuiSettings::sg_textHeight/4;
 

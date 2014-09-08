@@ -116,6 +116,10 @@ Dancefloormodel::printLayout()
 #ifndef INLINE
 int Dancefloormodel::_getIndex(int x, int y)
 {
+    if (!(x >= 0 && x < xsize && y >= 0 && y < ysize)) {
+        qDebug() << "BOUNDS ERROR: " <<x <<y;
+        qDebug() << "MAX SIZE    : " <<xsize <<ysize;
+    }
     Q_ASSERT(x >= 0 && x < xsize && y >= 0 && y < ysize);
     return xsize*y + x;
 }

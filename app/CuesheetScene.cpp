@@ -64,6 +64,9 @@ QGraphicsItem *CuesheetScene::findFirstReleventItem(QList<QGraphicsItem *> &endI
 
         SocketItem *targetSocket = getSocket(out);
         // Test for type compatability, source & sink, etc.
+        if (! targetSocket)
+            return nullptr;
+
         if (! _sourceSocket->getParam()->isConnectableTo(targetSocket->getParam()))
             // Same return logic as above
             return nullptr;
@@ -136,7 +139,7 @@ SocketItem *CuesheetScene::getSocket(QGraphicsItem *item)
     if (sock)
         return sock;
 
-    // OK, that didn't work.  Let's try a param.
+    // OK, it's not a socket.  Let's try a param.
     ParamItem *paramItem;
     paramItem = dynamic_cast<ParamItem *>(item);
     if (paramItem) {

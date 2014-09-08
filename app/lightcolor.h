@@ -40,6 +40,7 @@ private:
     int m_r, m_g, m_b;
 };
 
+Q_DECLARE_METATYPE(Lightcolor)
 
 // -----------------------------------------------------------------------------
 // Firing

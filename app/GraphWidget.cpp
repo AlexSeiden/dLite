@@ -50,19 +50,10 @@ void GraphWidget::addNode(Node *node)
         else
             sockItem->setPos(GuiSettings::socketWidth,yOffset);
 
-        // Testing
-#if 0
-        QPushButton *toolbutt = new QPushButton(QString::number(y));
-        QGraphicsProxyWidget *proxy = _scene->addWidget(toolbutt);
-        proxy->setParentItem(parItem);
-        proxy->setPos(GuiSettings::socketWidth * 2 +10, 0);
-        CHECKED_CONNECT(toolbutt, SIGNAL(clicked()), this, SLOT(buttclick()));
-#else
         ParamView *pv = new ParamView(nullptr, param);
         QGraphicsProxyWidget *proxy = _scene->addWidget(pv);
         proxy->setParentItem(parItem);
-        proxy->setPos(GuiSettings::socketWidth * 2 +50, 0);
-#endif
+        proxy->setPos(GuiSettings::socketWidth * 2 +70, 0);
     }
 }
 

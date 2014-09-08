@@ -30,9 +30,8 @@ public slots:
     void setValue(int val);
     void setValue(Lightcolor val);
 
-    void setProvider(std::function<void(float&)> closure);
-    void setProvider(std::function<void(int&)> closure);
-    void setProvider(std::function<void(Lightcolor&)> closure);
+    void setProvider(std::function<void()> closure);
+//    void setProvider(std::function<void(Lightcolor&)> closure);
 
     void launchColorDialog();
 

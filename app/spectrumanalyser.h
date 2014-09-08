@@ -107,6 +107,7 @@ public:
 
 signals:
     void spectrumChanged(const FrequencySpectrum &spectrum);
+    void dogsFuckedPope(int nDogs);
 
 private slots:
     void calculationComplete(const FrequencySpectrum &spectrum);

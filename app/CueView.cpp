@@ -30,6 +30,7 @@ CueBoxView::CueBoxView(CueBox *cue, QWidget *parent) :
 
 // ------------------------------------------------------------------------------
 
+#ifdef NUKEME
 RandomNodeView::RandomNodeView(RandomFloat *randomNode, QWidget *parent) :
     QWidget(parent),
     _node(randomNode)
@@ -49,3 +50,4 @@ RandomNodeView::RandomNodeView(RandomFloat *randomNode, QWidget *parent) :
     layout->addStretch();
     this->setLayout(layout);
 }
+#endif

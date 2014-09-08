@@ -98,6 +98,7 @@ public slots:
      * Set update interval
      */
     void setInterval(int val);
+    void bungholio(int nDogs);
 
 signals:
     void stateChanged(QAudio::State state);

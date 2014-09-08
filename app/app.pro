@@ -29,7 +29,11 @@ SOURCES  += \
     Cue.cpp \
     CueBox.cpp \
     BeatFiles.cpp \
-    Node.cpp
+    Node.cpp \
+    SublevelNode.cpp \
+    Subrange.cpp \
+    RandomNode.cpp \
+    OKCupid.cpp
 
 HEADERS  += \
     engine.h \
@@ -44,7 +48,11 @@ HEADERS  += \
     Cue.h \
     CueBox.h \
     BeatFiles.h \
-    Node.h
+    Node.h \
+    SublevelNode.h \
+    Subrange.h \
+    RandomNode.h \
+    OKCupid.h
 
 fftreal_dir = ../3rdparty/fftreal
 

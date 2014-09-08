@@ -1,11 +1,19 @@
 #include "Param.h"
 #include "lightcolor.h"
 #include <QDebug>
+#include "Node.h"
 
 // These constants defined for convinience & speed when doing type checks.
 const std::type_info & paramTypeFloat = typeid(Param<float>);
 const std::type_info & paramTypeInt = typeid(Param<int>);
 const std::type_info & paramTypeLcolor = typeid(Param<Lightcolor>);
+
+std::function<void()> ParamBase::getProvider()
+{
+        // The node implements operator() to create closure/functor.
+        // All output values will be updated.
+        return [this]() {(*this->_parentNode)();};
+}
 
 bool ParamBase::isConnectableTo(ParamBase *otherParam)
 {
@@ -31,6 +39,7 @@ bool ParamBase::isConnectableTo(ParamBase *otherParam)
     return true;
 }
 
+
 void ParamBase::connectParams(ParamBase *server, ParamBase *client)
 {
     // This assumes that server and client have already
@@ -55,6 +64,7 @@ void ParamBase::connectTo(ParamBase *server)
     // client is an input; they have the same type; etc.
 
     this->_connectedNode = server->getParent();
+    this->_connectedParam = server;
     // XXX theres got to be a better way to do this.
     {
     Param<int> *s = dynamic_cast<Param<int> *>(server);
@@ -99,3 +109,4 @@ void ParamBase::connectTo(ParamBase *server)
 
 
 }
+

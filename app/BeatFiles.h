@@ -13,6 +13,8 @@ class NodeOnset : public Node
 {
 public:
     NodeOnset();
+    void operator() (void);
+
     int     getNextBeat(int sample);
 
     void    loadFile(std::string filename);
@@ -37,6 +39,7 @@ class NodeBar : public Node
 {
 public:
     NodeBar();
+    void    operator() (void);
     int     getNextBeat(int sample);
 
     void    loadFile(std::string filename);

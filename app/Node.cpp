@@ -5,11 +5,15 @@
 //  Node
 //  base class
 
+int Node::_nodeCount = 0;
+
 Node::Node() :
     _name(QString()),
     _active(true),
     _type(UNDEFINED)
-{ }
+{
+    _nodeCount++;
+}
 
 Node::node_t Node::getType()
 {
@@ -28,29 +32,20 @@ void Node::setParamParent()
     }
 }
 
-// ------------------------------------------------------------------------------
-//  TriggerEvery
-//  Impulse class
-
-void TriggerEvery::operator()(bool &value)
+void Node::evalAllInputs()
 {
-    if (getCurrentTime() > _nextRefresh) {
-       _value = true;
-       _lastRefresh = _nextRefresh;
-       _nextRefresh += _interval;
+    foreach (ParamBase *p, getParams()) {
+        if (! p->isOutput()) {
+            p->eval();
+        }
     }
-    value = _value;
-
-    // Clear a "true" value after it's been read.
-    // XXX This assumes that this node is only connected to one output;
-    _value = false;
 }
-
 
 // ------------------------------------------------------------------------------
 //  Color ramp
 //      Mix between two colors
 ColorRamp::ColorRamp() :
+    Node(),
     _output(0),
     _c0(0),
     _c1(1),
@@ -78,156 +73,20 @@ ColorRamp::ColorRamp() :
     _paramList << &_output << &_c0 << &_c1 << &_mix;
 }
 
-void ColorRamp::operator()(Lightcolor &value)
+void ColorRamp::operator()()
 {
-    Lightcolor c0, c1;
-    _c0.getValue(c0);
-    _c1.getValue(c1);
-
-    float t;
-    _mix.getValue(t);
+    evalAllInputs();
 
     Lightcolor part0, part1;
-    part0 = c0*(1.0-t);     // XXX Doesn't seem to compile if float is first.
-    part1 = c1*t;
+    part0 = _c0._value*(1.0-_mix._value);     // XXX Doesn't seem to compile if float is first.
+    part1 = _c1._value*_mix._value;
 
 //    _value = (1.0-t)*c0 + t*c1;
-    _value = part0 + part1;
-
-    value = _value;
+    _output._value = part0 + part1;
 }
 
 // ------------------------------------------------------------------------------
-//  RandomFloat
-
-RandomFloat::RandomFloat() :
-    _value(0.0),
-    _output(0.0),
-    _min(0.0),
-    _max(1.0)
-{
-    setRandomEngine();
-    setName("RandomFloat");
-    _type = FLOAT;
-
-    // Declare params.
-    // TODO this could be factored out into static members.
-    _output.setName("out");
-    _output.setOutput(true);
-    _output.setConnectable(true);
-
-    _min.setName("min");
-    _min.setOutput(false);
-    _min.setConnectable(true);
-
-    _max.setName("max");
-    _max.setOutput(false);
-    _max.setConnectable(true);
-
-    _paramList << &_output << &_min << &_max;
-}
-
-
-
-void RandomFloat::setRandomEngine()
-{
-    std::random_device rd;
-    // Seed the "Mersenne Twister" random number generator from random_device
-    _randGenerator = new std::mt19937(rd());
-    // Initialize the distrubution on the range [_min, _max)
-    // NOTE:  this is the HALF-OPEN interval--inclusive of min, but exclusive of max
-    float min, max;
-    _min.getValue(min);
-    _max.getValue(max);
-    // TODO re-run this when distributions change.
-    // XXX if these are connections, this is going to break.
-    // Do we want a "non-animating" parameter class, or flag?
-    _distribution = new std::uniform_real_distribution<float>(min, max);
-}
-
-
-void RandomFloat::operator()(float &value)
-{
-    // First, check the trigger to see if it's time for a new number
-    bool trigVal = true;
-    //XXX _trigger(trigVal);
-    if (trigVal) {
-        _value =  (*_distribution)(*_randGenerator);
-    }
-
-    qDebug() << _value;
-
-    value = _value;
-}
-
-// ------------------------------------------------------------------------------
-//  RandomInt
-
-RandomInt::RandomInt() :
-    _value(0),
-    _output(0),
-    _min(0),
-    _max(20)
-{
-    setRandomEngine();
-    setName("RandomInt");
-    _type = INT;
-
-    // Declare params.
-    // TODO this could be factored out into static members.
-    _output.setName("out");
-    _output.setOutput(true);
-    _output.setConnectable(true);
-
-    _min.setName("min");
-    _min.setOutput(false);
-    _min.setConnectable(true);
-
-    _max.setName("max");
-    _max.setOutput(false);
-    _max.setConnectable(true);
-
-    _paramList << &_output << &_min << &_max;
-    setParamParent();
-}
-
-
-
-void RandomInt::setRandomEngine()
-{
-    std::random_device rd;
-    // Seed the "Mersenne Twister" random number generator from random_device
-    _randGenerator = new std::mt19937(rd());
-    // Initialize the distrubution on the range [_min, _max]
-    // NOTE:  this is the CLOSED interval--inclusive of both min and max.
-    int min, max;
-    _min.getValue(min);
-    _max.getValue(max);
-    // TODO re-run this when distributions change.
-    // XXX if these are connections, this is going to break.
-    // Do we want a "non-animating" parameter class, or flag?
-    _distribution = new std::uniform_int_distribution<int>(min, max);
-}
-
-
-void RandomInt::operator()(int &value)
-{
-    // XXX TODO:  ALL OPERATOR()s need to only exec once per 'frame'!
-
-    // First, check the trigger to see if it's time for a new number
-    bool trigVal = true;
-    //XXX _trigger(trigVal);
-    if (trigVal) {
-        _value =  (*_distribution)(*_randGenerator);
-    }
-    qDebug () << "randint" << _value;
-
-    value = _value;
-}
-
-
-// ------------------------------------------------------------------------------
-//  NodePrototypes
+//  Node Factory
 
 NodeFactory::NodeFactory() {}
 
@@ -268,18 +127,21 @@ Node * NodeFactory::instatiateNode(QString name)
 }
 
 NodeFactory * NodeFactory::Singleton() {
-    // We need this--rather than just using a single instance of NodeFactory--
+    // First, the NodeFactory obviously needs to be a singleton, since
+    // we don't want/need a bunch of separate factories or registries!
+    //
+    // We need to implement it this way--rather than just using a single
+    // instance of NodeFactory--
     // so that we get the right order of initialization, and the Registrar
     // won't be trying to access an uninitialized factory.
     static NodeFactory factory;
     return &factory;
 }
 
+// Return all nodes of a given type.
 const QStringList & NodeFactory::getNodesOfType(Node::node_t typeInfo) {
     return _registryByType[typeInfo];
 }
 
 
-static Registrar<RandomFloat>   registrar("RandomFloat", Node::FLOAT);
-static Registrar<RandomInt>     registrar2("RandomInt", Node::INT);
 static Registrar<ColorRamp>     registrar3("ColorRamp", Node::COLOR);

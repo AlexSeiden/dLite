@@ -25,6 +25,7 @@ private:
     ParamView *_colorParamVu;
 };
 
+#ifdef NUKEME
 class RandomNodeView : public QWidget
 {
     Q_OBJECT
@@ -37,5 +38,6 @@ private:
     ParamView *_minParamVu;
     ParamView *_maxParamVu;
 };
+#endif
 
 #endif // CUEVIEW_H

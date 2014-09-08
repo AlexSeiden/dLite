@@ -14,10 +14,7 @@ ProgressBar::ProgressBar(QWidget *parent)
     setMinimumHeight(30);
 }
 
-ProgressBar::~ProgressBar()
-{
-
-}
+ProgressBar::~ProgressBar() { }
 
 void ProgressBar::reset()
 {

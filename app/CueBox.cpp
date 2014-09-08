@@ -39,18 +39,17 @@ CueBox::CueBox() :
     _paramList << &_x <<&_y <<&_scale << &_alpha << &_color;
 }
 
+void CueBox::operator ()() {
+    evaluate();
+}
 
 void CueBox::evaluate()
 {
     if (!_active) return;
 
-    // Evaluate all attachable params:
-    int x=0;
-    int y=0;
-    Lightcolor color;
-    float alpha=1.0;
-    _x.getValue(x);
-    qDebug() << "x getvalue " << x;
+    evalAllInputs();
+
+//    qDebug() << "x getvalue " << x;
 
 //    int otherx;
 //    std::function<void(int &value)> lp = _x.getProvider();
@@ -58,23 +57,28 @@ void CueBox::evaluate()
 //    qDebug() << "other x    " << otherx;
 //    (*_x._connectedNode)(otherx);
 
-    RandomInt *rn = dynamic_cast<RandomInt *>(_x._connectedNode);
-    int rnx = -1;
-    (*rn)(rnx);
-    qDebug() << "rnx        " << rnx;
+//    RandomInt *rn = dynamic_cast<RandomInt *>(_x._connectedNode);
+//    int rnx = -1;
+//    (*rn)(rnx);
+//    qDebug() << "rnx        " << rnx;
 
 
 
-    _y.getValue(y);
+    Lightcolor color;
+    float alpha;
+    int x,y;
+
     _color.getValue(color);
     _alpha.getValue(alpha);
+    _x.getValue(x);
+    _y.getValue(y);
     color *= alpha;
 
     // "Fire" the light with the correct parameters
     Firing *firing = new Firing;
     firing->_color = color;
     firing->_alpha = alpha;
-    firing->setDecay(1);
+    firing->setDecay(1);    // TODO
     _dfModel->fireLight(x, y, firing);
 }
 

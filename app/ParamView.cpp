@@ -4,6 +4,7 @@
 #include "utils.h"
 
 // This is the param view for use in the graph view
+// TODO unify these
 ParamView::ParamView(QWidget *parent, ParamBase *param ) :
     QWidget(parent),
     _name(param->getName()),
@@ -31,7 +32,7 @@ ParamView::ParamView(QWidget *parent, ParamBase *param ) :
     else if (paramType == paramTypeInt){
         Param<int> * intParam = dynamic_cast<Param<int> *>(_param);
         QSpinBox *editorWidget = new QSpinBox;
-        editorWidget->setRange(1, 20);
+        editorWidget->setRange(0, 20);
         editorWidget->setSingleStep(1);
         _genericEditorWidget = editorWidget;
         _genericEditorWidget->setFixedSize(60,22);
@@ -154,30 +155,32 @@ void ParamView::launchColorDialog() {
 // It would be nice to template these, but that won't work with QObject
 // derived classes and the Qt moc.
 void ParamView::setValue(double val) {
-   Param<float> *p = dynamic_cast<Param<float> *>(this->_param);
-   Q_ASSERT(p);
-   p->setValue(val);
+    Param<float> *p = dynamic_cast<Param<float> *>(this->_param);
+    Q_ASSERT(p);
+    p->setValue(val);
+    p->_parentNode->paramHasBeenEdited();
 }
 
 void ParamView::setValue(int val) {
-   Param<int> *p = dynamic_cast<Param<int> *>(this->_param);
-   Q_ASSERT(p);
-   p->setValue(val);
+    Param<int> *p = dynamic_cast<Param<int> *>(this->_param);
+    Q_ASSERT(p);
+    p->setValue(val);
+    p->_parentNode->paramHasBeenEdited();
 }
 
 void ParamView::setValue(Lightcolor val) {
-   Param<Lightcolor> *p = dynamic_cast<Param<Lightcolor> *>(this->_param);
-   Q_ASSERT(p);
-   p->setValue(val);
+    Param<Lightcolor> *p = dynamic_cast<Param<Lightcolor> *>(this->_param);
+    Q_ASSERT(p);
+    p->setValue(val);
+    p->_parentNode->paramHasBeenEdited();
 }
 
-void ParamView::setProvider(std::function<void(float&)> closure) {
-   Param<float> *p = dynamic_cast<Param<float> *>(this->_param);
-   Q_ASSERT(p);
-   p->setProvider(closure);
+void ParamView::setProvider(std::function<void()> closure) {
+   this->setProvider(closure);
 }
 
-void ParamView::setProvider(std::function<void(int&)> closure) {
+#if 0
+void ParamView::setProvider(std::function<void()> closure) {
    Param<int> *p = dynamic_cast<Param<int> *>(this->_param);
    Q_ASSERT(p);
    p->setProvider(closure);
@@ -188,3 +191,4 @@ void ParamView::setProvider(std::function<void(Lightcolor&)> closure) {
    Q_ASSERT(p);
    p->setProvider(closure);
 }
+#endif

@@ -48,6 +48,7 @@ public:
     static QColor  sg_bg;
     static QColor  sg_textColor;
     static QColor  sg_sublevelRegion;
+    static int     sg_sublevelPenwidth;
     static int     sg_textHeight;
     static int     sg_textOffset;
 

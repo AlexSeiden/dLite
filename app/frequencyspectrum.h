@@ -2,6 +2,7 @@
 #define FREQUENCYSPECTRUM_H
 
 #include <QtCore/QVector>
+#include <QMetaType>
 
 /**
  * Represents a frequency spectrum as a series of elements, each of which
@@ -49,5 +50,7 @@ private:
     QVector<Element> m_elements;
 
 };
+
+Q_DECLARE_METATYPE(FrequencySpectrum)
 
 #endif // FREQUENCYSPECTRUM_H

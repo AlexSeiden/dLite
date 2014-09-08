@@ -2,6 +2,7 @@
 #define SPECTROGRAPH_H
 
 #include "frequencyspectrum.h"
+#include "Subrange.h"
 #include "sublevel.h"
 
 #include <QWidget>
@@ -14,8 +15,6 @@
 class Spectrograph : public QWidget
 {
     Q_OBJECT
-
-    friend class Subrange;      // TODO remove
 
 public:
     explicit Spectrograph(QWidget *parent = 0);
@@ -35,6 +34,7 @@ public:
 
 signals:
     void infoMessage(const QString &message, int intervalMs);
+    void subrangeHasChanged(Subrange *subrange);
 
 public slots:
     void reset();
@@ -44,6 +44,7 @@ public slots:
     void setFreqHi(int val);
     void printSpectrum();
     void submeterSelectionChanged(SublevelMeter *chosen);
+    void displayThisSubrange(Subrange *subrange);
 
 private:
     int barIndex(qreal frequency) const;
@@ -83,6 +84,8 @@ private:
     QRubberBand*		m_rubberBand;
 
     SublevelMeter *     selectedSublevelmeter;
+    bool                _showSubrange;
+    Subrange            _subrange;
 
     // Colors!
     static QColor barColor;

@@ -1,11 +1,11 @@
 #ifndef NODE_H
 #define NODE_H
 #include "Param.h"
-#include <random>
 #include <QList>
 #include <QString>
 #include <QStringList>
 #include <QMap>
+#include <QVariant>
 #include <functional>
 
 
@@ -19,6 +19,13 @@ public:
     Node();
     virtual ~Node();
 
+    // Functor that provides closure over instance object,
+    // and allows downstream clients to evaluate.
+    virtual void operator() (void) = 0;
+
+    // Called by editor widgets when a parameter has been changed.
+    virtual void paramHasBeenEdited() {}
+
     const QString &     getName() const {return _name;}
     void                setName(const QString name) {_name = name;}
 
@@ -30,37 +37,15 @@ public:
 
     void                setParamParent();
 
+    static  int         _nodeCount;
 
 protected:
+    void                evalAllInputs();
+
     QString               _name;
     bool                  _active;
-    QList<ParamBase *>    _paramList;       // Could be static
+    QList<ParamBase *>    _paramList;
     node_t                _type;
-};
-
-
-class TriggerEvery : public Node
-{
-
-public:
-    TriggerEvery() {}
-
-    void setTriggerInterval(int interval) {_interval = interval;}
-    void operator() (bool &value);
-
-private:
-    void    reset() {_value = false;}
-
-    bool    _value;
-
-    // These are in milliseconds
-    // Parameters
-    int     _interval;
-    //int     _refreshOffset; // TODO
-
-    // Internal timekeepers
-    int     _lastRefresh;
-    int     _nextRefresh;
 };
 
 class ColorRamp : public Node
@@ -70,11 +55,9 @@ public:
 
     // Functor that provides closure over instance object,
     // and allows downstream clients to evaluate.
-    void operator() (Lightcolor &value);
+    void operator() ();
 
 private:
-    Lightcolor   _value; // XXX is this now redundant to "output"?
-
     // Parameters
     Param<Lightcolor> _output;
     Param<Lightcolor> _c0;
@@ -83,58 +66,6 @@ private:
 
 private:
 
-};
-
-class RandomFloat : public Node
-{
-public:
-    RandomFloat();
-
-    // Functor that provides closure over instance object,
-    // and allows downstream clients to evaluate.
-    void operator() (float &value);
-
-//private:  // XXX
-    float   _value;
-
-    // Parameters
-    Param<float> _output;
-    Param<float> _min;
-    Param<float> _max;
-//    TriggerEvery _trigger;
-
-private:
-    void  setRandomEngine();
-
-    // Random number generator
-    std::mt19937 *_randGenerator;
-    std::uniform_real_distribution<float> *_distribution;
-};
-
-class RandomInt : public Node
-{
-public:
-    RandomInt();
-
-    // Functor that provides closure over instance object,
-    // and allows downstream clients to evaluate.
-    void operator() (int &value);
-
-//private:  // XXX
-    int   _value;
-
-    // Parameters
-    Param<int> _output;
-    Param<int> _min;
-    Param<int> _max;
-//    TriggerEvery _trigger;
-
-private:
-    void  setRandomEngine();
-
-    // Random number generator
-    std::mt19937 *_randGenerator;
-    std::uniform_int_distribution<int> *_distribution;
 };
 
 // NodeFactory

@@ -9,6 +9,8 @@ public:
     CueBox();
     void evaluate();
 
+    void operator() (void);
+
     friend class CueBoxView;
 
 protected:

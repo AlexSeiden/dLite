@@ -1,5 +1,4 @@
 #include "engine.h"
-#include "levelmeter.h"
 #include "sublevel.h"
 #include "mainwidget.h"
 #include "progressbar.h"
@@ -11,6 +10,7 @@
 #include "CueView.h"
 #include "CueLibView.h"
 #include "GraphWidget.h"
+#include "RandomNode.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -30,7 +30,6 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_engine(new Engine(this))
     ,   m_progressBar(new ProgressBar(this))
     ,   m_spectrograph(new Spectrograph(this))
-    ,   m_levelMeter(new LevelMeter(this))
     ,   m_fileButton(new QPushButton(this))
     ,   m_pauseButton(new QPushButton(this))
     ,   m_playButton(new QPushButton(this))
@@ -95,18 +94,8 @@ void MainWidget::stateChanged(QAudio::State state)
     updateButtonStates();
 
     if (QAudio::ActiveState != state && QAudio::SuspendedState != state) {
-        m_levelMeter->reset();
         m_spectrograph->reset();
     }
-}
-
-// TODO decouple position & spectrum change
-// They are artificially coupled in engine.cpp
-void MainWidget::spectrumChanged(qint64 position, qint64 length,
-                                 const FrequencySpectrum &spectrum)
-{
-    m_progressBar->windowChanged(position, length);
-    m_spectrograph->spectrumChanged(spectrum);
 }
 
 void MainWidget::infoMessage(const QString &message, int timeoutMs)
@@ -127,6 +116,7 @@ void MainWidget::errorMessage(const QString &heading, const QString &detail)
     QMessageBox::warning(this, heading, detail, QMessageBox::Close);
 }
 
+
 void MainWidget::timerEvent(QTimerEvent *event)
 {
     Q_ASSERT(event->timerId() == m_infoMessageTimerId);
@@ -139,6 +129,7 @@ void MainWidget::timerEvent(QTimerEvent *event)
 void MainWidget::audioPositionChanged(qint64 position)
 {
     Q_UNUSED(position)
+    // WTF
 }
 
 void MainWidget::bufferLengthChanged(qint64 length)
@@ -183,13 +174,11 @@ void MainWidget::createUi()
 
     m_infoMessage->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     m_infoMessage->setAlignment(Qt::AlignHCenter);
-    //windowLayout->addWidget(m_infoMessage);
 
     windowLayout->addWidget(m_progressBar);
 
-    // Spectrograph and level meter
+    // Spectrograph
     QScopedPointer<QHBoxLayout> analysisLayout(new QHBoxLayout);
-    analysisLayout->addWidget(m_levelMeter);
     analysisLayout->addWidget(m_spectrograph);
     windowLayout->addLayout(analysisLayout.data());
     analysisLayout.take();
@@ -313,15 +302,15 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_engine, SIGNAL(playPositionChanged(qint64)),
             this, SLOT(audioPositionChanged(qint64)));
 
-    CHECKED_CONNECT(m_engine, SIGNAL(levelChanged(qreal, qreal, int)),
-            m_levelMeter, SLOT(levelChanged(qreal, qreal, int)));
-
     CHECKED_CONNECT(m_controlpanel, SIGNAL(submeterSelectionChanged(SublevelMeter *)),
             m_spectrograph, SLOT(submeterSelectionChanged(SublevelMeter *)));
 
-    CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
-            this, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
+    CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(const FrequencySpectrum &)),
+            m_spectrograph, SLOT(spectrumChanged(const FrequencySpectrum &)));
 
+
+#ifdef NUKEME
+    // Info & error messages--now obsolete?
     CHECKED_CONNECT(m_engine, SIGNAL(infoMessage(QString, int)),
             this, SLOT(infoMessage(QString, int)));
 
@@ -330,7 +319,9 @@ void MainWidget::connectUi()
 
     CHECKED_CONNECT(m_spectrograph, SIGNAL(infoMessage(QString, int)),
             this, SLOT(infoMessage(QString, int)));
+#endif
 
+    // TODO Move to Spectrograph, or settings dialog
     CHECKED_CONNECT(m_numBandsSpinBox, SIGNAL(valueChanged(int)),
             m_spectrograph, SLOT(setNumBars(int)));
 
@@ -343,9 +334,10 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_specMaxSpinBox, SIGNAL(valueChanged(int)),
             m_spectrograph, SLOT(setFreqHi(int)));
 
+
+
     CHECKED_CONNECT(m_cueLibView, SIGNAL(newNodeRequest(QString)),
                     this, SLOT(newNodeRequest(QString)));
-
 
 }
 
@@ -363,7 +355,6 @@ void MainWidget::updateButtonStates()
 void MainWidget::reset()
 {
     m_engine->reset();
-    m_levelMeter->reset();
     m_spectrograph->reset();
     m_progressBar->reset();
 }
@@ -375,6 +366,7 @@ void MainWidget::newNodeRequest(QString name)
 {
     // TODO generate this list from a single place, where all cues are listed,
     // and the same place is used for the CueLib
+    // move to cuelibview.cpp
     Node *newNode;
 
     newNode = NodeFactory::Singleton()->instatiateNode(name);

@@ -41,17 +41,6 @@ void SpectrumAnalyserThread::setWindowFunction(WindowFunction type)
     calculateWindow();
 }
 
-#if 0
-void SpectrumAnalyserThread::setSubrange(qreal minFreq, qreal maxFreq, qreal minAmp, qreal maxAmp)
-{
-    minfreq = minFreq;
-    maxfreq = maxFreq;
-    minamp = minAmp;
-    maxamp = maxAmp;
-    subrangeMetering = true;
-}
-#endif
-
 /*
  * Pre-calculates a weighting window to convolve with the audio
  * samples prior to fft.
@@ -210,7 +199,9 @@ void SpectrumAnalyser::cancelCalculation()
 void SpectrumAnalyser::calculationComplete(const FrequencySpectrum &spectrum)
 {
     Q_ASSERT(Idle != m_state);
-    if (Busy == m_state)
+    if (Busy == m_state) {
         emit spectrumChanged(spectrum);
+        emit dogsFuckedPope(12);
+    }
     m_state = Idle;
 }

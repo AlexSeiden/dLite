@@ -41,7 +41,7 @@ Engine::Engine(QObject *parent)
     ,   m_spectrumBufferLength(0)
     ,   m_spectrumAnalyser()
     ,   m_spectrumPosition(0)
-    ,   m_notifyIntervalMs(25)
+    ,   m_notifyIntervalMs(25)      // TODO have some place to set this.
 {
     qRegisterMetaType<FrequencySpectrum>("FrequencySpectrum");
     qRegisterMetaType<WindowFunction>("WindowFunction");
@@ -52,6 +52,12 @@ Engine::Engine(QObject *parent)
 }
 
 Engine::~Engine() { }
+
+void Engine::bungholio(int nDogs)
+{
+    qDebug() << "fakkck";
+//    emit spectrumChanged(spectrum);
+}
 
 //-----------------------------------------------------------------------------
 // Public functions
@@ -178,7 +184,16 @@ void Engine::audioNotify()
                         << "m_dataLength "<< m_dataLength;
     }
 
+    // ==============================
+    // OKAY!
+    // THIS IS IT!  ARE YOU READY?
+
     _dfModel->evaluate(); // TODO move elsewhere--perhaps it's own timer loop
+
+    //
+    // TA-DA !
+    // ==============================
+
 }
 
 
@@ -393,7 +408,7 @@ void Engine::setLevel(qreal rmsLevel, qreal peakLevel, int numSamples)
     emit levelChanged(m_rmsLevel, m_peakLevel, numSamples);
 }
 
-/**
+/*
  * Sets interval at which spectrum is updated.
  * TODO:  this is also the interval at which the whole floor is
  * updated, and the two should probably be decoupled.

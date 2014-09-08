@@ -12,63 +12,20 @@
 
 
 // -----------------------------------------------------------------------------
-// Subrange
-
-Subrange::Subrange() :
-    freqMin(100.0),
-    freqMax(200.0),
-    ampMin(0.0),
-    ampMax(1.0)
-{ }
-
-Subrange::~Subrange() { }
-
-/*
- * Returns 0.0 if the given amplitude is below the minimum
- * threshold for the subrange, 1.0 if it's above it, and
- * a proportional value in between.
- */
-double Subrange::amplitudeWithinWindow(double amp)
-{
-    if (amp < ampMin)
-        return 0.0;
-    if (amp > ampMax)
-        return 1.0;
-    return ((amp-ampMin)/(ampMax-ampMin));
-}
-
-/*
- * Returns true if a given frequency is within the window
- * set for this range.
- */
-bool Subrange::isFrequencyWithinWindow(double freq)
-{
-    if (freq < freqMin)
-        return false;
-    if (freq > freqMax)
-        return false;
-    return true;
-}
-
-
-// -----------------------------------------------------------------------------
 // SublevelMeter
 
 SublevelMeter::SublevelMeter(QWidget *parent)
     :   QWidget(parent)
-    ,   m_level(0.0)
+    ,   _level(0.0)
     ,   _active(false)
     ,   _selectable(false)
     ,   _selected(false)
     ,   _dragTarget(false)
-    ,   _cue(NULL)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     setMinimumWidth(30);
     setAcceptDrops(true);
 }
-
-SublevelMeter::~SublevelMeter() {  }
 
 void SublevelMeter::setSelectable(bool status)
 {
@@ -82,8 +39,23 @@ bool SublevelMeter::setSelection(bool status)
     if (!_selectable) {
         return false;
     }
+
+    if (_selected == status)
+        return true;
+
     _selected = status;
     update();
+
+    // emit signal so that other meters can deselect, and the spectrograph
+    // can draw the appropriate window.
+    // XXX possible endless loop of signals?
+    if (_selected) {
+        emit iveBeenSelected(this);
+        // TODO emit drawThisSubrange(this->_subrange);
+    }
+    else
+        emit iveBeenSelected(NULL);
+
     return true;
 }
 
@@ -96,7 +68,7 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
 
     // Draw bar
     QRect bar = rect();
-    bar.setTop(rect().top() + (1.0 - m_level) * rect().height());
+    bar.setTop(rect().top() + (1.0 - _level) * rect().height());
     painter.fillRect(bar, GuiSettings::sl_barColor);
 
     // Draw pulsar
@@ -104,7 +76,7 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
     squareRect.setBottom(rect().top()+ rect().width());
     squareRect.setRight(rect().right()-1);
     QColor pulseColor;
-    pulseColor.setHsvF(0.0, 0.0, m_level);
+    pulseColor.setHsvF(0.0, 0.0, _level);
     painter.fillRect(squareRect, pulseColor);
     painter.drawRect(squareRect);
 
@@ -131,6 +103,7 @@ void SublevelMeter::paintEvent(QPaintEvent *event)
     }
 }
 
+// Mouse release events handle selection
 void SublevelMeter::mouseReleaseEvent(QMouseEvent *event)
 {
     if (!_selectable) {
@@ -183,77 +156,27 @@ void SublevelMeter::dropEvent(QDropEvent *event)
     ParamView *paramView = qobject_cast<ParamView *>(eventSrc->parent());
     Q_ASSERT(paramView);
 
+#if 0
+    // XXX this is troublesome here.
     auto closure = createProviderClosure();
-    paramView->setProvider(closure);
+    // the view receives this action, but needs the model to change.
+    // need something like
+    paramView->getParam()->connectTo(this->getParam());
+    // or
+    emit outputSeeksInput(this->getParam())
+#endif
+
+
 
     _dragTarget = false;
-
     // select this meter
     this->setSelection(true);
-    emit(iveBeenSelected(this));
 
     update();
 }
 
-
-// TODO this is business logic that shouldn't be in a view class.
-// TODO decouple position & spectrum change
-void SublevelMeter::spectrumChanged(qint64 position, qint64 length,
-                                 const FrequencySpectrum &spectrum)
+void SublevelMeter::levelChanged(qreal level)
 {
-    Q_UNUSED(position);
-    Q_UNUSED(length);
-    m_spectrum = spectrum;
-    if (_active) {
-        calculateLevel();
-        emit levelChanged(m_level);
-        update();
-    }
-}
-
-// TODO this is business logic that shouldn't be in a view class.
-void SublevelMeter::calculateLevel()
-{
-    // loop over all frequencies in the spectrum, and set the value
-    FrequencySpectrum::const_iterator i = m_spectrum.begin();
-    const FrequencySpectrum::const_iterator end = m_spectrum.end();
-    int index = 0;
-
-    float value = 0;
-    int nsamples = 0;
-    bool clipped = false;
-
-    for ( ; i != end; ++i, ++index) {
-        const FrequencySpectrum::Element e = *i;
-
-        // TODO could optimize by skipping straight to start frequency
-        if (_range.isFrequencyWithinWindow(e.frequency)) {
-            // amplitude window
-            value += _range.amplitudeWithinWindow(e.amplitude);
-            nsamples++;
-            clipped |= e.clipped;
-        }
-    }
-
-    // Compute subrange amplitude
-    if (nsamples > 0)
-        value /= nsamples;
-    if (value > 1.0) {
-        value = 1.0;
-        clipped = true;
-    }
-
-    m_level = value;
+    _level = level;
     update();
-
-    //emit subrangeLevelChanged(value);
 }
-
-// TODO this is business logic that shouldn't be in a view class.
-//template<class PT> std::function<void(PT&)> SublevelMeter::createProviderClosure()
-// TODO could use a functor instead.
-std::function<void(float&)> SublevelMeter::createProviderClosure()
-{
-    return [this] (float &out) {out = m_level;};
-}
-

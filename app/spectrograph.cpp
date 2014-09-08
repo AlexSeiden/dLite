@@ -6,7 +6,6 @@
 #include <QTimerEvent>
 #include <math.h>
 
-
 Spectrograph::Spectrograph(QWidget *parent)
     :   QWidget(parent)
     ,   m_lowFreq(10.0)
@@ -15,7 +14,8 @@ Spectrograph::Spectrograph(QWidget *parent)
     ,   m_isDragging(false)
     ,   m_dragStart(QPoint(0,0))
     ,   m_rubberBand(NULL)
-    ,   selectedSublevelmeter(NULL)
+    ,   selectedSublevelmeter(nullptr)
+    ,   _showSubrange(false)
 {
     setMinimumHeight(100);
 }
@@ -54,6 +54,7 @@ void Spectrograph::setFreqHi(int val)
     updateBars();
 }
 
+
 // -----------------------------------------------------------------------------
 // paintEvent
 
@@ -65,7 +66,6 @@ void Spectrograph::paintEvent(QPaintEvent *event)
     painter.fillRect(rect(), GuiSettings::sg_bg);
 
     const int numBars = m_bars.count();
-
 
     // Draw the outline
     QPen gridPen(GuiSettings::sg_gridColor);
@@ -88,7 +88,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
         painter.drawLine(line);
     }
 
-    if (numBars == 0)
+    if (numBars == 0)   // Ummm, something is seriously wrong if numBars==0
         return;
 
     // Calculate width of bars and gaps
@@ -130,7 +130,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
         painter.fillRect(bar, color);
     }
 
-    // Draw the labels
+    // Label each bar with its frequency in Hz:
     painter.setPen(GuiSettings::sg_textColor);
     for (int i=0; i<numBars; ++i) {
         QRect textrect = rect();
@@ -146,17 +146,16 @@ void Spectrograph::paintEvent(QPaintEvent *event)
     }
 
     // Do we have a subrange that should be drawn?
-    if (selectedSublevelmeter) {
-        QRectF *subrangewindow;
-        subrangewindow = &(selectedSublevelmeter->_range.subrangeWindow);
+    if (_showSubrange) {
+        QRectF subrangewindow = _subrange.getWindow();      // XXX should be const ref?
         QRectF subwin;
-        subwin.setTop(   rect().height() * subrangewindow->top());
-        subwin.setBottom(rect().height() * subrangewindow->bottom());
-        subwin.setLeft(  rect().width()  * subrangewindow->left());
-        subwin.setRight( rect().width()  * subrangewindow->right());
-        // TODO make this color settable/responsive to current selection
+        subwin.setTop   (rect().height() * subrangewindow.top());
+        subwin.setBottom(rect().height() * subrangewindow.bottom());
+        subwin.setLeft  (rect().width()  * subrangewindow.left());
+        subwin.setRight (rect().width()  * subrangewindow.right());
+
         QPen pen(GuiSettings::sg_sublevelRegion);
-        pen.setWidth(2);
+        pen.setWidth(GuiSettings::sg_sublevelPenwidth);
         painter.setPen(pen);
 
         painter.drawRect(subwin);
@@ -165,7 +164,10 @@ void Spectrograph::paintEvent(QPaintEvent *event)
 
 // -----------------------------------------------------------------------------
 // mouse events
+// These support dragging out a subrange in the graph.
 
+//  mousePressEvent:
+//      We're starting to drag out a subrange....
 void Spectrograph::mousePressEvent(QMouseEvent *event)
 {
     m_dragStart = event->pos();
@@ -175,46 +177,51 @@ void Spectrograph::mousePressEvent(QMouseEvent *event)
     m_rubberBand->show();
 }
 
+//  mouseMoveEvent:
+//      ...still dragging:  update rubber band lines....
 void Spectrograph::mouseMoveEvent(QMouseEvent *event)
 {
     m_rubberBand->setGeometry(QRect(m_dragStart, event->pos()).normalized());
 }
 
+//  mouseReleaseEvent:
+//      ...done dragging:  send out new subrange.
 void Spectrograph::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
 
-    Subrange dest;
-
     QRect geo = m_rubberBand->geometry();
+    // Clip geo to the spectrograph window.
     geo = geo.intersected(rect());
+    QRectF subrect;
 
-    // Find sampling window from rubberband rect
-    dest.freqMin = float(geo.left())/rect().width();
-    dest.subrangeWindow.setLeft(dest.freqMin);  // For drawing
-    dest.freqMin = frac2freq(dest.freqMin);     // Actual frequency
+    // Find sampling window from the rubberband rect
+    float fmin = float(geo.left())/rect().width();
+    subrect.setLeft(fmin);  // For drawing
+    fmin = frac2freq(fmin);     // Actual frequency
 
-    dest.freqMax = float(geo.right())/rect().width();
-    dest.subrangeWindow.setRight(dest.freqMax);
-    dest.freqMax = frac2freq(dest.freqMax);
+    float fmax = float(geo.right())/rect().width();
+    subrect.setRight(fmax);
+    fmax = frac2freq(fmax);
 
-    dest.ampMin = float(geo.bottom())/rect().height();
-    dest.ampMax = float(geo.top())/rect().height();
-    dest.subrangeWindow.setBottom(dest.ampMin);
-    dest.subrangeWindow.setTop(dest.ampMax);
+    float amin = float(geo.bottom())/rect().height();
+    float amax = float(geo.top())/rect().height();
+    subrect.setBottom(amin);
+    subrect.setTop(amax);
 
     // Invert range, since window y increases from top to bottom.
-    dest.ampMin = 1.0 - dest.ampMin;
-    dest.ampMax = 1.0 - dest.ampMax;
+    amin = 1.0 - amin;
+    amax = 1.0 - amax;
 
-    if (selectedSublevelmeter) {
-        selectedSublevelmeter->setRange(dest);
-        selectedSublevelmeter->setActive(true);
-    }
+    _subrange.setMinMax(fmin, fmax, amin, amax);
+    _subrange.setWin(subrect);
 
-    // Redraw
+    // TODO make sure appropriate subrange meter & node are listening!
+    emit subrangeHasChanged(&_subrange);
+
+    // Cleanup & redraw.
     m_rubberBand->hide();
-    this->update();
+    update();
 }
 
 void Spectrograph::reset()
@@ -224,6 +231,8 @@ void Spectrograph::reset()
     spectrumChanged(m_spectrum);
 }
 
+// spectrumChanged
+//      The new data is here!  The new data is here!  Wooooo!
 void Spectrograph::spectrumChanged(const FrequencySpectrum &spectrum)
 {
     m_spectrum = spectrum;
@@ -380,10 +389,23 @@ void Spectrograph::updateBars()
 
 void Spectrograph::printSpectrum() {
     // print next time it's calculated.  then it'll be cleared.
+    // for debugging.
     m_printspectrum = true;
 }
 
 void Spectrograph::submeterSelectionChanged(SublevelMeter *chosen)
 {
     selectedSublevelmeter = chosen;
+}
+
+void Spectrograph::displayThisSubrange(Subrange *subrange)
+{
+    if (subrange) {
+        _subrange = *subrange;
+        _showSubrange = true;
+    }
+    else
+        _showSubrange = false;
+
+    update();
 }
