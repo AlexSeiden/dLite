@@ -68,8 +68,9 @@ void Controlpanel::newSpectrumSensor()
 
     // Get the spectrum as they are calculated.
     // TODO use simpler spectrumChanged
-    CHECKED_CONNECT(_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
-            slm, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
+    // TODO need to connect to the SublevelNode, which will send level changes.
+//    CHECKED_CONNECT(_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
+//            slm, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
 
     numMeters++;
     meters.append(slm);

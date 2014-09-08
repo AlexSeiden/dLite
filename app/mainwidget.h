@@ -47,7 +47,8 @@ public:
 
 public slots:
     void stateChanged(QAudio::State state);
-//    void spectrumChanged(const FrequencySpectrum &spectrum);
+    void spectrumChanged(qint64 position, qint64 length,
+                         const FrequencySpectrum &spectrum);
     void infoMessage(const QString &message, int timeoutMs);
     void errorMessage(const QString &heading, const QString &detail);
     void audioPositionChanged(qint64 position);

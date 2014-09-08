@@ -98,6 +98,15 @@ void MainWidget::stateChanged(QAudio::State state)
     }
 }
 
+// TODO decouple position & spectrum change
+// They are artificially coupled in engine.cpp
+void MainWidget::spectrumChanged(qint64 position, qint64 length,
+                                 const FrequencySpectrum &spectrum)
+{
+    m_progressBar->windowChanged(position, length);
+    m_spectrograph->spectrumChanged(spectrum);
+}
+
 void MainWidget::infoMessage(const QString &message, int timeoutMs)
 {
     m_infoMessage->setText(message);
@@ -305,8 +314,8 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_controlpanel, SIGNAL(submeterSelectionChanged(SublevelMeter *)),
             m_spectrograph, SLOT(submeterSelectionChanged(SublevelMeter *)));
 
-    CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(const FrequencySpectrum &)),
-            m_spectrograph, SLOT(spectrumChanged(const FrequencySpectrum &)));
+    CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
+            this, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
 
 
 #ifdef NUKEME
