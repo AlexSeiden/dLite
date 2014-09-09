@@ -8,12 +8,6 @@
 // TODO MASTER TODO HERE
 // (because it's the first src file.)
 //
-// Connection semantics
-//      output connections
-//      non-anamatable params?
-//      distinguish sources and sinks in drag & drop
-//      distinguish sources and sinks icons
-//      Graph view?
 // Saving!
 // Node Types:
     // color nodes:
@@ -28,8 +22,9 @@
     // Position
     //      Paths
 // playback controller
+//      progress bar with clicking
 // Hardware interface!
-// Need way of recalling instantiated nodes that have had their views closed
+// multiple tabbed cue sheets
 
 // Cleaning:
 //      Remnants of original spectrum audio recording stuff in buffer length and

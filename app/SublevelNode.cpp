@@ -24,19 +24,17 @@ SublevelNode::SublevelNode(QObject *parent) :
                     SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
                     this,
                     SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
-    CHECKED_CONNECT(OKCupid::Singleton()->getSpectrograph(),
-                    SIGNAL(subrangeHasChanged(Subrange *)),
-                    this,
-                    SLOT(setSubrange(Subrange *)));
+    // New subranges are sent back to the nodes inside GraphWidget, at the moment.
+//    CHECKED_CONNECT(OKCupid::Singleton()->getSpectrograph(),
+//                    SIGNAL(subrangeHasChanged(Subrange *)),
+//                    this,
+//                    SLOT(setSubrange(Subrange *)));
     CHECKED_CONNECT(this,
                     SIGNAL(iveBeenSelected(SublevelNode*)),
                     OKCupid::Singleton()->getSpectrograph(),
                     SLOT(submeterSelectionChanged(SublevelNode *)));
 }
 
-
-
-//void SublevelNode::spectrumChanged(const FrequencySpectrum &spectrum)
 void SublevelNode::spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum)
 {
     Q_UNUSED(position)

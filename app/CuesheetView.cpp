@@ -1,4 +1,5 @@
-#include "Cuesheet.h"
+#include "CuesheetView.h"
+#include "GuiColors.h"
 #include <QtWidgets>
 
 #ifndef QT_NO_WHEELEVENT
@@ -18,7 +19,7 @@ void GraphicsView::wheelEvent(QWheelEvent *e)
 }
 #endif
 
-Cuesheet::Cuesheet(QWidget *parent)
+CuesheetView::CuesheetView(QWidget *parent)
     : QFrame(parent)
 {
     setFrameStyle(Sunken | StyledPanel);
@@ -35,8 +36,8 @@ Cuesheet::Cuesheet(QWidget *parent)
     graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
     graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
-    int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
-    QSize iconSize(size, size);
+//    int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
+    QSize iconSize(GuiSettings::iconSize, GuiSettings::iconSize);
 
     QToolButton *zoomInIcon = new QToolButton;
     zoomInIcon->setAutoRepeat(true);
@@ -80,23 +81,24 @@ Cuesheet::Cuesheet(QWidget *parent)
     setupMatrix();
 }
 
-QGraphicsView *Cuesheet::view() const
+QGraphicsView *CuesheetView::view() const
 {
     // This is only here to help implement zooming with wheel events.
     // TODO make pinch-to-zoom work.
     return static_cast<QGraphicsView *>(graphicsView);
 }
 
-void Cuesheet::resetView()
+void CuesheetView::resetView()
 {
     zoomSlider->setValue(250);
     setupMatrix();
+    // TODO this doesn't work so great.
     graphicsView->ensureVisible(QRectF(0, 0, 0, 0));
 
-    resetButton->setEnabled(false);
+//    resetButton->setEnabled(false);
 }
 
-void Cuesheet::setupMatrix()
+void CuesheetView::setupMatrix()
 {
     qreal scale = qPow(qreal(2), (zoomSlider->value() - 250) / qreal(50));
 
@@ -106,12 +108,12 @@ void Cuesheet::setupMatrix()
     graphicsView->setMatrix(matrix);
 }
 
-void Cuesheet::zoomIn(int level)
+void CuesheetView::zoomIn(int level)
 {
     zoomSlider->setValue(zoomSlider->value() + level);
 }
 
-void Cuesheet::zoomOut(int level)
+void CuesheetView::zoomOut(int level)
 {
     zoomSlider->setValue(zoomSlider->value() - level);
 }

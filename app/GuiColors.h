@@ -33,12 +33,15 @@ public:
     static int      paramHeight;
     static QPen     socketOutlinePen;
     static QPen     connectorPen;
+    static int      iconSize;
 
     // Dance floor widget
     static QColor  df_cellSepColor;
     static QColor  df_bgColor;
     static QColor  df_panelSepColor;
     static QColor  df_noCellColor;
+    static int     df_cellsize;
+    static int     df_cellspace;
 
     // Spectrograph widget
     static QColor  sg_barColor;

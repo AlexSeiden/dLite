@@ -143,7 +143,6 @@ void Dancefloormodel::fireLight(int x, int y, Firing *firing)
     light._firings.push_back(firing);
 }
 
-
 void Dancefloormodel::evaluate()
 {
     //qDebug("Time elapsed: %d ms", _t.elapsed());
@@ -153,14 +152,20 @@ void Dancefloormodel::evaluate()
 
     // For every light, get the firing vector:
     for (auto light = _lights.begin(); light != _lights.end(); ++light) {
+
         // For every firing, apply the decay & composite. starting with the "backmost"
-        Lightcolor lightColor(light->_value);
+#if 0
+        Lightcolor lightColor(light->_value);  // start with what was in buffer.
+#else
+        Lightcolor lightColor;  // start with black
+#endif
         auto firing = light->_firings.begin();
         while (firing != light->_firings.end())  {
             // Calculate the value of this firing
             bool keep = (*firing)->evaluate();
 
             // Comp it over the others
+            // TODO other comp modes
             lightColor = (*firing)->compOver(lightColor);
 
             // Remove firing from list if the event is over.
@@ -175,17 +180,14 @@ void Dancefloormodel::evaluate()
     _dfWidget->update();
 }
 
-void Dancefloormodel::addCue(Cue *cue) {
-    _cues.push_back(cue);
-    _numCues++;
-}
-
 void Dancefloormodel::evaluateAllCues() {
     for (Cue *cue : _cues) {
         cue->evaluate();
-        // XXX problem is that here we call the evaluate
-        // method for the base Cue class--not the actual
-        // method on the CueBox class.
     }
+}
+
+void Dancefloormodel::addCue(Cue *cue) {
+    _cues.push_back(cue);
+    _numCues++;
 }
 

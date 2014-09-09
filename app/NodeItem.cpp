@@ -40,6 +40,10 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
 
         ParamView *pv = new ParamView(nullptr, param);
         QGraphicsProxyWidget *proxy = this->scene()->addWidget(pv);
+#if 0
+        if (param->connectedParam())    //TODO update this when connections happen
+            parItem->setEnabled(false);
+#endif
         proxy->setParentItem(parItem);
         proxy->setPos(GuiSettings::socketWidth * 2 +70, 0);
     }
@@ -98,6 +102,23 @@ void NodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     // Used for updating any attached connectors.
     emit nodeMovedEventSignal();
     QGraphicsItem::mouseMoveEvent(event);
+}
+
+void NodeItem::keyPressEvent(QKeyEvent *event)
+{
+    // XXX  this isn't working
+    qDebug() << "keypress " << event->key();
+    switch (event->key()) {
+    case Qt::Key_Delete:
+        // XXX
+        delete this->_node;
+        this->scene()->removeItem(this);
+        deleteLater();
+        update();
+        break;
+    default:
+        QGraphicsItem::keyPressEvent(event);
+    }
 }
 
 void NodeItem::beenSelected()

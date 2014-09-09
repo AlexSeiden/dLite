@@ -33,6 +33,7 @@ signals:
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 
     bool dragOver;
 

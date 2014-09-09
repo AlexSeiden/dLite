@@ -2,6 +2,7 @@
 #include <QToolButton>
 #include <QPen>
 
+// GraphWidget aka CuesheetView
 QColor  GuiSettings::socketFillColor      = QColor(255,20,80);
 QColor  GuiSettings::socketOutlineColor   = QColor(255,255,255);
 QColor  GuiSettings::connectorColor       = QColor(20,20,80);
@@ -17,11 +18,15 @@ QColor  GuiSettings::selectedNodePenColor = QColor(255,100,100);
 int     GuiSettings::selectedNodePenWidth = 2;
 QPen    GuiSettings::socketOutlinePen   = QPen(GuiSettings::socketOutlineColor, 2, Qt::SolidLine);
 QPen    GuiSettings::connectorPen       = QPen(GuiSettings::connectorColor, 2, Qt::SolidLine);
+int     GuiSettings::iconSize             = 16;
 
+// Dancefloorwidget
 QColor  GuiSettings::df_bgColor           = QColor(30,30,80);
 QColor  GuiSettings::df_panelSepColor     = QColor(255,255,200);
 QColor  GuiSettings::df_cellSepColor      = QColor(100,100,100);
 QColor  GuiSettings::df_noCellColor       = QColor(60,60,60);
+int     GuiSettings::df_cellsize          = 20;
+int     GuiSettings::df_cellspace         = 4;
 
 // Spectrograph
 QColor  GuiSettings::sg_barColor          = QColor(51, 204, 102);
@@ -47,7 +52,8 @@ GuiSettings::GuiSettings(QObject *parent) :
 
 void    GuiSettings::editGuiColorsDialog(QObject *parent)
 {
-    //TODO void    GuiColors::editGuiColorsDialog()
+    Q_UNUSED(parent);
+    //LATER void    GuiColors::editGuiColorsDialog()
 }
 
 // Utility function

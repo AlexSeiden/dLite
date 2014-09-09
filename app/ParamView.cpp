@@ -17,7 +17,7 @@ ParamView::ParamView(QWidget *parent, ParamBase *param ) :
     const std::type_info & paramType = typeid(*param);
 
     // TODO make range & steps on spinboxes settable
-    if (paramType == paramTypeFloat) {
+   if (paramType == paramTypeFloat) {
         Param<float> * floatParam = dynamic_cast<Param<float> *>(_param);
         QDoubleSpinBox *editorWidget = new QDoubleSpinBox;
         editorWidget->setRange(0, 1.0);
@@ -41,7 +41,6 @@ ParamView::ParamView(QWidget *parent, ParamBase *param ) :
         editorWidget->setValue(val);
         CHECKED_CONNECT(editorWidget, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
     }
-#if 1
     else if (paramType == paramTypeLcolor) {
         Param<Lightcolor> * colorParam = dynamic_cast<Param<Lightcolor> *>(_param);
         QToolButton *editorWidget =  new QToolButton(this);
@@ -52,10 +51,12 @@ ParamView::ParamView(QWidget *parent, ParamBase *param ) :
         setButtonColor(editorWidget, qc);
         CHECKED_CONNECT(editorWidget, SIGNAL(clicked()), this, SLOT(launchColorDialog()));
     }
-#endif
     else
         qDebug() << "ERROR: could not match typeid(param)";
         // TODO handle error better
+
+    if (param->isOutput())
+        _genericEditorWidget->setEnabled(false);
 
     _genericEditorWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     _layout->addWidget(_genericEditorWidget);

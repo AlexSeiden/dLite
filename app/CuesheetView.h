@@ -1,5 +1,5 @@
-#ifndef CUESHEET_H
-#define CUESHEET_H
+#ifndef CUESHEETVIEW_H
+#define CUESHEETVIEW_H
 
 // The graph display widget, where Nodes & Cues are viewed &
 // connected.
@@ -13,13 +13,13 @@ class QSlider;
 class QToolButton;
 QT_END_NAMESPACE
 
-class Cuesheet;
+class CuesheetView;
 
 class GraphicsView : public QGraphicsView
 {
     Q_OBJECT
 public:
-    GraphicsView(Cuesheet *v) : QGraphicsView(), view(v) { }
+    GraphicsView(CuesheetView *v) : QGraphicsView(), view(v) { }
 
 protected:
 #ifndef QT_NO_WHEELEVENT
@@ -27,14 +27,14 @@ protected:
 #endif
 
 private:
-    Cuesheet *view;
+    CuesheetView *view;
 };
 
-class Cuesheet : public QFrame
+class CuesheetView : public QFrame
 {
     Q_OBJECT
 public:
-    explicit Cuesheet(QWidget *parent = 0);
+    explicit CuesheetView(QWidget *parent = 0);
 
     QGraphicsView *view() const;
 
@@ -52,4 +52,4 @@ private:
     QSlider *zoomSlider;
 };
 
-#endif // CUESHEET_H
+#endif // CUESHEETVIEW_H

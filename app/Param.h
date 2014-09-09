@@ -35,6 +35,7 @@ public:
     bool    isConnectable()         {return _isConnectable;}
     void    setOutput(bool status)             {_isOutput = status;}
     void    setConnectable(bool status)        {_isConnectable = status;}
+    ParamBase   *connectedParam()              {return _connectedParam;}
 
     bool    isConnectableTo(ParamBase *otherParam);
     void    connectParams(ParamBase *server, ParamBase *client);
@@ -68,9 +69,9 @@ public:
     // Both for inputs and outputs?  Would that break modularity?
     //QList<ParamBase *>  getConnections();
     Node *_connectedNode;
+    ParamBase *_connectedParam;
     Node *_parentNode;      // The node that this param is a part of.
 
-    ParamBase *_connectedParam;
 
     std::function<void()> _provider;
 

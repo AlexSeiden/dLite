@@ -10,9 +10,9 @@ const std::type_info & paramTypeLcolor = typeid(Param<Lightcolor>);
 
 std::function<void()> ParamBase::getProvider()
 {
-        // The node implements operator() to create closure/functor.
-        // All output values will be updated.
-        return [this]() {(*this->_parentNode)();};
+    // The Node implements operator() to create closure/functor.
+    // All output values will be updated.
+    return [this]() {(*this->_parentNode)();};
 }
 
 bool ParamBase::isConnectableTo(ParamBase *otherParam)

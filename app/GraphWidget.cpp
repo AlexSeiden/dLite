@@ -23,19 +23,23 @@ GraphWidget::GraphWidget(QWidget *parent) :
     _scene->setSceneRect(-3000.,-3000.,6000.,6000.);
     CHECKED_CONNECT(_scene, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));
 
-    Cuesheet *cs = new Cuesheet(NULL);
+    CuesheetView *cs = new CuesheetView(NULL);
     cs->view()->setScene(_scene);
     QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->setSpacing(0);
+    layout->setContentsMargins(0,0,0,0);
     layout->addWidget(cs);
-    this->setGeometry(10, 500, 700, 500);
-    this->setLayout(layout);
-    this->setWindowTitle("Cuesheet");
+    setGeometry(10, 500, 1500, 500);
+    setLayout(layout);
+    setWindowTitle("Cuesheet");
+    setWindowFlags( Qt::Window | Qt::WindowMaximizeButtonHint |
+                    Qt::CustomizeWindowHint);
 }
 
 void GraphWidget::selectionChanged()
 {
-   QList<QGraphicsItem *> selection = _scene->selectedItems();
-    qDebug() << "selectionChanged" << selection;
+    QList<QGraphicsItem *> selection = _scene->selectedItems();
+//    qDebug() << "selectionChanged" << selection;
     foreach (QGraphicsItem *item, selection) {
         NodeItem *nodeItem = dynamic_cast<NodeItem *>(item);
         if (nodeItem){
@@ -47,16 +51,20 @@ void GraphWidget::selectionChanged()
 void GraphWidget::subrangeHasChanged(Subrange *subrange)
 {
     QList<QGraphicsItem *> selection = _scene->selectedItems();
-    qDebug() << Q_FUNC_INFO << subrange;
-#if 0  // XXX
     foreach (QGraphicsItem *item, selection) {
         SublevelNodeItem *nodeItem = dynamic_cast<SublevelNodeItem *>(item);
+        int nSublevelNodes = 0;
         if (nodeItem) {
+            nSublevelNodes++;
             SublevelNode *node= dynamic_cast<SublevelNode *>(nodeItem->getNode());
             node->setSubrange(subrange);
         }
+
+        if (nSublevelNodes > 1) {
+            // eee
+            qDebug() << "Error: multiple subranges set in " << Q_FUNC_INFO << nSublevelNodes;
+        }
     }
-#endif
 }
 
 void GraphWidget::addNode(Node *node)

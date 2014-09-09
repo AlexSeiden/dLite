@@ -54,7 +54,7 @@ MainWidget::MainWidget(QWidget *parent)
     createUi();
 
     setMinimumHeight(400);
-    move(10,50);  // TODO restore from last saved
+    move(10,10);  // TODO restore from last saved
 
     // TODO move to settings/prefs  & allow setting this
     std::string layoutfile = std::string("/Users/alex/src/floorit/layout.csv");
@@ -321,6 +321,9 @@ void MainWidget::connectUi()
 
 //    CHECKED_CONNECT(m_controlpanel, SIGNAL(submeterSelectionChanged(SublevelMeter *)),
 //            m_spectrograph, SLOT(submeterSelectionChanged(SublevelMeter *)));
+
+    CHECKED_CONNECT(m_spectrograph, SIGNAL(subrangeHasChanged(Subrange *)),
+                    m_graphWidget, SLOT(subrangeHasChanged(Subrange*)));
 
     CHECKED_CONNECT(m_spectrograph, SIGNAL(subrangeHasChanged(Subrange*)),
             m_graphWidget, SLOT(subrangeHasChanged(Subrange*)));

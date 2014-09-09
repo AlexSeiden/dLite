@@ -11,15 +11,8 @@
 Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
     QWidget(parent)
 {
-    cellsize = 20;
-    cellspace = 4;
-
-#if 0
-    // I think all of this is unneeded now, because the model tells the view when to update.
-    timer = new QTimer(this);
-    CHECKED_CONNECT(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start(50);
-#endif
+    cellsize = GuiSettings::df_cellsize;
+    cellspace = GuiSettings::df_cellspace;
 
     setWindowTitle(tr("dLite floor"));
     setWindowFlags(Qt::Tool | Qt::WindowTitleHint  |
@@ -39,7 +32,7 @@ void Dancefloorwidget::setModel(Dancefloormodel *model)
     // TODO restore from saved & allowed saved layouts
     // also move to right side of screen?
     // also, snapping...
-    move(1100, 50);
+    move(1100, 10);
 }
 
 bool Dancefloorwidget::cellHasLights(int x, int y) {

@@ -50,6 +50,7 @@ RandomFloat::RandomFloat() :
     _max.setConnectable(true);
 
     _paramList << &_output << &_min << &_max;
+    setParamParent();
 }
 
 
@@ -79,8 +80,7 @@ void RandomFloat::operator()()
     if (trigVal) {
         _output._value =  (*_distribution)(*_randGenerator);
     }
-
-    qDebug() << _output._value;
+    _output._qvOutput = _output._value;
 }
 
 // ------------------------------------------------------------------------------
@@ -152,7 +152,6 @@ void RandomInt::operator()()
     if (trigVal) {
         _output._value =  (*_distribution)(*_randGenerator);
     }
-    qDebug () << "randint " << _name << _output._value;
     _output._qvOutput = _output._value;
 }
 

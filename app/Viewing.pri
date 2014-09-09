@@ -5,7 +5,6 @@ SOURCES += \
     dancefloorwidget.cpp \
     sublevel.cpp \
     ParamView.cpp \
-    Cuesheet.cpp \
     GraphWidget.cpp \
     CuesheetScene.cpp \
     GuiColors.cpp \
@@ -18,14 +17,13 @@ SOURCES += \
     Whip.cpp \
     CueLibView.cpp \
     settingsdialog.cpp \
-    $$PWD/ColorButton.cpp
+    $$PWD/CuesheetView.cpp
 
 HEADERS += \
     mainwidget.h \
     dancefloorwidget.h  \
     sublevel.h \
     ParamView.h         \
-    Cuesheet.h          \
     GraphWidget.h       \
     CuesheetScene.h     \
     GuiColors.h         \
@@ -38,4 +36,4 @@ HEADERS += \
     Whip.h \
     CueLibView.h \
     settingsdialog.h \
-    $$PWD/ColorButton.h
+    $$PWD/CuesheetView.h

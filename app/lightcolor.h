@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <QColor>
+#include <QMetaType>
 
 // Forward declarations
 class Cue;
@@ -16,15 +17,20 @@ class Lightcolor
 {
 public:
     Lightcolor();
+    ~Lightcolor();
+
     Lightcolor(int r, int g, int b);
     Lightcolor(int val);
     explicit Lightcolor(float r, float g, float b);
     explicit Lightcolor(float val);
     explicit Lightcolor(const QColor &qc);
+    Lightcolor(const Lightcolor &rhs);
 
     int getRed()    {return m_r;}
     int getGreen()  {return m_g;}
     int getBlue()   {return m_b;}
+
+    Lightcolor  & operator=(const Lightcolor &rhs);
 
     Lightcolor  & operator+=(const Lightcolor &rhs);
     Lightcolor  & operator*=(const Lightcolor &rhs);

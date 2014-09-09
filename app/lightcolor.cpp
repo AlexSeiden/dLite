@@ -2,6 +2,7 @@
 #include <QDebug>
 
 Lightcolor::Lightcolor() : m_r(0), m_g(0), m_b(0) { }
+Lightcolor::~Lightcolor() { }
 
 Lightcolor::Lightcolor(int r, int g, int b) : m_r(r), m_g(g), m_b(b) { }
 
@@ -13,6 +14,13 @@ Lightcolor::Lightcolor(float val) : m_r(val*255), m_g(val*255), m_b(val*255) { }
 
 Lightcolor::Lightcolor(const QColor &qc) : m_r(qc.red()), m_g(qc.green()), m_b(qc.blue()) { }
 
+Lightcolor::Lightcolor(const Lightcolor &rhs)
+{
+    this->m_r = rhs.m_r;
+    this->m_g = rhs.m_g;
+    this->m_b = rhs.m_b;
+}
+
 QColor Lightcolor::toQColor() {
     int r = std::min(255, std::max(m_r,0));
     int g = std::min(255, std::max(m_g,0));
@@ -22,6 +30,18 @@ QColor Lightcolor::toQColor() {
 }
 
 // Lightcolor operators
+
+// Assignment operator
+Lightcolor& Lightcolor::operator=(const Lightcolor& rhs) // copy assignment
+{
+    if (this != &rhs) { // self-assignment check expected
+        this->m_r = rhs.m_r;
+        this->m_g = rhs.m_g;
+        this->m_b = rhs.m_b;
+    }
+    return *this;
+}
+
 Lightcolor & Lightcolor::operator*=(float scalar) {
     this->m_r *= scalar;
     this->m_g *= scalar;
@@ -131,7 +151,7 @@ bool Firing::evaluate() {
 
 Lightcolor Firing::compOver(const Lightcolor &lightcolor) {
     Lightcolor out = lightcolor;
-    out *= _alpha;
+    out *= (1.0 - _alpha);
     out += _color;
     return out;
 }

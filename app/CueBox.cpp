@@ -15,7 +15,9 @@ CueBox::CueBox() :
 {
     int numCues = _dfModel->getNumCues();
     setName(QString("BoxCue%1").arg(numCues));
+    _type = CUE;
 
+    // Declare params.
     _x.setName("x");
     _x.setOutput(false);
     _x.setConnectable(true);
@@ -37,6 +39,7 @@ CueBox::CueBox() :
     _color.setConnectable(true);
 
     _paramList << &_x <<&_y <<&_scale << &_alpha << &_color;
+    setParamParent();
 }
 
 void CueBox::operator ()() {
@@ -48,21 +51,6 @@ void CueBox::evaluate()
     if (!_active) return;
 
     evalAllInputs();
-
-//    qDebug() << "x getvalue " << x;
-
-//    int otherx;
-//    std::function<void(int &value)> lp = _x.getProvider();
-//    lp(otherx);
-//    qDebug() << "other x    " << otherx;
-//    (*_x._connectedNode)(otherx);
-
-//    RandomInt *rn = dynamic_cast<RandomInt *>(_x._connectedNode);
-//    int rnx = -1;
-//    (*rn)(rnx);
-//    qDebug() << "rnx        " << rnx;
-
-
 
     Lightcolor color;
     float alpha;
