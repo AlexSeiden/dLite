@@ -19,13 +19,6 @@ public:
     Node();
     virtual ~Node();
 
-    // Functor that provides closure over instance object,
-    // and allows downstream clients to evaluate.
-    virtual void operator() (void) = 0;
-
-    // Called by editor widgets when a parameter has been changed.
-    virtual void paramHasBeenEdited() {}
-
     const QString &     getName() const {return _name;}
     void                setName(const QString name) {_name = name;}
 
@@ -35,11 +28,30 @@ public:
     virtual node_t      getType();
     QList<ParamBase *>  getParams()        {return _paramList;}
 
-    void                setParamParent();
+    // Functor that provides closure over instance object,
+    // and allows downstream clients to evaluate.
+    virtual void operator() (void) = 0;
+
+    // Called by editor widgets when a parameter has been changed.
+    // Most nodes don't need this--only onces like RandomInt where
+    // setup has to be re-run when parameters change.
+    virtual void paramHasBeenEdited() {}
+
+    // Only needed on Nodes that have special editor widgets
+    // (such as the SubrangeNode) where selection matters to other
+    // widgets in editors.  (GROSS--a view thing in the model?)
     virtual void        beenSelected();
 
-    static  int         _nodeCount;
+    // Boilerplate call in every operator(); checks to make sure
+    // that the operator hasn't been run already for a given frame.
+    // This would not only be wasteful, but may well be wrong.
+    virtual bool        evaluatedThisFrame();
 
+    // Boilerplate call in every ctor; sets a pointer from
+    // the parameter back to the parent.
+    void                setParamParent();
+
+    static  int         _nodeCount;
 
 protected:
     void                evalAllInputs();
@@ -48,6 +60,7 @@ protected:
     bool                  _active;
     QList<ParamBase *>    _paramList;
     node_t                _type;
+    int                   _frameLastEvaluated;
 };
 
 // NodeFactory

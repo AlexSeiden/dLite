@@ -14,7 +14,6 @@ class SublevelMeter;
 class ProgressBar;
 class SettingsDialog;
 class Spectrograph;
-class Controlpanel;
 class Dancefloorwidget;
 class Dancefloormodel;
 class CueLibView;
@@ -62,9 +61,10 @@ private slots:
     void showSettingsDialog();
     void updateButtonStates();
 
-    // XXX Again, these are more of a "model" or "controller" issue than a view/widget one.
+#ifdef NUKEME
     void newCue();
     void newRandomNode();
+#endif
 
 private:
     void createUi();
@@ -99,7 +99,6 @@ private:
 
     Dancefloormodel *       m_dancefloormodel;
     Dancefloorwidget *      m_dancefloorwidget;
-    Controlpanel *          m_controlpanel;
     CueLibView *            m_cueLibView;
     GraphWidget *           m_graphWidget;
 };

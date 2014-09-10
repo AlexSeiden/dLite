@@ -5,13 +5,12 @@
 #include "settingsdialog.h"
 #include "spectrograph.h"
 #include "utils.h"
-#include "controlpanel.h"
 #include "dancefloorwidget.h"
 #include "CueView.h"
 #include "CueLibView.h"
 #include "GraphWidget.h"
 #include "RandomNode.h"
-#include "OKCupid.h"
+#include "Cupid.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -43,7 +42,6 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_settingsDialog(new SettingsDialog(m_engine->interval(), this))
     ,   m_loadFileAction(0)
     ,   m_dancefloormodel(new Dancefloormodel)  // TODO should be allocated in main?
-    ,   m_controlpanel(NULL)
     ,   m_cueLibView(NULL)
 {
 
@@ -63,13 +61,10 @@ MainWidget::MainWidget(QWidget *parent)
 
     m_dancefloorwidget = new Dancefloorwidget();
     m_dancefloorwidget->setModel(m_dancefloormodel);
-    m_dancefloormodel->setView(m_dancefloorwidget);  // XXX This seems like bad form
+    m_dancefloormodel->setView(m_dancefloorwidget);  // GROSS
     m_dancefloorwidget->show();
 
     m_engine->setDancefloormodel(m_dancefloormodel);
-
-    m_controlpanel = new Controlpanel(NULL, m_engine, m_dancefloormodel);
-//    m_controlpanel->show();
 
     m_cueLibView = new CueLibView(NULL);
     m_cueLibView->show();
@@ -84,9 +79,9 @@ MainWidget::MainWidget(QWidget *parent)
 
 
     // OK, these are essentially globals:  GROSS
-    OKCupid::Singleton()->setSpectrograph(m_spectrograph);
-    OKCupid::Singleton()->setDancefloormodel(m_dancefloormodel);
-    OKCupid::Singleton()->setEngine(m_engine);
+    Cupid::Singleton()->setSpectrograph(m_spectrograph);
+    Cupid::Singleton()->setDancefloormodel(m_dancefloormodel);
+    Cupid::Singleton()->setEngine(m_engine);
 }
 
 MainWidget::~MainWidget() { }
@@ -146,7 +141,7 @@ void MainWidget::timerEvent(QTimerEvent *event)
 void MainWidget::audioPositionChanged(qint64 position)
 {
     Q_UNUSED(position)
-    // WTF
+    // WTF why isn't this used?  Can we nuke it?
 }
 
 void MainWidget::bufferLengthChanged(qint64 length)
@@ -319,9 +314,6 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_engine, SIGNAL(playPositionChanged(qint64)),
             this, SLOT(audioPositionChanged(qint64)));
 
-//    CHECKED_CONNECT(m_controlpanel, SIGNAL(submeterSelectionChanged(SublevelMeter *)),
-//            m_spectrograph, SLOT(submeterSelectionChanged(SublevelMeter *)));
-
     CHECKED_CONNECT(m_spectrograph, SIGNAL(subrangeHasChanged(Subrange *)),
                     m_graphWidget, SLOT(subrangeHasChanged(Subrange*)));
 
@@ -385,6 +377,7 @@ void MainWidget::reset()
 //-----------------------------------------------------------------------------
 // New node slots
 //-----------------------------------------------------------------------------
+// TODO move this to OKCupid?  Or somewhere else?
 void MainWidget::newNodeRequest(QString name)
 {
     // TODO generate this list from a single place, where all cues are listed,
@@ -395,18 +388,21 @@ void MainWidget::newNodeRequest(QString name)
     newNode = NodeFactory::Singleton()->instatiateNode(name);
     if (newNode) {
         m_graphWidget->addNode(newNode);
-    } else if (name == tr("Box cue")) {
+    }
+#ifdef NUKEME
+    else if (name == tr("Box cue")) {
         this->newCue();
-    } else if (name == tr("Spectrum range")) {
-        // XXX this should be consistent with the others.
-        m_controlpanel->newSpectrumSensor();
     } else if (name == tr("RandomFloat")) {
         this->newRandomNode();
-    } else {
+    }
+#endif
+    else {
         qDebug() << "New Node request for " << name;
+        // ErrorHandling
     }
 }
 
+#ifdef NUKEME
 void MainWidget::newCue()
 {
     CueBox *cue = new CueBox();
@@ -421,5 +417,5 @@ void MainWidget::newRandomNode()
     m_graphWidget->addNode(node);
 //    RandomNodeView *rv = new RandomNodeView(node, NULL);
 //    rv->show();
-
 }
+#endif

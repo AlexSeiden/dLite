@@ -44,7 +44,7 @@ public:
     virtual void eval() {
         if (_provider)
             _provider();
-        // XXX gah!  it evaluates it, but now it's stuck
+        // GROSS.  it evaluates it, but now it's stuck
         // in the providers "output" variable.
     }
 
@@ -146,7 +146,7 @@ public:
     // Or should setValue be disabled when there is a provider?
     void setValue(const PT &value) {_value = value;}
 
-    // ??? do we need this?
+    // ??? do we need this?  Would it be better just to assign a _type field?
     virtual const std::type_info & getType() {return typeid(this);}
 
     PT _value;
@@ -161,4 +161,5 @@ public:
 extern const std::type_info & paramTypeFloat;
 extern const std::type_info & paramTypeInt;
 extern const std::type_info & paramTypeLcolor;
+extern const std::type_info & paramTypeBool;
 #endif // PARAM_H

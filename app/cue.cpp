@@ -1,11 +1,6 @@
 #include "Cue.h"
 #include "dancefloormodel.h"
 
-void randLight(int &value) // XXX
-{
-    value = rand() % 18;
-}
-
 // ------------------------------------------------------------------------------
 //  Cue
 //  Abstract base class

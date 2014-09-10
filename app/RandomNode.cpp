@@ -1,27 +1,6 @@
 #include "RandomNode.h"
 #include <QDebug>
 
-#ifdef NOTREADY
-// ------------------------------------------------------------------------------
-//  TriggerEvery
-//  Impulse class
-
-void TriggerEvery::operator()()
-{
-    if (getCurrentTime() > _nextRefresh) {
-       _output._value = true;
-       _lastRefresh = _nextRefresh;
-       _nextRefresh += _interval._value;
-    }
-
-    // TODO:  Clear a "true" value after it's been read.
-    // XXX This assumes that this node is only connected to one output;
-//    _value = false;
-}
-#endif
-
-
-
 // ------------------------------------------------------------------------------
 //  RandomFloat
 
@@ -29,14 +8,14 @@ RandomFloat::RandomFloat() :
     Node(),
     _output(0.0),
     _min(0.0),
-    _max(1.0)
+    _max(1.0),
+    _trigger(true)
 {
     setRandomEngine();
     setName("RandomFloat");
     _type = FLOAT;
 
     // Declare params.
-    // TODO this could be factored out into static members.
     _output.setName("out");
     _output.setOutput(true);
     _output.setConnectable(true);
@@ -49,11 +28,13 @@ RandomFloat::RandomFloat() :
     _max.setOutput(false);
     _max.setConnectable(true);
 
-    _paramList << &_output << &_min << &_max;
+    _trigger.setName("trigger");
+    _trigger.setOutput(false);
+    _trigger.setConnectable(true);
+
+    _paramList << &_output << &_min << &_max << &_trigger;
     setParamParent();
 }
-
-
 
 void RandomFloat::setRandomEngine()
 {
@@ -71,6 +52,11 @@ void RandomFloat::setRandomEngine()
     _distribution = new std::uniform_real_distribution<float>(min, max);
 }
 
+void RandomFloat::paramHasBeenEdited()
+{
+    // Need to reset random engine.
+    setRandomEngine();
+}
 
 void RandomFloat::operator()()
 {
@@ -88,10 +74,10 @@ void RandomFloat::operator()()
 
 RandomInt::RandomInt() :
     Node(),
-    _value(0),
     _output(0),
     _min(0),
-    _max(20)
+    _max(20),
+    _trigger(true)
 {
     setName(QString("RandomInt%1").arg(_nodeCount));
     _type = INT;
@@ -111,19 +97,16 @@ RandomInt::RandomInt() :
     _max.setOutput(false);
     _max.setConnectable(false);
 
-    _paramList << &_output << &_min << &_max;
+    _trigger.setName("trigger");
+    _trigger.setOutput(false);
+    _trigger.setConnectable(true);
+
+    _paramList << &_output << &_min << &_max << &_trigger;
     setParamParent();
 
     // Specialized init for this node.  Will re-rerun if params edited.
     setRandomEngine();
 }
-
-void RandomInt::paramHasBeenEdited()
-{
-    // Need to reset random engine.
-    setRandomEngine();
-}
-
 
 void RandomInt::setRandomEngine()
 {
@@ -141,20 +124,24 @@ void RandomInt::setRandomEngine()
     _distribution = new std::uniform_int_distribution<int>(min, max);
 }
 
+void RandomInt::paramHasBeenEdited()
+{
+    // Need to reset random engine.
+    setRandomEngine();
+}
 
 void RandomInt::operator()()
 {
-    // XXX TODO:  ALL OPERATOR()s need to only exec once per 'frame'!
+    if (evaluatedThisFrame())
+        return;
+    evalAllInputs();
 
     // First, check the trigger to see if it's time for a new number
-    bool trigVal = true;
-    //XXX _trigger(trigVal);
-    if (trigVal) {
+    if (_trigger._value) {
         _output._value =  (*_distribution)(*_randGenerator);
     }
     _output._qvOutput = _output._value;
 }
-
 
 static Registrar<RandomFloat>   registrar("RandomFloat", Node::FLOAT);
 static Registrar<RandomInt>     registrar2("RandomInt", Node::INT);

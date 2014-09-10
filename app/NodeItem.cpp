@@ -38,14 +38,17 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
         else
             sockItem->setPos(GuiSettings::socketWidth,yOffset);
 
+        // Display an editor widget for the parameter value.
         ParamView *pv = new ParamView(nullptr, param);
         QGraphicsProxyWidget *proxy = this->scene()->addWidget(pv);
 #if 0
+        // XXX this is broken; for some reason, its setting the value on other connections
+        // as well.
         if (param->connectedParam())    //TODO update this when connections happen
             parItem->setEnabled(false);
 #endif
         proxy->setParentItem(parItem);
-        proxy->setPos(GuiSettings::socketWidth * 2 +70, 0);
+        proxy->setPos(GuiSettings::socketWidth * 2 + 70, 0);
     }
 }
 
@@ -57,12 +60,14 @@ QRectF NodeItem::boundingRect() const
 
 void NodeItem::paint(QPainter *painter,
            const QStyleOptionGraphicsItem *option, QWidget *widget)
+// XXX I don't think I'm handling the QStyleOptions stuff correctly.
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
     painter->save();
 
-    //painter->setBrush(dragOver ? color.light(130) : GuiColors::nodeBGColor); // XXX handle color differently
+    //painter->setBrush(dragOver ? color.light(130) : GuiColors::nodeBGColor);
+    // TODO drag-over highlighting
     painter->setBrush(GuiSettings::nodeBGColor); // TODO color by type
 
     QBrush b = painter->brush();
@@ -110,7 +115,7 @@ void NodeItem::keyPressEvent(QKeyEvent *event)
     qDebug() << "keypress " << event->key();
     switch (event->key()) {
     case Qt::Key_Delete:
-        // XXX
+        // XXX this will probably break. need to make sure dtors do right thing.
         delete this->_node;
         this->scene()->removeItem(this);
         deleteLater();

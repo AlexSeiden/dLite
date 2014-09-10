@@ -29,6 +29,8 @@ QT_END_NAMESPACE
  */
 class Engine : public QObject
 {
+    friend class Cupid;
+
     Q_OBJECT
 
 public:
@@ -71,6 +73,12 @@ public:
      * \return Position in bytes.
      */
     qint64 playPosition() const { return m_playPosition; }
+
+    /**
+     * Position of the audio output device.
+     * \return Position in microseconds.
+     */
+    qint64 getCurrentTime() const {return _uSecs; }
 
     /**
      * Length of the internal engine buffer.
@@ -207,8 +215,11 @@ private:
 
     // Interval in milliseconds between calls that update the spectrum, etc.
     int    				m_notifyIntervalMs;
-
     Dancefloormodel     *_dfModel;
+
+protected:
+    qint64              _uSecs;
+
 };
 
 #endif // ENGINE_H

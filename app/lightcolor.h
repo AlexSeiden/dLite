@@ -61,14 +61,12 @@ public:
     Firing(Lightcolor color, float alpha, compmode_t compmode, decayfunc_t decayfunc, Cue *cue=nullptr);
 
     bool        evaluate();
-    //bool evaluate(long time);  // evaluates for a specific time?
-    Lightcolor  getValue() {return _color;}
-    float       getAlpha() {return _alpha;}
+    //bool evaluate(long time);  // LATER evaluates for a specific time?
+
     Lightcolor  compOver(const Lightcolor &lightcolor);
     void        setDecay(decayfunc_t dfunk) {_decayfunction = dfunk;}
     void        setDecay(int i);
 
-//private:  //XXX
     Lightcolor  _color;
     float       _alpha;
     compmode_t  _compMode;

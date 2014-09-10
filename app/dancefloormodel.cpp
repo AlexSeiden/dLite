@@ -11,29 +11,29 @@
 #include <QStringList>
 #include "dancefloorwidget.h"
 
-using namespace std;
 
 Dancefloormodel::Dancefloormodel(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    _numCues(0),
+    _frame(0)
 {
-    _numCues = 0;
-
-    _t.start(); // XXX debugging
+    _timeSinceLastUpdate.start();
 }
 
 Dancefloormodel::~Dancefloormodel() { }
 
-// TODO add Foot-squares as well as lights
-bool Dancefloormodel::ImportLayout(string &layoutCsvFile)
+
+// LATER add Foot-squares as well as lights
+bool Dancefloormodel::ImportLayout(std::string &layoutCsvFile)
 {
-    string line;
-    vector< string> lines;
-    vector< vector <string> > cells;
+    std::string line;
+    std::vector< std::string> lines;
+    std::vector< std::vector <std::string> > cells;
 
     // Read in all lines
     std::ifstream myfile(layoutCsvFile);
     if (! myfile.is_open())
-        // TODO error
+        // ErrorHandling
         return false;
 
     while ( getline (myfile,line, '\r') ) {
@@ -42,16 +42,16 @@ bool Dancefloormodel::ImportLayout(string &layoutCsvFile)
     myfile.close();
 
     // OK, now we know the number of rows
-    ysize = lines.size();
+    _ysize = lines.size();
 
     // Break into individual cells
     for (size_t i = 0; i<lines.size(); ++i) {
         // Split each row into cells
         line = lines[i];
-        istringstream ss(line);
-        string token;
+        std::istringstream ss(line);
+        std::string token;
 
-        vector<string> row;
+        std::vector<std::string> row;
         while(getline(ss, token, ',')) {
             row.push_back(token);
         }
@@ -61,25 +61,23 @@ bool Dancefloormodel::ImportLayout(string &layoutCsvFile)
     // Find longest row, use that for x size.
    size_t rowSize = cells[0].size();
    for (size_t i = 1; i< cells.size(); ++i)
-        rowSize = max(cells[i].size(),  rowSize);
+        rowSize = std::max(cells[i].size(),  rowSize);
 
-    xsize = rowSize;
+    _xsize = rowSize;
 
-    // Now alloc arrays:
-    size_t arraySize = xsize*ysize;
-    lightIDs.resize(arraySize);
-    values.resize(arraySize);
-    firings.resize(arraySize);
+    // Alloc the Lights.  These store the pixel values, as well as the hardware
+    // address of the particular LED.
+    size_t arraySize = _xsize*_ysize;
     _lights.resize(arraySize);
 
     // And fill 'em up
-    for (int y=0; y<ysize; ++y){
-        for (int x=0; x<xsize; ++x){
+    for (int y=0; y<_ysize; ++y){
+        for (int x=0; x<_xsize; ++x){
             int index = _getIndex(x,y);
-            string cell = cells[y][x];
-            if (cell.size() == 0 || cell.compare("X")==0) {
+            std::string cell = cells[y][x];
+            if (cell.size() == 0 || cell.compare("X")==0)
                 _lights[index]._lightID = 0;
-            } else
+            else
                 _lights[index]._lightID = std::atoi(cell.c_str());
             _lights[index]._value = Lightcolor();
         }
@@ -97,18 +95,12 @@ bool Dancefloormodel::hasPixel(int x, int y)
         return true;
 }
 
-/*
- * Test routine to print layout.
- */
-void
-Dancefloormodel::printLayout()
+// Test routine to print layout on console.
+void Dancefloormodel::printLayout()
 {
-    for (int y=0; y<ysize; ++y){
-        for (int x=0; x<xsize; ++x){
-            int index = _getIndex(x,y);
-            printf("%4d", lightIDs[index]);
-            //cout << lightIDs[index];
-        }
+    for (int y=0; y<_ysize; ++y){
+        for (int x=0; x<_xsize; ++x)
+            printf("%4d", _lights[_getIndex(x,y)]._lightID);
         printf("\n");
     }
 }
@@ -116,12 +108,12 @@ Dancefloormodel::printLayout()
 #ifndef INLINE
 int Dancefloormodel::_getIndex(int x, int y)
 {
-    if (!(x >= 0 && x < xsize && y >= 0 && y < ysize)) {
+    if (!(x >= 0 && x < _xsize && y >= 0 && y < _ysize)) {
         qDebug() << "BOUNDS ERROR: " <<x <<y;
-        qDebug() << "MAX SIZE    : " <<xsize <<ysize;
+        qDebug() << "MAX SIZE    : " <<_xsize <<_ysize;
     }
-    Q_ASSERT(x >= 0 && x < xsize && y >= 0 && y < ysize);
-    return xsize*y + x;
+    Q_ASSERT(x >= 0 && x < _xsize && y >= 0 && y < _ysize);
+    return _xsize*y + x;
 }
 #endif
 
@@ -146,7 +138,7 @@ void Dancefloormodel::fireLight(int x, int y, Firing *firing)
 void Dancefloormodel::evaluate()
 {
     //qDebug("Time elapsed: %d ms", _t.elapsed());
-    _t.restart();
+    _timeSinceLastUpdate.restart();
 
     evaluateAllCues();
 
@@ -157,7 +149,7 @@ void Dancefloormodel::evaluate()
 #if 0
         Lightcolor lightColor(light->_value);  // start with what was in buffer.
 #else
-        Lightcolor lightColor;  // start with black
+        Lightcolor lightColor(0,0,0);  // start with black
 #endif
         auto firing = light->_firings.begin();
         while (firing != light->_firings.end())  {
@@ -178,6 +170,11 @@ void Dancefloormodel::evaluate()
     }
 
     _dfWidget->update();
+
+    // This keeps track of the current "frame" that's being evaluated.
+    // It's used to make sure certain things are evaluated once--and only
+    // once--per frame, as well as allowing triggers to reset correctly.
+    _frame++;
 }
 
 void Dancefloormodel::evaluateAllCues() {

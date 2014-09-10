@@ -51,6 +51,7 @@ bool SublevelMeter::setSelection(bool status)
     // XXX possible endless loop of signals?
     if (_selected) {
         emit iveBeenSelected(this);
+        // Kinda GROSS ...handled in a bunch of places.
         // TODO emit drawThisSubrange(this->_subrange);
     }
     else

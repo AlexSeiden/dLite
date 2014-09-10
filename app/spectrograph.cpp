@@ -147,7 +147,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
 
     // Do we have a subrange that should be drawn?
     if (_showSubrange) {
-        QRectF subrangewindow = _subrange.getWindow();      // XXX should be const ref?
+        QRectF subrangewindow = _subrange.getWindow();
         QRectF subwin;
         subwin.setTop   (rect().height() * subrangewindow.top());
         subwin.setBottom(rect().height() * subrangewindow.bottom());

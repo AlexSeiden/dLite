@@ -7,6 +7,7 @@
 const std::type_info & paramTypeFloat = typeid(Param<float>);
 const std::type_info & paramTypeInt = typeid(Param<int>);
 const std::type_info & paramTypeLcolor = typeid(Param<Lightcolor>);
+const std::type_info & paramTypeBool = typeid(Param<bool>);
 
 std::function<void()> ParamBase::getProvider()
 {
@@ -65,7 +66,7 @@ void ParamBase::connectTo(ParamBase *server)
 
     this->_connectedNode = server->getParent();
     this->_connectedParam = server;
-    // XXX theres got to be a better way to do this.
+    // GROSS. theres got to be a better way to do this.
     {
     Param<int> *s = dynamic_cast<Param<int> *>(server);
     Param<int> *c = dynamic_cast<Param<int> *>(this);
@@ -93,6 +94,15 @@ void ParamBase::connectTo(ParamBase *server)
     }
     }
 
+    {
+    Param<bool> *s = dynamic_cast<Param<bool> *>(server);
+    Param<bool> *c = dynamic_cast<Param<bool> *>(this);
+    if (s && c) {
+        c->setProvider(s->getProvider());
+        return;
+    }
+    }
+
     qDebug() << "ERROR--connectTo";
 
     qDebug() << "as per typeid(*this/server):";
@@ -106,7 +116,4 @@ void ParamBase::connectTo(ParamBase *server)
     qDebug() << "as per getType:";
     qDebug() << "thisType    " << this->getType().name();
     qDebug() << "serverType  " << server->getType().name() << endl;
-
-
 }
-

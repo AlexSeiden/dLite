@@ -1,6 +1,6 @@
 #include "SublevelNode.h"
 #include "utils.h"
-#include "OKCupid.h"
+#include "Cupid.h"
 #include "engine.h"
 
 // Sublevel node is unusual, since its Parameters are really the subrange
@@ -20,7 +20,7 @@ SublevelNode::SublevelNode(QObject *parent) :
     _paramList << &_output;
     setParamParent();
 
-    CHECKED_CONNECT(OKCupid::Singleton()->getEngine(),
+    CHECKED_CONNECT(Cupid::Singleton()->getEngine(),
                     SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
                     this,
                     SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
@@ -31,7 +31,7 @@ SublevelNode::SublevelNode(QObject *parent) :
 //                    SLOT(setSubrange(Subrange *)));
     CHECKED_CONNECT(this,
                     SIGNAL(iveBeenSelected(SublevelNode*)),
-                    OKCupid::Singleton()->getSpectrograph(),
+                    Cupid::Singleton()->getSpectrograph(),
                     SLOT(submeterSelectionChanged(SublevelNode *)));
 }
 
@@ -43,8 +43,8 @@ void SublevelNode::spectrumChanged(qint64 position, qint64 length, const Frequen
     _spectrum = spectrum;
     if (_active) {
         calculateLevel();
-        // TODO make sure levelChanged signal is connected to appropriate slot
-        // in any subrangemeter widgets.
+        // levelChanged signal is connected to the appropriate slot
+        // in any subrangemeter widgets in SublevelNodeItem ctor
         emit levelChanged(_output._value);
     }
 }

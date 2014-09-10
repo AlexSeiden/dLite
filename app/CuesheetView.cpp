@@ -6,7 +6,7 @@
 void GraphicsView::wheelEvent(QWheelEvent *e)
 {
     // This is only here to help implement zooming with wheel events.
-    // TODO make pinch-to-zoom work.
+    // LATER pinch-to-zoom work.
     if (e->modifiers() & Qt::ControlModifier) {
         if (e->delta() > 0)
             view->zoomIn(6);
@@ -84,7 +84,7 @@ CuesheetView::CuesheetView(QWidget *parent)
 QGraphicsView *CuesheetView::view() const
 {
     // This is only here to help implement zooming with wheel events.
-    // TODO make pinch-to-zoom work.
+    // LATER make pinch-to-zoom work.
     return static_cast<QGraphicsView *>(graphicsView);
 }
 

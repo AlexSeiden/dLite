@@ -1,5 +1,6 @@
 #include "Node.h"
 #include "utils.h"
+#include "Cupid.h"
 
 // ------------------------------------------------------------------------------
 //  Node
@@ -24,7 +25,7 @@ Node::~Node() {}
 
 void Node::beenSelected() {}
 
-// XXX gross.  at least, should be a better way to init this.
+// GROSS.  at least, should be a better way to init this.
 // should be a better way to find out without having to maintain this.
 // kinda breaks encapsulation to have it in the first place.
 void Node::setParamParent()
@@ -42,6 +43,17 @@ void Node::evalAllInputs()
         }
     }
 }
+
+bool Node::evaluatedThisFrame()
+{
+    int frame =  Cupid::getCurrentFrame();
+    if (frame == _frameLastEvaluated)
+        return true;
+
+    _frameLastEvaluated = frame;
+    return false;
+}
+
 // ------------------------------------------------------------------------------
 //  Node Factory
 
@@ -68,14 +80,15 @@ Node * NodeFactory::instatiateNode(QString name)
     NodeInstatiator_t instancer = _registry[name.toStdString()];
     if (! instancer)
         return nullptr;
-        // TODO error
+        // ErrorHandling
 
     instance = instancer();
     _allNodes.append(instance); // XXX Hmmm, this might be a good place to use a weak ptr.
 
 #if 0
     // wrap instance in a shared ptr and return
-    // XXX not sure if I'm handling the shared_ptr stuff correctly
+    // XXX not sure if I'm handling the shared_ptr stuff correctly.
+    // also not sure if it's needed.
     if (instance != nullptr)
         return std::shared_ptr<Node>(instance);
     else

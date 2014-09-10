@@ -101,15 +101,3 @@ qint16 realToPcm(qreal real)
 {
     return real * PCMS16MaxValue;
 }
-
-static qint64 _currentTimeInMS = 0;
-
-qint64 getCurrentTime()
-{
-    return _currentTimeInMS;
-}
-
-void setCurrentTime(qint64 uSecs)
-{
-    _currentTimeInMS = uSecs/1000;
-}

@@ -29,16 +29,18 @@ ColorRamp::ColorRamp() :
     _mix.setOutput(false);
     _mix.setConnectable(true);
 
-    _paramList << &_output << &_c0 << &_c1 << &_mix;
+    _paramList << &_output << &_c1 << &_c0 << &_mix;
     setParamParent();
 }
 
 void ColorRamp::operator()()
 {
+    if (evaluatedThisFrame())
+        return;
     evalAllInputs();
 
     Lightcolor part0, part1;
-    part0 = _c0._value*(1.0-_mix._value);     // XXX Doesn't seem to compile if float is first.
+    part0 = _c0._value*(1.0-_mix._value);     // NOTE Doesn't seem to compile if float is first.
     part1 = _c1._value*_mix._value;
 
 //    _value = (1.0-t)*c0 + t*c1;

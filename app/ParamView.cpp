@@ -10,9 +10,9 @@ ParamView::ParamView(QWidget *parent, ParamBase *param ) :
     _name(param->getName()),
     _param(param)
 {
-    _layout = new QHBoxLayout;
-    _layout->setSpacing(0);
-    _layout->setContentsMargins(8,0,8,0);
+    QHBoxLayout * layout = new QHBoxLayout;
+    layout->setSpacing(0);
+    layout->setContentsMargins(8,0,8,0);
 
     const std::type_info & paramType = typeid(*param);
 
@@ -26,13 +26,13 @@ ParamView::ParamView(QWidget *parent, ParamBase *param ) :
         float val = 0.0;
         floatParam->getValue(val);
         editorWidget->setValue(val);
-        _genericEditorWidget->setFixedSize(60,22);
+        _genericEditorWidget->setFixedSize(60,22); // XXX is this causing the zoom to break? NOPE
         CHECKED_CONNECT(editorWidget, SIGNAL(valueChanged(double)), this, SLOT(setValue(double)));
     }
     else if (paramType == paramTypeInt){
         Param<int> * intParam = dynamic_cast<Param<int> *>(_param);
         QSpinBox *editorWidget = new QSpinBox;
-        editorWidget->setRange(0, 20);
+        editorWidget->setRange(0, 10000);   // XXX need some way to set ranges etc.
         editorWidget->setSingleStep(1);
         _genericEditorWidget = editorWidget;
         _genericEditorWidget->setFixedSize(60,22);
@@ -51,16 +51,28 @@ ParamView::ParamView(QWidget *parent, ParamBase *param ) :
         setButtonColor(editorWidget, qc);
         CHECKED_CONNECT(editorWidget, SIGNAL(clicked()), this, SLOT(launchColorDialog()));
     }
-    else
+    else if (paramType == paramTypeBool) {
+        Param<bool> * boolParam = dynamic_cast<Param<bool> *>(_param);
+        QCheckBox *editorWidget =  new QCheckBox(this);
+        _genericEditorWidget = editorWidget;
+        bool val;
+        boolParam->getValue(val);
+        editorWidget->setChecked(val);
+        // XXX below we're calling setValue(int) when we should probly call setValue(bool)
+        CHECKED_CONNECT(editorWidget, SIGNAL(stateChanged(int)), this, SLOT(setValue(int)));
+    }
+    else {
         qDebug() << "ERROR: could not match typeid(param)";
-        // TODO handle error better
+        Q_ASSERT(false);
+        // ErrorHandling
+   }
 
     if (param->isOutput())
         _genericEditorWidget->setEnabled(false);
 
     _genericEditorWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    _layout->addWidget(_genericEditorWidget);
-    this->setLayout(_layout);
+    layout->addWidget(_genericEditorWidget);
+    this->setLayout(layout);
 }
 
 
@@ -70,9 +82,9 @@ ParamView::ParamView(QWidget *parent, QString name, ParamBase *param) :
     _name(name),
     _param(param)
 {
-    _layout = new QHBoxLayout;
-    _layout->setSpacing(0);
-    _layout->setContentsMargins(8,0,8,0);
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->setSpacing(0);
+    layout->setContentsMargins(8,0,8,0);
 
     _whipButton = new Whip(_param, this);
 
@@ -120,22 +132,22 @@ ParamView::ParamView(QWidget *parent, QString name, ParamBase *param) :
     }
     else
         qDebug() << "ERROR: could not match typeid(param)";
-        // TODO handle error better
+        // ErrorHandling
 
     _genericEditorWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     if (! param->isOutput()) {
-        _layout->addWidget(_whipButton);
-        _layout->addWidget(_label);
-        _layout->addWidget(_genericEditorWidget);
+        layout->addWidget(_whipButton);
+        layout->addWidget(_label);
+        layout->addWidget(_genericEditorWidget);
     }
     else {
-        _layout->addSpacing(_whipButton->width());
-        _layout->addWidget(_label);
-        _layout->addWidget(_whipButton);
+        layout->addSpacing(_whipButton->width());
+        layout->addWidget(_label);
+        layout->addWidget(_whipButton);
     }
-    _layout->addStretch();
-    this->setLayout(_layout);
+    layout->addStretch();
+    this->setLayout(layout);
 }
 
 void ParamView::launchColorDialog() {
@@ -176,11 +188,11 @@ void ParamView::setValue(Lightcolor val) {
     p->_parentNode->paramHasBeenEdited();
 }
 
+#ifdef NUKEME
 void ParamView::setProvider(std::function<void()> closure) {
    this->setProvider(closure);
 }
 
-#if 0
 void ParamView::setProvider(std::function<void()> closure) {
    Param<int> *p = dynamic_cast<Param<int> *>(this->_param);
    Q_ASSERT(p);

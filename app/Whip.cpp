@@ -38,7 +38,7 @@ Whip::Whip(ParamBase *param, QWidget *parent, bool inputConnection) :
 }
 
 // Initiate drag event on mouse press.
-// TODO: on click & release, bring up connected object.
+// LATER: on click & release, bring up connected object.
 // on click & drag, initiate drag&drop.
 void Whip::mousePressEvent(QMouseEvent *event)
 {

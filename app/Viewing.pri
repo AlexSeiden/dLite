@@ -12,7 +12,6 @@ SOURCES += \
     levelmeter.cpp \
     progressbar.cpp \
     spectrograph.cpp \
-    controlpanel.cpp \
     CueView.cpp \
     Whip.cpp \
     CueLibView.cpp \
@@ -31,7 +30,6 @@ HEADERS += \
     levelmeter.h \
     progressbar.h \
     spectrograph.h \
-    controlpanel.h \
     CueView.h \
     Whip.h \
     CueLibView.h \

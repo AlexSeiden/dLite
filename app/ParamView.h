@@ -30,8 +30,10 @@ public slots:
     void setValue(int val);
     void setValue(Lightcolor val);
 
+#ifdef NUKEME
     void setProvider(std::function<void()> closure);
 //    void setProvider(std::function<void(Lightcolor&)> closure);
+#endif
 
     void launchColorDialog();
 
@@ -42,7 +44,6 @@ private:
     Whip            *_whipButton;
     QLabel          *_label;
     QWidget         *_genericEditorWidget;
-    QHBoxLayout     *_layout;       // XXX might not need to save this.
 };
 
 #endif // PARAMVIEW_H

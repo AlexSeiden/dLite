@@ -82,7 +82,7 @@ QGraphicsItem *CuesheetScene::findFirstReleventItem(QList<QGraphicsItem *> &endI
 
 void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    // XXX nb:  if only one  of "_isConnecting" and "_line" are true, then
+    // ErrorHandling nb:  if only one  of "_isConnecting" and "_line" are true, then
     // we have some internal inconsistancy.
     if (_isConnecting && _line) {
         // Find the QGraphicsItems that's underneath the release position.

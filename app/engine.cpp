@@ -136,12 +136,11 @@ void Engine::suspend()
 
 void Engine::audioNotify()
 {
-    // Find current playPosition in bytes
 
-    const qint64 uSecs = m_audioOutput->processedUSecs();
-    const qint64 playPosition = audioLength(m_format, uSecs);
+    _uSecs = m_audioOutput->processedUSecs();
+    // Find current playPosition in bytes
+    const qint64 playPosition = audioLength(m_format, _uSecs);
     setPlayPosition(qMin(bufferLength(), playPosition));
-    setCurrentTime(uSecs);
 
     // Look backwards from the playPosition when computing the level and the spectrum
     const qint64 levelPosition = playPosition - m_levelBufferLength;
@@ -154,7 +153,7 @@ void Engine::audioNotify()
         m_bufferPosition = 0;
         m_dataLength = 0;
         // Data needs to be read into m_buffer in order to be analysed
-        // TODO :-P gross.  should read into one buffer, and play from that buffer.
+        // GROSS.  should read into one buffer, and play from that buffer.
         const qint64 readPos = qMax(qint64(0), qMin(levelPosition, spectrumPosition));
         const qint64 readEnd = qMin(m_analysisFile->size(), qMax(levelPosition + m_levelBufferLength, spectrumPosition + m_spectrumBufferLength));
         const qint64 readLen = readEnd - readPos + audioLength(m_format, WaveformWindowDuration);
@@ -344,7 +343,7 @@ void Engine::setPlayPosition(qint64 position, bool forceEmit)
         emit playPositionChanged(m_playPosition);
 }
 
-// XXX may be able to nix this
+// NUKEME may be able to nix this
 void Engine::calculateLevel(qint64 position, qint64 length)
 {
     Q_ASSERT(position + length <= m_bufferPosition + m_dataLength);

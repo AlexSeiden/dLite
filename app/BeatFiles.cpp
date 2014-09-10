@@ -1,11 +1,12 @@
 #include "BeatFiles.h"
 #include "Node.h"
+#include "Cupid.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
 
-// TODO MASTER TODO HERE
+// TODO master todo here
 // (because it's the first src file.)
 //
 // Saving!
@@ -30,9 +31,60 @@
 //      Remnants of original spectrum audio recording stuff in buffer length and
 //      window changed things
 
+
+// ------------------------------------------------------------------------------
+//  TriggerEvery
+//      Triggers every _interval milliseconds
+
+TriggerEvery::TriggerEvery() :
+    Node(),
+    _output(true),
+    _interval(500)
+{
+    setName("TriggerEvery");
+    _type = BEAT;
+
+    _output.setName("out");
+    _output.setOutput(true);
+    _output.setConnectable(true);
+
+    _interval.setName("interval");
+    _interval.setOutput(false);
+    _interval.setConnectable(false);
+
+    // Set refresh to current time, so when we make a new one in the middle
+    // of playing, it won't have to catch up.
+    _nextRefresh = Cupid::getCurrentTime();
+    _lastRefresh = Cupid::getCurrentTime();
+    _paramList << &_output << &_interval;
+    setParamParent();
+}
+
+void TriggerEvery::operator()()
+{
+    // Only run any operator once per frame:
+    if (evaluatedThisFrame())
+        return;
+
+    // Automatically reset after triggering.
+    _output._value = false;
+
+    // XXX this breaks if we move the audio playhead back in time.
+    qint64 mSecs =  Cupid::getCurrentTime() / 1000;
+    if (mSecs > _nextRefresh) {
+       _output._value = true;
+       _lastRefresh = _nextRefresh;
+       _nextRefresh += _interval._value;
+    }
+    _output._qvOutput.setValue(_output._value);
+}
+
+
 // ------------------------------------------------------------------------------
 // NodeOnset
 //      Loads "onset" info from precomputed file.
+//      This node will generate an impulse (bool 'true')
+//      for one frame after each onset.
 
 NodeOnset::NodeOnset() : Node()
 {
@@ -45,9 +97,10 @@ NodeOnset::NodeOnset() : Node()
 
     _offset.setName("offset");
     _offset.setOutput(false);
-    _offset.setConnectable(true);
+    _offset.setConnectable(false);
 
     _paramList << &_output << &_offset;
+    setParamParent();
 }
 
 void NodeOnset::loadFile(std::string filename)
@@ -55,7 +108,7 @@ void NodeOnset::loadFile(std::string filename)
     std::ifstream filestream;
     filestream.open(filename, std::ios::in);
     if (! filestream.is_open())
-        return; // TODO error
+        return; // ErrorHandling
 
     std::string line;
     while ( getline (filestream,line) ) {
@@ -69,7 +122,7 @@ void NodeOnset::operator()()
 {
     // XXX TODO:  ALL OPERATOR()s need to only exec once per 'frame'!
 
-    // TODO implement operator
+    // XXX implement operator
     _output._value = true;
 }
 
@@ -85,7 +138,7 @@ void NodeBar::loadFile(std::string filename)
     std::ifstream filestream;
     filestream.open(filename, std::ios::in);
     if (! filestream.is_open())
-        return; // TODO error
+        return; // ErrorHandling
 
     std::string line;
     while ( getline (filestream,line) ) {
@@ -103,12 +156,13 @@ void NodeBar::loadFile(std::string filename)
 void NodeBar::operator()() {
     // XXX TODO:  ALL OPERATOR()s need to only exec once per 'frame'!
 
-    // TODO implement operator
+    // XXX implement operator
 //    _output._value = true;
 }
 
 
 // ------------------------------------------------------------------------------
 // Register
-static Registrar<NodeOnset>     registrar("Onset", Node::BEAT);
+static Registrar<TriggerEvery>  registrar0("TriggerEvery", Node::BEAT);
+static Registrar<NodeOnset>     registrar1("Onset", Node::BEAT);
 static Registrar<NodeBar>       registrar2("Bar", Node::BEAT);

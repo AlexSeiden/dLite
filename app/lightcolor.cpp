@@ -127,7 +127,7 @@ Firing::Firing(Lightcolor color, float alpha, compmode_t compmode, decayfunc_t d
     _cue(cue)
 { }
 
-void Firing::setDecay(int i) // TODO gross!
+void Firing::setDecay(int i) // GROSS
 {
     if (i == 0)
         _decayfunction = noDecay;
