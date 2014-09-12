@@ -24,6 +24,8 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
+    void avoidCollisions();
+
     Node *getNode() {return _node;}
 
     virtual void beenSelected();
@@ -84,9 +86,11 @@ class ConnectorItem : public QGraphicsObject
 public:
     explicit  ConnectorItem(SocketItem *serverSocket, SocketItem *clientSocket, QGraphicsItem *parent = 0);
 
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
-    void updatePath();
+    QRectF          boundingRect() const;
+    void            paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    QPainterPath    shape() const;
+
+    void            updatePath();
 
 public slots:
     void gotMoved();

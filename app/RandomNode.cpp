@@ -132,6 +132,7 @@ void RandomInt::paramHasBeenEdited()
 
 void RandomInt::operator()()
 {
+    // Boilerplate start of operator:
     if (evaluatedThisFrame())
         return;
     evalAllInputs();
@@ -140,8 +141,76 @@ void RandomInt::operator()()
     if (_trigger._value) {
         _output._value =  (*_distribution)(*_randGenerator);
     }
+
+    // Boilerplate end of operator:
     _output._qvOutput = _output._value;
 }
 
-static Registrar<RandomFloat>   registrar("RandomFloat", Node::FLOAT);
+// ------------------------------------------------------------------------------
+//  ModuloInt
+
+SequenceInt::SequenceInt() :
+    Node(),
+    _output(0),
+    _min(6),
+    _max(12),
+    _trigger(true)
+{
+    setName(QString("SequenceInt%1").arg(_nodeCount));
+    _type = INT;
+
+    // Declare params.
+    _output.setName("out");
+    _output.setConnectable(true);
+    _output.setOutput(true);
+
+    _min.setName("min");
+    _min.setOutput(false);
+    _min.setConnectable(true);
+
+    _max.setName("max");
+    _max.setOutput(false);
+    _max.setConnectable(true);
+
+    _trigger.setName("trigger");
+    _trigger.setOutput(false);
+    _trigger.setConnectable(true);
+
+    _counter = _min._value;
+    _paramList << &_output << &_min << &_max << &_trigger;
+    setParamParent();
+}
+
+void SequenceInt::paramHasBeenEdited()
+{
+    // Need to recheck range.
+    if (_counter > _max._value)
+        _counter = _max._value;
+    else if (_counter < _min._value)
+        _counter = _min._value;
+}
+
+void SequenceInt::operator()()
+{
+    // Boilerplate start of operator:
+    if (evaluatedThisFrame())
+        return;
+        //XXX would need to recheck bounds if min or max changed.
+    evalAllInputs();
+
+    // First, check the trigger to see if it's time for a new number
+    // XXX also breaks when scrubbing.
+    if (_trigger._value) {
+        _counter++;
+        if (_counter > _max._value)
+            _counter = _min._value;
+        _output._value =  _counter;
+    }
+
+    // Boilerplate end of operator:
+    _output._qvOutput = _output._value;
+}
+
+static Registrar<RandomFloat>   registrar1("RandomFloat", Node::FLOAT);
 static Registrar<RandomInt>     registrar2("RandomInt", Node::INT);
+static Registrar<SequenceInt>   registrar3("SequenceInt", Node::INT);

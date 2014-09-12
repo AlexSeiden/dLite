@@ -11,13 +11,16 @@ QColor  GuiSettings::nodeBGColor          = QColor(120,100,60);
 QColor  GuiSettings::nodeTextColor        = QColor(255,255,255);
 QColor  GuiSettings::paramTextColor       = QColor(255,255,255);
 QColor  GuiSettings::paramFillColor       = QColor(120,100,60);
-int     GuiSettings::nodeWidth            = 230;                 // Width of the entire node
+QColor  GuiSettings::outputParamFillColor = QColor(100,100,100);
+int     GuiSettings::nodeWidth            = 230;                // Width of the entire node
+int     GuiSettings::nodeSpacing          = 20;                 // Space between nodes
 int     GuiSettings::socketWidth          = 16;                 // Width of the socket connector rectangle
 int     GuiSettings::paramHeight          = 25;                 // Height of each param
 QColor  GuiSettings::selectedNodePenColor = QColor(255,100,100);
 int     GuiSettings::selectedNodePenWidth = 2;
 QPen    GuiSettings::socketOutlinePen   = QPen(GuiSettings::socketOutlineColor, 2, Qt::SolidLine);
 QPen    GuiSettings::connectorPen       = QPen(GuiSettings::connectorColor, 2, Qt::SolidLine);
+int     GuiSettings::connectorEndSize     = 5;
 int     GuiSettings::iconSize             = 16;
 
 // Dancefloorwidget

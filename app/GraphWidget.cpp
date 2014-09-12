@@ -14,21 +14,20 @@
 #include "sublevel.h"
 #include <QPushButton>
 
-int GraphWidget::_numNodeItems = 0;
-
 GraphWidget::GraphWidget(QWidget *parent) :
     QWidget(parent),
-    _scene(new CuesheetScene)
+    _scene(new CuesheetScene),
+    _csview(new CuesheetView)
 {
     _scene->setSceneRect(-3000.,-3000.,6000.,6000.);
+    _csview->view()->setScene(_scene);
+
     CHECKED_CONNECT(_scene, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));
 
-    CuesheetView *cs = new CuesheetView(NULL);
-    cs->view()->setScene(_scene);
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
-    layout->addWidget(cs);
+    layout->addWidget(_csview);
     setGeometry(10, 500, 1500, 500);
     setLayout(layout);
     setWindowTitle("Cuesheet");
@@ -39,7 +38,6 @@ GraphWidget::GraphWidget(QWidget *parent) :
 void GraphWidget::selectionChanged()
 {
     QList<QGraphicsItem *> selection = _scene->selectedItems();
-//    qDebug() << "selectionChanged" << selection;
     foreach (QGraphicsItem *item, selection) {
         NodeItem *nodeItem = dynamic_cast<NodeItem *>(item);
         if (nodeItem){
@@ -61,8 +59,8 @@ void GraphWidget::subrangeHasChanged(Subrange *subrange)
         }
 
         if (nSublevelNodes > 1) {
-            // eee
-            qDebug() << "Error: multiple subranges set in " << Q_FUNC_INFO << nSublevelNodes;
+            // ErrorHandling
+            qDebug() << "Error: multiple subranges simulatnously selected " << Q_FUNC_INFO << nSublevelNodes;
         }
     }
 }
@@ -78,12 +76,13 @@ void GraphWidget::addNode(Node *node)
         nodeItem = new NodeItem(node);
 
     // TODO better positioning.
-    nodeItem->setPos(_numNodeItems*GuiSettings::nodeWidth*1.3,-200.);
-    _numNodeItems++;
+    QPointF  center = _csview->view()->mapToScene(_csview->view()->viewport()->rect().center());
+    nodeItem->setPos(center);
+
     _scene->addItem(nodeItem);
+    nodeItem->avoidCollisions();
 }
 
-void GraphWidget::buttclick()
-{
-    qDebug() << "buttclick";
-}
+//TODO  void GraphWidget::frameSelected()
+//TODO  void GraphWidget::frameAll()
+

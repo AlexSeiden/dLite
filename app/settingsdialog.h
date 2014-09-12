@@ -27,25 +27,24 @@ public:
     ~SettingsDialog();
 
     WindowFunction windowFunction() const { return m_windowFunction; }
-    const QAudioDeviceInfo &outputDevice() const { return m_outputDevice; }
     int interval() const { return m_interval; }
 
 private slots:
     void windowFunctionChanged(int index);
-    void outputDeviceChanged(int index);
     void intervalChanged(const QString text);
 
 private:
     WindowFunction          m_windowFunction;
-    QAudioDeviceInfo        m_outputDevice;
     int                     m_interval;
-    int      				m_spectrumNumBands;
-    int      				m_spectrumLow;
-    int      				m_spectrumHi;
-
-    QComboBox *m_outputDeviceComboBox;
+//    int      				m_spectrumNumBands;
+//    int      				m_spectrumLow;
+//    int      				m_spectrumHi;
     QComboBox *m_windowFunctionComboBox;
     QLineEdit *m_intervalLineEdit;
+    QSpinBox *				m_numBandsSpinBox;
+    QSpinBox *				m_specMinSpinBox;
+    QSpinBox *				m_specMaxSpinBox;
+
 };
 
 #endif // SETTINGSDIALOG_H

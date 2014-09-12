@@ -24,31 +24,11 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
 
     // Make a ParamItem for every param in the node:
     int y = 0;
-    int yOffset = GuiSettings::paramHeight/2;
     for (ParamBase *param : node->getParams()) {
         y+=GuiSettings::paramHeight;
         ParamItem *parItem = new ParamItem(param, this);
         parItem->setPos(0,y);
 
-        // And build socket items within each param.
-        SocketItem *sockItem = new SocketItem(param, parItem);
-        parItem->setSocket(sockItem);
-        if (param->isOutput())
-            sockItem->setPos(GuiSettings::nodeWidth - GuiSettings::socketWidth, yOffset);
-        else
-            sockItem->setPos(GuiSettings::socketWidth,yOffset);
-
-        // Display an editor widget for the parameter value.
-        ParamView *pv = new ParamView(nullptr, param);
-        QGraphicsProxyWidget *proxy = this->scene()->addWidget(pv);
-#if 0
-        // XXX this is broken; for some reason, its setting the value on other connections
-        // as well.
-        if (param->connectedParam())    //TODO update this when connections happen
-            parItem->setEnabled(false);
-#endif
-        proxy->setParentItem(parItem);
-        proxy->setPos(GuiSettings::socketWidth * 2 + 70, 0);
     }
 }
 
@@ -134,15 +114,54 @@ void NodeItem::beenSelected()
     _node->beenSelected();
 }
 
+void NodeItem::avoidCollisions()
+{
+   QList<QGraphicsItem *>colliders = collidingItems(Qt::IntersectsItemBoundingRect);
+//   QList<QGraphicsItem *>colliders = collidingItems();
+
+   foreach (QGraphicsItem *item, colliders) {
+       NodeItem *ni = dynamic_cast<NodeItem *>(item);
+       if (ni) {
+           moveBy(GuiSettings::nodeWidth + GuiSettings::nodeSpacing, 0);
+           avoidCollisions();
+           break;
+       }
+   }
+}
+
 //-----------------------------------------------------------------------------
 // ParamItem
 
 ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
     QGraphicsObject(parent),
-    _param(param),
-    _socket(nullptr)
+    _param(param)
+{
+    int yOffset = GuiSettings::paramHeight/2;
 
-{ }
+    // Build socket items
+    _socket = new SocketItem(param, this);
+    if (param->isOutput())
+        // Output items get their socket on the right side
+        _socket->setPos(GuiSettings::nodeWidth - GuiSettings::socketWidth, yOffset);
+    else {
+        // Input items get their socket on the left side, and get an editor
+        // proxyWidget too.
+        _socket->setPos(GuiSettings::socketWidth,yOffset);
+
+        // Display an editor widget for the parameter value.
+        ParamView *pv = new ParamView(nullptr, param);
+        QGraphicsProxyWidget *proxy = this->scene()->addWidget(pv);
+#if 0
+        // XXX this is broken; for some reason, it's setting the value on other connections
+        // as well.
+        if (param->connectedParam())    //TODO update this when connections happen
+            parItem->setEnabled(false);
+#endif
+        proxy->setParentItem(this);
+        proxy->setPos(GuiSettings::socketWidth * 2 + 70, 0);
+    }
+}
+
 
 QRectF ParamItem::boundingRect() const
 {
@@ -157,7 +176,10 @@ void ParamItem::paint(QPainter *painter,
     Q_UNUSED(widget);
 
     // Set box for this param
-    painter->setBrush(GuiSettings::paramFillColor);
+    if (_param->isOutput())
+        painter->setBrush(GuiSettings::outputParamFillColor);
+    else
+        painter->setBrush(GuiSettings::paramFillColor);
     QRect rr(0,0,GuiSettings::nodeWidth,GuiSettings::paramHeight);
 
     // Draw rectangle
@@ -245,29 +267,40 @@ QRectF ConnectorItem::boundingRect() const
     QPointF nStart = _serverSocket->scenePos();
     QPointF nEnd = _clientSocket->scenePos();
 
-    QRectF bbox(_pStart, QSizeF(_pEnd.x() - _pStart.x(), _pEnd.y() - _pStart.y()));
+    // Compute two rects when dragging.  The first is the rect
+    // that connects _pStart & _pEnd -- the PREVIOUS positions.
+    QRectF bbox(_pStart, QSizeF(qMax(_pEnd.x() - _pStart.x(),100.), _pEnd.y() - _pStart.y()));
     bbox = bbox.normalized();
 
-    QRectF nbox(_pStart, QSizeF(nEnd.x() - nStart.x(), nEnd.y() - nStart.y()));
+    // The second rect connects the NEW positions of the sockets.
+    // This matters when we are dragging quickly.
+    QRectF nbox(_pStart, QSizeF(qMax(nEnd.x() - nStart.x(),100.), nEnd.y() - nStart.y()));
     nbox = nbox.normalized();
 
+    // Take the union of both:
     bbox = bbox.united(nbox);
 
+    // And add a fudge factor
     bbox = bbox.adjusted(-extra, -extra, extra, extra);
     return bbox;
 }
 
+QPainterPath ConnectorItem::shape() const
+{
+    return(*_path);
+}
+
 void ConnectorItem::updatePath()
 {
-    _pStart = _serverSocket->scenePos(); // + QPointF(GuiSettings::socketWidth/2., GuiSettings::socketWidth/2.);
-    _pEnd   = _clientSocket->scenePos(); // + QPointF(GuiSettings::socketWidth/2., GuiSettings::socketWidth/2.);
+    _pStart = _serverSocket->scenePos();
+    _pEnd   = _clientSocket->scenePos();
 
     if (_path)
         delete _path;
 
     _path = new QPainterPath();
     _path->moveTo(_pStart);
-    _path->cubicTo(_pStart+QPointF(100,0), _pEnd+QPointF(-100,0), _pEnd);
+    _path->cubicTo(_pStart+QPointF(100.,0.), _pEnd+QPointF(-100.,0.), _pEnd);
 }
 
 void ConnectorItem::paint(QPainter *painter,
@@ -283,7 +316,8 @@ void ConnectorItem::paint(QPainter *painter,
         painter->drawPath(*_path);
 
     // TODO set ellipse pen brush & size
-    painter->drawEllipse(0,0,5,5);
+    painter->drawEllipse(_pStart, GuiSettings::connectorEndSize, GuiSettings::connectorEndSize);
+    painter->drawEllipse(_pEnd,   GuiSettings::connectorEndSize, GuiSettings::connectorEndSize);
 
     painter->restore();
 }

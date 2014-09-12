@@ -30,8 +30,7 @@ private:
 
     QList<QPushButton *> buttons;
 
-    QHBoxLayout *mainLayout;
-    QSignalMapper *signalMapper;
+    QSignalMapper *_signalMapper;
 };
 
 #endif // CUELIBVIEW_H

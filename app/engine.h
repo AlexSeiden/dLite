@@ -40,61 +40,41 @@ public:
     QAudio::State state() const { return m_state; }
     int interval() {return m_notifyIntervalMs;}
 
-    /**
-     * \return Current audio format
-     * \note May be QAudioFormat() if engine is not initialized
-     */
+    // return Current audio format
+    // note May be QAudioFormat() if engine is not initialized
     const QAudioFormat& format() const { return m_format; }
 
-    /**
-     * Stop any ongoing recording or playback, and reset to ground state.
-     */
+    // Stop any ongoing recording or playback, and reset to ground state.
     void reset();
 
-    /**
-     * Load data from WAV file
-     */
+    // Load data from WAV file
     bool loadFile(const QString &fileName);
 
-    /**
-     * RMS level of the most recently processed set of audio samples.
-     * \return Level in range (0.0, 1.0)
-     */
+    // RMS level of the most recently processed set of audio samples.
+    // \return Level in range (0.0, 1.0)
     qreal rmsLevel() const { return m_rmsLevel; }
 
-    /**
-     * Peak level of the most recently processed set of audio samples.
-     * \return Level in range (0.0, 1.0)
-     */
+    // Peak level of the most recently processed set of audio samples.
+    // \return Level in range (0.0, 1.0)
     qreal peakLevel() const { return m_peakLevel; }
 
-    /**
-     * Position of the audio output device.
-     * \return Position in bytes.
-     */
+    // Position of the audio output device.
+    // \return Position in bytes.
     qint64 playPosition() const { return m_playPosition; }
 
-    /**
-     * Position of the audio output device.
-     * \return Position in microseconds.
-     */
+    // Position of the audio output device.
+    // \return Position in microseconds.
     qint64 getCurrentTime() const {return _uSecs; }
 
-    /**
-     * Length of the internal engine buffer.
-     * \return Buffer length in bytes.
-     */
+    // Length of the internal engine buffer.
+    // \return Buffer length in bytes.
     qint64 bufferLength() const;
 
-    /**
-     * Amount of data held in the buffer.
-     * \return Data length in bytes.
-     */
+    // Amount of data held in the buffer.
+    // \return Data length in bytes.
     qint64 dataLength() const { return m_dataLength; }
 
-    /**
-     * Set window function applied to audio data before spectral analysis.
-     */
+    // Set window function applied to audio data before spectral analysis.
     void setWindowFunction(WindowFunction type);
 
     void setDancefloormodel(Dancefloormodel *df) {_dfModel = df;}
@@ -102,71 +82,45 @@ public:
 public slots:
     void startPlayback();
     void suspend();
-    /**
-     * Set update interval
-     */
+    // Set update interval
     void setInterval(int val);
-    void bungholio(int nDogs);
 
 signals:
     void stateChanged(QAudio::State state);
 
-    /**
-     * Informational message for non-modal display
-     */
+    // Informational message for non-modal display
     void infoMessage(const QString &message, int durationMs);
 
-    /**
-     * Error message for modal display
-     */
+    // Error message for modal display
     void errorMessage(const QString &heading, const QString &detail);
 
-    /**
-     * Format of audio data has changed
-     */
+    // Format of audio data has changed
     void formatChanged(const QAudioFormat &format);
 
-    /**
-     * Length of buffer has changed.
-     * \param duration Duration in microseconds
-     */
+    // Length of buffer has changed.
+    // \param duration Duration in microseconds
     void bufferLengthChanged(qint64 duration);
 
-    /**
-     * Amount of data in buffer has changed.
-     * \param Length of data in bytes
-     */
+    // Amount of data in buffer has changed.
+    // \param Length of data in bytes
     void dataLengthChanged(qint64 duration);
 
-    /**
-     * Position of the audio output device has changed.
-     * \param position Position in bytes
-     */
+    // Position of the audio output device has changed.
+    // \param position Position in bytes
     void playPositionChanged(qint64 position);
 
-    /**
-     * Level changed
-     * \param rmsLevel RMS level in range 0.0 - 1.0
-     * \param peakLevel Peak level in range 0.0 - 1.0
-     * \param numSamples Number of audio samples analyzed
-     */
+    // Level changed
+    // \param rmsLevel RMS level in range 0.0 - 1.0
+    // \param peakLevel Peak level in range 0.0 - 1.0
+    // \param numSamples Number of audio samples analyzed
     void levelChanged(qreal rmsLevel, qreal peakLevel, int numSamples);
 
-    /**
-     * Spectrum has changed.
-     * \param position Position of start of window in bytes
-     * \param length   Length of window in bytes
-     * \param spectrum Resulting frequency spectrum
-     */
+    // Spectrum has changed.
+    // \param position Position of start of window in bytes
+    // \param length   Length of window in bytes
+    // \param spectrum Resulting frequency spectrum
     // TODO change this to only pass the spectrum
     void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
-
-    /**
-     * Buffer containing audio data has changed.
-     * \param position Position of start of buffer in bytes
-     * \param buffer   Buffer
-     */
-    void bufferChanged(qint64 position, qint64 length, const QByteArray &buffer);
 
 private slots:
     void audioNotify();
@@ -183,14 +137,12 @@ private:
     void setPlayPosition(qint64 position, bool forceEmit = false);
     void calculateLevel(qint64 position, qint64 length);
     void calculateSpectrum(qint64 position);
-    void setLevel(qreal rmsLevel, qreal peakLevel, int numSamples);
 
 private:
     QAudio::State       m_state;
 
-    WavFile*            m_file;
-    // We need a second file handle via which to read data into m_buffer
-    // for analysis
+    WavFile*            m_wavFileHandle;
+    // We need a second file handle via which to read data into m_buffer for analysis
     WavFile*            m_analysisFile;
 
     QAudioFormat        m_format;
@@ -218,7 +170,10 @@ private:
     Dancefloormodel     *_dfModel;
 
 protected:
+    // Used directly by Cupid.
     qint64              _uSecs;
+    QString             m_audiofilename;
+    QString             m_onsetfilename;
 
 };
 

@@ -48,10 +48,14 @@ public slots:
     void stateChanged(QAudio::State state);
     void spectrumChanged(qint64 position, qint64 length,
                          const FrequencySpectrum &spectrum);
+#ifdef NUKEME
     void infoMessage(const QString &message, int timeoutMs);
     void errorMessage(const QString &heading, const QString &detail);
+#endif
+
     void audioPositionChanged(qint64 position);
-    void bufferLengthChanged(qint64 length);
+
+    void bufferLengthChanged(qint64 length);    // XXX should nuke
 
     // XXX This is more of a "model" or "controller" issue than a view/widget one.
     void newNodeRequest(QString name);
@@ -85,10 +89,6 @@ private:
     QIcon                   m_playIcon;
     QPushButton*            m_settingsButton;
     QIcon                   m_settingsIcon;
-
-    QSpinBox *				m_numBandsSpinBox;
-    QSpinBox *				m_specMinSpinBox;
-    QSpinBox *				m_specMaxSpinBox;
 
     QLabel*                 m_infoMessage;
     int                     m_infoMessageTimerId;

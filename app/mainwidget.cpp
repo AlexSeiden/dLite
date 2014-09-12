@@ -34,9 +34,9 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_pauseButton(new QPushButton(this))
     ,   m_playButton(new QPushButton(this))
     ,   m_settingsButton(new QPushButton(this))
-    ,   m_numBandsSpinBox(new QSpinBox(this))
-    ,   m_specMinSpinBox(new QSpinBox(this))
-    ,   m_specMaxSpinBox(new QSpinBox(this))
+//    ,   m_numBandsSpinBox(new QSpinBox(this))
+//    ,   m_specMinSpinBox(new QSpinBox(this))
+//    ,   m_specMaxSpinBox(new QSpinBox(this))
     ,   m_infoMessage(new QLabel(tr(""), this))
     ,   m_infoMessageTimerId(NullTimerId)
     ,   m_settingsDialog(new SettingsDialog(m_engine->interval(), this))
@@ -51,8 +51,8 @@ MainWidget::MainWidget(QWidget *parent)
 
     createUi();
 
-    setMinimumHeight(400);
-    move(10,10);  // TODO restore from last saved
+    setMinimumSize(500, 400);
+    move(5,10);  // TODO restore from last saved
 
     // TODO move to settings/prefs  & allow setting this
     std::string layoutfile = std::string("/Users/alex/src/floorit/layout.csv");
@@ -75,7 +75,8 @@ MainWidget::MainWidget(QWidget *parent)
     connectUi();
 
     // TODO default to last played.
-    m_engine->loadFile(QString("/Users/alex/Documents/lights/Jam On It/Jam On It.wav"));
+    //m_engine->loadFile(QString("/Users/alex/Documents/lights/Jam On It/Jam On It.wav"));
+    m_engine->loadFile(QString("/Users/alex/Documents/WAVS/Awesome/Awesome.wav"));
 
 
     // OK, these are essentially globals:  GROSS
@@ -110,6 +111,7 @@ void MainWidget::spectrumChanged(qint64 position, qint64 length,
     m_spectrograph->spectrumChanged(spectrum);
 }
 
+#ifdef NUKEME
 void MainWidget::infoMessage(const QString &message, int timeoutMs)
 {
     m_infoMessage->setText(message);
@@ -127,6 +129,7 @@ void MainWidget::errorMessage(const QString &heading, const QString &detail)
 {
     QMessageBox::warning(this, heading, detail, QMessageBox::Close);
 }
+#endif
 
 
 void MainWidget::timerEvent(QTimerEvent *event)
@@ -235,50 +238,6 @@ void MainWidget::createUi()
     windowLayout->addLayout(bottomPaneLayout.data());
     bottomPaneLayout.take(); // ownership transferred to windowLayout
 
-
-    // Options layout
-    QLabel *numBandsLabel = new QLabel(tr("Number of Bands"), this);
-    m_numBandsSpinBox->setMinimum(3);
-    m_numBandsSpinBox->setMaximum(40);
-    m_numBandsSpinBox->setFixedWidth(50);
-    m_numBandsSpinBox->setValue(m_spectrograph->numBars());
-    QScopedPointer<QHBoxLayout> numBandsLayout (new QHBoxLayout);
-    numBandsLayout->addWidget(numBandsLabel);
-    numBandsLayout->addWidget(m_numBandsSpinBox);
-    numBandsLayout->addStretch();
-
-    QLabel *specMinLabel = new QLabel(tr("Min Freq"), this);
-    m_specMinSpinBox->setMinimum(0);
-    m_specMinSpinBox->setMaximum(20000);
-    m_specMinSpinBox->setFixedWidth(70);
-    m_specMinSpinBox->setValue(m_spectrograph->freqLo());
-    QScopedPointer<QHBoxLayout> specMinLayout (new QHBoxLayout);
-    specMinLayout->addWidget(specMinLabel);
-    specMinLayout->addWidget(m_specMinSpinBox);
-    specMinLayout->addStretch();
-
-    QLabel *specMaxLabel = new QLabel(tr("Max Freq"), this);
-    m_specMaxSpinBox->setMinimum(0);
-    m_specMaxSpinBox->setMaximum(40000);
-    m_specMaxSpinBox->setFixedWidth(70);
-    m_specMaxSpinBox->setValue(m_spectrograph->freqHi());
-    QScopedPointer<QHBoxLayout> specMaxLayout (new QHBoxLayout);
-    specMaxLayout->addWidget(specMaxLabel);
-    specMaxLayout->addWidget(m_specMaxSpinBox);
-    specMaxLayout->addStretch();
-
-    QScopedPointer<QHBoxLayout> optionsLayout(new QHBoxLayout);
-    optionsLayout->addLayout(numBandsLayout.data());
-    optionsLayout->addLayout(specMinLayout.data());
-    optionsLayout->addLayout(specMaxLayout.data());
-    numBandsLayout.take(); 			// ownership transferred to options layout
-    specMinLayout.take(); 			// ownership transferred to options layout
-    specMaxLayout.take(); 			// ownership transferred to options layout
-    //optionsLayout->addStretch();	// Fills empty space rather than stretching out sub-layouts.
-
-    windowLayout->addLayout(optionsLayout.data());
-    optionsLayout.take(); // ownership transferred to windowLayout
-
     // Apply layout
     setLayout(windowLayout);
 }
@@ -336,25 +295,74 @@ void MainWidget::connectUi()
             this, SLOT(infoMessage(QString, int)));
 #endif
 
-    // TODO Move to Spectrograph, or settings dialog
-    CHECKED_CONNECT(m_numBandsSpinBox, SIGNAL(valueChanged(int)),
-            m_spectrograph, SLOT(setNumBars(int)));
-
-    // TODO these should only signal when enter is hit or something.
-    // And they probably shouldn't be spinboxes; or at least should increment
-    // geometrically.
-    CHECKED_CONNECT(m_specMinSpinBox, SIGNAL(valueChanged(int)),
-            m_spectrograph, SLOT(setFreqLo(int)));
-
-    CHECKED_CONNECT(m_specMaxSpinBox, SIGNAL(valueChanged(int)),
-            m_spectrograph, SLOT(setFreqHi(int)));
-
 
 
     CHECKED_CONNECT(m_cueLibView, SIGNAL(newNodeRequest(QString)),
                     this, SLOT(newNodeRequest(QString)));
 
 }
+
+#if 0
+QLayout *createSpectrumOptionsUI(QWidget *parent, Spectrograph *spectrograph)
+{
+
+    QHBoxLayout *layout = new QHBoxLayout;
+
+    // Options layout
+    QLabel *numBandsLabel = new QLabel(tr("Number of Bands"), parent);
+    QSpinBox *numBandsSpinBox = new QSpinBox(parent);
+    numBandsSpinBox->setMinimum(3);
+    numBandsSpinBox->setMaximum(40);
+    numBandsSpinBox->setFixedWidth(50);
+    numBandsSpinBox->setValue(spectrograph->numBars());
+    QScopedPointer<QHBoxLayout> numBandsLayout (new QHBoxLayout);
+    numBandsLayout->addWidget(numBandsLabel);
+    numBandsLayout->addWidget(numBandsSpinBox);
+    numBandsLayout->addStretch();
+    layout->addLayout(numBandsLayout.data());
+    numBandsLayout.take();
+
+    QLabel *specMinLabel = new QLabel(tr("Min Freq"), parent);
+    QSpinBox *specMinSpinBox = new QSpinBox(parent);
+    specMinSpinBox->setMinimum(0);
+    specMinSpinBox->setMaximum(20000);
+    specMinSpinBox->setFixedWidth(70);
+    specMinSpinBox->setValue(spectrograph->freqLo());
+    QScopedPointer<QHBoxLayout> specMinLayout (new QHBoxLayout);
+    specMinLayout->addWidget(specMinLabel);
+    specMinLayout->addWidget(specMinSpinBox);
+    specMinLayout->addStretch();
+    layout->addLayout(specMinLayout.data());
+    specMinLayout.take();
+
+    QLabel *specMaxLabel = new QLabel(tr("Max Freq"), parent);
+    QSpinBox *specMaxSpinBox = new QSpinBox(parent);
+    specMaxSpinBox->setMinimum(0);
+    specMaxSpinBox->setMaximum(40000);
+    specMaxSpinBox->setFixedWidth(70);
+    specMaxSpinBox->setValue(spectrograph->freqHi());
+    QScopedPointer<QHBoxLayout> specMaxLayout (new QHBoxLayout);
+    specMaxLayout->addWidget(specMaxLabel);
+    specMaxLayout->addWidget(specMaxSpinBox);
+    specMaxLayout->addStretch();
+    layout->addLayout(specMaxLayout.data());
+    specMaxLayout.take(); // ownership transferred to dialogLayout
+
+    // TODO Move to Spectrograph, or settings dialog
+    CHECKED_CONNECT(numBandsSpinBox, SIGNAL(valueChanged(int)),
+            spectrograph, SLOT(setNumBars(int)));
+
+    // TODO these probably shouldn't be spinboxes; or at least should increment
+    // geometrically.
+    CHECKED_CONNECT(specMinSpinBox, SIGNAL(valueChanged(int)),
+            spectrograph, SLOT(setFreqLo(int)));
+
+    CHECKED_CONNECT(specMaxSpinBox, SIGNAL(valueChanged(int)),
+            spectrograph, SLOT(setFreqHi(int)));
+
+    return layout;
+}
+#endif
 
 void MainWidget::updateButtonStates()
 {

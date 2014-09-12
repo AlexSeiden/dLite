@@ -137,7 +137,7 @@ void Dancefloormodel::fireLight(int x, int y, Firing *firing)
 
 void Dancefloormodel::evaluate()
 {
-    //qDebug("Time elapsed: %d ms", _t.elapsed());
+    qDebug("Time elapsed: %d ms", _timeSinceLastUpdate.elapsed());
     _timeSinceLastUpdate.restart();
 
     evaluateAllCues();

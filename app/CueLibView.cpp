@@ -7,30 +7,30 @@ CueLibView::CueLibView(QWidget *parent) :
     QWidget(parent)
 {
     createUi();
-    move(500, 50);
+    move(500, 10);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 void CueLibView::createUi()
 {
-    signalMapper = new QSignalMapper(this);
+    _signalMapper = new QSignalMapper(this);
 
-    mainLayout = new QHBoxLayout;
+    QGridLayout *mainLayout = new QGridLayout;
     mainLayout->setMargin(2);
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(4,4,4,4);
+    mainLayout->setContentsMargins(2,2,2,2);
 
-    mainLayout->addWidget(createGroup("Cues", Node::CUE));
-    mainLayout->addWidget(createGroup("Ints", Node::INT));
-    mainLayout->addWidget(createGroup("Floats", Node::FLOAT));
-    mainLayout->addWidget(createGroup("Colors", Node::COLOR));
-    mainLayout->addWidget(createGroup("Beats", Node::BEAT));
+    mainLayout->addWidget(createGroup("Cues", Node::CUE),0,0);
+    mainLayout->addWidget(createGroup("Ints", Node::INT),0,1);
+    mainLayout->addWidget(createGroup("Floats", Node::FLOAT),0,2);
+    mainLayout->addWidget(createGroup("Colors", Node::COLOR),1,0);
+    mainLayout->addWidget(createGroup("Beats", Node::BEAT),1,1);
     setLayout(mainLayout);
 
     setWindowTitle(tr("Cue Library"));
-    setWindowFlags(Qt::Window | Qt::WindowTitleHint |
-                   Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
+    setWindowFlags( Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
 
-    CHECKED_CONNECT(signalMapper, SIGNAL(mapped(QString)),
+    CHECKED_CONNECT(_signalMapper, SIGNAL(mapped(QString)),
                     this, SIGNAL(newNodeRequest(QString)));
     // The newNodeRequest signal from here is monitored by mainwidget,
     // who does the bulk of the dispatching.
@@ -42,6 +42,8 @@ QGroupBox *CueLibView::createGroup(QString typeName, Node::node_t nodeType)
     QGroupBox *groupBox = new QGroupBox(typeName);
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
+    layout->setMargin(2);
+    layout->setContentsMargins(2,2,2,2);
 
     QStringList allNodenames = NodeFactory::Singleton()->getNodesOfType(nodeType);
 
@@ -59,6 +61,6 @@ void CueLibView::addButtonToUi(QLayout *layout, QString buttonName) {
     QPushButton *butt = new QPushButton(buttonName);
     buttons.push_back(butt);
     layout->addWidget(butt);
-    signalMapper->setMapping(butt, buttonName);
-    CHECKED_CONNECT(butt, SIGNAL(clicked()), signalMapper, SLOT(map()));
+    _signalMapper->setMapping(butt, buttonName);
+    CHECKED_CONNECT(butt, SIGNAL(clicked()), _signalMapper, SLOT(map()));
 }

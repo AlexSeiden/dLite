@@ -16,6 +16,9 @@ SettingsDialog::SettingsDialog(int interval,
     ,   m_interval(interval)
     ,   m_windowFunctionComboBox(new QComboBox(this))
     ,   m_intervalLineEdit(new QLineEdit(this))
+    ,   m_numBandsSpinBox(new QSpinBox(this))
+    ,   m_specMinSpinBox(new QSpinBox(this))
+    ,   m_specMaxSpinBox(new QSpinBox(this))
 {
     QVBoxLayout *dialogLayout = new QVBoxLayout(this);
 
@@ -48,6 +51,7 @@ SettingsDialog::SettingsDialog(int interval,
     CHECKED_CONNECT(m_intervalLineEdit, SIGNAL(textChanged(QString)),
                     this, SLOT(intervalChanged(QString)));
 
+
     // Add standard buttons to layout
     QDialogButtonBox *buttonBox = new QDialogButtonBox(this);
     buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -69,12 +73,6 @@ void SettingsDialog::windowFunctionChanged(int index)
     m_windowFunction = static_cast<WindowFunction>(
             m_windowFunctionComboBox->itemData(index).value<int>());
 }
-
-void SettingsDialog::outputDeviceChanged(int index)
-{
-    m_outputDevice = m_outputDeviceComboBox->itemData(index).value<QAudioDeviceInfo>();
-}
-
 
 void SettingsDialog::intervalChanged(const QString text)
 {

@@ -21,12 +21,10 @@ public slots:
     void addNode(Node *node);
     void subrangeHasChanged(Subrange *subrange);
     void selectionChanged();
-    void buttclick();
 
 private:
-    QGraphicsScene *_scene;
-
-    static int _numNodeItems;
+    QGraphicsScene *    _scene;
+    CuesheetView *      _csview;
 };
 
 #endif // GRAPHWIDGET_H

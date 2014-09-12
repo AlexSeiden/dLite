@@ -55,4 +55,26 @@ private:
     std::uniform_int_distribution<int> *_distribution;
 };
 
+class SequenceInt : public Node
+{
+public:
+    SequenceInt();
+
+    // Functor that provides closure over instance object,
+    // and allows downstream clients to evaluate.
+    void operator() ();
+
+    void paramHasBeenEdited();
+
+private:
+    // Parameters
+    Param<int> _output;
+    Param<int> _min;
+    Param<int> _max;
+    Param<bool> _trigger;
+
+private:
+    int _counter;
+};
+
 #endif // RANDOMNODE_H

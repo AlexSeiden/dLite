@@ -23,16 +23,19 @@ public:
     static QColor   nodeBGColor;
     static QColor   nodeTextColor;
     static int      nodeWidth;
+    static int      nodeSpacing;
     static QColor   selectedNodePenColor;
     static int      selectedNodePenWidth;
     static QColor   socketFillColor;
     static QColor   socketOutlineColor;
     static QColor   paramFillColor;
+    static QColor   outputParamFillColor;
     static QColor   paramTextColor;
     static int      socketWidth;
     static int      paramHeight;
     static QPen     socketOutlinePen;
     static QPen     connectorPen;
+    static int      connectorEndSize;
     static int      iconSize;
 
     // Dance floor widget

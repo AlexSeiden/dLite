@@ -35,6 +35,8 @@ ColorRamp::ColorRamp() :
 
 void ColorRamp::operator()()
 {
+    // Boilerplate start of operator:
+    // TODO:  add start & end boilerplate to the generic
     if (evaluatedThisFrame())
         return;
     evalAllInputs();
@@ -42,9 +44,9 @@ void ColorRamp::operator()()
     Lightcolor part0, part1;
     part0 = _c0._value*(1.0-_mix._value);     // NOTE Doesn't seem to compile if float is first.
     part1 = _c1._value*_mix._value;
-
-//    _value = (1.0-t)*c0 + t*c1;
     _output._value = part0 + part1;
+
+    // Boilerplate end of operator:
     _output._qvOutput.setValue(_output._value);
 }
 
