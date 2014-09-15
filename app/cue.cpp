@@ -10,6 +10,6 @@ Cue::Cue() :
 {
     _type = CUE;
     // Add this to list of cues the model knows about.
-    if (Cue::_dfModel)
-        Cue::_dfModel->addCue(this);
+    Q_ASSERT(Cue::_dfModel);
+    Cue::_dfModel->addCue(this);
 }

@@ -16,8 +16,6 @@ class Dancefloormodel : public QObject
 {
     Q_OBJECT
 
-    friend class Cupid;
-
 public:
     explicit Dancefloormodel(QObject *parent = 0);
     ~Dancefloormodel();
@@ -28,13 +26,13 @@ public:
     Lightcolor  getPixel(int x, int y);
     QColor      getQColor(int x, int y);
 
-    int getXsize() {return _xsize;}
-    int getYsize() {return _ysize;}
+    int getXsize() const {return _xsize;}
+    int getYsize() const {return _ysize;}
 
     void addCue(Cue *cue);
-    int getNumCues()    {return _numCues;}
+    int getNumCues() const    {return _cues.size();}
 
-    int getFrame()      {return _frame;}    // GROSS
+    int getFrame() const      {return _frame;}
 
     void setView(Dancefloorwidget *dfwidget) { _dfWidget = dfwidget;}
 
@@ -47,7 +45,6 @@ protected:
     int                 _xsize, _ysize;
     std::vector<Light>  _lights;
     std::vector<Cue *>  _cues;
-    int                 _numCues;
 
     int                 _frame;
     QTime               _timeSinceLastUpdate;

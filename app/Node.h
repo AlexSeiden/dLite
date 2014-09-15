@@ -20,6 +20,11 @@ class NodeFactory;
 class Node
 {
 public:
+    // These types are purely used for classification for the Cuelibrary.
+    // Actual node output connection type is dependent on the parameters
+    // marked "output", and can include multiples of these types.
+    // Style:  that might be a good enough reason for replacing this enum--
+    // as well as the _type field--with lists for the Cuelibrary directly.
     enum node_t {CUE, FLOAT, INT, COLOR, BEAT, POSITION, UNDEFINED};
 
     Node();
@@ -80,7 +85,7 @@ protected:
     // Boilerplate call in every ctor; sets a pointer from
     // the parameter back to the parent.
     void                setParamParent();
-    ParamBase *         getParamPbyName(QString paramname);
+    ParamBase *         getParamByName(QString paramname);
 
 
     static  int         _nodeCount; // TODO remove this
@@ -139,7 +144,8 @@ private:
     std::map<std::string, NodeInstatiator_t>    _registry;
     QMap<Node::node_t, QStringList>             _registryByType;
     QMap<QUuid, Node*>                          _registryUUIDtoNodep;
-    QMap<QUuid, ParamBase*>                     _registryUUIDtoParamp;
+    QMap<QUuid, ParamBase*>                     _registryUUIDtoParam;
+    QMap<ParamBase *, QUuid>                    _connectionsToMake;
 
     // Inventory
     QList<Node *>   _allNodes;

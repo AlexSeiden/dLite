@@ -132,6 +132,22 @@ void NodeItem::avoidCollisions()
    }
 }
 
+void NodeItem::read(const QJsonObject &json)
+{
+    // ErrorHandling
+    qreal x, y;
+    x = json["xPos"].toDouble();
+    y = json["yPos"].toDouble();
+    setPos(x,y);
+}
+
+void NodeItem::write(QJsonObject &json) const
+{
+    // ErrorHandling
+    json["xPos"] = x();
+    json["yPos"] = y();
+}
+
 //-----------------------------------------------------------------------------
 // ParamItem
 

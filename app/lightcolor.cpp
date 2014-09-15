@@ -82,6 +82,8 @@ const Lightcolor Lightcolor::operator*(double rhs) {
 }
 
 #if 0
+// Now handled by non-member operator*, which allows implicit type promotion
+// (I think...or maybe I've just fixed other problems....)
 const Lightcolor Lightcolor::operator*(const Lightcolor &rhs) {
     Lightcolor result = *this;
     result *= rhs;

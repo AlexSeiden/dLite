@@ -49,7 +49,8 @@ void ParamBase::connectTo(ParamBase *server)
     // client is an input; they have the same type; etc.
 
     this->_connectedParam = server;
-    // GROSS. theres got to be a better way to do this.
+
+    // GROSS -- There's got to be a better way to do this.
     {
     Param<int> *s = dynamic_cast<Param<int> *>(server);
     Param<int> *c = dynamic_cast<Param<int> *>(this);
@@ -86,7 +87,7 @@ void ParamBase::connectTo(ParamBase *server)
     }
     }
 
-    qDebug() << "ERROR--connectTo";
+    qDebug() << "ERROR" << Q_FUNC_INFO;
 
     qDebug() << "as per typeid(*this/server):";
     qDebug() << "thisType    " << typeid(*this).name();
@@ -101,26 +102,34 @@ void ParamBase::connectTo(ParamBase *server)
     qDebug() << "serverType  " << server->getType().name() << endl;
 }
 
-void ParamBase::read(const QJsonObject &json)
-{
-}
+// -------------------------
+// Param i/o
 
+// Writing
 void ParamBase::write(QJsonObject &json) const
 {
 //    json["type"] = _type; // TODO translate
     json["name"] = _name;
-    json["isOutput"] = _isOutput;
-    json["isConnectable"] = _isConnectable;
     json["uuid"] = _uuid.toString();
     if (_connectedParam)
         json["connectedTo"] = _connectedParam->_uuid.toString();
+#if 0
+    // These shouldn't change for a given parameter, and so for now
+    // we don't output them.
+    json["isOutput"] = _isOutput;
+    json["isConnectable"] = _isConnectable;
+#endif
+    // Values of params are written by the type-specialized versions below.
 }
 
 
-
+// Template specializations
 template <> void Param<Lightcolor>::write(QJsonObject &json) const
 {
     ParamBase::write(json);
+    if (isOutput())
+        return;
+
     json["red"] = _value.getRed();
     json["green"] = _value.getGreen();
     json["blue"] = _value.getBlue();
@@ -129,17 +138,63 @@ template <> void Param<Lightcolor>::write(QJsonObject &json) const
 template <> void Param<float>::write(QJsonObject &json) const
 {
     ParamBase::write(json);
+    if (isOutput())
+        return;
     json["value"] = _value;
 }
 
 template <> void Param<bool>::write(QJsonObject &json) const
 {
     ParamBase::write(json);
+    if (isOutput())
+        return;
     json["value"] = _value;
 }
 
 template <> void Param<int>::write(QJsonObject &json) const
 {
     ParamBase::write(json);
+    if (isOutput())
+        return;
     json["value"] = _value;
+}
+
+// Reading
+
+void ParamBase::read(const QJsonObject &json)
+{
+    // ErrorHandling
+    _uuid = QUuid(json["uuid"].toString());
+}
+
+template <> void Param<int>::read(const QJsonObject &json)
+{
+    ParamBase::read(json);
+    if (isOutput())
+        return;
+    setValue(json["value"].toInt());
+}
+
+template <> void Param<float>::read(const QJsonObject &json)
+{
+    ParamBase::read(json);
+    if (isOutput())
+        return;
+    setValue(json["value"].toDouble());
+}
+
+template <> void Param<bool>::read(const QJsonObject &json)
+{
+    ParamBase::read(json);
+    if (isOutput())
+        return;
+    setValue(json["value"].toBool());
+}
+
+template <> void Param<Lightcolor>::read(const QJsonObject &json)
+{
+    ParamBase::read(json);
+    if (isOutput())
+        return;
+    _value = Lightcolor(json["red"].toInt(), json["green"].toInt(), json["blue"].toInt());
 }

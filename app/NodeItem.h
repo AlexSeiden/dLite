@@ -7,9 +7,9 @@
 #include <QGraphicsObject>
 #include <QList>
 
-
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
+class QJsonObject;
 QT_END_NAMESPACE
 
 // Forward declarations
@@ -25,10 +25,12 @@ public:
     void    paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
     void    avoidCollisions();
-
-    Node *  getNode() {return _node;}
-
+    Node*   getNode() const {return _node;}
     virtual void beenSelected();
+
+    // Serialization
+    virtual void read(const QJsonObject &json);
+    virtual void write(QJsonObject &json) const;
 
 signals:
     void    nodeMovedEventSignal();
@@ -36,8 +38,9 @@ signals:
 protected:
     void    mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void    keyPressEvent(QKeyEvent *event);
+
     Node    *_node;
-    QMarginsF  _margins; // for padding on rect bbox
+    QMarginsF  _margins; // for padding on the bounding rect
 };
 
 
@@ -51,7 +54,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
     void setSocket(SocketItem *sock) {_socket = sock;}
-    SocketItem *getSocket() {return _socket;}
+    SocketItem *getSocket()          {return _socket;}
 
 private:
     ParamBase    *_param;

@@ -5,6 +5,9 @@
 #include <QGraphicsLineItem>
 
 // Subclasses QGraphicsScene, for viewing a Cuesheet.
+
+
+// Forward declarations:
 class SocketItem;
 
 QT_BEGIN_NAMESPACE
@@ -26,6 +29,7 @@ public slots:
     void setConnecting(bool status=true) {_isConnecting = status;}
     void setStartPoint(QPointF startPoint) {_startPoint = startPoint;}
     void startLine(QGraphicsSceneMouseEvent *mouseEvent, SocketItem *srcItem);
+    void connectSockets(SocketItem *server, SocketItem *client);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);

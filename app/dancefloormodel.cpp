@@ -14,9 +14,10 @@
 
 Dancefloormodel::Dancefloormodel(QObject *parent) :
     QObject(parent),
-    _numCues(0),
     _frame(0)
 {
+    // _timeSinceLastUpdate is tracked just to see how well the interface is really
+    // responding.
     _timeSinceLastUpdate.start();
 }
 
@@ -175,6 +176,8 @@ void Dancefloormodel::evaluate()
     // This keeps track of the current "frame" that's being evaluated.
     // It's used to make sure certain things are evaluated once--and only
     // once--per frame, as well as allowing triggers to reset correctly.
+    // Note that each frame will *not* take the exact same amount of time,
+    // although they should in general be pretty close.
     _frame++;
 }
 
@@ -186,5 +189,4 @@ void Dancefloormodel::evaluateAllCues() {
 
 void Dancefloormodel::addCue(Cue *cue) {
     _cues.push_back(cue);
-    _numCues++;
 }

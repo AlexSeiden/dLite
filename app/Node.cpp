@@ -6,6 +6,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QUuid>
+#include "GraphWidget.h"        // GROSS
 
 // ------------------------------------------------------------------------------
 //  Node
@@ -24,8 +25,8 @@ Node::Node() :
 
 Node::~Node() {}
 
-// Virtual method allows nodes, such as Sublevels & Paths, which have special
-// editors, to do their thing.
+// The "beenSelected" method is virtual so that nodes like Sublevels
+// & Paths can communicate with special editors.
 void Node::beenSelected() {}
 
 Node::node_t Node::getType()
@@ -36,7 +37,7 @@ Node::node_t Node::getType()
 
 // GROSS.  at least, should be a better way to init this.
 // should be a better way to find out without having to maintain this.
-// kinda breaks encapsulation to have it in the first place.
+// This kinda breaks encapsulation to have it in the first place.
 void Node::setParamParent()
 {
     foreach (ParamBase *p, _paramList) {
@@ -65,15 +66,21 @@ bool Node::evaluatedThisFrame()
 
 void Node::read(const QJsonObject &json)
 {
+    _name      = json["name"].toString();
+    _active    = json["active"].toBool();
+
 }
 
 void Node::write(QJsonObject &json) const
 {
+    // ErrorHandling
+
     json["name"] = _name;
-    json["type"] = _type;
     json["active"] = _active;
+    // "classname" here is the name used in the NodeFactory registry.
     json["classname"] = _className;
     json["uuid"] = _uuid.toString();
+    //json["type"] = _type; // Type is unchanging per class.
 
     QJsonArray paramJsonArray;
     foreach (const ParamBase *param, _paramList) {
@@ -81,18 +88,19 @@ void Node::write(QJsonObject &json) const
          param->write(paramJ);
          paramJsonArray.append(paramJ);
      }
-     json["paramList"] = paramJsonArray;
+    json["paramList"] = paramJsonArray;
 
      // TODO write graph view info
 }
 
-ParamBase *Node::getParamPbyName(QString paramname)
+ParamBase *Node::getParamByName(QString paramname)
 {
     // Return the parameter called "paramname"
     foreach (ParamBase *p, _paramList) {
         if (paramname == p->getName())
             return p;
     }
+    // ErrorHandling
     return nullptr;
 }
 
@@ -164,30 +172,15 @@ const QStringList & NodeFactory::getNodesOfType(Node::node_t typeInfo) {
     return _registryByType[typeInfo];
 }
 
-bool NodeFactory::readFromFile(QString filename)
-{
-    QFile loadFile(filename);
 
-    if (!loadFile.open(QIODevice::ReadOnly)) {
-        qWarning("Couldn't open saved file.");
-        return false;
-    }
-
-    QByteArray saveData = loadFile.readAll();
-
-    QJsonDocument loadDoc(QJsonDocument::fromJson(saveData));
-
-    readAllNodes(loadDoc.object());
-
-    return true;
-}
+// -------------------
+// File writing
 
 bool NodeFactory::saveToFile(QString filename)
 {
-    QFile saveFile(filename);
-
-    if (!saveFile.open(QIODevice::WriteOnly)) {
-        qWarning("Couldn't open save file."); //ErrorHandling
+    QFile qfile(filename);
+    if (!qfile.open(QIODevice::WriteOnly)) {
+        qWarning("Couldn't open file for saving."); //ErrorHandling
         return false;
     }
 
@@ -195,71 +188,10 @@ bool NodeFactory::saveToFile(QString filename)
     // Fill sceneObject with all the scene data.
     write(sceneObject);
 
-    QJsonDocument saveDoc(sceneObject);
-    saveFile.write(saveDoc.toJson());
+    QJsonDocument jsonDoc(sceneObject);
+    qfile.write(jsonDoc.toJson());
 
     return true;
-}
-
-void NodeFactory::readNode(const QJsonObject &json)
-{
-    QString classname   = json["classname"].toString();
-    QUuid uuid          = QUuid(json["uuid"].toString());
-
-    Node * newnode      = Singleton()->instatiateNode(classname, uuid);
-    newnode->_name      = json["name"].toString();
-    newnode->_type      = Node::node_t(qRound(json["type"].toDouble()));
-    newnode->_active    = json["name"].toBool();
-
-    _registryUUIDtoNodep[newnode->_uuid] = newnode;
-
-    QJsonArray paramsArray = json["paramList"].toArray();
-    QMap<ParamBase *, QUuid> connectionsToMake;
-    for (int i = 0; i < paramsArray.size(); ++i) {
-        QJsonObject paramObject = paramsArray[i].toObject();
-        // Params don't need to be instantiated, since they are not dynamic.
-        // Any given node will automatically instantiate all its params.
-        // But their values, UUIDs, and connections must be read and assigned appropriately.
-        // XXX PARAM VALUES AREN'T BEING OUTPUT
-        QString paramname = paramObject["name"].toString();
-
-        // Find a pointer to the named param in this node:
-        ParamBase *param = newnode->getParamPbyName(paramname);
-
-        // Read UUID, and store in registry
-        param->_uuid = QUuid(paramObject["uuid"].toString());
-        _registryUUIDtoParamp[param->_uuid] = param;
-
-        // If param has a connection, deal with that:
-        if (paramObject.contains("connectedTo")) {
-            QUuid connectedUUID = QUuid(paramObject["connectedTo"].toString());
-            // Since connections may be made to parameters that haven't been
-            // instantiated yet, we need to save all these connections, then
-            // make them after everything has been read and instatiated:
-            connectionsToMake[param] = connectedUUID;
-        }
-
-        // Read params value:
-
-        // TODO XXX
-
-    }
-
-}
-
-void NodeFactory::readAllNodes(const QJsonObject &json)
-{
-    // TODO something like this:
-    //CueSheet.clear();
-    // or
-    //CueSheet.new();
-    // or maybe Nodefactory::{new,clear}....
-
-    QJsonArray nodesArray = json["nodes"].toArray();
-    for (int i = 0; i < nodesArray.size(); ++i) {
-        QJsonObject nodeObject = nodesArray[i].toObject();
-        readNode(nodeObject);
-    }
 }
 
 void NodeFactory::write(QJsonObject &json) const
@@ -278,4 +210,89 @@ void NodeFactory::write(QJsonObject &json) const
      //     onset, beat, etc., files
      //     UI settings
 
+}
+
+// -------------------
+// File reading
+
+bool NodeFactory::readFromFile(QString filename)
+{
+    QFile qfile(filename);
+    if (!qfile.open(QIODevice::ReadOnly)) {
+        qWarning("Couldn't open saved file.");
+        return false;
+    }
+
+    QByteArray fileData = qfile.readAll();
+    QJsonDocument jsonDoc(QJsonDocument::fromJson(fileData));
+
+    readAllNodes(jsonDoc.object());
+
+    return true;
+}
+
+void NodeFactory::readAllNodes(const QJsonObject &json)
+{
+    // TODO something like this:
+    //CueSheet.clear();
+    // or
+    //CueSheet.new();
+    // or maybe Nodefactory::{new,clear}....
+
+    QJsonArray nodesArray = json["nodes"].toArray();
+    for (int i = 0; i < nodesArray.size(); ++i) {
+        QJsonObject nodeObject = nodesArray[i].toObject();
+        readNode(nodeObject);
+    }
+
+    // Make connections
+    foreach (ParamBase* param, _connectionsToMake.keys()) {
+        QUuid serverUuid =  _connectionsToMake[param];
+        ParamBase* server = _registryUUIDtoParam[serverUuid];
+        param->connectTo(server);
+        // TODO XXX add connection objects
+        // something like
+        //CuesheetScene::connectSockets(SocketItem *server, SocketItem *client)
+        // except that calls connectTo, and I'd rather not get too deep into the Cuesheetscene stuff anyway.
+    }
+
+}
+
+void NodeFactory::readNode(const QJsonObject &json)
+{
+    QString classname   = json["classname"].toString();
+    QUuid uuid          = QUuid(json["uuid"].toString());
+
+    Node * newnode      = Singleton()->instatiateNode(classname, uuid);
+    newnode->read(json);
+
+    QJsonArray paramsArray = json["paramList"].toArray();
+    for (int i = 0; i < paramsArray.size(); ++i) {
+        QJsonObject paramJsonObject = paramsArray[i].toObject();
+        // Params don't need to be instantiated, since they are not dynamic;
+        // any given node will automatically instantiate all its params.
+        // But their values, UUIDs, and connections must be read and assigned appropriately.
+        QString paramname = paramJsonObject["name"].toString();
+
+        // Find a pointer to the named param in this node:
+        ParamBase *param = newnode->getParamByName(paramname);
+
+        // Read values, which is specialized by type.
+        param->read(paramJsonObject);
+
+        // Store UUID in registry
+        _registryUUIDtoParam[param->getUuid()] = param;
+
+        // If param has a connection, deal with that:
+        if (paramJsonObject.contains("connectedTo")) {
+            QUuid connectedUUID = QUuid(paramJsonObject["connectedTo"].toString());
+            // Since connections will be made to parameters that may not have been
+            // instantiated yet, we need to save all these connections, then
+            // make them after everything has been read and instatiated.
+            _connectionsToMake[param] = connectedUUID;
+        }
+    }
+
+
+    Cupid::Singleton()->getGraphWidget()->addNode(newnode);  // GROSS  XXX
 }

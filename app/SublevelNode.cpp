@@ -103,4 +103,25 @@ void SublevelNode::beenSelected()
     emit iveBeenSelected(this);
 }
 
+void SublevelNode::write(QJsonObject &json) const
+{
+    // Override for serialization
+    Node::write(json);
+    json["freqMin"] = _range._freqMin;
+    json["freqMax"] = _range._freqMax;
+    json["ampMin"] = _range._ampMin;
+    json["ampMax"] = _range._ampMax;
+}
+
+void SublevelNode::read(const QJsonObject &json)
+{
+    // Override for serialization
+    Node::read(json);
+    _range._freqMin = json["freqMin"].toDouble();
+    _range._freqMax = json["freqMax"].toDouble();
+    _range._ampMin = json["ampMin"].toDouble();
+    _range._ampMax = json["ampMax"].toDouble();
+}
+
+
 static Registrar<SublevelNode>   registrar("SublevelNode", Node::FLOAT);

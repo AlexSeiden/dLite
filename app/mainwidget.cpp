@@ -31,6 +31,7 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_spectrograph(new Spectrograph(this))
     ,   m_fileButton(new QPushButton(this))
     ,   m_saveButton(new QPushButton(this))
+    ,   m_openButton(new QPushButton(this))
     ,   m_pauseButton(new QPushButton(this))
     ,   m_playButton(new QPushButton(this))
     ,   m_settingsButton(new QPushButton(this))
@@ -83,6 +84,7 @@ MainWidget::MainWidget(QWidget *parent)
     Cupid::Singleton()->setSpectrograph(m_spectrograph);
     Cupid::Singleton()->setDancefloormodel(m_dancefloormodel);
     Cupid::Singleton()->setEngine(m_engine);
+    Cupid::Singleton()->setGraphWidget(m_graphWidget);
 }
 
 MainWidget::~MainWidget() { }
@@ -164,17 +166,27 @@ void MainWidget::showFileDialog()
     const QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open WAV file"), dir, "*.wav");
     if (fileNames.count()) {
         reset();
-        m_engine->loadFile(fileNames.front());
+        m_engine->loadFile(fileNames.front()); // TODO open multiple files
         updateButtonStates();
     }
 }
 
 void MainWidget::showSaveDialog()
 {
-    const QString dir = QDir::homePath();
+    const QString dir = QDir::homePath(); // XXX
     const QString fileName = QFileDialog::getSaveFileName(this, tr("Save file"), dir);
     if (! fileName.isEmpty()) {
         NodeFactory::Singleton()->saveToFile(fileName);
+    }
+}
+
+void MainWidget::showOpenDialog()
+{
+    const QString dir = QDir::homePath(); // XXX
+    const QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open dLite file"), dir, "*.json *.dLite");
+    if (fileNames.count()) {
+        QString fileName = fileNames.front(); // TODO open multiple files
+        NodeFactory::Singleton()->readFromFile(fileName);
         updateButtonStates();
     }
 }
@@ -233,6 +245,7 @@ void MainWidget::createUi()
     m_settingsButton->setMinimumSize(buttonSize);
 
     m_saveButton->setText(tr("Save..."));
+    m_openButton->setText(tr("Open..."));
 
 
     QScopedPointer<QHBoxLayout> buttonPanelLayout(new QHBoxLayout);
@@ -241,6 +254,7 @@ void MainWidget::createUi()
     buttonPanelLayout->addWidget(m_pauseButton);
     buttonPanelLayout->addWidget(m_playButton);
     buttonPanelLayout->addWidget(m_settingsButton);
+    buttonPanelLayout->addWidget(m_openButton);
     buttonPanelLayout->addWidget(m_saveButton);
 
     QWidget *buttonPanel = new QWidget(this);
@@ -270,6 +284,9 @@ void MainWidget::connectUi()
 
     CHECKED_CONNECT(m_saveButton, SIGNAL(clicked()),
             this, SLOT(showSaveDialog()));
+
+    CHECKED_CONNECT(m_openButton, SIGNAL(clicked()),
+            this, SLOT(showOpenDialog()));
 
     CHECKED_CONNECT(m_settingsButton, SIGNAL(clicked()),
             this, SLOT(showSettingsDialog()));
@@ -404,7 +421,7 @@ void MainWidget::reset()
 //-----------------------------------------------------------------------------
 // New node slots
 //-----------------------------------------------------------------------------
-// TODO move this to Cupid?  Or Nodefactory? Or somewhere else?
+// GROSS : move this to Cupid?  Or Nodefactory? Or somewhere else?
 void MainWidget::newNodeRequest(QString name)
 {
     // TODO generate this list from a single place, where all cues are listed,
@@ -414,9 +431,12 @@ void MainWidget::newNodeRequest(QString name)
 
     newNode = NodeFactory::Singleton()->instatiateNode(name);
     if (newNode)
+        // Would "correct MVC" mean that the graphWidget should figure this out
+        // on its own, by talking to the "model"?
+        // This is also GROSS
         m_graphWidget->addNode(newNode);
     else {
-        qDebug() << "New Node request for " << name;
+        qDebug() << "Unknown newNodeRequest for " << name;
         // ErrorHandling
     }
 }

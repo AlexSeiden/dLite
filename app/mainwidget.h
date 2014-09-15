@@ -63,13 +63,9 @@ public slots:
 private slots:
     void showFileDialog();
     void showSaveDialog();
+    void showOpenDialog();
     void showSettingsDialog();
     void updateButtonStates();
-
-#ifdef NUKEME
-    void newCue();
-    void newRandomNode();
-#endif
 
 private:
     void createUi();
@@ -85,6 +81,7 @@ private:
 
     QPushButton*            m_fileButton;
     QPushButton*            m_saveButton;
+    QPushButton*            m_openButton;
     QPushButton*            m_pauseButton;
     QIcon                   m_pauseIcon;
     QPushButton*            m_playButton;

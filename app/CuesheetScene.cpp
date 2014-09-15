@@ -116,12 +116,7 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                     server = targetSocket;
                     client = _startSocket;
                 }
-                ConnectorItem *connection = new ConnectorItem(server, client);
-                addItem(connection);
-
-                // Make the actual connection between parameters.
-                // GROSS -- shouldn't this be handled in the model?
-                client->getParam()->connectTo(server->getParam());
+                connectSockets(server, client);
             }
         }
     }
@@ -130,6 +125,16 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
     setConnecting(false);
     setStartPoint(QPointF());
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
+}
+
+void CuesheetScene::connectSockets(SocketItem *server, SocketItem *client)
+{
+    ConnectorItem *connection = new ConnectorItem(server, client);
+    addItem(connection);
+
+    // Make the actual connection between parameters.
+    // GROSS -- shouldn't this be handled in the model?
+    client->getParam()->connectTo(server->getParam());
 }
 
 SocketItem *CuesheetScene::getSocket(QGraphicsItem *item)

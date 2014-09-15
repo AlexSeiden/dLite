@@ -23,6 +23,8 @@ public:
     void beenSelected();
 
     Subrange *getSubrange() {return &_range;}
+    virtual void read(const QJsonObject &json);
+    virtual void write(QJsonObject &json) const;
 
 
 public slots:

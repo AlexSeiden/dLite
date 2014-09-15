@@ -16,7 +16,7 @@ public:
 
     // If we make this take the current min/max freq, it could
     // calculate this wrt the correct range.
-    QRectF getWindow() {return _subrangeWindow;}  // XXX This should handle scaling to freqMin/Max
+    QRectF  getWindow() {return _subrangeWindow;}  // XXX This should handle scaling to freqMin/Max
     void    setMinMax(float fmin, float fmax, float amin, float amax) {
         _freqMin = fmin;
         _freqMax = fmax;
@@ -28,15 +28,18 @@ public:
     double  amplitudeWithinWindow(double amp);
     bool    isFrequencyWithinWindow(double freq);
 
-private:
+protected:
     float _freqMin, _freqMax;
     float _ampMin, _ampMax;
 
     // XXX this will be wrong if the spectrograph min & max frequencies
     // are changed during execution.
     QRectF _subrangeWindow;
+
+    friend class SublevelNode;
 };
 
+// Allows Subrange to be passed via signals & slots
 Q_DECLARE_METATYPE(Subrange)
 
 #endif // SUBRANGE_H

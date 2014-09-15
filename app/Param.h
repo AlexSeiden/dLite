@@ -30,13 +30,14 @@ public:
         _uuid(QUuid::createUuid())  { }
     virtual ~ParamBase() { }
 
-    QString     getName()                      {return _name;}
+    QString     getName() const                {return _name;}
     void        setName(QString name)          {_name = name;}
-    bool        isOutput()                     {return _isOutput;}
-    bool        isConnectable()                {return _isConnectable;}
+    bool        isOutput() const               {return _isOutput;}
+    bool        isConnectable() const          {return _isConnectable;}
     void        setOutput(bool status)         {_isOutput = status;}
     void        setConnectable(bool status)    {_isConnectable = status;}
-    ParamBase   *connectedParam()              {return _connectedParam;}
+    ParamBase*  connectedParam()               {return _connectedParam;}
+    QUuid&      getUuid()                      {return _uuid;}
 
     bool    isConnectableTo(ParamBase *otherParam);
     void    connectTo(ParamBase *server);
@@ -139,32 +140,9 @@ public:
 
     PARAMT _value;
 
+    virtual void read(const QJsonObject &json);
     virtual void write(QJsonObject &json) const;
-#if 0
-    // This will be used for floats, ints, and bools.
-    // Colors and regions will be handled by template specialization.
-    void write(QJsonObject &json) const {
-        ParamBase::write(json);
-//        json["value"] = _value;
-    }
-
-#endif
 };
-
-#if 0
-template <>
-class Param<Lightcolor> : public ParamBase
-{
-    void write(QJsonObject &json) const {
-        ParamBase::write(json);
-        Lightcolor value;
-        this->getValue(value);
-        json["red"] = value.getRed();
-        json["green"] = value.getGreen();
-        json["blue"] = value.getBlue();
-    }
-};
-#endif
 
 // For convinience & speed when doing RTTI
 extern const std::type_info & paramTypeFloat;

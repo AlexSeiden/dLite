@@ -10,6 +10,7 @@
 // (because it's the first src file.)
 //
 // Saving!
+// Shape rendering with either QPainter, GL, or something else.
 // Node Types:
     // color nodes:
     //      palette
@@ -20,6 +21,8 @@
     // Regions
     // Position
     //      Paths
+// Compositing modes
+// Firing decay modes
 // playback controller
 //      progress bar with clicking
 // Hardware interface!
@@ -28,6 +31,7 @@
 // Cleaning:
 //      Remnants of original spectrum audio recording stuff in buffer length and
 //      window changed things
+// Clean up object model & separation-of-concerns
 
 
 // ------------------------------------------------------------------------------
@@ -271,7 +275,6 @@ void NodeBar::operator()() {
     // XXX this breaks if we move the audio playhead back in time.
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
     if (mSecs > _nextRefresh) {
-//        qDebug() << Q_FUNC_INFO << mSecs << _nextRefresh;
        _output._value = true;
        _nextRefresh = _bars[++_nextIndex];
     }
@@ -388,12 +391,11 @@ void NodeBarBeat::operator()() {
     // XXX this breaks if we move the audio playhead back in time.
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
     if (mSecs > _nextRefresh) {
-        qDebug() << mSecs << _nextRefresh;
         _barTriggerOutput._value = true;
         _beatTriggerOutput._value = true;
         _beatNumberOutput._value = _beatnumber[_nextIndex];
         _barNumberOutput._value = _nextIndex;
-       _nextRefresh = _beats[++_nextIndex];
+        _nextRefresh = _beats[++_nextIndex];
     }
 
     // Boilerplate end of operator:
@@ -446,4 +448,4 @@ void convertSamplesToMS(std::vector<int> &samples)
 static Registrar<TriggerEvery>  registrar0("TriggerEvery", Node::BEAT);
 static Registrar<NodeOnset>     registrar1("Onset", Node::BEAT);
 static Registrar<NodeBar>       registrar2("Bar", Node::BEAT);
-static Registrar<NodeBarBeat>   registrar3("Bars&&Beats", Node::BEAT); // XXX This is a multi output node!
+static Registrar<NodeBarBeat>   registrar3("Bars&&Beats", Node::BEAT);
