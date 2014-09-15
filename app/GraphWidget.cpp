@@ -44,6 +44,7 @@ void GraphWidget::selectionChanged()
             nodeItem->beenSelected();
         }
     }
+    // TODO if no SublevelNode selected, setSubrange = NULL
 }
 
 void GraphWidget::subrangeHasChanged(Subrange *subrange)

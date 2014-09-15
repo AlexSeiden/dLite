@@ -6,10 +6,9 @@
 #include "spectrograph.h"
 #include "utils.h"
 #include "dancefloorwidget.h"
-#include "CueView.h"
 #include "CueLibView.h"
 #include "GraphWidget.h"
-#include "RandomNode.h"
+#include "Node.h"
 #include "Cupid.h"
 
 #include <QLabel>
@@ -31,6 +30,7 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_progressBar(new ProgressBar(this))
     ,   m_spectrograph(new Spectrograph(this))
     ,   m_fileButton(new QPushButton(this))
+    ,   m_saveButton(new QPushButton(this))
     ,   m_pauseButton(new QPushButton(this))
     ,   m_playButton(new QPushButton(this))
     ,   m_settingsButton(new QPushButton(this))
@@ -159,11 +159,22 @@ void MainWidget::bufferLengthChanged(qint64 length)
 
 void MainWidget::showFileDialog()
 {
+    // TODO Load & queue multiple files
     const QString dir;
     const QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open WAV file"), dir, "*.wav");
     if (fileNames.count()) {
         reset();
         m_engine->loadFile(fileNames.front());
+        updateButtonStates();
+    }
+}
+
+void MainWidget::showSaveDialog()
+{
+    const QString dir = QDir::homePath();
+    const QString fileName = QFileDialog::getSaveFileName(this, tr("Save file"), dir);
+    if (! fileName.isEmpty()) {
+        NodeFactory::Singleton()->saveToFile(fileName);
         updateButtonStates();
     }
 }
@@ -221,12 +232,16 @@ void MainWidget::createUi()
     m_settingsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     m_settingsButton->setMinimumSize(buttonSize);
 
+    m_saveButton->setText(tr("Save..."));
+
+
     QScopedPointer<QHBoxLayout> buttonPanelLayout(new QHBoxLayout);
     buttonPanelLayout->addStretch();
     buttonPanelLayout->addWidget(m_fileButton);
     buttonPanelLayout->addWidget(m_pauseButton);
     buttonPanelLayout->addWidget(m_playButton);
     buttonPanelLayout->addWidget(m_settingsButton);
+    buttonPanelLayout->addWidget(m_saveButton);
 
     QWidget *buttonPanel = new QWidget(this);
     buttonPanel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -252,6 +267,9 @@ void MainWidget::connectUi()
 
     CHECKED_CONNECT(m_fileButton, SIGNAL(clicked()),
             this, SLOT(showFileDialog()));
+
+    CHECKED_CONNECT(m_saveButton, SIGNAL(clicked()),
+            this, SLOT(showSaveDialog()));
 
     CHECKED_CONNECT(m_settingsButton, SIGNAL(clicked()),
             this, SLOT(showSettingsDialog()));
@@ -303,6 +321,7 @@ void MainWidget::connectUi()
 }
 
 #if 0
+// TODO find a home for this, either in settings or spectrograph
 QLayout *createSpectrumOptionsUI(QWidget *parent, Spectrograph *spectrograph)
 {
 
@@ -385,7 +404,7 @@ void MainWidget::reset()
 //-----------------------------------------------------------------------------
 // New node slots
 //-----------------------------------------------------------------------------
-// TODO move this to OKCupid?  Or somewhere else?
+// TODO move this to Cupid?  Or Nodefactory? Or somewhere else?
 void MainWidget::newNodeRequest(QString name)
 {
     // TODO generate this list from a single place, where all cues are listed,
@@ -394,36 +413,10 @@ void MainWidget::newNodeRequest(QString name)
     Node *newNode;
 
     newNode = NodeFactory::Singleton()->instatiateNode(name);
-    if (newNode) {
+    if (newNode)
         m_graphWidget->addNode(newNode);
-    }
-#ifdef NUKEME
-    else if (name == tr("Box cue")) {
-        this->newCue();
-    } else if (name == tr("RandomFloat")) {
-        this->newRandomNode();
-    }
-#endif
     else {
         qDebug() << "New Node request for " << name;
         // ErrorHandling
     }
 }
-
-#ifdef NUKEME
-void MainWidget::newCue()
-{
-    CueBox *cue = new CueBox();
-    m_graphWidget->addNode(cue);
-//    CueBoxView *cv = new CueBoxView(cue, NULL);
-//    cv->show();
-}
-
-void MainWidget::newRandomNode()
-{
-    RandomFloat *node = new RandomFloat();
-    m_graphWidget->addNode(node);
-//    RandomNodeView *rv = new RandomNodeView(node, NULL);
-//    rv->show();
-}
-#endif

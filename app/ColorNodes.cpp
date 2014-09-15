@@ -4,10 +4,9 @@
 //  Color ramp
 //      Mix between two colors
 ColorRamp::ColorRamp() :
-    Node(),
     _output(0),
-    _c0(0),
-    _c1(1),
+    _c0(0.0),
+    _c1(1.0),
     _mix(.5)
 {
     setName("ColorRamp");
@@ -42,7 +41,7 @@ void ColorRamp::operator()()
     evalAllInputs();
 
     Lightcolor part0, part1;
-    part0 = _c0._value*(1.0-_mix._value);     // NOTE Doesn't seem to compile if float is first.
+    part0 = (1.0-_mix._value)*_c0._value;
     part1 = _c1._value*_mix._value;
     _output._value = part0 + part1;
 

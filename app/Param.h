@@ -4,6 +4,7 @@
 #include <QList>
 #include <QString>
 #include <QVariant>
+#include <QUuid>
 #include <functional>
 #include <typeinfo>
 #include "lightcolor.h"
@@ -14,6 +15,7 @@
 //      An abstract base class.
 
 class Node;
+class QJsonObject;
 
 class ParamBase
 {
@@ -21,24 +23,22 @@ class ParamBase
 public:
     ParamBase() :
         _provider(nullptr),
+        _connectedParam(nullptr),
         _isOutput(false),
         _isConnectable(true),
-        _type(typeid(this))     { }
+        _type(typeid(this)),
+        _uuid(QUuid::createUuid())  { }
     virtual ~ParamBase() { }
 
-//    virtual void setProvider(std::function<void(void *)> provider) = 0;
-//    virtual std::function<void(void *)> getProvider() = 0;
-
-    QString getName()               {return _name;}
-    void    setName(QString name)   {_name = name;}
-    bool    isOutput()              {return _isOutput;}
-    bool    isConnectable()         {return _isConnectable;}
-    void    setOutput(bool status)             {_isOutput = status;}
-    void    setConnectable(bool status)        {_isConnectable = status;}
+    QString     getName()                      {return _name;}
+    void        setName(QString name)          {_name = name;}
+    bool        isOutput()                     {return _isOutput;}
+    bool        isConnectable()                {return _isConnectable;}
+    void        setOutput(bool status)         {_isOutput = status;}
+    void        setConnectable(bool status)    {_isConnectable = status;}
     ParamBase   *connectedParam()              {return _connectedParam;}
 
     bool    isConnectableTo(ParamBase *otherParam);
-    void    connectParams(ParamBase *server, ParamBase *client);
     void    connectTo(ParamBase *server);
 
     virtual void eval() {
@@ -57,34 +57,47 @@ public:
     void setProvider(std::function<void()> provider) {_provider = provider;}
 
     // Returns a pointer of the Node that this is a parameter for.
-    Node *getParent() {return _parentNode;}
+    Node *  getParent() {return _parentNode;}
+    void    setParent(Node *parent) {_parentNode = parent;}
 
     // Valid only for input nodes
-    Node *getServer() {return _connectedNode;}
+    Node *getServer() {
+        if (_connectedParam)
+            return _connectedParam->getParent();
+        return nullptr;
+    }
 
-    // Valid only for output nodes
+    // Serialization
+    virtual void read(const QJsonObject &json);
+    virtual void write(QJsonObject &json) const;
+
+    // Would be valid only for output nodes
     //Node *getClients();
 
     // Would it be useful to maintain a linked list of connections here?
     // Both for inputs and outputs?  Would that break modularity?
     //QList<ParamBase *>  getConnections();
-    Node *_connectedNode;
-    ParamBase *_connectedParam;
-    Node *_parentNode;      // The node that this param is a part of.
 
-
-    std::function<void()> _provider;
-
-    QString _name;
-    bool _isOutput;
-    bool _isConnectable;
-    const std::type_info & _type;
 
     // Any OUTPUT params need to stick their value in here.
     QVariant    _qvOutput;
+
+protected:
+    std::function<void()>   _provider;
+    ParamBase *             _connectedParam;
+    Node *                  _parentNode;      // The node that this param is a part of.
+
+    QString                 _name;
+    bool                    _isOutput;
+    bool                    _isConnectable;
+    const std::type_info &  _type;
+    /*const*/ QUuid             _uuid; // Can't be const bc of assignment during file read
+
+    friend class NodeFactory;
 };
 
 
+// ------------------------------------------------------------------------------
 // Templated Param class
 //      Instatiated with the following types:
 //          float
@@ -94,68 +107,64 @@ public:
 //          positions
 //          regions
 
-template <class PT>
+template <class PARAMT>
 class Param : public ParamBase
 {
 public:
-    Param(PT value=PT()) :
+    Param(PARAMT value=PARAMT()) :
         _value(value)
         {}
 
     virtual ~Param() {}
 
-#if 0
-    virtual void operator() (PT &value) {value = _value;}
-
-    virtual void getValue(PT &value)  {
-        // update current member value, if provider is connected
-        if (_provider)
-            _provider(_value);
-
+    virtual void getValue(PARAMT &value)  {
         // All values are returned by reference, even for fundamental types like ints and
         // floats, for generality with all types, such as Lightcolor & regions.
         value = _value;
     }
-
-    // This applies to input parameters only: it sets the provider "function"
-    // that is excuted to compute the value of this parameter.
-    void setProvider(std::function<void(PT&)> provider) {_provider = provider;}
-
-    // This applies to output parameters only:  it returns a provider "function"
-    // that can be executed by a client to compute the value the client uses.
-    std::function<void(PT&)> getProvider() {
-        // Assumes that the node implements operator() to create closure/functor.
-        return [this](PT &val) {(*this)(val);};
-     }
-#else
-    virtual void getValue(PT &value)  {
-        // All values are returned by reference, even for fundamental types like ints and
-        // floats, for generality with all types, such as Lightcolor & regions.
-        value = _value;
-    }
-#endif
 
     virtual void eval() {
         if (_provider) {
             _provider();
-            _value = _connectedParam->_qvOutput.value<PT>();
+            _value = _connectedParam->_qvOutput.value<PARAMT>();
         }
     }
 
     // ??? Should this automatically disable a _provider functor, if there is one?
     // Or should setValue be disabled when there is a provider?
-    void setValue(const PT &value) {_value = value;}
+    void setValue(const PARAMT &value) {_value = value;}
 
     // ??? do we need this?  Would it be better just to assign a _type field?
     virtual const std::type_info & getType() {return typeid(this);}
 
-    PT _value;
-#if 0
-    std::function<void(PT &value)> _provider;
-#endif
+    PARAMT _value;
 
+    virtual void write(QJsonObject &json) const;
+#if 0
+    // This will be used for floats, ints, and bools.
+    // Colors and regions will be handled by template specialization.
+    void write(QJsonObject &json) const {
+        ParamBase::write(json);
+//        json["value"] = _value;
+    }
+
+#endif
 };
 
+#if 0
+template <>
+class Param<Lightcolor> : public ParamBase
+{
+    void write(QJsonObject &json) const {
+        ParamBase::write(json);
+        Lightcolor value;
+        this->getValue(value);
+        json["red"] = value.getRed();
+        json["green"] = value.getGreen();
+        json["blue"] = value.getBlue();
+    }
+};
+#endif
 
 // For convinience & speed when doing RTTI
 extern const std::type_info & paramTypeFloat;

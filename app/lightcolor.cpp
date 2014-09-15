@@ -1,6 +1,10 @@
 #include "lightcolor.h"
 #include <QDebug>
 
+// -----------------------------------------------------------------------------
+//  Lightcolor
+
+// Constructors
 Lightcolor::Lightcolor() : m_r(0), m_g(0), m_b(0) { }
 Lightcolor::~Lightcolor() { }
 
@@ -8,12 +12,13 @@ Lightcolor::Lightcolor(int r, int g, int b) : m_r(r), m_g(g), m_b(b) { }
 
 Lightcolor::Lightcolor(int val) : m_r(val), m_g(val), m_b(val) { }
 
-Lightcolor::Lightcolor(float r, float g, float b) : m_r(r*255), m_g(g*255), m_b(b*255) { }
+Lightcolor::Lightcolor(double r, double g, double b) : m_r(r*255), m_g(g*255), m_b(b*255) { }
 
-Lightcolor::Lightcolor(float val) : m_r(val*255), m_g(val*255), m_b(val*255) { }
+Lightcolor::Lightcolor(double val) : m_r(val*255), m_g(val*255), m_b(val*255) { }
 
 Lightcolor::Lightcolor(const QColor &qc) : m_r(qc.red()), m_g(qc.green()), m_b(qc.blue()) { }
 
+// Copy constructor
 Lightcolor::Lightcolor(const Lightcolor &rhs)
 {
     this->m_r = rhs.m_r;
@@ -29,7 +34,6 @@ QColor Lightcolor::toQColor() {
     return QColor(r,g,b);
 }
 
-// Lightcolor operators
 
 // Assignment operator
 Lightcolor& Lightcolor::operator=(const Lightcolor& rhs) // copy assignment
@@ -42,7 +46,8 @@ Lightcolor& Lightcolor::operator=(const Lightcolor& rhs) // copy assignment
     return *this;
 }
 
-Lightcolor & Lightcolor::operator*=(float scalar) {
+// Arithmetic  operators
+Lightcolor & Lightcolor::operator*=(double scalar) {
     this->m_r *= scalar;
     this->m_g *= scalar;
     this->m_b *= scalar;
@@ -53,10 +58,13 @@ Lightcolor & Lightcolor::operator*=(const Lightcolor &rhs) {
     this->m_r *= rhs.m_r;
     this->m_g *= rhs.m_g;
     this->m_b *= rhs.m_b;
-    // Normalize
-    this->m_r /= (255*255);
-    this->m_g /= (255*255);
-    this->m_b /= (255*255);
+    // Normalize:
+    // Done in float, this would be
+    // float resultF = (r0/255.)*(r1/255.)
+    // int resultI = resultF * 255;
+    this->m_r /= 255;
+    this->m_g /= 255;
+    this->m_b /= 255;
     return *this;
 }
 
@@ -67,17 +75,19 @@ Lightcolor & Lightcolor::operator+=(const Lightcolor &rhs) {
     return *this;
 }
 
-const Lightcolor Lightcolor::operator*(float rhs) {
+const Lightcolor Lightcolor::operator*(double rhs) {
     Lightcolor result = *this;
     result *= rhs;
     return result;
 }
 
+#if 0
 const Lightcolor Lightcolor::operator*(const Lightcolor &rhs) {
     Lightcolor result = *this;
     result *= rhs;
     return result;
 }
+#endif
 
 const Lightcolor Lightcolor::operator+(const Lightcolor& rhs) {
     Lightcolor result = *this;
@@ -85,7 +95,14 @@ const Lightcolor Lightcolor::operator+(const Lightcolor& rhs) {
     return result;
 }
 
-
+// Allow mixed mode multiplication with implicit type conversions
+// and arbitrary order (Myers, item 24)
+const Lightcolor operator*(const Lightcolor& lhs, const Lightcolor& rhs)
+{
+    Lightcolor result = lhs;
+    result *= rhs;
+    return result;
+}
 
 
 // -----------------------------------------------------------------------------
@@ -119,7 +136,7 @@ Firing::Firing() :
     _decayfunction(exponentialDecay)
 { }
 
-Firing::Firing(Lightcolor color, float alpha, compmode_t compmode, decayfunc_t decayfunc, Cue *cue) :
+Firing::Firing(Lightcolor color, double alpha, compmode_t compmode, decayfunc_t decayfunc, Cue *cue) :
     _color(color),
     _alpha(alpha),
     _compMode(compmode),

@@ -33,9 +33,9 @@ SOURCES  += \
     SublevelNode.cpp \
     Subrange.cpp \
     RandomNode.cpp \
-    SublevelNodeItem.cpp \
     ColorNodes.cpp \
-    Cupid.cpp
+    Cupid.cpp \
+    Saver.cpp
 
 HEADERS  += \
     engine.h \
@@ -54,9 +54,9 @@ HEADERS  += \
     SublevelNode.h \
     Subrange.h \
     RandomNode.h \
-    SublevelNodeItem.h \
     ColorNodes.h \
-    Cupid.h
+    Cupid.h \
+    Saver.h
 
 fftreal_dir = ../3rdparty/fftreal
 

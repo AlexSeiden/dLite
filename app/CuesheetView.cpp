@@ -22,7 +22,7 @@ void GraphicsView::wheelEvent(QWheelEvent *e)
 CuesheetView::CuesheetView(QWidget *parent)
     : QFrame(parent)
 {
-    setFrameStyle(Sunken | StyledPanel);
+    setFrameStyle(NoFrame);
     graphicsView = new GraphicsView(this);
     graphicsView->setRenderHint(QPainter::Antialiasing, true);
 #if 0
@@ -43,13 +43,13 @@ CuesheetView::CuesheetView(QWidget *parent)
     zoomInIcon->setAutoRepeat(true);
     zoomInIcon->setAutoRepeatInterval(33);
     zoomInIcon->setAutoRepeatDelay(0);
-    zoomInIcon->setIcon(QPixmap(":/zoomin.png"));
+    zoomInIcon->setIcon(QPixmap(":/images/zoomin.png"));
     zoomInIcon->setIconSize(iconSize);
     QToolButton *zoomOutIcon = new QToolButton;
     zoomOutIcon->setAutoRepeat(true);
     zoomOutIcon->setAutoRepeatInterval(33);
     zoomOutIcon->setAutoRepeatDelay(0);
-    zoomOutIcon->setIcon(QPixmap(":/zoomout.png"));
+    zoomOutIcon->setIcon(QPixmap(":/images/zoomout.png"));
     zoomOutIcon->setIconSize(iconSize);
     zoomSlider = new QSlider;
     zoomSlider->setMinimum(0);

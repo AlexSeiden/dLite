@@ -21,23 +21,23 @@ public:
 
     Lightcolor(int r, int g, int b);
     Lightcolor(int val);
-    explicit Lightcolor(float r, float g, float b);
-    explicit Lightcolor(float val);
-    explicit Lightcolor(const QColor &qc);
+    Lightcolor(double r, double g, double b);
+    Lightcolor(double val);
+    Lightcolor(const QColor &qc);
     Lightcolor(const Lightcolor &rhs);
 
-    int getRed()    {return m_r;}
-    int getGreen()  {return m_g;}
-    int getBlue()   {return m_b;}
+    int getRed() const    {return m_r;}
+    int getGreen() const  {return m_g;}
+    int getBlue() const   {return m_b;}
 
     Lightcolor  & operator=(const Lightcolor &rhs);
 
     Lightcolor  & operator+=(const Lightcolor &rhs);
     Lightcolor  & operator*=(const Lightcolor &rhs);
-    Lightcolor  & operator*=(float scalar);
+    Lightcolor  & operator*=(double scalar);
 
-    const Lightcolor  operator*(float rhs);
-    const Lightcolor  operator*(const Lightcolor &rhs);
+    const Lightcolor  operator*(double rhs);
+//    const Lightcolor  operator*(const Lightcolor &rhs);
     const Lightcolor  operator+(const Lightcolor &rhs);
 
     QColor toQColor();
@@ -45,6 +45,9 @@ public:
 private:
     int m_r, m_g, m_b;
 };
+
+// Non-member operator allows implicit type promotion
+const Lightcolor operator*(const Lightcolor& lhs, const Lightcolor& rhs);
 
 Q_DECLARE_METATYPE(Lightcolor)
 
@@ -58,7 +61,7 @@ class Firing
 {
 public:
     Firing();
-    Firing(Lightcolor color, float alpha, compmode_t compmode, decayfunc_t decayfunc, Cue *cue=nullptr);
+    Firing(Lightcolor color, double alpha, compmode_t compmode, decayfunc_t decayfunc, Cue *cue=nullptr);
 
     bool        evaluate();
     //bool evaluate(long time);  // LATER evaluates for a specific time?

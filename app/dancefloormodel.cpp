@@ -137,7 +137,7 @@ void Dancefloormodel::fireLight(int x, int y, Firing *firing)
 
 void Dancefloormodel::evaluate()
 {
-    qDebug("Time elapsed: %d ms", _timeSinceLastUpdate.elapsed());
+//    qDebug("Time elapsed: %d ms", _timeSinceLastUpdate.elapsed());
     _timeSinceLastUpdate.restart();
 
     evaluateAllCues();
@@ -169,6 +169,7 @@ void Dancefloormodel::evaluate()
         light->_value = lightColor;
     }
 
+    // STYLE should this be a signal/slot?
     _dfWidget->update();
 
     // This keeps track of the current "frame" that's being evaluated.
@@ -187,4 +188,3 @@ void Dancefloormodel::addCue(Cue *cue) {
     _cues.push_back(cue);
     _numCues++;
 }
-

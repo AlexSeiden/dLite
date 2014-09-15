@@ -48,6 +48,7 @@ QColor  GuiSettings::sl_barColor          = GuiSettings::sg_barColor;
 QColor  GuiSettings::sl_squareColor       = QColor(0,0,255);
 QColor  GuiSettings::sl_selectedColor     = GuiSettings::sg_sublevelRegion;
 QColor  GuiSettings::sl_dragTarget        = QColor(255,20,20);
+int     GuiSettings::sl_barHeight         = 25;
 
 GuiSettings::GuiSettings(QObject *parent) :
     QObject(parent)

@@ -34,10 +34,15 @@ protected:
 
 private:
     QGraphicsItem *findFirstReleventItem(QList<QGraphicsItem *> &endItems);
-    SocketItem  *_sourceSocket;
-    QPointF _startPoint;
-    QGraphicsLineItem *_line;
-    bool    _isConnecting;
+
+    SocketItem *        _startSocket;
+    QPointF             _startPoint;
+    QGraphicsLineItem * _line;
+    //  This is set to true while we are in the process of attempting to
+    //  to drag a connection between two nodes.  That is, the user has clicked
+    //  on a socket, but hasn't yet finished the action by clicking on another
+    //  socket to connect to.
+    bool                _isConnecting;
 };
 
 #endif // CUESHEETSCENE_H

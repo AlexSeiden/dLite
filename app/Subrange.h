@@ -16,7 +16,7 @@ public:
 
     // If we make this take the current min/max freq, it could
     // calculate this wrt the correct range.
-    QRectF getWindow() {return _subrangeWindow;}
+    QRectF getWindow() {return _subrangeWindow;}  // XXX This should handle scaling to freqMin/Max
     void    setMinMax(float fmin, float fmax, float amin, float amax) {
         _freqMin = fmin;
         _freqMax = fmax;

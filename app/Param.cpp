@@ -2,6 +2,8 @@
 #include "lightcolor.h"
 #include <QDebug>
 #include "Node.h"
+#include <QJsonObject>
+#include <QJsonArray>
 
 // These constants defined for convinience & speed when doing type checks.
 const std::type_info & paramTypeFloat = typeid(Param<float>);
@@ -40,31 +42,12 @@ bool ParamBase::isConnectableTo(ParamBase *otherParam)
     return true;
 }
 
-
-void ParamBase::connectParams(ParamBase *server, ParamBase *client)
-{
-    // This assumes that server and client have already
-    // been verified as being compatable:  i.e., server is an output,
-    // client is an input; they have the same type; etc.
-
-   Param<int> *s = dynamic_cast<Param<int> *>(server);
-   Param<int> *c = dynamic_cast<Param<int> *>(client);
-   if (s && c) {
-       c->setProvider(s->getProvider());
-       return;
-   }
-
-   qDebug() << "ERROR--connectParams";
-}
-
-
 void ParamBase::connectTo(ParamBase *server)
 {
     // This assumes that server and client have already
     // been verified as being compatable:  i.e., server is an output,
     // client is an input; they have the same type; etc.
 
-    this->_connectedNode = server->getParent();
     this->_connectedParam = server;
     // GROSS. theres got to be a better way to do this.
     {
@@ -116,4 +99,47 @@ void ParamBase::connectTo(ParamBase *server)
     qDebug() << "as per getType:";
     qDebug() << "thisType    " << this->getType().name();
     qDebug() << "serverType  " << server->getType().name() << endl;
+}
+
+void ParamBase::read(const QJsonObject &json)
+{
+}
+
+void ParamBase::write(QJsonObject &json) const
+{
+//    json["type"] = _type; // TODO translate
+    json["name"] = _name;
+    json["isOutput"] = _isOutput;
+    json["isConnectable"] = _isConnectable;
+    json["uuid"] = _uuid.toString();
+    if (_connectedParam)
+        json["connectedTo"] = _connectedParam->_uuid.toString();
+}
+
+
+
+template <> void Param<Lightcolor>::write(QJsonObject &json) const
+{
+    ParamBase::write(json);
+    json["red"] = _value.getRed();
+    json["green"] = _value.getGreen();
+    json["blue"] = _value.getBlue();
+}
+
+template <> void Param<float>::write(QJsonObject &json) const
+{
+    ParamBase::write(json);
+    json["value"] = _value;
+}
+
+template <> void Param<bool>::write(QJsonObject &json) const
+{
+    ParamBase::write(json);
+    json["value"] = _value;
+}
+
+template <> void Param<int>::write(QJsonObject &json) const
+{
+    ParamBase::write(json);
+    json["value"] = _value;
 }

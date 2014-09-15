@@ -30,8 +30,9 @@ public slots:
     void setSubrange(Subrange *range) {_range = *range;}
 
 signals:
-    // used by SublevelMeter widget:
+    // used by RangeMeter widget:
     void levelChanged(qreal level);
+
     // used by Spectrograph widget:
     void displayThisSubrange(const Subrange &subrange);
     void iveBeenSelected(SublevelNode *me);

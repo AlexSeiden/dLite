@@ -15,14 +15,14 @@ CuesheetScene::CuesheetScene(QObject *parent) :
 void CuesheetScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if (_isConnecting) {
-        startLine(mouseEvent, _sourceSocket);
+        startLine(mouseEvent, _startSocket);
     }
     QGraphicsScene::mousePressEvent(mouseEvent);
 }
 
 void CuesheetScene::startLine(QGraphicsSceneMouseEvent *mouseEvent, SocketItem *srcItem) {
     setConnecting();
-    _sourceSocket = srcItem;
+    _startSocket = srcItem;
     _startPoint = mouseEvent->scenePos();
     _line = new QGraphicsLineItem(QLineF(_startPoint, _startPoint));
     _line->setPen(QPen(GuiSettings::connectorColor, 2));
@@ -55,7 +55,7 @@ QGraphicsItem *CuesheetScene::findFirstReleventItem(QList<QGraphicsItem *> &endI
             continue;
 
         // Can't connect to ourselves
-        if (out == dynamic_cast<QGraphicsItem *>(_sourceSocket))
+        if (out == dynamic_cast<QGraphicsItem *>(_startSocket))
             // Return nullptr rather than continue, because we've actually
             // hit something--ourselves--that's invalid.  We could check to see
             // if there's a *valid* hit behind us, but that's probably more confusing
@@ -67,7 +67,7 @@ QGraphicsItem *CuesheetScene::findFirstReleventItem(QList<QGraphicsItem *> &endI
         if (! targetSocket)
             return nullptr;
 
-        if (! _sourceSocket->getParam()->isConnectableTo(targetSocket->getParam()))
+        if (! _startSocket->getParam()->isConnectableTo(targetSocket->getParam()))
             // Same return logic as above
             return nullptr;
 
@@ -82,7 +82,10 @@ QGraphicsItem *CuesheetScene::findFirstReleventItem(QList<QGraphicsItem *> &endI
 
 void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    // ErrorHandling nb:  if only one  of "_isConnecting" and "_line" are true, then
+    // Finish a possible connection action:  verify if we have a valid connection,
+    // and then wire things together if appropriate.  Either way, clean up.
+
+    // ErrorHandling:  If only one of "_isConnecting" and "_line" are true, then
     // we have some internal inconsistancy.
     if (_isConnecting && _line) {
         // Find the QGraphicsItems that's underneath the release position.
@@ -92,7 +95,7 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         // Delete the temporary line we've been dragging out,
         // because soon we'll replace it with the real connector.
         removeItem(_line);
-//        delete _line;  XXX this seems to cause crashes.  but is it now leaking mem?
+//        delete _line;  XXX this seems to cause crashes--but is it now leaking mem?
         _line = nullptr;
 
         if (targetItem) {
@@ -102,25 +105,23 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             if (targetSocket) {
                 // Create the actual connection object
                 SocketItem *server, *client;
-                // This assumes that _sourceSocket and targetSocket have already
+                // This assumes that _startSocket and targetSocket have already
                 // been verified as being compatable:  i.e., one's an input, the
                 // other an output; they have the same type; etc.  This is done
                 // when findFirstReleventItem() calls isConnectableTo()
-                if (_sourceSocket->getParam()->isOutput()) {
-                    server = _sourceSocket;
+                if (_startSocket->getParam()->isOutput()) {
+                    server = _startSocket;
                     client = targetSocket;
                 } else {
                     server = targetSocket;
-                    client = _sourceSocket;
+                    client = _startSocket;
                 }
                 ConnectorItem *connection = new ConnectorItem(server, client);
                 addItem(connection);
 
-                // TODO Tell the sockets about the connection, so they can update them with the position.
-                // Or, should sockets just broadcast their positions via signals, and connections listen via slots?
+                // Make the actual connection between parameters.
+                // GROSS -- shouldn't this be handled in the model?
                 client->getParam()->connectTo(server->getParam());
-    //            _sourceSocket->addConnection(connection);
-    //            targetSocket->addConnection(connection);
             }
         }
     }

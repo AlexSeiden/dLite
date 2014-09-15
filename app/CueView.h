@@ -25,19 +25,4 @@ private:
     ParamView *_colorParamVu;
 };
 
-#ifdef NUKEME
-class RandomNodeView : public QWidget
-{
-    Q_OBJECT
-public:
-    explicit RandomNodeView(RandomFloat *randomNode, QWidget *parent = 0);
-
-private:
-    RandomFloat *_node;  // ??? should inherit from NodeView base class?
-    ParamView *_outParamVu;
-    ParamView *_minParamVu;
-    ParamView *_maxParamVu;
-};
-#endif
-
 #endif // CUEVIEW_H

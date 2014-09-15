@@ -4,7 +4,6 @@
 #include "Param.h"
 #include "CueView.h"
 
-#include <math.h>
 #include <QPainter>
 #include <QTimer>
 #include <QDebug>

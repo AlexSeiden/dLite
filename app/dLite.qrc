@@ -4,5 +4,7 @@
         <file>images/settings.png</file>
         <file>images/whip_connected.png</file>
         <file>images/whip_disconnected.png</file>
+        <file>images/zoomout.png</file>
+        <file>images/zoomin.png</file>
     </qresource>
 </RCC>

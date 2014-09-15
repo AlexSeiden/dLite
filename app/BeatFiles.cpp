@@ -15,8 +15,6 @@
     //      palette
     //      spline
     // beats!
-    //      flesh out trigger node type
-    //      view widgets
     //      segmentino
     //      breakdown viewer
     // Regions
@@ -37,7 +35,6 @@
 //      Triggers every _interval milliseconds
 
 TriggerEvery::TriggerEvery() :
-    Node(),
     _output(true),
     _interval(500)
 {
@@ -85,7 +82,7 @@ void TriggerEvery::operator()()
 //      This node will generate an impulse (bool 'true')
 //      for one frame after each onset.
 
-NodeOnset::NodeOnset() : Node()
+NodeOnset::NodeOnset()
 {
     setName("NodeOnset");
     _type = BEAT;
@@ -189,7 +186,7 @@ void NodeOnset::operator()()
 // NodeBar
 //      Loads bar (measure) info from precomputed file.
 
-NodeBar::NodeBar() : Node()
+NodeBar::NodeBar()
 {
     setName("NodeBar");
     _type = BEAT;
@@ -287,7 +284,7 @@ void NodeBar::operator()() {
 // NodeBar
 //      Loads bar (measure) info from precomputed file.
 
-NodeBarBeat::NodeBarBeat() : Node()
+NodeBarBeat::NodeBarBeat()
 {
     setName("NodeBarBeat");
     _type = BEAT;

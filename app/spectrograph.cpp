@@ -216,7 +216,7 @@ void Spectrograph::mouseReleaseEvent(QMouseEvent *event)
     _subrange.setMinMax(fmin, fmax, amin, amax);
     _subrange.setWin(subrect);
 
-    // TODO make sure appropriate subrange meter & node are listening!
+    // Make sure appropriate subrange meter & node are listening!
     emit subrangeHasChanged(&_subrange);
 //    if (_selectedSublevelNode)
 //        _selectedSublevelNode->setSubrange(_subrange);

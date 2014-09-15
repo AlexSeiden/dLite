@@ -5,7 +5,6 @@
 //  RandomFloat
 
 RandomFloat::RandomFloat() :
-    Node(),
     _output(0.0),
     _min(0.0),
     _max(1.0),
@@ -48,7 +47,6 @@ void RandomFloat::setRandomEngine()
     _max.getValue(max);
     // TODO re-run this when distributions change.
     // XXX if these are connections, this is going to break.
-    // Do we want a "non-animating" parameter class, or flag?
     _distribution = new std::uniform_real_distribution<float>(min, max);
 }
 
@@ -60,12 +58,14 @@ void RandomFloat::paramHasBeenEdited()
 
 void RandomFloat::operator()()
 {
-    // First, check the trigger to see if it's time for a new number
-    bool trigVal = true;
-    //XXX _trigger(trigVal);
-    if (trigVal) {
+    // Boilerplate start-of-operator():
+    if (evaluatedThisFrame())
+        return;
+    evalAllInputs();
+
+    if (_trigger._value)
         _output._value =  (*_distribution)(*_randGenerator);
-    }
+
     _output._qvOutput = _output._value;
 }
 
@@ -73,7 +73,6 @@ void RandomFloat::operator()()
 //  RandomInt
 
 RandomInt::RandomInt() :
-    Node(),
     _output(0),
     _min(0),
     _max(20),
@@ -132,15 +131,14 @@ void RandomInt::paramHasBeenEdited()
 
 void RandomInt::operator()()
 {
-    // Boilerplate start of operator:
+    // Boilerplate start-of-operator():
     if (evaluatedThisFrame())
         return;
     evalAllInputs();
 
     // First, check the trigger to see if it's time for a new number
-    if (_trigger._value) {
+    if (_trigger._value)
         _output._value =  (*_distribution)(*_randGenerator);
-    }
 
     // Boilerplate end of operator:
     _output._qvOutput = _output._value;
@@ -150,7 +148,6 @@ void RandomInt::operator()()
 //  ModuloInt
 
 SequenceInt::SequenceInt() :
-    Node(),
     _output(0),
     _min(6),
     _max(12),

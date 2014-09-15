@@ -7,8 +7,7 @@
 // it operates on.  As such, it doesn't have "Params" like most other nodes
 // do.
 SublevelNode::SublevelNode(QObject *parent) :
-    QObject(parent),
-    Node()
+    QObject(parent)
 {
     setName(QString("SublevelNode%1").arg(_nodeCount));
     _type = FLOAT;
@@ -25,7 +24,7 @@ SublevelNode::SublevelNode(QObject *parent) :
                     this,
                     SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
     // New subranges are sent back to the nodes inside GraphWidget, at the moment.
-//    CHECKED_CONNECT(OKCupid::Singleton()->getSpectrograph(),
+//    CHECKED_CONNECT(Cupid::Singleton()->getSpectrograph(),
 //                    SIGNAL(subrangeHasChanged(Subrange *)),
 //                    this,
 //                    SLOT(setSubrange(Subrange *)));
@@ -86,10 +85,13 @@ void SublevelNode::calculateLevel()
 
 void SublevelNode::operator()()
 {
-    // XXX TODO:  ALL OPERATOR()s need to only exec once per 'frame'!
+    if (evaluatedThisFrame())
+        return;
+    // Don't need to evalAllInputs() here because we know there are none!
+
     // ??? could evaluate here, "pull" style:
     // calculateLevel();
-    // rather than running whenever the spectrum is updated??
+    // rather than running whenever the spectrum is updated?
 
     _output._qvOutput = _output._value;
 }
@@ -102,12 +104,3 @@ void SublevelNode::beenSelected()
 }
 
 static Registrar<SublevelNode>   registrar("SublevelNode", Node::FLOAT);
-
-#ifdef NUKEME
-// TODO
-std::function<void()> SublevelNode::createProviderClosure()
-{
-    return [this] (void) { ;};
-}
-#endif
-

@@ -14,11 +14,11 @@
 
 NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     QGraphicsObject(parent),
-    dragOver(false),
     _node(node)
 {
 //    setAcceptDrops(true);
     //setZValue((x + y) % 2); // TODO
+    _margins = QMarginsF(9,5,9,5);
 
     setFlags(ItemIsSelectable | ItemIsMovable);
 
@@ -34,8 +34,10 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
 
 QRectF NodeItem::boundingRect() const
 {
-    int hh = _node->getParams().size() + 1;  // + 1 for the node name
-    return QRectF(-5, -5, GuiSettings::nodeWidth+9, GuiSettings::paramHeight*hh+9);
+    int nRows = _node->getParams().size() + 1;
+    QRectF bbox =  QRectF(0,0,GuiSettings::nodeWidth,
+                          GuiSettings::paramHeight*nRows);
+    return bbox.marginsAdded(_margins);
 }
 
 void NodeItem::paint(QPainter *painter,
@@ -53,7 +55,8 @@ void NodeItem::paint(QPainter *painter,
     QBrush b = painter->brush();
     QPen p = painter->pen();
 
-    QRect bigrect(0,0,GuiSettings::nodeWidth,GuiSettings::paramHeight*(_node->getParams().size()+1));
+    QRectF bigrect = boundingRect();
+    bigrect = bigrect.marginsRemoved(_margins);
     painter->setBrush(GuiSettings::nodeNameColor);
     painter->drawRect(bigrect);
     painter->setBrush(b);
@@ -63,16 +66,14 @@ void NodeItem::paint(QPainter *painter,
         QPen selectedPen = QPen(GuiSettings::selectedNodePenColor);
         selectedPen.setWidth(GuiSettings::selectedNodePenWidth);
         painter->setPen(selectedPen);
-        QRect biggerRect = bigrect.adjusted(-2,-2,2,2);
+        QRectF biggerRect = bigrect.marginsAdded(QMarginsF(2,2,2,2));
         painter->drawRect(biggerRect);
         painter->restore();
     }
 
 
-    int y = 0;
     // Draw node name
-    QRect rr(0,y,GuiSettings::nodeWidth,GuiSettings::paramHeight);
-    y+=GuiSettings::paramHeight;
+    QRect rr(0,0,GuiSettings::nodeWidth,GuiSettings::paramHeight);
     painter->setPen(GuiSettings::nodeTextColor);
     rr.translate(5, 5);
     painter->drawText(rr,_node->getName());
@@ -114,6 +115,8 @@ void NodeItem::beenSelected()
     _node->beenSelected();
 }
 
+// When placing a node in the graph, moves it to the right until it finds an
+// empty space.
 void NodeItem::avoidCollisions()
 {
    QList<QGraphicsItem *>colliders = collidingItems(Qt::IntersectsItemBoundingRect);
@@ -227,6 +230,7 @@ void SocketItem::paint(QPainter *painter,
 
 void SocketItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    // Start drawing out a connector line
     qobject_cast<CuesheetScene*>(scene())->startLine(event, this);
     update();
 }
@@ -234,6 +238,8 @@ void SocketItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 //-----------------------------------------------------------------------------
 // ConnectorItem
+//      These are used to draw the connections between nodes once they've
+//      been connected.
 
 ConnectorItem::ConnectorItem(SocketItem *serverSocket, SocketItem *clientSocket,
                              QGraphicsItem *parent) :
@@ -261,14 +267,33 @@ void ConnectorItem::gotMoved()
 
 QRectF ConnectorItem::boundingRect() const
 {
-    // XXX doesn't correctly handle the cubic.
-
-    qreal extra = 20.; // XXX kinda arbitrary
     QPointF nStart = _serverSocket->scenePos();
     QPointF nEnd = _clientSocket->scenePos();
 
     // Compute two rects when dragging.  The first is the rect
     // that connects _pStart & _pEnd -- the PREVIOUS positions.
+#if 1
+    float leftprev = qMin(_pStart.x(), _pEnd.x()-100);
+    float leftnext = qMin( nStart.x(),  nEnd.x()-100);
+    float left     = qMin( leftprev,    leftnext);
+
+    float rightprev = qMax(_pStart.x()+100, _pEnd.x());
+    float rightnext = qMax( nStart.x()+100,  nEnd.x());
+    float right     = qMax( rightprev,       rightnext);
+
+    float topprev = qMin(_pStart.y(), _pEnd.y());
+    float topnext = qMin( nStart.y(),  nEnd.y());
+    float top     = qMin( topprev,    topnext);
+
+    float bottomprev = qMax(_pStart.y(), _pEnd.y());
+    float bottomnext = qMax( nStart.y(),  nEnd.y());
+    float bottom     = qMax( bottomprev,  bottomnext);
+
+
+    QRectF bbox(QPointF(left,top),QPointF(right, bottom));
+
+#else
+
     QRectF bbox(_pStart, QSizeF(qMax(_pEnd.x() - _pStart.x(),100.), _pEnd.y() - _pStart.y()));
     bbox = bbox.normalized();
 
@@ -281,7 +306,9 @@ QRectF ConnectorItem::boundingRect() const
     bbox = bbox.united(nbox);
 
     // And add a fudge factor
-    bbox = bbox.adjusted(-extra, -extra, extra, extra);
+#endif
+    qreal extra = 20.; // XXX kinda arbitrary
+    bbox.adjust(-extra, -extra, extra, extra);
     return bbox;
 }
 

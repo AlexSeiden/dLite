@@ -21,26 +21,23 @@ class NodeItem : public QGraphicsObject
 public:
     explicit NodeItem(Node *node, QGraphicsItem *parent = 0);
 
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    virtual QRectF  boundingRect() const;
+    void    paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
-    void avoidCollisions();
+    void    avoidCollisions();
 
-    Node *getNode() {return _node;}
+    Node *  getNode() {return _node;}
 
     virtual void beenSelected();
 
 signals:
-    void nodeMovedEventSignal();
+    void    nodeMovedEventSignal();
 
 protected:
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-
-    bool dragOver;
-
-private:
+    void    mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void    keyPressEvent(QKeyEvent *event);
     Node    *_node;
+    QMarginsF  _margins; // for padding on rect bbox
 };
 
 
@@ -59,7 +56,6 @@ public:
 private:
     ParamBase    *_param;
     SocketItem   *_socket;
-
 };
 
 
@@ -67,16 +63,16 @@ class SocketItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    explicit SocketItem(ParamBase *param, QGraphicsObject *parent);
+    explicit    SocketItem(ParamBase *param, QGraphicsObject *parent);
 
-    QRectF boundingRect() const;
-    void   paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
-    ParamBase *getParam() {return _param;}
+    QRectF      boundingRect() const;
+    void        paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    ParamBase * getParam() {return _param;}
 
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void        mousePressEvent(QGraphicsSceneMouseEvent *event);
 
 private:
-    ParamBase    *_param;
+    ParamBase   *_param;
 };
 
 

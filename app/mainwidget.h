@@ -62,6 +62,7 @@ public slots:
 
 private slots:
     void showFileDialog();
+    void showSaveDialog();
     void showSettingsDialog();
     void updateButtonStates();
 
@@ -83,6 +84,7 @@ private:
     Spectrograph*           m_spectrograph;
 
     QPushButton*            m_fileButton;
+    QPushButton*            m_saveButton;
     QPushButton*            m_pauseButton;
     QIcon                   m_pauseIcon;
     QPushButton*            m_playButton;

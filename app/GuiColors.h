@@ -65,6 +65,7 @@ public:
     static QColor  sl_squareColor;
     static QColor  sl_selectedColor;
     static QColor  sl_dragTarget;
+    static int     sl_barHeight;
 
 
     void    editGuiColorsDialog(QObject *parent = 0);

@@ -19,8 +19,9 @@ signals:
 
 public slots:
     void addNode(Node *node);
-    void subrangeHasChanged(Subrange *subrange);
     void selectionChanged();
+
+    void subrangeHasChanged(Subrange *subrange);
 
 private:
     QGraphicsScene *    _scene;
