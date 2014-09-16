@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include "lightcolor.h"
-#include "dancefloormodel.h"
+#include "DanceFloor.h"
 
 class Dancefloorwidget : public QWidget
 {
@@ -12,7 +12,7 @@ public:
     explicit Dancefloorwidget(QWidget *parent = 0);
     ~Dancefloorwidget();
 
-    void setModel(Dancefloormodel *model);
+    void setModel(Dancefloor *model);
     void setHasLights(int x, int y, bool status);
 
 public:
@@ -26,7 +26,7 @@ signals:
     void infoMessage(const QString &message, int intervalMs);
 
 private:
-    Dancefloormodel *dfModel;
+    Dancefloor *dfModel;
     bool    cellHasLights(int x, int y);
     int     xsize;
     int     ysize;

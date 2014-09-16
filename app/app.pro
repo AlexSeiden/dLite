@@ -24,7 +24,6 @@ SOURCES  += \
     utils.cpp \
     wavfile.cpp \
     lightcolor.cpp \
-    dancefloormodel.cpp \
     Param.cpp \
     Cue.cpp \
     CueBox.cpp \
@@ -34,7 +33,9 @@ SOURCES  += \
     Subrange.cpp \
     RandomNode.cpp \
     ColorNodes.cpp \
-    Cupid.cpp
+    Cupid.cpp \
+    Imager.cpp \
+    DanceFloor.cpp
 
 HEADERS  += \
     engine.h \
@@ -43,7 +44,6 @@ HEADERS  += \
     spectrumanalyser.h \
     utils.h \
     wavfile.h \
-    dancefloormodel.h \
     lightcolor.h \
     Param.h \
     Cue.h \
@@ -54,7 +54,9 @@ HEADERS  += \
     Subrange.h \
     RandomNode.h \
     ColorNodes.h \
-    Cupid.h
+    Cupid.h \
+    Imager.h \
+    DanceFloor.h
 
 fftreal_dir = ../3rdparty/fftreal
 

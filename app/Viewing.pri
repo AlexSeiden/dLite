@@ -13,7 +13,8 @@ SOURCES += \
     CueLibView.cpp \
     settingsdialog.cpp \
     CuesheetView.cpp \
-    SublevelNodeItem.cpp
+    SublevelNodeItem.cpp \
+    $$PWD/ConnectorItem.cpp
 
 HEADERS += \
     mainwidget.h \
@@ -28,4 +29,5 @@ HEADERS += \
     CueLibView.h \
     settingsdialog.h \
     CuesheetView.h \
-    SublevelNodeItem.h
+    SublevelNodeItem.h \
+    $$PWD/ConnectorItem.h

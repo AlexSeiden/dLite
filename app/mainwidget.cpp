@@ -42,7 +42,7 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_infoMessageTimerId(NullTimerId)
     ,   m_settingsDialog(new SettingsDialog(m_engine->interval(), this))
     ,   m_loadFileAction(0)
-    ,   m_dancefloormodel(new Dancefloormodel)  // TODO should be allocated in main?
+    ,   m_dancefloormodel(new Dancefloor)  // TODO should be allocated in main?
     ,   m_cueLibView(NULL)
 {
 
@@ -58,7 +58,7 @@ MainWidget::MainWidget(QWidget *parent)
     // TODO move to settings/prefs  & allow setting this
     std::string layoutfile = std::string("/Users/alex/src/floorit/layout.csv");
     m_dancefloormodel->ImportLayout(layoutfile);
-    Cue::setDancefloormodel(m_dancefloormodel);
+    Cue::setDancefloor(m_dancefloormodel);
 
     m_dancefloorwidget = new Dancefloorwidget();
     m_dancefloorwidget->setModel(m_dancefloormodel);
@@ -82,7 +82,7 @@ MainWidget::MainWidget(QWidget *parent)
 
     // OK, these are essentially globals:  GROSS
     Cupid::Singleton()->setSpectrograph(m_spectrograph);
-    Cupid::Singleton()->setDancefloormodel(m_dancefloormodel);
+    Cupid::Singleton()->setDancefloor(m_dancefloormodel);
     Cupid::Singleton()->setEngine(m_engine);
     Cupid::Singleton()->setGraphWidget(m_graphWidget);
 }
@@ -108,7 +108,7 @@ void MainWidget::stateChanged(QAudio::State state)
 void MainWidget::spectrumChanged(qint64 position, qint64 length,
                                  const FrequencySpectrum &spectrum)
 {
-    // ??? Why don't we send signals to m_spectrograph & m_progressBar?
+    // ??? Why are these implemented as function calls, instead of signals?
     m_progressBar->windowChanged(position, length);
     m_spectrograph->spectrumChanged(spectrum);
 }
@@ -187,6 +187,7 @@ void MainWidget::showOpenDialog()
     if (fileNames.count()) {
         QString fileName = fileNames.front(); // TODO open multiple files
         NodeFactory::Singleton()->readFromFile(fileName);
+        m_graphWidget->addAllNodes(NodeFactory::Singleton()->allNodes());
         updateButtonStates();
     }
 }
@@ -224,7 +225,7 @@ void MainWidget::createUi()
     // Button panel
     const QSize buttonSize(30, 30);
 
-    m_fileButton->setText(tr("File..."));
+    m_fileButton->setText(tr("Song..."));
 
     m_pauseIcon = style()->standardIcon(QStyle::SP_MediaPause);
     m_pauseButton->setIcon(m_pauseIcon);

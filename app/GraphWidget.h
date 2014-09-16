@@ -2,8 +2,10 @@
 #define GRAPHWIDGET_H
 
 #include <QWidget>
-#include <QGraphicsScene>
+#include <QList>
+#include "CuesheetScene.h"
 #include "CuesheetView.h"
+#include "Param.h"
 
 class Node;
 class Subrange;
@@ -15,7 +17,7 @@ public:
     explicit GraphWidget(QWidget *parent = 0);
     ~GraphWidget() {}
 
-signals:
+    void addAllNodes(QList<Node*> allNodes);
 
 public slots:
     void addNode(Node *node);
@@ -24,7 +26,9 @@ public slots:
     void subrangeHasChanged(Subrange *subrange);
 
 private:
-    QGraphicsScene *    _scene;
+    void addConnection(ParamBase *, ParamBase*);
+
+    CuesheetScene *     _scene;
     CuesheetView *      _csview;
 };
 

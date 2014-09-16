@@ -1,12 +1,11 @@
 #include "CueBox.h"
-#include "dancefloormodel.h"
+#include "DanceFloor.h"
 #include <QDebug>
 #include "Node.h"
 
-Dancefloormodel *Cue::_dfModel = nullptr;
+Dancefloor *Cue::_dfModel = nullptr;
 
 CueBox::CueBox() :
-    Cue(),
     _x(10),
     _y(8),
     _scale(1.0),
@@ -42,7 +41,10 @@ CueBox::CueBox() :
     setParamParent();
 }
 
-void CueBox::operator ()() {
+// Is this actually called?  I don't think so, but I guess since Node is
+// pure virtual and operator() must be defined so that the class is concrete,
+// this is here...
+void CueBox::operator()() {
     evaluate();
 }
 
@@ -66,7 +68,8 @@ void CueBox::evaluate()
     Firing *firing = new Firing;
     firing->_color = color;
     firing->_alpha = alpha;
-    firing->setDecay(1);    // TODO
+    firing->setDecayMode(_decayMode);
+    firing->setCompMode(_compMode);
     _dfModel->fireLight(x, y, firing);
 }
 

@@ -9,7 +9,6 @@
 #include "Cue.h"
 #include "Node.h"
 #include "CueBox.h"
-#include "Whip.h"
 #include "Param.h"
 
 QT_BEGIN_NAMESPACE
@@ -30,18 +29,12 @@ public slots:
     void setValue(int val);
     void setValue(Lightcolor val);
 
-#ifdef NUKEME
-    void setProvider(std::function<void()> closure);
-//    void setProvider(std::function<void(Lightcolor&)> closure);
-#endif
-
     void launchColorDialog();
 
 private:
     QString         _name;
     ParamBase       *_param;
 
-    Whip            *_whipButton;
     QLabel          *_label;
     QWidget         *_genericEditorWidget;
 };

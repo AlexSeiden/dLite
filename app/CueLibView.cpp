@@ -7,7 +7,7 @@ CueLibView::CueLibView(QWidget *parent) :
     QWidget(parent)
 {
     createUi();
-    move(500, 10);
+    move(520, 10);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
@@ -33,7 +33,8 @@ void CueLibView::createUi()
     CHECKED_CONNECT(_signalMapper, SIGNAL(mapped(QString)),
                     this, SIGNAL(newNodeRequest(QString)));
     // The newNodeRequest signal from here is monitored by mainwidget,
-    // who does the bulk of the dispatching.
+    // which does the instantiation, partly by calling back here,
+    // and partly by calling graphWidget->addNode()
 
 }
 

@@ -1,6 +1,6 @@
 #include "engine.h"
 #include "utils.h"
-#include "dancefloormodel.h"
+#include "DanceFloor.h"
 
 #include <math.h>
 

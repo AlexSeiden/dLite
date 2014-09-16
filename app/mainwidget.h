@@ -15,7 +15,7 @@ class ProgressBar;
 class SettingsDialog;
 class Spectrograph;
 class Dancefloorwidget;
-class Dancefloormodel;
+class Dancefloor;
 class CueLibView;
 class GraphWidget;
 
@@ -96,7 +96,7 @@ private:
 
     QAction*                m_loadFileAction;
 
-    Dancefloormodel *       m_dancefloormodel;
+    Dancefloor *       m_dancefloormodel;
     Dancefloorwidget *      m_dancefloorwidget;
     CueLibView *            m_cueLibView;
     GraphWidget *           m_graphWidget;

@@ -12,13 +12,13 @@
 class Cue;
 class Dancefloorwidget;
 
-class Dancefloormodel : public QObject
+class Dancefloor : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit Dancefloormodel(QObject *parent = 0);
-    ~Dancefloormodel();
+    explicit Dancefloor(QObject *parent = 0);
+    ~Dancefloor();
     bool ImportLayout(std::string & layoutCsvFile);
     void printLayout();
 

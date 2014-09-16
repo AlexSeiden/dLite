@@ -8,7 +8,8 @@
 // Forward declarations
 class Cue;
 
-enum compmode_t {SET, ADD, OVER, UNDER};
+enum compMode_t {SET, ADD, OVER, UNDER};
+enum decayMode_t {IMMEDIATE, EXPONENTIAL, FOREVER};
 
 // -----------------------------------------------------------------------------
 // Lightcolor
@@ -24,6 +25,7 @@ public:
     Lightcolor(double r, double g, double b);
     Lightcolor(double val);
     Lightcolor(const QColor &qc);
+    Lightcolor(const QRgb &qrgb);
     Lightcolor(const Lightcolor &rhs);
 
     int getRed() const    {return m_r;}
@@ -61,18 +63,19 @@ class Firing
 {
 public:
     Firing();
-    Firing(Lightcolor color, double alpha, compmode_t compmode, decayfunc_t decayfunc, Cue *cue=nullptr);
+    Firing(Lightcolor color, double alpha, compMode_t compmode, decayfunc_t decayfunc, Cue *cue=nullptr);
 
     bool        evaluate();
-    //bool evaluate(long time);  // LATER evaluates for a specific time?
 
     Lightcolor  compOver(const Lightcolor &lightcolor);
-    void        setDecay(decayfunc_t dfunk) {_decayfunction = dfunk;}
-    void        setDecay(int i);
+    Lightcolor  compAdd(const Lightcolor &lightcolor);
+    void        setCompMode(compMode_t cm) {_compMode = cm;}
+//    void        setDecayMode(decayfunc_t dfunk) {_decayfunction = dfunk;}
+    void        setDecayMode(decayMode_t dmode);
 
     Lightcolor  _color;
     float       _alpha;
-    compmode_t  _compMode;
+    compMode_t  _compMode;
     decayfunc_t _decayfunction;
     Cue         *_cue; // mainly used when the same cue wants to replace
                       // a firing in the buffer, rather than add to it.

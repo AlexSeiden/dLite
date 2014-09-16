@@ -1,5 +1,6 @@
 #include "lightcolor.h"
 #include <QDebug>
+#include <QRgb>
 
 // -----------------------------------------------------------------------------
 //  Lightcolor
@@ -15,6 +16,8 @@ Lightcolor::Lightcolor(int val) : m_r(val), m_g(val), m_b(val) { }
 Lightcolor::Lightcolor(double r, double g, double b) : m_r(r*255), m_g(g*255), m_b(b*255) { }
 
 Lightcolor::Lightcolor(double val) : m_r(val*255), m_g(val*255), m_b(val*255) { }
+
+Lightcolor::Lightcolor(const QRgb &qrgb) : m_r(qRed(qrgb)), m_g(qGreen(qrgb)), m_b(qBlue(qrgb)) { }
 
 Lightcolor::Lightcolor(const QColor &qc) : m_r(qc.red()), m_g(qc.green()), m_b(qc.blue()) { }
 
@@ -138,7 +141,7 @@ Firing::Firing() :
     _decayfunction(exponentialDecay)
 { }
 
-Firing::Firing(Lightcolor color, double alpha, compmode_t compmode, decayfunc_t decayfunc, Cue *cue) :
+Firing::Firing(Lightcolor color, double alpha, compMode_t compmode, decayfunc_t decayfunc, Cue *cue) :
     _color(color),
     _alpha(alpha),
     _compMode(compmode),
@@ -146,16 +149,16 @@ Firing::Firing(Lightcolor color, double alpha, compmode_t compmode, decayfunc_t 
     _cue(cue)
 { }
 
-void Firing::setDecay(int i) // GROSS
+void Firing::setDecayMode(decayMode_t dmode) // GROSS
 {
-    if (i == 0)
-        _decayfunction = noDecay;
-    else if (i == 1)
+    if (dmode == IMMEDIATE)
         _decayfunction = instantDecay;
-    else if (i == 2)
-        _decayfunction = exponentialDecay;
+    else if (dmode == FOREVER)
+        _decayfunction = noDecay;
+    else if (dmode == EXPONENTIAL)
+        _decayfunction = exponentialDecay;      // TODO allow setting decay params
     else
-        qDebug() << "setDecay called with bad arg " << i;
+        qDebug() << "setDecay called with bad arg " << dmode;
 }
 
 bool Firing::evaluate() {
@@ -172,6 +175,15 @@ Lightcolor Firing::compOver(const Lightcolor &lightcolor) {
     Lightcolor out = lightcolor;
     out *= (1.0 - _alpha);
     out += _color;
+    // XXX compute new alpha
+    return out;
+}
+
+
+Lightcolor Firing::compAdd(const Lightcolor &lightcolor) {
+    Lightcolor out = lightcolor;
+    out += _color;
+    // XXX compute new alpha
     return out;
 }
 

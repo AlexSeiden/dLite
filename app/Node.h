@@ -46,6 +46,7 @@ public:
     virtual void operator() (void) = 0;
 
 #if 0
+    // LATER
     // Suggested by Myers item 35
     void operator() (void) {
         if (evaluatedThisFrame())
@@ -103,8 +104,6 @@ protected:
     // This is so instantiateNode can set classname:
     //friend Node* NodeFactory::instatiateNode(QString classname);
     friend class NodeFactory;
-
-
 };
 
 
@@ -126,13 +125,13 @@ public:
 
     void registerNodetype(QString classname, Node::node_t typeInfo, NodeInstatiator_t instantiatorFunction);
     const QStringList & getNodesOfType(Node::node_t typeInfo);
-
-    bool saveToFile(QString filename);
-    bool readFromFile(QString filename);
+    QList<Node*>        allNodes() {return _allNodes;}
 
     static NodeFactory *Singleton();
 
     // Serialization
+    bool saveToFile(QString filename);
+    bool readFromFile(QString filename);
     void readNode(const QJsonObject &json);
     void readAllNodes(const QJsonObject &json);
     void write(QJsonObject &json) const;
@@ -148,8 +147,9 @@ private:
     QMap<ParamBase *, QUuid>                    _connectionsToMake;
 
     // Inventory
+    // Maybe this belongs to dancefloor???
     QList<Node *>   _allNodes;
-};      // NodeFactory
+};
 
 
 // ------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-#include "dancefloormodel.h"
+#include "DanceFloor.h"
 
 #include <QDebug>
 #include <iostream>
@@ -12,7 +12,7 @@
 #include "dancefloorwidget.h"
 
 
-Dancefloormodel::Dancefloormodel(QObject *parent) :
+Dancefloor::Dancefloor(QObject *parent) :
     QObject(parent),
     _frame(0)
 {
@@ -21,11 +21,11 @@ Dancefloormodel::Dancefloormodel(QObject *parent) :
     _timeSinceLastUpdate.start();
 }
 
-Dancefloormodel::~Dancefloormodel() { }
+Dancefloor::~Dancefloor() { }
 
 
 // LATER add Foot-squares as well as lights
-bool Dancefloormodel::ImportLayout(std::string &layoutCsvFile)
+bool Dancefloor::ImportLayout(std::string &layoutCsvFile)
 {
     std::string line;
     std::vector< std::string> lines;
@@ -87,7 +87,7 @@ bool Dancefloormodel::ImportLayout(std::string &layoutCsvFile)
     return true;
 }
 
-bool Dancefloormodel::hasPixel(int x, int y)
+bool Dancefloor::hasPixel(int x, int y)
 {
     int index = _getIndex(x,y);
     if (_lights[index]._lightID == 0)
@@ -97,7 +97,7 @@ bool Dancefloormodel::hasPixel(int x, int y)
 }
 
 // Test routine to print layout on console.
-void Dancefloormodel::printLayout()
+void Dancefloor::printLayout()
 {
     for (int y=0; y<_ysize; ++y){
         for (int x=0; x<_xsize; ++x)
@@ -107,7 +107,7 @@ void Dancefloormodel::printLayout()
 }
 
 #ifndef INLINE
-int Dancefloormodel::_getIndex(int x, int y)
+int Dancefloor::_getIndex(int x, int y)
 {
     if (!(x >= 0 && x < _xsize && y >= 0 && y < _ysize)) {
         qDebug() << "BOUNDS ERROR: " <<x <<y;
@@ -118,15 +118,15 @@ int Dancefloormodel::_getIndex(int x, int y)
 }
 #endif
 
-Lightcolor Dancefloormodel::getPixel(int x, int y) {
+Lightcolor Dancefloor::getPixel(int x, int y) {
     return _lights[_getIndex(x,y)]._value;
 }
 
-QColor Dancefloormodel::getQColor(int x, int y) {
+QColor Dancefloor::getQColor(int x, int y) {
     return _lights[_getIndex(x,y)]._value.toQColor();
 }
 
-void Dancefloormodel::fireLight(int x, int y, Firing *firing)
+void Dancefloor::fireLight(int x, int y, Firing *firing)
 {
     // TODO Need to insert the firings correctly into the buffer,
     // so that repeat firings by the same cue do the correct thing.
@@ -136,7 +136,7 @@ void Dancefloormodel::fireLight(int x, int y, Firing *firing)
     light._firings.push_back(firing);
 }
 
-void Dancefloormodel::evaluate()
+void Dancefloor::evaluate()
 {
 //    qDebug("Time elapsed: %d ms", _timeSinceLastUpdate.elapsed());
     _timeSinceLastUpdate.restart();
@@ -181,12 +181,12 @@ void Dancefloormodel::evaluate()
     _frame++;
 }
 
-void Dancefloormodel::evaluateAllCues() {
+void Dancefloor::evaluateAllCues() {
     for (Cue *cue : _cues) {
         cue->evaluate();
     }
 }
 
-void Dancefloormodel::addCue(Cue *cue) {
+void Dancefloor::addCue(Cue *cue) {
     _cues.push_back(cue);
 }

@@ -20,7 +20,7 @@ ParamView::ParamView(QWidget *parent, ParamBase *param ) :
    if (paramType == paramTypeFloat) {
         Param<float> * floatParam = dynamic_cast<Param<float> *>(_param);
         QDoubleSpinBox *editorWidget = new QDoubleSpinBox;
-        editorWidget->setRange(0, 1.0);
+        editorWidget->setRange(0, 10.0);
         editorWidget->setSingleStep(.01);
         _genericEditorWidget = editorWidget;
         float val = 0.0;
@@ -41,7 +41,7 @@ ParamView::ParamView(QWidget *parent, ParamBase *param ) :
         editorWidget->setValue(val);
         CHECKED_CONNECT(editorWidget, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
     }
-    else if (paramType == paramTypeLcolor) {
+    else if (paramType == paramTypeLightcolor) {
         Param<Lightcolor> * colorParam = dynamic_cast<Param<Lightcolor> *>(_param);
         QToolButton *editorWidget =  new QToolButton(this);
         _genericEditorWidget = editorWidget;

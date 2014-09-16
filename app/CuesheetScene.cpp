@@ -1,7 +1,8 @@
 #include "CuesheetScene.h"
 #include "NodeItem.h"
-#include <QGraphicsSceneMouseEvent>
+#include "ConnectorItem.h"
 #include "GuiColors.h"
+#include <QGraphicsSceneMouseEvent>
 #include <QDebug>
 
 
@@ -117,6 +118,10 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                     client = _startSocket;
                 }
                 connectSockets(server, client);
+
+                // Make the actual connection between parameters.
+                // GROSS -- shouldn't this be handled in the model?
+                client->getParam()->connectTo(server->getParam());
             }
         }
     }
@@ -131,10 +136,6 @@ void CuesheetScene::connectSockets(SocketItem *server, SocketItem *client)
 {
     ConnectorItem *connection = new ConnectorItem(server, client);
     addItem(connection);
-
-    // Make the actual connection between parameters.
-    // GROSS -- shouldn't this be handled in the model?
-    client->getParam()->connectTo(server->getParam());
 }
 
 SocketItem *CuesheetScene::getSocket(QGraphicsItem *item)
@@ -163,5 +164,20 @@ SocketItem *CuesheetScene::getSocket(QGraphicsItem *item)
 
     // Fuck it, must be something we can't connect to anyway.
     qDebug() << "can't connect to type: " << typeid(item).name() << " of item " << item;
+    return nullptr;
+}
+
+// This is super inefficient from an algorithmic point of view,
+// but in practical terms shouldn't be a problem.
+SocketItem *CuesheetScene::getSocketForParam(ParamBase* param)
+{
+    QList<QGraphicsItem*>allItems = items();
+    foreach (QGraphicsItem* item, allItems) {
+        SocketItem *sock = dynamic_cast<SocketItem *>(item);
+        if (! sock)
+            continue;
+        if (sock->getParam() == param)
+            return sock;
+    }
     return nullptr;
 }

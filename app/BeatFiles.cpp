@@ -10,6 +10,7 @@
 // (because it's the first src file.)
 //
 // Saving!
+//      need connector restore
 // Shape rendering with either QPainter, GL, or something else.
 // Node Types:
     // color nodes:
@@ -27,6 +28,14 @@
 //      progress bar with clicking
 // Hardware interface!
 // multiple tabbed cue sheets
+// Export/bake
+
+// global hotkeys:
+//      space to start/stop
+//      frame all / frame selected
+//      rewind
+
+// compmode & decaymode pups on cuewidgets
 
 // Cleaning:
 //      Remnants of original spectrum audio recording stuff in buffer length and

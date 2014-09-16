@@ -21,7 +21,7 @@ Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
 
 Dancefloorwidget::~Dancefloorwidget() { }
 
-void Dancefloorwidget::setModel(Dancefloormodel *model)
+void Dancefloorwidget::setModel(Dancefloor *model)
 {
     dfModel = model;
     xsize = model->getXsize();

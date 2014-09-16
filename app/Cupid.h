@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include "Param.h"
-#include "dancefloormodel.h"
+#include "DanceFloor.h"
 #include "engine.h"
 
 class GraphWidget;
@@ -25,10 +25,10 @@ public:
                         { return _spectrograph;}
     void            setSpectrograph(QObject* spectrograph)
                         {_spectrograph = spectrograph;}
-    Dancefloormodel* getDancefloormodel()
-                        { return _dancefloormodel;}
-    void            setDancefloormodel(Dancefloormodel* dfmodel)
-                        {_dancefloormodel = dfmodel;}
+    Dancefloor*     getDancefloor()
+                        { return _dancefloor;}
+    void            setDancefloor(Dancefloor* dfmodel)
+                        {_dancefloor = dfmodel;}
     Engine*         getEngine()
                         { return _engine;}
     void            setEngine(Engine* engine)
@@ -40,21 +40,15 @@ public:
 
     // Syntactic sugar
     static int      getCurrentFrame()
-                        {return Singleton()->_dancefloormodel->getFrame();}
+                        {return Singleton()->_dancefloor->getFrame();}
     static int      getPlaybackPositionUSecs()
                         {return Singleton()->_engine->_uSecs;}
     static QString  getAudioFilename()
                         {return Singleton()->_engine->m_audiofilename;}
 
-#if 0 // NUKEMEMAYBE
-public slots:
-    void    inputSeeksOutput(ParamBase *param);
-    void    outputSeeksInput(ParamBase *param);
-#endif
-
 private:
     QObject*         _spectrograph;
-    Dancefloormodel* _dancefloormodel;
+    Dancefloor*      _dancefloor;
     Engine*          _engine;
     GraphWidget*     _graphWidget;
 };

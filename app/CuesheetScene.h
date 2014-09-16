@@ -5,10 +5,12 @@
 #include <QGraphicsLineItem>
 
 // Subclasses QGraphicsScene, for viewing a Cuesheet.
+// Should only be directly manipulated by graphwidget
 
 
 // Forward declarations:
 class SocketItem;
+class ParamBase;
 
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
@@ -23,7 +25,7 @@ class CuesheetScene : public QGraphicsScene
 public:
     explicit CuesheetScene(QObject *parent = 0);
     SocketItem  *getSocket(QGraphicsItem *item);
-
+    SocketItem  *getSocketForParam(ParamBase* param);
 
 public slots:
     void setConnecting(bool status=true) {_isConnecting = status;}

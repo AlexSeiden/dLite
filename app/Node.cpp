@@ -250,12 +250,7 @@ void NodeFactory::readAllNodes(const QJsonObject &json)
         QUuid serverUuid =  _connectionsToMake[param];
         ParamBase* server = _registryUUIDtoParam[serverUuid];
         param->connectTo(server);
-        // TODO XXX add connection objects
-        // something like
-        //CuesheetScene::connectSockets(SocketItem *server, SocketItem *client)
-        // except that calls connectTo, and I'd rather not get too deep into the Cuesheetscene stuff anyway.
     }
-
 }
 
 void NodeFactory::readNode(const QJsonObject &json)
@@ -292,7 +287,4 @@ void NodeFactory::readNode(const QJsonObject &json)
             _connectionsToMake[param] = connectedUUID;
         }
     }
-
-
-    Cupid::Singleton()->getGraphWidget()->addNode(newnode);  // GROSS  XXX
 }

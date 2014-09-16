@@ -45,6 +45,7 @@ void GraphWidget::selectionChanged()
         }
     }
     // TODO if no SublevelNode selected, setSubrange = NULL
+    // TODO Allow selection of Connections
 }
 
 void GraphWidget::subrangeHasChanged(Subrange *subrange)
@@ -66,6 +67,36 @@ void GraphWidget::subrangeHasChanged(Subrange *subrange)
     }
 }
 
+void GraphWidget::addAllNodes(QList<Node*> allNodes)
+{
+    // First add all the nodes...
+    foreach (Node *node, allNodes)
+        addNode(node);
+
+    // ...then make all the connections.
+    foreach (Node *node, allNodes) {
+        foreach (ParamBase *param, node->getParams()) {
+            if (param->connectedParam()) {
+                addConnection(param->connectedParam(), param);
+            }
+        }
+    }
+}
+
+void GraphWidget::addConnection(ParamBase* server, ParamBase* client)
+{
+    // Find sockets
+   SocketItem* serverSocket = _scene->getSocketForParam(server);
+   SocketItem* clientSocket = _scene->getSocketForParam(client);
+   if (serverSocket && clientSocket) {
+       _scene->connectSockets(serverSocket, clientSocket);
+   }
+   else {
+       // ErrorHandling
+       qDebug() << Q_FUNC_INFO << "Could not connect" ;
+   }
+}
+
 void GraphWidget::addNode(Node *node)
 {
     NodeItem *nodeItem;
@@ -79,8 +110,8 @@ void GraphWidget::addNode(Node *node)
     // TODO better positioning.
     QPointF  center = _csview->view()->mapToScene(_csview->view()->viewport()->rect().center());
     nodeItem->setPos(center);
-
     _scene->addItem(nodeItem);
+    // Moves the node so it isn't right on top of one that's already displayed.
     nodeItem->avoidCollisions();
 }
 

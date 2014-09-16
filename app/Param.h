@@ -19,7 +19,6 @@ class QJsonObject;
 
 class ParamBase
 {
-
 public:
     ParamBase() :
         _provider(nullptr),
@@ -131,8 +130,6 @@ public:
         }
     }
 
-    // ??? Should this automatically disable a _provider functor, if there is one?
-    // Or should setValue be disabled when there is a provider?
     void setValue(const PARAMT &value) {_value = value;}
 
     // ??? do we need this?  Would it be better just to assign a _type field?
@@ -147,6 +144,6 @@ public:
 // For convinience & speed when doing RTTI
 extern const std::type_info & paramTypeFloat;
 extern const std::type_info & paramTypeInt;
-extern const std::type_info & paramTypeLcolor;
+extern const std::type_info & paramTypeLightcolor;
 extern const std::type_info & paramTypeBool;
 #endif // PARAM_H

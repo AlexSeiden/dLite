@@ -15,7 +15,7 @@
 #include <QVector>
 
 class FrequencySpectrum;
-class Dancefloormodel;
+class Dancefloor;
 QT_BEGIN_NAMESPACE
 class QAudioInput;
 class QAudioOutput;
@@ -77,7 +77,7 @@ public:
     // Set window function applied to audio data before spectral analysis.
     void setWindowFunction(WindowFunction type);
 
-    void setDancefloormodel(Dancefloormodel *df) {_dfModel = df;}
+    void setDancefloormodel(Dancefloor *df) {_dfModel = df;}
 
 public slots:
     void startPlayback();
@@ -167,7 +167,7 @@ private:
 
     // Interval in milliseconds between calls that update the spectrum, etc.
     int    				m_notifyIntervalMs;
-    Dancefloormodel     *_dfModel;
+    Dancefloor     *_dfModel;
 
 protected:
     // Used directly by Cupid.

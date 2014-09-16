@@ -8,7 +8,7 @@
 // These constants defined for convinience & speed when doing type checks.
 const std::type_info & paramTypeFloat = typeid(Param<float>);
 const std::type_info & paramTypeInt = typeid(Param<int>);
-const std::type_info & paramTypeLcolor = typeid(Param<Lightcolor>);
+const std::type_info & paramTypeLightcolor = typeid(Param<Lightcolor>);
 const std::type_info & paramTypeBool = typeid(Param<bool>);
 
 std::function<void()> ParamBase::getProvider()

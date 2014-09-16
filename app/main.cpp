@@ -6,8 +6,8 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setApplicationName("dLite");
 
-    MainWidget w;
-    w.show();
+    MainWidget mainwidget;
+    mainwidget.show();
 
 
     return app.exec();
