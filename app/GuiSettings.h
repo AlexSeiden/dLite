@@ -1,5 +1,5 @@
-#ifndef GUICOLORS_H
-#define GUICOLORS_H
+#ifndef GUISETTINGS_H
+#define GUISETTINGS_H
 
 #include <QObject>
 #include <QColor>
@@ -18,7 +18,6 @@ class GuiSettings : public QObject
 public:
     explicit GuiSettings(QObject *parent = 0);
     // Graph widget
-    static QColor   connectorColor;
     static QColor   nodeNameColor;
     static QColor   nodeBGColor;
     static QColor   nodeTextColor;
@@ -34,7 +33,10 @@ public:
     static int      socketWidth;
     static int      paramHeight;
     static QPen     socketOutlinePen;
+    static QColor   connectorColor;
+    static QColor   connectorCenterColor;
     static QPen     connectorPen;
+    static QBrush   connectorBrush;
     static int      connectorEndSize;
     static int      iconSize;
 
@@ -58,7 +60,6 @@ public:
     static int     sg_textHeight;
     static int     sg_textOffset;
 
-
     // Sublevel meter
     static QColor  sl_bgColor;
     static QColor  sl_barColor;
@@ -66,6 +67,13 @@ public:
     static QColor  sl_selectedColor;
     static QColor  sl_dragTarget;
     static int     sl_barHeight;
+
+    // Transport
+    static QColor  trans_bgColor;
+    static QColor  trans_barColor;
+    static int     trans_barHeight;
+
+
 
 
     void    editGuiColorsDialog(QObject *parent = 0);
@@ -78,4 +86,4 @@ public:
 // Utility function to set bg color on toolbar button
 void setButtonColor(QToolButton *colorButton, const QColor &col);
 
-#endif // GUICOLORS_H
+#endif // GUISETTINGS_H

@@ -29,8 +29,8 @@ public:
     virtual void beenSelected();
 
     // Serialization
-    virtual void read(const QJsonObject &json);
-    virtual void write(QJsonObject &json) const;
+    virtual void readFromJSONObj(const QJsonObject &json);
+    virtual void writeToJSONObj(QJsonObject &json) const;
 
 signals:
     void    nodeMovedEventSignal();

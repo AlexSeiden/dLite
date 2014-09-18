@@ -1,5 +1,5 @@
 #include "CuesheetView.h"
-#include "GuiColors.h"
+#include "GuiSettings.h"
 #include <QtWidgets>
 
 #ifndef QT_NO_WHEELEVENT

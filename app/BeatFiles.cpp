@@ -7,41 +7,53 @@
 
 
 // TODO master todo here
-// (because it's the first src file.)
-//
-// Saving!
-//      need connector restore
-// Shape rendering with either QPainter, GL, or something else.
-// Node Types:
-    // color nodes:
-    //      palette
-    //      spline
-    // beats!
-    //      segmentino
-    //      breakdown viewer
-    // Regions
-    // Position
-    //      Paths
-// Compositing modes
-// Firing decay modes
-// playback controller
-//      progress bar with clicking
-// Hardware interface!
-// multiple tabbed cue sheets
-// Export/bake
+/*
+ (because it's the first src file.)
 
-// global hotkeys:
-//      space to start/stop
-//      frame all / frame selected
-//      rewind
+ Hardware interface!
+ Saving!
+      restore graphwidget positions
+ Connection selection
+      and deletion
+ Node deletion
 
-// compmode & decaymode pups on cuewidgets
+ Node Types:
+   color nodes:
+        palette
+        spline
+   beats!
+        segmentino
+        breakdown viewer
+   Regions
+   Paths
 
-// Cleaning:
-//      Remnants of original spectrum audio recording stuff in buffer length and
-//      window changed things
-// Clean up object model & separation-of-concerns
+ Compositing modes
+ Firing decay modes
 
+ playback controller
+      progress bar with clicking
+      multiple queued songs
+
+ multiple tabbed cue sheets
+ Export/bake
+ more Shape rendering with QPainter
+
+global hotkeys:
+  space to start/stop
+  frame all / frame selected
+  rewind
+
+ compmode & decaymode pups on cuewidgets
+
+Cleaning:
+    Remnants of original spectrum audio recording stuff in bufferlength and
+    windowchanged things
+    Clean up object model & separation-of-concerns
+
+Bugs:
+    "QGraphicsScene::addItem: item has already been added to this scene"
+
+*/
 
 // ------------------------------------------------------------------------------
 //  TriggerEvery
@@ -247,7 +259,8 @@ void NodeBar::loadFile()
     QFileInfo finfo = QFileInfo(audioFilename);
     QString path = finfo.path();
     QString basename = finfo.completeBaseName();
-    QString filename = path + "/" + basename + "_vamp_qm-vamp-plugins_qm-barbeattracker_bars.csv";
+    QString filename = path + "/" + basename
+            + "_vamp_qm-vamp-plugins_qm-barbeattracker_bars.csv";
     loadFile(filename);
 }
 
@@ -326,7 +339,8 @@ NodeBarBeat::NodeBarBeat()
     _nextIndex = 0;
     _nextRefresh = 0;
 
-    _paramList << &_barNumberOutput << &_beatNumberOutput << &_barTriggerOutput << &_beatTriggerOutput << &_offset;
+    _paramList << &_barNumberOutput << &_beatNumberOutput <<
+                  &_barTriggerOutput << &_beatTriggerOutput << &_offset;
     setParamParent();
 }
 
@@ -359,7 +373,8 @@ void NodeBarBeat::loadFile()
     QFileInfo finfo = QFileInfo(audioFilename);
     QString path = finfo.path();
     QString basename = finfo.completeBaseName();
-    QString filename = path + "/" + basename + "_vamp_qm-vamp-plugins_qm-barbeattracker_beatcounts.csv";
+    QString filename = path + "/" + basename
+            + "_vamp_qm-vamp-plugins_qm-barbeattracker_beatcounts.csv";
     loadFile(filename);
 }
 
@@ -400,10 +415,12 @@ void NodeBarBeat::operator()() {
     // XXX this breaks if we move the audio playhead back in time.
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
     if (mSecs > _nextRefresh) {
-        _barTriggerOutput._value = true;
         _beatTriggerOutput._value = true;
         _beatNumberOutput._value = _beatnumber[_nextIndex];
-        _barNumberOutput._value = _nextIndex;
+        if (_beatNumberOutput._value == 1) {
+            _barTriggerOutput._value = true;
+            _barNumberOutput._value++;
+        }
         _nextRefresh = _beats[++_nextIndex];
     }
 

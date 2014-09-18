@@ -14,6 +14,8 @@ public:
     void            paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
     QPainterPath    shape() const;
 
+    SocketItem*     getClient()     {return _clientSocket;}
+    SocketItem*     getServer()     {return _serverSocket;}
     void            updatePath();
 
 public slots:

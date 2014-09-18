@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QTimerEvent>
 #include <math.h>
-#include "GuiColors.h"
+#include "GuiSettings.h"
 
 Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
     QWidget(parent)
@@ -15,7 +15,8 @@ Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
     cellspace = GuiSettings::df_cellspace;
 
     setWindowTitle(tr("dLite floor"));
-    setWindowFlags(Qt::Tool | Qt::WindowTitleHint  |
+//    setWindowFlags(Qt::Tool | Qt::WindowTitleHint  |
+    setWindowFlags(Qt::WindowTitleHint  |
                    Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
 }
 
@@ -49,10 +50,9 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
     // Draw the outline
     QPen cellPen(GuiSettings::df_cellSepColor);
     painter.setPen(cellPen);
-//    painter.drawLine(rect().topLeft(), rect().topRight());
-//    painter.drawLine(rect().topRight(), rect().bottomRight());
-//    painter.drawLine(rect().bottomRight(), rect().bottomLeft());
-//    painter.drawLine(rect().bottomLeft(), rect().topLeft());
+
+//    QColor woodcol(186,176,153);
+    QColor woodcol(130,123,112);
 
     QRect cell(0,0, cellsize, cellsize);
     for (int y=0; y<ysize; ++y) {
@@ -65,6 +65,30 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
             else
                 painter.fillRect(cell, GuiSettings::df_noCellColor);
             painter.drawRect(cell);
+
+            // HACK!!
+            // Vertical bars
+            int xstart= (y<9) ? 4 : 6;
+            int xend= (y<9) ? 19 : 17;
+            if ((x>xstart) && (x<xend) && (y>2) && (y<17) && (x%2==1)) {
+                    QRect wood = cell;
+                    wood.setLeft(cell.right()+2);
+                    wood.setRight(cell.right()+cellspace);
+                    wood.setTop(cell.top()-cellspace+2);
+                    wood.setBottom(cell.bottom()+cellspace-1);
+                    painter.fillRect(wood,woodcol);
+            }
+            // Horizontal bars
+            xstart= (y<10) ? 5 : 7;
+            xend= (y<10) ? 18 : 16;
+            if ((x>xstart) && (x<xend) && (y>2) && (y<18) && (y%2==1)) {
+                    QRect wood = cell;
+                    wood.setLeft(cell.left()-cellspace+1);
+                    wood.setRight(cell.right()+cellspace);
+                    wood.setTop(cell.top()-cellspace+1);
+                    wood.setBottom(cell.top()-1);
+                    painter.fillRect(wood,woodcol);
+            }
         }
     }
 }

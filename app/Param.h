@@ -68,18 +68,17 @@ public:
     }
 
     // Serialization
-    virtual void read(const QJsonObject &json);
-    virtual void write(QJsonObject &json) const;
-
-    // Would be valid only for output nodes
-    //Node *getClients();
+    virtual void readFromJSONObj(const QJsonObject &json);
+    virtual void writeToJSONObj(QJsonObject &json) const;
 
     // Would it be useful to maintain a linked list of connections here?
     // Both for inputs and outputs?  Would that break modularity?
     //QList<ParamBase *>  getConnections();
-
+    // Would be valid only for output nodes
+    //Node *getClients();
 
     // Any OUTPUT params need to stick their value in here.
+    // Kinda GROSS but easiest way to (AFAIK) to pass arbitray datatypes.
     QVariant    _qvOutput;
 
 protected:
@@ -137,8 +136,8 @@ public:
 
     PARAMT _value;
 
-    virtual void read(const QJsonObject &json);
-    virtual void write(QJsonObject &json) const;
+    virtual void readFromJSONObj(const QJsonObject &json);
+    virtual void writeToJSONObj(QJsonObject &json) const;
 };
 
 // For convinience & speed when doing RTTI

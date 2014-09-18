@@ -106,7 +106,7 @@ void ParamBase::connectTo(ParamBase *server)
 // Param i/o
 
 // Writing
-void ParamBase::write(QJsonObject &json) const
+void ParamBase::writeToJSONObj(QJsonObject &json) const
 {
 //    json["type"] = _type; // TODO translate
     json["name"] = _name;
@@ -124,9 +124,9 @@ void ParamBase::write(QJsonObject &json) const
 
 
 // Template specializations
-template <> void Param<Lightcolor>::write(QJsonObject &json) const
+template <> void Param<Lightcolor>::writeToJSONObj(QJsonObject &json) const
 {
-    ParamBase::write(json);
+    ParamBase::writeToJSONObj(json);
     if (isOutput())
         return;
 
@@ -135,25 +135,25 @@ template <> void Param<Lightcolor>::write(QJsonObject &json) const
     json["blue"] = _value.getBlue();
 }
 
-template <> void Param<float>::write(QJsonObject &json) const
+template <> void Param<float>::writeToJSONObj(QJsonObject &json) const
 {
-    ParamBase::write(json);
+    ParamBase::writeToJSONObj(json);
     if (isOutput())
         return;
     json["value"] = _value;
 }
 
-template <> void Param<bool>::write(QJsonObject &json) const
+template <> void Param<bool>::writeToJSONObj(QJsonObject &json) const
 {
-    ParamBase::write(json);
+    ParamBase::writeToJSONObj(json);
     if (isOutput())
         return;
     json["value"] = _value;
 }
 
-template <> void Param<int>::write(QJsonObject &json) const
+template <> void Param<int>::writeToJSONObj(QJsonObject &json) const
 {
-    ParamBase::write(json);
+    ParamBase::writeToJSONObj(json);
     if (isOutput())
         return;
     json["value"] = _value;
@@ -161,39 +161,39 @@ template <> void Param<int>::write(QJsonObject &json) const
 
 // Reading
 
-void ParamBase::read(const QJsonObject &json)
+void ParamBase::readFromJSONObj(const QJsonObject &json)
 {
     // ErrorHandling
     _uuid = QUuid(json["uuid"].toString());
 }
 
-template <> void Param<int>::read(const QJsonObject &json)
+template <> void Param<int>::readFromJSONObj(const QJsonObject &json)
 {
-    ParamBase::read(json);
+    ParamBase::readFromJSONObj(json);
     if (isOutput())
         return;
     setValue(json["value"].toInt());
 }
 
-template <> void Param<float>::read(const QJsonObject &json)
+template <> void Param<float>::readFromJSONObj(const QJsonObject &json)
 {
-    ParamBase::read(json);
+    ParamBase::readFromJSONObj(json);
     if (isOutput())
         return;
     setValue(json["value"].toDouble());
 }
 
-template <> void Param<bool>::read(const QJsonObject &json)
+template <> void Param<bool>::readFromJSONObj(const QJsonObject &json)
 {
-    ParamBase::read(json);
+    ParamBase::readFromJSONObj(json);
     if (isOutput())
         return;
     setValue(json["value"].toBool());
 }
 
-template <> void Param<Lightcolor>::read(const QJsonObject &json)
+template <> void Param<Lightcolor>::readFromJSONObj(const QJsonObject &json)
 {
-    ParamBase::read(json);
+    ParamBase::readFromJSONObj(json);
     if (isOutput())
         return;
     _value = Lightcolor(json["red"].toInt(), json["green"].toInt(), json["blue"].toInt());

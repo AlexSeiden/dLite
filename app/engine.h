@@ -50,21 +50,13 @@ public:
     // Load data from WAV file
     bool loadFile(const QString &fileName);
 
-    // RMS level of the most recently processed set of audio samples.
-    // \return Level in range (0.0, 1.0)
-    qreal rmsLevel() const { return m_rmsLevel; }
-
-    // Peak level of the most recently processed set of audio samples.
-    // \return Level in range (0.0, 1.0)
-    qreal peakLevel() const { return m_peakLevel; }
-
     // Position of the audio output device.
     // \return Position in bytes.
-    qint64 playPosition() const { return m_playPosition; }
+    qint64 playPosition() const {return m_playPosition;}
 
     // Position of the audio output device.
     // \return Position in microseconds.
-    qint64 getCurrentTime() const {return _uSecs; }
+    qint64 getCurrentTime() const {return _uSecs;}
 
     // Length of the internal engine buffer.
     // \return Buffer length in bytes.
@@ -109,12 +101,6 @@ signals:
     // \param position Position in bytes
     void playPositionChanged(qint64 position);
 
-    // Level changed
-    // \param rmsLevel RMS level in range 0.0 - 1.0
-    // \param peakLevel Peak level in range 0.0 - 1.0
-    // \param numSamples Number of audio samples analyzed
-    void levelChanged(qreal rmsLevel, qreal peakLevel, int numSamples);
-
     // Spectrum has changed.
     // \param position Position of start of window in bytes
     // \param length   Length of window in bytes
@@ -157,8 +143,6 @@ private:
     qint64              m_dataLength;
 
     int                 m_levelBufferLength;
-    qreal               m_rmsLevel;
-    qreal               m_peakLevel;
 
     int                 m_spectrumBufferLength;	// in bytes
     QByteArray          m_spectrumBuffer;
@@ -167,14 +151,15 @@ private:
 
     // Interval in milliseconds between calls that update the spectrum, etc.
     int    				m_notifyIntervalMs;
-    Dancefloor     *_dfModel;
+
+    //  Only needed to call evaluate.  Perhaps should use signals?  XXX
+    Dancefloor          *_dfModel;
 
 protected:
     // Used directly by Cupid.
     qint64              _uSecs;
     QString             m_audiofilename;
     QString             m_onsetfilename;
-
 };
 
 #endif // ENGINE_H

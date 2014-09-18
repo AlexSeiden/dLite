@@ -1,5 +1,5 @@
 #include "spectrograph.h"
-#include "GuiColors.h"
+#include "GuiSettings.h"
 #include <QDebug>
 #include <QMouseEvent>
 #include <QPainter>
@@ -216,7 +216,7 @@ void Spectrograph::mouseReleaseEvent(QMouseEvent *event)
     _subrange.setMinMax(fmin, fmax, amin, amax);
     _subrange.setWin(subrect);
 
-    // Make sure appropriate subrange meter & node are listening!
+    // Make sure appropriate SublevelNode & SublevelNodeItem are listening!
     emit subrangeHasChanged(&_subrange);
 //    if (_selectedSublevelNode)
 //        _selectedSublevelNode->setSubrange(_subrange);
@@ -412,3 +412,66 @@ void Spectrograph::displayThisSubrange(Subrange *subrange)
 
     update();
 }
+
+#if 0
+// TODO find a home for this, either in settings or spectrograph
+QLayout *createSpectrumOptionsUI(QWidget *parent, Spectrograph *spectrograph)
+{
+
+    QHBoxLayout *layout = new QHBoxLayout;
+
+    // Options layout
+    QLabel *numBandsLabel = new QLabel(tr("Number of Bands"), parent);
+    QSpinBox *numBandsSpinBox = new QSpinBox(parent);
+    numBandsSpinBox->setMinimum(3);
+    numBandsSpinBox->setMaximum(40);
+    numBandsSpinBox->setFixedWidth(50);
+    numBandsSpinBox->setValue(spectrograph->numBars());
+    QScopedPointer<QHBoxLayout> numBandsLayout (new QHBoxLayout);
+    numBandsLayout->addWidget(numBandsLabel);
+    numBandsLayout->addWidget(numBandsSpinBox);
+    numBandsLayout->addStretch();
+    layout->addLayout(numBandsLayout.data());
+    numBandsLayout.take();
+
+    QLabel *specMinLabel = new QLabel(tr("Min Freq"), parent);
+    QSpinBox *specMinSpinBox = new QSpinBox(parent);
+    specMinSpinBox->setMinimum(0);
+    specMinSpinBox->setMaximum(20000);
+    specMinSpinBox->setFixedWidth(70);
+    specMinSpinBox->setValue(spectrograph->freqLo());
+    QScopedPointer<QHBoxLayout> specMinLayout (new QHBoxLayout);
+    specMinLayout->addWidget(specMinLabel);
+    specMinLayout->addWidget(specMinSpinBox);
+    specMinLayout->addStretch();
+    layout->addLayout(specMinLayout.data());
+    specMinLayout.take();
+
+    QLabel *specMaxLabel = new QLabel(tr("Max Freq"), parent);
+    QSpinBox *specMaxSpinBox = new QSpinBox(parent);
+    specMaxSpinBox->setMinimum(0);
+    specMaxSpinBox->setMaximum(40000);
+    specMaxSpinBox->setFixedWidth(70);
+    specMaxSpinBox->setValue(spectrograph->freqHi());
+    QScopedPointer<QHBoxLayout> specMaxLayout (new QHBoxLayout);
+    specMaxLayout->addWidget(specMaxLabel);
+    specMaxLayout->addWidget(specMaxSpinBox);
+    specMaxLayout->addStretch();
+    layout->addLayout(specMaxLayout.data());
+    specMaxLayout.take(); // ownership transferred to dialogLayout
+
+    // TODO Move to Spectrograph, or settings dialog
+    CHECKED_CONNECT(numBandsSpinBox, SIGNAL(valueChanged(int)),
+            spectrograph, SLOT(setNumBars(int)));
+
+    // TODO these probably shouldn't be spinboxes; or at least should increment
+    // geometrically.
+    CHECKED_CONNECT(specMinSpinBox, SIGNAL(valueChanged(int)),
+            spectrograph, SLOT(setFreqLo(int)));
+
+    CHECKED_CONNECT(specMaxSpinBox, SIGNAL(valueChanged(int)),
+            spectrograph, SLOT(setFreqHi(int)));
+
+    return layout;
+}
+#endif

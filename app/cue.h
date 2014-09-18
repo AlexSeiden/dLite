@@ -3,6 +3,7 @@
 
 #include "lightcolor.h"
 #include "Node.h"
+#include "Firing.h"
 
 // Need forward class declaration, since both Cue.h and DanceFloor.h include each other
 class Dancefloor;
@@ -21,8 +22,8 @@ public:
 
     static void     setDancefloor(Dancefloor *dfmodel) {_dfModel = dfmodel;}
 
-    void write(QJsonObject &json) const;
-    void read(const QJsonObject &json);
+    void writeToJSONObj(QJsonObject &json) const;
+    void readFromJSONObj(const QJsonObject &json);
 
 protected:
     compMode_t      _compMode;      // TODO allow selection & implement compmodes

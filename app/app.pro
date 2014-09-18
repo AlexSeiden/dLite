@@ -35,7 +35,10 @@ SOURCES  += \
     ColorNodes.cpp \
     Cupid.cpp \
     Imager.cpp \
-    DanceFloor.cpp
+    DanceFloor.cpp \
+    PathNode.cpp \
+    RegionNode.cpp \
+    Firing.cpp
 
 HEADERS  += \
     engine.h \
@@ -56,7 +59,10 @@ HEADERS  += \
     ColorNodes.h \
     Cupid.h \
     Imager.h \
-    DanceFloor.h
+    DanceFloor.h \
+    PathNode.h \
+    RegionNode.h \
+    Firing.h
 
 fftreal_dir = ../3rdparty/fftreal
 

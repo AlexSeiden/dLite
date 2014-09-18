@@ -5,6 +5,7 @@
 #include "Subrange.h"
 #include "frequencyspectrum.h"
 #include <QObject>
+#include <QMetaType>
 
 
 // Nodes that interact with custom view widgets and/or get info
@@ -23,8 +24,8 @@ public:
     void beenSelected();
 
     Subrange *getSubrange() {return &_range;}
-    virtual void read(const QJsonObject &json);
-    virtual void write(QJsonObject &json) const;
+    virtual void readFromJSONObj(const QJsonObject &json);
+    virtual void writeToJSONObj(QJsonObject &json) const;
 
 
 public slots:
@@ -48,5 +49,10 @@ private:
     Param<float>        _output;
     Subrange            _range;
 };
+
+// XXX dunno why this doesn't compile;
+// Perhaps automatic b/c derived from QObject?
+// may not be needed--are we actually using the iveBeenSelected method?
+// Q_DECLARE_METATYPE(SublevelNode)
 
 #endif // SUBLEVELNODE_H

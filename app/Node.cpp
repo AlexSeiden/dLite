@@ -64,14 +64,14 @@ bool Node::evaluatedThisFrame()
     return false;
 }
 
-void Node::read(const QJsonObject &json)
+void Node::readFromJSONObj(const QJsonObject &json)
 {
     _name      = json["name"].toString();
     _active    = json["active"].toBool();
 
 }
 
-void Node::write(QJsonObject &json) const
+void Node::writeToJSONObj(QJsonObject &json) const
 {
     // ErrorHandling
 
@@ -85,7 +85,7 @@ void Node::write(QJsonObject &json) const
     QJsonArray paramJsonArray;
     foreach (const ParamBase *param, _paramList) {
          QJsonObject paramJ;
-         param->write(paramJ);
+         param->writeToJSONObj(paramJ);
          paramJsonArray.append(paramJ);
      }
     json["paramList"] = paramJsonArray;
@@ -186,7 +186,7 @@ bool NodeFactory::saveToFile(QString filename)
 
     QJsonObject sceneObject;
     // Fill sceneObject with all the scene data.
-    write(sceneObject);
+    writeToJSONObj(sceneObject);
 
     QJsonDocument jsonDoc(sceneObject);
     qfile.write(jsonDoc.toJson());
@@ -194,13 +194,13 @@ bool NodeFactory::saveToFile(QString filename)
     return true;
 }
 
-void NodeFactory::write(QJsonObject &json) const
+void NodeFactory::writeToJSONObj(QJsonObject &json) const
 {
 
     QJsonArray nodeJsonArray;
     foreach (const Node *node, _allNodes) {
          QJsonObject nodeJson;
-         node->write(nodeJson);
+         node->writeToJSONObj(nodeJson);
          nodeJsonArray.append(nodeJson);
      }
      json["nodes"] = nodeJsonArray;
@@ -238,11 +238,12 @@ void NodeFactory::readAllNodes(const QJsonObject &json)
     // or
     //CueSheet.new();
     // or maybe Nodefactory::{new,clear}....
+    // Or maybe this should be a switch in the file open dialog?
 
     QJsonArray nodesArray = json["nodes"].toArray();
     for (int i = 0; i < nodesArray.size(); ++i) {
         QJsonObject nodeObject = nodesArray[i].toObject();
-        readNode(nodeObject);
+        readNodeFromJSONObj(nodeObject);
     }
 
     // Make connections
@@ -253,16 +254,16 @@ void NodeFactory::readAllNodes(const QJsonObject &json)
     }
 }
 
-void NodeFactory::readNode(const QJsonObject &json)
+void NodeFactory::readNodeFromJSONObj(const QJsonObject &json)
 {
     QString classname   = json["classname"].toString();
     QUuid uuid          = QUuid(json["uuid"].toString());
 
     Node * newnode      = Singleton()->instatiateNode(classname, uuid);
-    newnode->read(json);
+    newnode->readFromJSONObj(json);
 
     QJsonArray paramsArray = json["paramList"].toArray();
-    for (int i = 0; i < paramsArray.size(); ++i) {
+    for (int i=0; i<paramsArray.size(); ++i) {
         QJsonObject paramJsonObject = paramsArray[i].toObject();
         // Params don't need to be instantiated, since they are not dynamic;
         // any given node will automatically instantiate all its params.
@@ -273,7 +274,7 @@ void NodeFactory::readNode(const QJsonObject &json)
         ParamBase *param = newnode->getParamByName(paramname);
 
         // Read values, which is specialized by type.
-        param->read(paramJsonObject);
+        param->readFromJSONObj(paramJsonObject);
 
         // Store UUID in registry
         _registryUUIDtoParam[param->getUuid()] = param;

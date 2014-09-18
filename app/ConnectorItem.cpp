@@ -1,7 +1,7 @@
 #include "ConnectorItem.h"
 #include "NodeItem.h"
 #include "CuesheetScene.h"
-#include "GuiColors.h"
+#include "GuiSettings.h"
 #include "utils.h"
 #include <QtWidgets>
 #include <QPainterPath>
@@ -114,6 +114,7 @@ void ConnectorItem::paint(QPainter *painter,
         painter->drawPath(*_path);
 
     // TODO set ellipse pen brush & size
+    painter->setBrush(GuiSettings::connectorBrush);
     painter->drawEllipse(_pStart, GuiSettings::connectorEndSize, GuiSettings::connectorEndSize);
     painter->drawEllipse(_pEnd,   GuiSettings::connectorEndSize, GuiSettings::connectorEndSize);
 

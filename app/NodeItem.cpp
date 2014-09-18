@@ -1,6 +1,6 @@
 #include "NodeItem.h"
 #include "CuesheetScene.h"
-#include "GuiColors.h"
+#include "GuiSettings.h"
 #include "utils.h"
 #include <QtWidgets>
 #include <QPainterPath>
@@ -115,8 +115,7 @@ void NodeItem::beenSelected()
     _node->beenSelected();
 }
 
-// When placing a node in the graph, moves it to the right until it finds an
-// empty space.
+// Find an empty space in the graph to display a new node:
 void NodeItem::avoidCollisions()
 {
    QList<QGraphicsItem *>colliders = collidingItems(Qt::IntersectsItemBoundingRect);
@@ -132,7 +131,7 @@ void NodeItem::avoidCollisions()
    }
 }
 
-void NodeItem::read(const QJsonObject &json)
+void NodeItem::readFromJSONObj(const QJsonObject &json)
 {
     // ErrorHandling
     qreal x, y;
@@ -141,7 +140,7 @@ void NodeItem::read(const QJsonObject &json)
     setPos(x,y);
 }
 
-void NodeItem::write(QJsonObject &json) const
+void NodeItem::writeToJSONObj(QJsonObject &json) const
 {
     // ErrorHandling
     json["xPos"] = x();

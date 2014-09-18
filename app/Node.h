@@ -79,8 +79,8 @@ private:
     virtual bool        evaluatedThisFrame();
 
     // Serialization
-    virtual void read(const QJsonObject &json);
-    virtual void write(QJsonObject &json) const;
+    virtual void readFromJSONObj(const QJsonObject &json);
+    virtual void writeToJSONObj(QJsonObject &json) const;
 
 protected:
     // Boilerplate call in every ctor; sets a pointer from
@@ -132,9 +132,9 @@ public:
     // Serialization
     bool saveToFile(QString filename);
     bool readFromFile(QString filename);
-    void readNode(const QJsonObject &json);
+    void readNodeFromJSONObj(const QJsonObject &json);
     void readAllNodes(const QJsonObject &json);
-    void write(QJsonObject &json) const;
+    void writeToJSONObj(QJsonObject &json) const;
 
 private:
 
@@ -147,7 +147,7 @@ private:
     QMap<ParamBase *, QUuid>                    _connectionsToMake;
 
     // Inventory
-    // Maybe this belongs to dancefloor???
+    // GROSS Maybe this belongs to dancefloor???
     QList<Node *>   _allNodes;
 };
 

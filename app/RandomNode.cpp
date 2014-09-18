@@ -45,7 +45,6 @@ void RandomFloat::setRandomEngine()
     float min, max;
     _min.getValue(min);
     _max.getValue(max);
-    // TODO re-run this when distributions change.
     // XXX if these are connections, this is going to break.
     _distribution = new std::uniform_real_distribution<float>(min, max);
 }

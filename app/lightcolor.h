@@ -7,6 +7,7 @@
 
 // Forward declarations
 class Cue;
+class Firing;
 
 enum compMode_t {SET, ADD, OVER, UNDER};
 enum decayMode_t {IMMEDIATE, EXPONENTIAL, FOREVER};
@@ -48,38 +49,11 @@ private:
     int m_r, m_g, m_b;
 };
 
-// Non-member operator allows implicit type promotion
+// Non-member operator allows implicit type promotion.
+// See ColorRamp node for an example.
 const Lightcolor operator*(const Lightcolor& lhs, const Lightcolor& rhs);
 
 Q_DECLARE_METATYPE(Lightcolor)
-
-// -----------------------------------------------------------------------------
-// Firing
-
-class Firing;
-typedef bool (*decayfunc_t)(Firing *);
-
-class Firing
-{
-public:
-    Firing();
-    Firing(Lightcolor color, double alpha, compMode_t compmode, decayfunc_t decayfunc, Cue *cue=nullptr);
-
-    bool        evaluate();
-
-    Lightcolor  compOver(const Lightcolor &lightcolor);
-    Lightcolor  compAdd(const Lightcolor &lightcolor);
-    void        setCompMode(compMode_t cm) {_compMode = cm;}
-//    void        setDecayMode(decayfunc_t dfunk) {_decayfunction = dfunk;}
-    void        setDecayMode(decayMode_t dmode);
-
-    Lightcolor  _color;
-    float       _alpha;
-    compMode_t  _compMode;
-    decayfunc_t _decayfunction;
-    Cue         *_cue; // mainly used when the same cue wants to replace
-                      // a firing in the buffer, rather than add to it.
-};
 
 // -----------------------------------------------------------------------------
 // Light

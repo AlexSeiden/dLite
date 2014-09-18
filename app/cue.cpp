@@ -6,7 +6,7 @@
 //  Abstract base class
 
 Cue::Cue() :
-    _compMode(SET),
+    _compMode(ADD),
     _decayMode(IMMEDIATE)
 {
     _type = CUE;
@@ -15,18 +15,18 @@ Cue::Cue() :
     Cue::_dfModel->addCue(this);
 }
 
-void Cue::write(QJsonObject &json) const
+void Cue::writeToJSONObj(QJsonObject &json) const
 {
     // Override for serialization
-    Node::write(json);
+    Node::writeToJSONObj(json);
     json["compMode"] = _compMode;       // XXX
     json["decaymode"] = _decayMode;     // XXX
 }
 
-void Cue::read(const QJsonObject &json)
+void Cue::readFromJSONObj(const QJsonObject &json)
 {
     // Override for serialization
-    Node::read(json);
+    Node::readFromJSONObj(json);
     _compMode = compMode_t(qRound(json["compMode"].toDouble()));   // XXX
     _decayMode = decayMode_t(qRound(json["decayMode"].toDouble()));   // XXX
 }

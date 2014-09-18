@@ -3,6 +3,10 @@
 #include "CueLibView.h"
 #include "utils.h"
 
+// ------------------------------------------------------------------------------
+// CueLibView
+// View that allows the user to create new nodes.
+
 CueLibView::CueLibView(QWidget *parent) :
     QWidget(parent)
 {
@@ -25,6 +29,7 @@ void CueLibView::createUi()
     mainLayout->addWidget(createGroup("Floats", Node::FLOAT),0,2);
     mainLayout->addWidget(createGroup("Colors", Node::COLOR),1,0);
     mainLayout->addWidget(createGroup("Beats", Node::BEAT),1,1);
+    mainLayout->addWidget(createGroup("Paths", Node::POSITION),1,2);
     setLayout(mainLayout);
 
     setWindowTitle(tr("Cue Library"));
@@ -33,8 +38,8 @@ void CueLibView::createUi()
     CHECKED_CONNECT(_signalMapper, SIGNAL(mapped(QString)),
                     this, SIGNAL(newNodeRequest(QString)));
     // The newNodeRequest signal from here is monitored by mainwidget,
-    // which does the instantiation, partly by calling back here,
-    // and partly by calling graphWidget->addNode()
+    // which does the instantiation, XXX partly by calling back here,
+    // and partly by calling XXX graphWidget->addNode()
 
 }
 

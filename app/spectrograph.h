@@ -23,7 +23,6 @@ public:
 
     void setParams(int numBars, qreal lowFreq, qreal highFreq);
 
-    // QWidget
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);

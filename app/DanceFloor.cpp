@@ -23,7 +23,6 @@ Dancefloor::Dancefloor(QObject *parent) :
 
 Dancefloor::~Dancefloor() { }
 
-
 // LATER add Foot-squares as well as lights
 bool Dancefloor::ImportLayout(std::string &layoutCsvFile)
 {
@@ -146,12 +145,14 @@ void Dancefloor::evaluate()
     // For every light, get the firing vector:
     for (auto light = _lights.begin(); light != _lights.end(); ++light) {
 
-        // For every firing, apply the decay & composite. starting with the "backmost"
+        // For every firing, apply the decay & composite.
 #if 0
         Lightcolor lightColor(light->_value);  // start with what was in buffer.
 #else
         Lightcolor lightColor(0,0,0);  // start with black
 #endif
+        // This starts with the oldest firing;
+        // Right now, firings are added to the back of the vector
         auto firing = light->_firings.begin();
         while (firing != light->_firings.end())  {
             // Calculate the value of this firing
@@ -159,7 +160,16 @@ void Dancefloor::evaluate()
 
             // Comp it over the others
             // TODO other comp modes
-            lightColor = (*firing)->compOver(lightColor);
+            switch ((*firing)->_compMode) {
+            case OVER:
+                lightColor = (*firing)->compOver(lightColor);
+                break;
+            default:
+            case ADD:
+                lightColor = (*firing)->compAdd(lightColor);
+                break;
+            }
+
 
             // Remove firing from list if the event is over.
             if (! keep)

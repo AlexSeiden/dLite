@@ -2,7 +2,7 @@
 #include "NodeItem.h"
 #include "Node.h"
 #include "CuesheetScene.h"
-#include "GuiColors.h"
+#include "GuiSettings.h"
 #include "utils.h"
 #include "ParamView.h"
 #include <QHBoxLayout>

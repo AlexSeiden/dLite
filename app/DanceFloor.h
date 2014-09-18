@@ -19,22 +19,23 @@ class Dancefloor : public QObject
 public:
     explicit Dancefloor(QObject *parent = 0);
     ~Dancefloor();
-    bool ImportLayout(std::string & layoutCsvFile);
-    void printLayout();
+
+    bool        ImportLayout(std::string & layoutCsvFile);
+    void        printLayout();
 
     bool        hasPixel(int x, int y);
     Lightcolor  getPixel(int x, int y);
     QColor      getQColor(int x, int y);
 
-    int getXsize() const {return _xsize;}
-    int getYsize() const {return _ysize;}
+    int         getXsize() const {return _xsize;}
+    int         getYsize() const {return _ysize;}
 
-    void addCue(Cue *cue);
-    int getNumCues() const    {return _cues.size();}
+    void        addCue(Cue *cue);
+    int         getNumCues() const    {return _cues.size();}
 
-    int getFrame() const      {return _frame;}
+    int         getFrame() const      {return _frame;}
 
-    void setView(Dancefloorwidget *dfwidget) { _dfWidget = dfwidget;}
+    void        setView(Dancefloorwidget *dfwidget) { _dfWidget = dfwidget;}
 
 public slots:
     void evaluate();
@@ -47,7 +48,7 @@ protected:
     std::vector<Cue *>  _cues;
 
     int                 _frame;
-    QTime               _timeSinceLastUpdate;
+    QTime               _timeSinceLastUpdate;   // Used for monitoring responsiveness, not cueing.
 
     Dancefloorwidget    *_dfWidget;
 

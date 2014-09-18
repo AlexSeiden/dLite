@@ -6,15 +6,15 @@ SOURCES += \
     ParamView.cpp \
     GraphWidget.cpp \
     CuesheetScene.cpp \
-    GuiColors.cpp \
     NodeItem.cpp    \
-    progressbar.cpp \
     spectrograph.cpp \
     CueLibView.cpp \
     settingsdialog.cpp \
     CuesheetView.cpp \
     SublevelNodeItem.cpp \
-    $$PWD/ConnectorItem.cpp
+    $$PWD/ConnectorItem.cpp \
+    $$PWD/Transport.cpp \
+    $$PWD/GuiSettings.cpp
 
 HEADERS += \
     mainwidget.h \
@@ -22,12 +22,12 @@ HEADERS += \
     ParamView.h         \
     GraphWidget.h       \
     CuesheetScene.h     \
-    GuiColors.h         \
     NodeItem.h          \
-    progressbar.h \
     spectrograph.h \
     CueLibView.h \
     settingsdialog.h \
     CuesheetView.h \
     SublevelNodeItem.h \
-    $$PWD/ConnectorItem.h
+    $$PWD/ConnectorItem.h \
+    $$PWD/Transport.h \
+    $$PWD/GuiSettings.h

@@ -1,7 +1,7 @@
 #include "engine.h"
 #include "sublevel.h"
 #include "mainwidget.h"
-#include "progressbar.h"
+#include "Transport.h"
 #include "settingsdialog.h"
 #include "spectrograph.h"
 #include "utils.h"
@@ -27,7 +27,7 @@ const int NullTimerId = -1;
 MainWidget::MainWidget(QWidget *parent)
     :   QWidget(parent)
     ,   m_engine(new Engine(this))
-    ,   m_progressBar(new ProgressBar(this))
+    ,   m_transport(new Transport(this))
     ,   m_spectrograph(new Spectrograph(this))
     ,   m_fileButton(new QPushButton(this))
     ,   m_saveButton(new QPushButton(this))
@@ -35,14 +35,10 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_pauseButton(new QPushButton(this))
     ,   m_playButton(new QPushButton(this))
     ,   m_settingsButton(new QPushButton(this))
-//    ,   m_numBandsSpinBox(new QSpinBox(this))
-//    ,   m_specMinSpinBox(new QSpinBox(this))
-//    ,   m_specMaxSpinBox(new QSpinBox(this))
     ,   m_infoMessage(new QLabel(tr(""), this))
     ,   m_infoMessageTimerId(NullTimerId)
     ,   m_settingsDialog(new SettingsDialog(m_engine->interval(), this))
-    ,   m_loadFileAction(0)
-    ,   m_dancefloormodel(new Dancefloor)  // TODO should be allocated in main?
+    ,   m_dancefloor(new Dancefloor)  // TODO should be allocated in main?
     ,   m_cueLibView(NULL)
 {
 
@@ -57,15 +53,15 @@ MainWidget::MainWidget(QWidget *parent)
 
     // TODO move to settings/prefs  & allow setting this
     std::string layoutfile = std::string("/Users/alex/src/floorit/layout.csv");
-    m_dancefloormodel->ImportLayout(layoutfile);
-    Cue::setDancefloor(m_dancefloormodel);
+    m_dancefloor->ImportLayout(layoutfile);
+    Cue::setDancefloor(m_dancefloor);
 
     m_dancefloorwidget = new Dancefloorwidget();
-    m_dancefloorwidget->setModel(m_dancefloormodel);
-    m_dancefloormodel->setView(m_dancefloorwidget);  // GROSS
+    m_dancefloorwidget->setModel(m_dancefloor);
+    m_dancefloor->setView(m_dancefloorwidget);  // GROSS
     m_dancefloorwidget->show();
 
-    m_engine->setDancefloormodel(m_dancefloormodel);
+    m_engine->setDancefloormodel(m_dancefloor);
 
     m_cueLibView = new CueLibView(NULL);
     m_cueLibView->show();
@@ -82,7 +78,7 @@ MainWidget::MainWidget(QWidget *parent)
 
     // OK, these are essentially globals:  GROSS
     Cupid::Singleton()->setSpectrograph(m_spectrograph);
-    Cupid::Singleton()->setDancefloor(m_dancefloormodel);
+    Cupid::Singleton()->setDancefloor(m_dancefloor);
     Cupid::Singleton()->setEngine(m_engine);
     Cupid::Singleton()->setGraphWidget(m_graphWidget);
 }
@@ -108,12 +104,13 @@ void MainWidget::stateChanged(QAudio::State state)
 void MainWidget::spectrumChanged(qint64 position, qint64 length,
                                  const FrequencySpectrum &spectrum)
 {
-    // ??? Why are these implemented as function calls, instead of signals?
-    m_progressBar->windowChanged(position, length);
+    Q_UNUSED(position)
+    Q_UNUSED(length)
+    // ??? Why is this a function call, instead of a signal?
     m_spectrograph->spectrumChanged(spectrum);
 }
 
-#ifdef NUKEME
+#if 0 // NUKEMEMAYBE
 void MainWidget::infoMessage(const QString &message, int timeoutMs)
 {
     m_infoMessage->setText(message);
@@ -151,7 +148,7 @@ void MainWidget::audioPositionChanged(qint64 position)
 
 void MainWidget::bufferLengthChanged(qint64 length)
 {
-    m_progressBar->bufferLengthChanged(length);
+    m_transport->bufferLengthChanged(length);
 }
 
 
@@ -214,7 +211,7 @@ void MainWidget::createUi()
     m_infoMessage->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     m_infoMessage->setAlignment(Qt::AlignHCenter);
 
-    windowLayout->addWidget(m_progressBar);
+    windowLayout->addWidget(m_transport);
 
     // Spectrograph
     QScopedPointer<QHBoxLayout> analysisLayout(new QHBoxLayout);
@@ -295,7 +292,7 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_engine, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(stateChanged(QAudio::State)));
 
-    m_progressBar->bufferLengthChanged(m_engine->bufferLength());
+    m_transport->bufferLengthChanged(m_engine->bufferLength());
 
     CHECKED_CONNECT(m_engine, SIGNAL(bufferLengthChanged(qint64)),
             this, SLOT(bufferLengthChanged(qint64)));
@@ -304,7 +301,7 @@ void MainWidget::connectUi()
             this, SLOT(updateButtonStates()));
 
     CHECKED_CONNECT(m_engine, SIGNAL(playPositionChanged(qint64)),
-            m_progressBar, SLOT(playPositionChanged(qint64)));
+            m_transport, SLOT(playPositionChanged(qint64)));
 
     CHECKED_CONNECT(m_engine, SIGNAL(playPositionChanged(qint64)),
             this, SLOT(audioPositionChanged(qint64)));
@@ -338,69 +335,6 @@ void MainWidget::connectUi()
 
 }
 
-#if 0
-// TODO find a home for this, either in settings or spectrograph
-QLayout *createSpectrumOptionsUI(QWidget *parent, Spectrograph *spectrograph)
-{
-
-    QHBoxLayout *layout = new QHBoxLayout;
-
-    // Options layout
-    QLabel *numBandsLabel = new QLabel(tr("Number of Bands"), parent);
-    QSpinBox *numBandsSpinBox = new QSpinBox(parent);
-    numBandsSpinBox->setMinimum(3);
-    numBandsSpinBox->setMaximum(40);
-    numBandsSpinBox->setFixedWidth(50);
-    numBandsSpinBox->setValue(spectrograph->numBars());
-    QScopedPointer<QHBoxLayout> numBandsLayout (new QHBoxLayout);
-    numBandsLayout->addWidget(numBandsLabel);
-    numBandsLayout->addWidget(numBandsSpinBox);
-    numBandsLayout->addStretch();
-    layout->addLayout(numBandsLayout.data());
-    numBandsLayout.take();
-
-    QLabel *specMinLabel = new QLabel(tr("Min Freq"), parent);
-    QSpinBox *specMinSpinBox = new QSpinBox(parent);
-    specMinSpinBox->setMinimum(0);
-    specMinSpinBox->setMaximum(20000);
-    specMinSpinBox->setFixedWidth(70);
-    specMinSpinBox->setValue(spectrograph->freqLo());
-    QScopedPointer<QHBoxLayout> specMinLayout (new QHBoxLayout);
-    specMinLayout->addWidget(specMinLabel);
-    specMinLayout->addWidget(specMinSpinBox);
-    specMinLayout->addStretch();
-    layout->addLayout(specMinLayout.data());
-    specMinLayout.take();
-
-    QLabel *specMaxLabel = new QLabel(tr("Max Freq"), parent);
-    QSpinBox *specMaxSpinBox = new QSpinBox(parent);
-    specMaxSpinBox->setMinimum(0);
-    specMaxSpinBox->setMaximum(40000);
-    specMaxSpinBox->setFixedWidth(70);
-    specMaxSpinBox->setValue(spectrograph->freqHi());
-    QScopedPointer<QHBoxLayout> specMaxLayout (new QHBoxLayout);
-    specMaxLayout->addWidget(specMaxLabel);
-    specMaxLayout->addWidget(specMaxSpinBox);
-    specMaxLayout->addStretch();
-    layout->addLayout(specMaxLayout.data());
-    specMaxLayout.take(); // ownership transferred to dialogLayout
-
-    // TODO Move to Spectrograph, or settings dialog
-    CHECKED_CONNECT(numBandsSpinBox, SIGNAL(valueChanged(int)),
-            spectrograph, SLOT(setNumBars(int)));
-
-    // TODO these probably shouldn't be spinboxes; or at least should increment
-    // geometrically.
-    CHECKED_CONNECT(specMinSpinBox, SIGNAL(valueChanged(int)),
-            spectrograph, SLOT(setFreqLo(int)));
-
-    CHECKED_CONNECT(specMaxSpinBox, SIGNAL(valueChanged(int)),
-            spectrograph, SLOT(setFreqHi(int)));
-
-    return layout;
-}
-#endif
-
 void MainWidget::updateButtonStates()
 {
     const bool pauseEnabled = (QAudio::ActiveState == m_engine->state() ||
@@ -416,7 +350,7 @@ void MainWidget::reset()
 {
     m_engine->reset();
     m_spectrograph->reset();
-    m_progressBar->reset();
+    m_transport->reset();
 }
 
 //-----------------------------------------------------------------------------

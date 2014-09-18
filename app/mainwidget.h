@@ -11,7 +11,7 @@
 class Engine;
 class FrequencySpectrum;
 class SublevelMeter;
-class ProgressBar;
+class Transport;
 class SettingsDialog;
 class Spectrograph;
 class Dancefloorwidget;
@@ -41,21 +41,20 @@ public:
     explicit MainWidget(QWidget *parent = 0);
     ~MainWidget();
 
-    // QObject
     void timerEvent(QTimerEvent *event);
 
 public slots:
     void stateChanged(QAudio::State state);
     void spectrumChanged(qint64 position, qint64 length,
                          const FrequencySpectrum &spectrum);
-#ifdef NUKEME
+#if 0  // NUKEMEMAYBE
     void infoMessage(const QString &message, int timeoutMs);
     void errorMessage(const QString &heading, const QString &detail);
 #endif
 
     void audioPositionChanged(qint64 position);
 
-    void bufferLengthChanged(qint64 length);    // XXX should nuke
+    void bufferLengthChanged(qint64 length);
 
     // XXX This is more of a "model" or "controller" issue than a view/widget one.
     void newNodeRequest(QString name);
@@ -76,7 +75,7 @@ private:
 private:
     Engine*                 m_engine;
 
-    ProgressBar*            m_progressBar;
+    Transport*              m_transport;
     Spectrograph*           m_spectrograph;
 
     QPushButton*            m_fileButton;
@@ -89,14 +88,14 @@ private:
     QPushButton*            m_settingsButton;
     QIcon                   m_settingsIcon;
 
+#if 1 // NUKEMEMAYBE
     QLabel*                 m_infoMessage;
     int                     m_infoMessageTimerId;
+#endif
 
     SettingsDialog*         m_settingsDialog;
 
-    QAction*                m_loadFileAction;
-
-    Dancefloor *       m_dancefloormodel;
+    Dancefloor *            m_dancefloor;
     Dancefloorwidget *      m_dancefloorwidget;
     CueLibView *            m_cueLibView;
     GraphWidget *           m_graphWidget;

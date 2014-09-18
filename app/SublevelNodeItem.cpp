@@ -1,7 +1,7 @@
 #include "SublevelNodeItem.h"
 #include "SublevelNode.h"
 #include "sublevel.h"
-#include "GuiColors.h"
+#include "GuiSettings.h"
 #include "utils.h"
 #include "CuesheetScene.h"
 #include <QGraphicsProxyWidget>

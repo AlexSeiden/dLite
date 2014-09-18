@@ -1,11 +1,10 @@
-#include "GuiColors.h"
+#include "GuiSettings.h"
 #include <QToolButton>
 #include <QPen>
 
-// GraphWidget aka CuesheetView
+// GraphWidget & related classes (CuesheetView, NodeItem, SocketItem, ParamItem, ConnectorItem)
 QColor  GuiSettings::socketFillColor      = QColor(255,20,80);
 QColor  GuiSettings::socketOutlineColor   = QColor(255,255,255);
-QColor  GuiSettings::connectorColor       = QColor(20,20,80);
 QColor  GuiSettings::nodeNameColor        = QColor(55,55,255);
 QColor  GuiSettings::nodeBGColor          = QColor(120,100,60);
 QColor  GuiSettings::nodeTextColor        = QColor(255,255,255);
@@ -18,8 +17,11 @@ int     GuiSettings::socketWidth          = 16;                 // Width of the 
 int     GuiSettings::paramHeight          = 25;                 // Height of each param
 QColor  GuiSettings::selectedNodePenColor = QColor(255,100,100);
 int     GuiSettings::selectedNodePenWidth = 2;
-QPen    GuiSettings::socketOutlinePen   = QPen(GuiSettings::socketOutlineColor, 2, Qt::SolidLine);
-QPen    GuiSettings::connectorPen       = QPen(GuiSettings::connectorColor, 2, Qt::SolidLine);
+QPen    GuiSettings::socketOutlinePen     = QPen(GuiSettings::socketOutlineColor, 2, Qt::SolidLine);
+QColor  GuiSettings::connectorColor       = QColor(20,20,80);
+QColor  GuiSettings::connectorCenterColor = QColor(0,0,0);
+QPen    GuiSettings::connectorPen         = QPen(GuiSettings::connectorColor, 2, Qt::SolidLine);
+QBrush  GuiSettings::connectorBrush       = QBrush(GuiSettings::connectorCenterColor);
 int     GuiSettings::connectorEndSize     = 5;
 int     GuiSettings::iconSize             = 16;
 
@@ -49,6 +51,11 @@ QColor  GuiSettings::sl_squareColor       = QColor(0,0,255);
 QColor  GuiSettings::sl_selectedColor     = GuiSettings::sg_sublevelRegion;
 QColor  GuiSettings::sl_dragTarget        = QColor(255,20,20);
 int     GuiSettings::sl_barHeight         = 25;
+
+QColor  GuiSettings::trans_bgColor        = QColor(0,0,0);
+QColor  GuiSettings::trans_barColor       = QColor(40,50,255);
+int     GuiSettings::trans_barHeight      = 20;
+
 
 GuiSettings::GuiSettings(QObject *parent) :
     QObject(parent)

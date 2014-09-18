@@ -1,5 +1,5 @@
 #include "ParamView.h"
-#include "GuiColors.h"
+#include "GuiSettings.h"
 #include <QtWidgets>
 #include "utils.h"
 
@@ -58,9 +58,7 @@ ParamView::ParamView(QWidget *parent, ParamBase *param ) :
         bool val;
         boolParam->getValue(val);
         editorWidget->setChecked(val);
-        // XXX below we're calling setValue(int) when we should probly call setValue(bool)
-        // but it seems to work....
-        CHECKED_CONNECT(editorWidget, SIGNAL(stateChanged(int)), this, SLOT(setValue(int)));
+        CHECKED_CONNECT(editorWidget, SIGNAL(stateChanged(int)), this, SLOT(setBoolValue(int)));
     }
     else {
         qDebug() << "ERROR: could not match typeid(param)";
@@ -102,6 +100,7 @@ void ParamView::setValue(double val) {
     p->getParent()->paramHasBeenEdited();
 }
 
+
 void ParamView::setValue(int val) {
     Param<int> *p = dynamic_cast<Param<int> *>(this->_param);
     Q_ASSERT(p);
@@ -113,5 +112,19 @@ void ParamView::setValue(Lightcolor val) {
     Param<Lightcolor> *p = dynamic_cast<Param<Lightcolor> *>(this->_param);
     Q_ASSERT(p);
     p->setValue(val);
+    p->getParent()->paramHasBeenEdited();
+}
+
+// Need to have this be a separate "setBoolFunction" with an int argument,
+// rather than simply "setValue(bool val)", because Qt checkboxes return
+// ints--Checked, unchecked, and "Partially Checked" when in a hierarchy.
+void ParamView::setBoolValue(int val) {
+    Param<bool> *p = dynamic_cast<Param<bool> *>(this->_param);
+    Q_ASSERT(p);
+    if (val == 0)
+        p->setValue(false);
+    else
+        p->setValue(true);
+
     p->getParent()->paramHasBeenEdited();
 }
