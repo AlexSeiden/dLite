@@ -20,6 +20,7 @@ class NodeItem : public QGraphicsObject
     Q_OBJECT
 public:
     explicit NodeItem(Node *node, QGraphicsItem *parent = 0);
+    ~NodeItem();
 
     virtual QRectF  boundingRect() const;
     void    paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);

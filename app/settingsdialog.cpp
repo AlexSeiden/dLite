@@ -16,9 +16,6 @@ SettingsDialog::SettingsDialog(int interval,
     ,   m_interval(interval)
     ,   m_windowFunctionComboBox(new QComboBox(this))
     ,   m_intervalLineEdit(new QLineEdit(this))
-    ,   m_numBandsSpinBox(new QSpinBox(this))
-    ,   m_specMinSpinBox(new QSpinBox(this))
-    ,   m_specMaxSpinBox(new QSpinBox(this))
 {
     QVBoxLayout *dialogLayout = new QVBoxLayout(this);
 

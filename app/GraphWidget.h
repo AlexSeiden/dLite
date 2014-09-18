@@ -30,6 +30,9 @@ private:
 
     CuesheetScene *     _scene;
     CuesheetView *      _csview;
+
+protected:
+    void    keyPressEvent(QKeyEvent *event);
 };
 
 #endif // GRAPHWIDGET_H

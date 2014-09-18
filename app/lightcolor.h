@@ -43,6 +43,8 @@ public:
 //    const Lightcolor  operator*(const Lightcolor &rhs);
     const Lightcolor  operator+(const Lightcolor &rhs);
 
+    void    setRGB(unsigned char *rgb);
+
     QColor toQColor();
 
 private:
@@ -63,6 +65,8 @@ class Light
 public:
     Light();
 
+    int                 _controllerIndex;
+    int                 _lightIndex;
     int                 _lightID;
     Lightcolor          _value;
     std::vector <Firing *>   _firings;

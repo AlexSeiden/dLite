@@ -109,6 +109,19 @@ const Lightcolor operator*(const Lightcolor& lhs, const Lightcolor& rhs)
     return result;
 }
 
+int clamp(int in) {
+    if (in < 0) return 0;
+    if (in > 255) return 255;
+    return in;
+}
+
+void Lightcolor::setRGB(unsigned char *rgb)
+{
+    rgb[0] = clamp(m_r);
+    rgb[1] = clamp(m_g);
+    rgb[2] = clamp(m_b);
+}
+
 // -----------------------------------------------------------------------------
 // Light
 

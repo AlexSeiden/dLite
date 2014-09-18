@@ -8,6 +8,7 @@
 #include "lightcolor.h"
 #include "Param.h"
 #include "Cue.h"
+#include "Device.h"
 
 class Cue;
 class Dancefloorwidget;
@@ -40,6 +41,7 @@ public:
 public slots:
     void evaluate();
     void evaluateAllCues();
+    void sendToDevice();
     void fireLight(int x, int y, Firing *f);
 
 protected:
@@ -51,6 +53,7 @@ protected:
     QTime               _timeSinceLastUpdate;   // Used for monitoring responsiveness, not cueing.
 
     Dancefloorwidget    *_dfWidget;
+    Device              _device;
 
 
 #ifdef INLINE

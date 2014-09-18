@@ -118,3 +118,29 @@ void GraphWidget::addNode(Node *node)
 //TODO  void GraphWidget::frameSelected()
 //TODO  void GraphWidget::frameAll()
 
+
+void GraphWidget::keyPressEvent(QKeyEvent *event)
+{
+    qDebug() << Q_FUNC_INFO << "keypress " << event->key();
+    switch (event->key()) {
+    case Qt::Key_Delete:
+        // XXX this will probably break. need to make sure dtors do right thing.
+
+//        delete this->_node;
+//        this->scene()->removeItem(this);
+//        deleteLater();
+        update();
+        break;
+    default:
+        QWidget::keyPressEvent(event);
+    }
+}
+
+#if 0
+deleteSelection() {
+    QList<QGraphicsItem *> selection = _scene->selectedItems();
+    foreach (QGraphicsItem *item, selection) {
+        delete item;
+    }
+}
+#endif

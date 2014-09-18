@@ -77,8 +77,13 @@ bool Dancefloor::ImportLayout(std::string &layoutCsvFile)
             std::string cell = cells[y][x];
             if (cell.size() == 0 || cell.compare("X")==0)
                 _lights[index]._lightID = 0;
-            else
-                _lights[index]._lightID = std::atoi(cell.c_str());
+            else {
+                // GROSS
+                int lightID = std::atoi(cell.c_str());
+                _lights[index]._lightID = lightID;
+                _lights[index]._controllerIndex = lightID /100 - 1;
+                _lights[index]._lightIndex = lightID % 100;
+            }
             _lights[index]._value = Lightcolor();
         }
     }
@@ -182,6 +187,8 @@ void Dancefloor::evaluate()
 
     // STYLE should this be a signal/slot?
     _dfWidget->update();
+    sendToDevice();
+
 
     // This keeps track of the current "frame" that's being evaluated.
     // It's used to make sure certain things are evaluated once--and only
@@ -199,4 +206,19 @@ void Dancefloor::evaluateAllCues() {
 
 void Dancefloor::addCue(Cue *cue) {
     _cues.push_back(cue);
+}
+
+void Dancefloor::sendToDevice()
+{
+    // GROSS should move this to inside device.
+    for (auto light = _lights.begin(); light != _lights.end(); ++light) {
+        if (light->_lightID == 0)
+            continue;
+
+        unsigned char rgb[3];
+        light->_value.setRGB(rgb);
+        _device.setlight(light->_controllerIndex, light->_lightIndex, rgb);
+    }
+    // Output to network.
+    _device.send();
 }

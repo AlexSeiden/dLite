@@ -32,6 +32,16 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     }
 }
 
+
+NodeItem::~NodeItem()
+{
+    scene()->removeItem(this);
+
+
+    // Delete nodes
+    delete _node;
+}
+
 QRectF NodeItem::boundingRect() const
 {
     int nRows = _node->getParams().size() + 1;
@@ -168,15 +178,20 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
 
         // Display an editor widget for the parameter value.
         ParamView *pv = new ParamView(nullptr, param);
+#if 0
         QGraphicsProxyWidget *proxy = this->scene()->addWidget(pv);
+        proxy->setParentItem(this);
+#else
+        QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
+        proxy->setWidget(pv);
+#endif
+        proxy->setPos(GuiSettings::socketWidth * 2 + 70, 0);
 #if 0
         // XXX this is broken; for some reason, it's setting the value on other connections
         // as well.
         if (param->connectedParam())    //TODO update this when connections happen
             parItem->setEnabled(false);
 #endif
-        proxy->setParentItem(this);
-        proxy->setPos(GuiSettings::socketWidth * 2 + 70, 0);
     }
 }
 
