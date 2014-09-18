@@ -45,6 +45,7 @@ public:
     static QColor  df_bgColor;
     static QColor  df_panelSepColor;
     static QColor  df_noCellColor;
+    static QColor  df_woodColor;
     static int     df_cellsize;
     static int     df_cellspace;
 

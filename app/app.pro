@@ -38,7 +38,8 @@ SOURCES  += \
     DanceFloor.cpp \
     PathNode.cpp \
     RegionNode.cpp \
-    Firing.cpp
+    Firing.cpp \
+    Device.cpp
 
 HEADERS  += \
     engine.h \
@@ -62,7 +63,8 @@ HEADERS  += \
     DanceFloor.h \
     PathNode.h \
     RegionNode.h \
-    Firing.h
+    Firing.h \
+    Device.h
 
 fftreal_dir = ../3rdparty/fftreal
 

@@ -65,7 +65,7 @@ Lightcolor Firing::compOver(const Lightcolor &lightcolor) {
     Lightcolor out = lightcolor;
     out *= (1.0 - _alpha);
     out += _color;
-    // XXX compute new alpha
+    // TODO compute new alpha
     return out;
 }
 
@@ -73,7 +73,7 @@ Lightcolor Firing::compOver(const Lightcolor &lightcolor) {
 Lightcolor Firing::compAdd(const Lightcolor &lightcolor) {
     Lightcolor out = lightcolor;
     out += _color;
-    // XXX compute new alpha
+    // TODO compute new alpha
     return out;
 }
 
@@ -81,6 +81,6 @@ Lightcolor Firing::compSet(const Lightcolor &lightcolor) {
     Q_UNUSED(lightcolor)
 
     Lightcolor out = _color;
-    // XXX compute new alpha
+    // TODO compute new alpha
     return out;
 }

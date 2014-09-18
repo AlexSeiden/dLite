@@ -10,11 +10,14 @@
 /*
  (because it's the first src file.)
 
+ AudioNotify drop
+
  Hardware interface!
  Saving!
       restore graphwidget positions
  Connection selection
       and deletion
+
  Node deletion
 
  Node Types:

@@ -30,6 +30,7 @@ QColor  GuiSettings::df_bgColor           = QColor(30,30,80);
 QColor  GuiSettings::df_panelSepColor     = QColor(255,255,200);
 QColor  GuiSettings::df_cellSepColor      = QColor(100,100,100);
 QColor  GuiSettings::df_noCellColor       = QColor(60,60,60);
+QColor  GuiSettings::df_woodColor         = QColor(130,123,112);
 int     GuiSettings::df_cellsize          = 20;
 int     GuiSettings::df_cellspace         = 4;
 

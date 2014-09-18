@@ -51,8 +51,6 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
     QPen cellPen(GuiSettings::df_cellSepColor);
     painter.setPen(cellPen);
 
-//    QColor woodcol(186,176,153);
-    QColor woodcol(130,123,112);
 
     QRect cell(0,0, cellsize, cellsize);
     for (int y=0; y<ysize; ++y) {
@@ -66,7 +64,7 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
                 painter.fillRect(cell, GuiSettings::df_noCellColor);
             painter.drawRect(cell);
 
-            // HACK!!
+            // GROSS HACK!!
             // Vertical bars
             int xstart= (y<9) ? 4 : 6;
             int xend= (y<9) ? 19 : 17;
@@ -76,7 +74,7 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
                     wood.setRight(cell.right()+cellspace);
                     wood.setTop(cell.top()-cellspace+2);
                     wood.setBottom(cell.bottom()+cellspace-1);
-                    painter.fillRect(wood,woodcol);
+                    painter.fillRect(wood,GuiSettings::df_woodColor);
             }
             // Horizontal bars
             xstart= (y<10) ? 5 : 7;
@@ -87,7 +85,7 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
                     wood.setRight(cell.right()+cellspace);
                     wood.setTop(cell.top()-cellspace+1);
                     wood.setBottom(cell.top()-1);
-                    painter.fillRect(wood,woodcol);
+                    painter.fillRect(wood,GuiSettings::df_woodColor);
             }
         }
     }
