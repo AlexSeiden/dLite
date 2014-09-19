@@ -27,6 +27,7 @@ public:
     explicit CuesheetScene(QObject *parent = 0);
     SocketItem*     getSocket(QGraphicsItem *item);
     SocketItem*     getSocketForParam(ParamBase* param);
+    ConnectorItem*  getConnectorForClient(ParamBase* client);
     ConnectorItem*  getConnectorForParam(ParamBase* param);
 
 public slots:

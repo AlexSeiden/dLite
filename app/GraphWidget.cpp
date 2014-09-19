@@ -121,26 +121,22 @@ void GraphWidget::addNode(Node *node)
 
 void GraphWidget::keyPressEvent(QKeyEvent *event)
 {
-    qDebug() << Q_FUNC_INFO << "keypress " << event->key();
     switch (event->key()) {
     case Qt::Key_Delete:
+    case Qt::Key_Backspace:
         // XXX this will probably break. need to make sure dtors do right thing.
-
-//        delete this->_node;
-//        this->scene()->removeItem(this);
-//        deleteLater();
+        deleteSelection();
         update();
         break;
     default:
+        qDebug() << Q_FUNC_INFO << "keypress " << event->key();
         QWidget::keyPressEvent(event);
     }
 }
 
-#if 0
-deleteSelection() {
+void GraphWidget::deleteSelection() {
     QList<QGraphicsItem *> selection = _scene->selectedItems();
     foreach (QGraphicsItem *item, selection) {
         delete item;
     }
 }
-#endif

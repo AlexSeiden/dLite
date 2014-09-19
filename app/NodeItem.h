@@ -3,6 +3,7 @@
 
 #include "Param.h"
 #include "Node.h"
+#include "CuesheetScene.h"
 #include <QGraphicsItem>
 #include <QGraphicsObject>
 #include <QList>
@@ -14,6 +15,7 @@ QT_END_NAMESPACE
 
 // Forward declarations
 class SocketItem;
+class ConnectionItem;
 
 class NodeItem : public QGraphicsObject
 {
@@ -28,6 +30,9 @@ public:
     void    avoidCollisions();
     Node*   getNode() const {return _node;}
     virtual void beenSelected();
+    QList<ConnectionItem*>  getConnectionItems();
+
+    CuesheetScene *csScene() {return dynamic_cast<CuesheetScene*>(scene());}
 
     // Serialization
     virtual void readFromJSONObj(const QJsonObject &json);
@@ -54,12 +59,13 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
-    void setSocket(SocketItem *sock) {_socket = sock;}
-    SocketItem *getSocket()          {return _socket;}
+    void            setSocket(SocketItem *sock) {_socket = sock;}
+    SocketItem*     getSocket()                 {return _socket;}
+    ParamBase*      getParam()                  {return _param;}
 
 private:
-    ParamBase    *_param;
-    SocketItem   *_socket;
+    ParamBase*      _param;
+    SocketItem*     _socket;
 };
 
 

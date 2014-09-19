@@ -15,6 +15,12 @@ Cue::Cue() :
     Cue::_dfModel->addCue(this);
 }
 
+Cue::~Cue()
+{
+    Cue::_dfModel->removeCue(this);
+    // XXX remove from node inventory.
+}
+
 void Cue::writeToJSONObj(QJsonObject &json) const
 {
     // Override for serialization

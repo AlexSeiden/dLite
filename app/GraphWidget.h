@@ -27,6 +27,7 @@ public slots:
 
 private:
     void addConnection(ParamBase *, ParamBase*);
+    void deleteSelection();
 
     CuesheetScene *     _scene;
     CuesheetView *      _csview;

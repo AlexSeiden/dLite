@@ -12,6 +12,7 @@ class Cue : public Node
 {
 public:
     Cue();
+    ~Cue();
 
     void            setCompMode(compMode_t mode)   {_compMode = mode;}
     compMode_t      getCompMode()                  {return _compMode;}

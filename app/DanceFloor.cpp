@@ -175,7 +175,6 @@ void Dancefloor::evaluate()
                 break;
             }
 
-
             // Remove firing from list if the event is over.
             if (! keep)
                 firing = light->_firings.erase(firing);
@@ -206,6 +205,17 @@ void Dancefloor::evaluateAllCues() {
 
 void Dancefloor::addCue(Cue *cue) {
     _cues.push_back(cue);
+}
+
+void Dancefloor::removeCue(Cue *cue) {
+    auto cueIter = _cues.begin();
+    while (cueIter != _cues.end())  {
+        // Remove firing from list if the event is over.
+        if (*cueIter == cue)
+            cueIter = _cues.erase(cueIter);
+        else
+            cueIter++;
+    }
 }
 
 void Dancefloor::sendToDevice()

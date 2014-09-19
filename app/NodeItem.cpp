@@ -6,6 +6,7 @@
 #include <QPainterPath>
 #include "ParamView.h"
 #include <QGraphicsProxyWidget>
+#include "ConnectorItem.h"
 
 // Classes for drawing the graph view representation of all the nodes.
 
@@ -35,10 +36,27 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
 
 NodeItem::~NodeItem()
 {
+    // Look for connections, and remove them:
+    QList<QGraphicsItem *> kiddos = childItems();
+    foreach (QGraphicsItem *kid, kiddos) {
+        ParamItem* pi = dynamic_cast<ParamItem*>(kid);
+        if (! pi) {
+            qDebug() << Q_FUNC_INFO << "hmm, non-paramitem child of nodeitem";
+            continue;
+        }
+        ConnectorItem *cnctr = csScene()->getConnectorForParam(pi->getParam());
+        if (cnctr) {
+            // Only need to disconnect clients; if this is a server,
+            // the whole node gets disconnected below when the node is deleted.
+            cnctr->getClient()->getParam()->disconnect();
+            scene()->removeItem(cnctr);
+            delete cnctr;
+        }
+    }
+
     scene()->removeItem(this);
 
-
-    // Delete nodes
+    // Delete node
     delete _node;
 }
 
@@ -178,13 +196,8 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
 
         // Display an editor widget for the parameter value.
         ParamView *pv = new ParamView(nullptr, param);
-#if 0
-        QGraphicsProxyWidget *proxy = this->scene()->addWidget(pv);
-        proxy->setParentItem(this);
-#else
         QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
         proxy->setWidget(pv);
-#endif
         proxy->setPos(GuiSettings::socketWidth * 2 + 70, 0);
 #if 0
         // XXX this is broken; for some reason, it's setting the value on other connections

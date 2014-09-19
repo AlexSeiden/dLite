@@ -40,6 +40,7 @@ public:
 
     bool    isConnectableTo(ParamBase *otherParam);
     void    connectTo(ParamBase *server);
+    void    disconnect() {_connectedParam = nullptr; _provider = nullptr;}
 
     virtual void eval() {
         if (_provider)

@@ -53,7 +53,8 @@ void ColorRamp::operator()()
 //  BriteColor
 //      Creates a new hi-brightness, hi-sat color every trigger
 BriteColor::BriteColor() :
-    _output(0)
+    _output(0),
+    _trigger(true)
 {
     setName("BriteColor");
     _type = COLOR;

@@ -32,6 +32,7 @@ public:
     int         getYsize() const {return _ysize;}
 
     void        addCue(Cue *cue);
+    void        removeCue(Cue *cue);
     int         getNumCues() const    {return _cues.size();}
 
     int         getFrame() const      {return _frame;}

@@ -121,7 +121,7 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 // If this client already has a connection, we need to delete it's
                 // visual representation:
                 if (client->getParam()->connectedParam()) {
-                    ConnectorItem* cnctr = getConnectorForParam(client->getParam());
+                    ConnectorItem* cnctr = getConnectorForClient(client->getParam());
                     removeItem(cnctr);
                     delete cnctr;
                 }
@@ -192,6 +192,19 @@ SocketItem *CuesheetScene::getSocketForParam(ParamBase* param)
 
 // This is super inefficient from an algorithmic point of view,
 // but in practical terms shouldn't be a problem.
+ConnectorItem *CuesheetScene::getConnectorForClient(ParamBase* client)
+{
+    QList<QGraphicsItem*>allItems = items();
+    foreach (QGraphicsItem* item, allItems) {
+        ConnectorItem *cnctr = dynamic_cast<ConnectorItem *>(item);
+        if (! cnctr)
+            continue;
+        if (cnctr->getClient()->getParam() == client)
+            return cnctr;
+    }
+    return nullptr;
+}
+
 ConnectorItem *CuesheetScene::getConnectorForParam(ParamBase* param)
 {
     QList<QGraphicsItem*>allItems = items();
@@ -201,11 +214,8 @@ ConnectorItem *CuesheetScene::getConnectorForParam(ParamBase* param)
             continue;
         if (cnctr->getClient()->getParam() == param)
             return cnctr;
-#if 0
-        // This will only be call for client parameters....
         if (cnctr->getServer()->getParam() == param)
             return cnctr;
-#endif
     }
     return nullptr;
 }
