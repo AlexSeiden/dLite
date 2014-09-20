@@ -29,6 +29,7 @@ public slots:
     void setBoolValue(int val);
     void setValue(int val);
     void setValue(Lightcolor val);
+    void textChanged(QString val);
 
     void launchColorDialog();
 

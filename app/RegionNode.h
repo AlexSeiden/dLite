@@ -27,11 +27,7 @@ signals:
     void regionNodeSelected(RegionNode *me);
 
 private:
-    Param<int>        _x;       // Output
-    Param<int>        _y;       // Output
-
     QList<Position> _positions;
-
 };
 
 

@@ -128,7 +128,7 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
                 connectSockets(server, client);
                 // Make the actual connection between parameters.
-                // GROSS -- shouldn't this be handled in the model?
+                // GROSS -- sholdn't this be handled in the model?
                 client->getParam()->connectTo(server->getParam());
             }
         }
@@ -175,8 +175,9 @@ SocketItem *CuesheetScene::getSocket(QGraphicsItem *item)
     return nullptr;
 }
 
-// This is super inefficient from an algorithmic point of view,
-// but in practical terms shouldn't be a problem.
+// The following are super inefficient from an algorithmic point of view,
+// but in practical terms it shouldn't be a problem.  If it is, we'll
+// optimize then.
 SocketItem *CuesheetScene::getSocketForParam(ParamBase* param)
 {
     QList<QGraphicsItem*>allItems = items();
@@ -190,8 +191,6 @@ SocketItem *CuesheetScene::getSocketForParam(ParamBase* param)
     return nullptr;
 }
 
-// This is super inefficient from an algorithmic point of view,
-// but in practical terms shouldn't be a problem.
 ConnectorItem *CuesheetScene::getConnectorForClient(ParamBase* client)
 {
     QList<QGraphicsItem*>allItems = items();

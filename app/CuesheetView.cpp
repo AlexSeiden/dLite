@@ -25,13 +25,11 @@ CuesheetView::CuesheetView(QWidget *parent)
     setFrameStyle(NoFrame);
     graphicsView = new GraphicsView(this);
     graphicsView->setRenderHint(QPainter::Antialiasing, true);
-#if 0
-    graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
-    graphicsView->setInteractive(false);
-#else
+
     graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
     graphicsView->setInteractive(true);
-#endif
+
+    // ??? Not sure about these flags...they came from the example stuff
     graphicsView->setOptimizationFlags(QGraphicsView::DontSavePainterState);
     graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
     graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -39,6 +37,7 @@ CuesheetView::CuesheetView(QWidget *parent)
 //    int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
     QSize iconSize(GuiSettings::iconSize, GuiSettings::iconSize);
 
+    // Create zoom slider
     QToolButton *zoomInIcon = new QToolButton;
     zoomInIcon->setAutoRepeat(true);
     zoomInIcon->setAutoRepeatInterval(33);

@@ -9,6 +9,7 @@ class ConnectorItem : public QGraphicsObject
     Q_OBJECT
 public:
     explicit  ConnectorItem(SocketItem *serverSocket, SocketItem *clientSocket, QGraphicsItem *parent = 0);
+    ~ConnectorItem();
 
     QRectF          boundingRect() const;
     void            paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);

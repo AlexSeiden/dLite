@@ -21,6 +21,7 @@
 #include <QFileDialog>
 #include <QTimerEvent>
 #include <QMessageBox>
+#include <QShortCut>
 
 const int NullTimerId = -1;
 
@@ -81,6 +82,8 @@ MainWidget::MainWidget(QWidget *parent)
     Cupid::Singleton()->setDancefloor(m_dancefloor);
     Cupid::Singleton()->setEngine(m_engine);
     Cupid::Singleton()->setGraphWidget(m_graphWidget);
+
+    createShortcuts();
 }
 
 MainWidget::~MainWidget() { }
@@ -333,6 +336,22 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_cueLibView, SIGNAL(newNodeRequest(QString)),
                     this, SLOT(newNodeRequest(QString)));
 
+}
+
+void MainWidget::createShortcuts()
+{
+    // Toggle audio playback
+    m_spaceShortcut = new QShortcut(Qt::Key_Space, this);
+    m_spaceShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_spaceShortcut, SIGNAL(activated()), m_engine, SLOT(togglePlayback()));
+
+    m_frameAllShortcut = new QShortcut(Qt::Key_A, this);
+    m_frameAllShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_frameAllShortcut, SIGNAL(activated()), m_graphWidget, SLOT(frameAll()));
+
+    m_frameSelectedShortcut = new QShortcut(Qt::Key_F, this);
+    m_frameSelectedShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_frameSelectedShortcut, SIGNAL(activated()), m_graphWidget, SLOT(frameSelection()));
 }
 
 void MainWidget::updateButtonStates()

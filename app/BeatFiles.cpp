@@ -6,19 +6,14 @@
 #include <sstream>
 
 
-// TODO master todo here
+// TODO master todo here (because it's the first src file.)
 /*
- (because it's the first src file.)
 
  AudioNotify drop
 
  Hardware interface!
  Saving!
       restore graphwidget positions
- Connection selection
-      and deletion
-
- Node deletion
 
  Node Types:
    color nodes:
@@ -29,6 +24,8 @@
         breakdown viewer
    Regions
    Paths
+
+ Grid BG option in graph view
 
  Compositing modes
  Firing decay modes
@@ -43,7 +40,7 @@
 
 global hotkeys:
   space to start/stop
-  frame all / frame selected
+  frame all / frame selected  (Still a little funky)
   rewind
 
  compmode & decaymode pups on cuewidgets
@@ -54,7 +51,6 @@ Cleaning:
     Clean up object model & separation-of-concerns
 
 Bugs:
-    "QGraphicsScene::addItem: item has already been added to this scene"
 
 */
 

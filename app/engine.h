@@ -74,6 +74,7 @@ public:
 public slots:
     void startPlayback();
     void suspend();
+    void togglePlayback();
     // Set update interval
     void setInterval(int val);
 

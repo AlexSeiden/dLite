@@ -2,6 +2,7 @@
 #include "NodeItem.h"
 #include "Node.h"
 #include "CuesheetScene.h"
+#include "CuesheetView.h"
 #include "GuiSettings.h"
 #include "utils.h"
 #include "ParamView.h"
@@ -35,6 +36,13 @@ GraphWidget::GraphWidget(QWidget *parent) :
                     Qt::CustomizeWindowHint);
 }
 
+
+// We need to know when items, like SublevelNode, that have special
+// editing are selected, so we can notify other widgets where the
+// editing might take place.  For example, SublevelNodes allow dragging
+// out a rectangle in the spectrograph, and the spectrograph will display
+// the current subrange of a sublevel node.
+// Similarly, path & region nodes use the dancefloor widget.
 void GraphWidget::selectionChanged()
 {
     QList<QGraphicsItem *> selection = _scene->selectedItems();
@@ -97,6 +105,7 @@ void GraphWidget::addConnection(ParamBase* server, ParamBase* client)
    }
 }
 
+// Style:  This is doing a lot of stuff, that might be better implemented elsewhere?
 void GraphWidget::addNode(Node *node)
 {
     NodeItem *nodeItem;
@@ -113,10 +122,40 @@ void GraphWidget::addNode(Node *node)
     _scene->addItem(nodeItem);
     // Moves the node so it isn't right on top of one that's already displayed.
     nodeItem->avoidCollisions();
+    _scene->clearSelection();
+    nodeItem->setSelected(true);
+    _csview->view()->ensureVisible(nodeItem);
 }
 
-//TODO  void GraphWidget::frameSelected()
-//TODO  void GraphWidget::frameAll()
+void GraphWidget::frameItems(QList<QGraphicsItem *> items)
+{
+    if (items.length() == 0) {
+        return;
+    }
+
+    QRectF bbox = items[0]->boundingRect();
+    foreach (QGraphicsItem *selection, items) {
+        bbox = bbox.united(selection->boundingRect());
+    }
+    _csview->view()->ensureVisible(bbox);
+}
+
+void GraphWidget::frameSelection()
+{
+    QList<QGraphicsItem *> selection = _scene->selectedItems();
+    if (selection.length() == 0) {
+        frameAll();
+        return;
+    }
+
+    frameItems(selection);
+}
+
+void GraphWidget::frameAll()
+{
+    QList<QGraphicsItem *> allItems = _scene->items();
+    frameItems(allItems);
+}
 
 
 void GraphWidget::keyPressEvent(QKeyEvent *event)
@@ -124,12 +163,19 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
     switch (event->key()) {
     case Qt::Key_Delete:
     case Qt::Key_Backspace:
-        // XXX this will probably break. need to make sure dtors do right thing.
         deleteSelection();
         update();
         break;
+#if 0
+    case Qt::Key_A:     // Handled by global shortcuts
+        frameAll();
+        break;
+    case Qt::Key_F:
+        frameSelection();
+        break;
+#endif
     default:
-        qDebug() << Q_FUNC_INFO << "keypress " << event->key();
+        qDebug() << Q_FUNC_INFO << "keypress " << event->key() << " ; text()" << event->text();
         QWidget::keyPressEvent(event);
     }
 }

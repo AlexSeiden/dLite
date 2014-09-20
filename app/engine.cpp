@@ -124,6 +124,16 @@ void Engine::suspend()
     }
 }
 
+void Engine::togglePlayback()
+{
+    if (QAudio::ActiveState == m_state)
+        m_audioOutput->suspend();
+    else if (QAudio::IdleState == m_state)
+        m_audioOutput->resume();
+    else
+        startPlayback();
+}
+
 //-----------------------------------------------------------------------------
 // Private slots
 //-----------------------------------------------------------------------------
@@ -191,7 +201,6 @@ void Engine::audioNotify()
     // ==============================
 
 }
-
 
 void Engine::audioStateChanged(QAudio::State state)
 {

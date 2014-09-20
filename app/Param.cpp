@@ -6,10 +6,11 @@
 #include <QJsonArray>
 
 // These constants defined for convinience & speed when doing type checks.
-const std::type_info & paramTypeFloat = typeid(Param<float>);
-const std::type_info & paramTypeInt = typeid(Param<int>);
-const std::type_info & paramTypeLightcolor = typeid(Param<Lightcolor>);
-const std::type_info & paramTypeBool = typeid(Param<bool>);
+// ??? Are these still needed?  Would it be better just to have use an enum?
+const std::type_info & paramTypeFloat       = typeid(Param<float>);
+const std::type_info & paramTypeInt         = typeid(Param<int>);
+const std::type_info & paramTypeLightcolor  = typeid(Param<Lightcolor>);
+const std::type_info & paramTypeBool        = typeid(Param<bool>);
 
 std::function<void()> ParamBase::getProvider()
 {
@@ -18,6 +19,10 @@ std::function<void()> ParamBase::getProvider()
     return [this]() {(*this->_parentNode)();};
 }
 
+
+// ------------------------------------------------------------------------------
+// isConnectableTo
+//      returns true if this parameter can be connected to "otherParam"
 bool ParamBase::isConnectableTo(ParamBase *otherParam)
 {
     if (!this->isConnectable())
@@ -30,18 +35,25 @@ bool ParamBase::isConnectableTo(ParamBase *otherParam)
     if (typeid(*this) != typeid(*otherParam))
         return false;
 
-    // Make sure one is an input param and one is an output param
+    // LATER allow for automatic type promotion/conversion--
+    // e.g. convert "int" types to "floats",
+    //      "floats" to "colors"
+    // perhaps even "floats" to "ints" via trucation.
+
+    // Make this is an input param and the other is an output param
     if (this->isOutput() == otherParam->isOutput())
         return false;
 
-    // LATER allow for auto type promotion/conversion
-
-    // LATER check for cycles :-P
+    // XXX check for cycles :-P
 
     // Everything looks OK!
     return true;
 }
 
+// ------------------------------------------------------------------------------
+// connectTo
+//      connects this parameter (the "client") to an output parameter on another
+//      node (the "server").
 void ParamBase::connectTo(ParamBase *server)
 {
     // This assumes that server and client have already
@@ -103,11 +115,11 @@ void ParamBase::connectTo(ParamBase *server)
 }
 
 
+// ------------------------------------------------------------------------------
+// Serialization
+//      (or "file i/o," as we called in the old days.)
 
-// -------------------------
-// Param i/o
-
-// Writing
+// Writing (base class)
 void ParamBase::writeToJSONObj(QJsonObject &json) const
 {
 //    json["type"] = _type; // TODO translate
@@ -124,8 +136,7 @@ void ParamBase::writeToJSONObj(QJsonObject &json) const
     // Values of params are written by the type-specialized versions below.
 }
 
-
-// Template specializations
+// Writing (template specializations)
 template <> void Param<Lightcolor>::writeToJSONObj(QJsonObject &json) const
 {
     ParamBase::writeToJSONObj(json);
@@ -161,14 +172,14 @@ template <> void Param<int>::writeToJSONObj(QJsonObject &json) const
     json["value"] = _value;
 }
 
-// Reading
-
+// Reading (base class)
 void ParamBase::readFromJSONObj(const QJsonObject &json)
 {
     // ErrorHandling
     _uuid = QUuid(json["uuid"].toString());
 }
 
+// Reading (template specializations)
 template <> void Param<int>::readFromJSONObj(const QJsonObject &json)
 {
     ParamBase::readFromJSONObj(json);

@@ -54,7 +54,7 @@ void RegionNode::writeToJSONObj(QJsonObject &json) const
 {
     Node::writeToJSONObj(json);
 
-#if 0
+#if 1
     // Override for serialization
     QJsonArray regionJsonArray;
     foreach (const Position pos, _positions) {
@@ -71,7 +71,7 @@ void RegionNode::readFromJSONObj(const QJsonObject &json)
 {
     // Override for serialization
     Node::readFromJSONObj(json);
-#if 0
+#if 1
     QJsonArray positionsArray = json["positions"].toArray();
     for (int i=0; i<positionsArray.size(); ++i) {
         QJsonObject posJsonObject = positionsArray[i].toObject();

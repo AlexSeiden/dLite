@@ -19,15 +19,21 @@ ConnectorItem::ConnectorItem(SocketItem *serverSocket, SocketItem *clientSocket,
     _clientSocket(clientSocket),
     _path(nullptr)
 {
-    // Connection arrows are always in back
     setZValue(1000.0);
     updatePath();
+
+    setFlags(ItemIsSelectable);
 
     CHECKED_CONNECT(_serverSocket->parentObject()->parentObject(),
                     SIGNAL(nodeMovedEventSignal()), this, SLOT(gotMoved()));
     CHECKED_CONNECT(_clientSocket->parentObject()->parentObject(),
                     SIGNAL(nodeMovedEventSignal()), this, SLOT(gotMoved()));
+}
 
+ConnectorItem::~ConnectorItem()
+{
+    getClient()->getParam()->disconnect();
+    getServer()->getParam()->disconnect();
 }
 
 void ConnectorItem::gotMoved()
@@ -43,7 +49,8 @@ QRectF ConnectorItem::boundingRect() const
 
     // Compute two rects when dragging.  The first is the rect
     // that connects _pStart & _pEnd -- the PREVIOUS positions.
-#if 1
+    // The second rect connects the NEW positions of the sockets--
+    // nStart & nEnd. This matters when we are dragging quickly.
     float leftprev = qMin(_pStart.x(), _pEnd.x()-100);
     float leftnext = qMin( nStart.x(),  nEnd.x()-100);
     float left     = qMin( leftprev,    leftnext);
@@ -60,24 +67,8 @@ QRectF ConnectorItem::boundingRect() const
     float bottomnext = qMax( nStart.y(),  nEnd.y());
     float bottom     = qMax( bottomprev,  bottomnext);
 
-
     QRectF bbox(QPointF(left,top),QPointF(right, bottom));
 
-#else
-
-    QRectF bbox(_pStart, QSizeF(qMax(_pEnd.x() - _pStart.x(),100.), _pEnd.y() - _pStart.y()));
-    bbox = bbox.normalized();
-
-    // The second rect connects the NEW positions of the sockets.
-    // This matters when we are dragging quickly.
-    QRectF nbox(_pStart, QSizeF(qMax(nEnd.x() - nStart.x(),100.), nEnd.y() - nStart.y()));
-    nbox = nbox.normalized();
-
-    // Take the union of both:
-    bbox = bbox.united(nbox);
-
-    // And add a fudge factor
-#endif
     qreal extra = 20.; // XXX kinda arbitrary
     bbox.adjust(-extra, -extra, extra, extra);
     return bbox;
@@ -90,6 +81,8 @@ QPainterPath ConnectorItem::shape() const
 
 void ConnectorItem::updatePath()
 {
+    // Makes a new path when one of the ends has been moved.
+
     _pStart = _serverSocket->scenePos();
     _pEnd   = _clientSocket->scenePos();
 
@@ -108,7 +101,10 @@ void ConnectorItem::paint(QPainter *painter,
     Q_UNUSED(widget);
 
     painter->save();
-    painter->setPen(GuiSettings::connectorPen);
+    if (isSelected())
+        painter->setPen(GuiSettings::connectorPenSelected);
+    else
+        painter->setPen(GuiSettings::connectorPen);
     painter->setBrush(Qt::NoBrush);
     if (_path)
         painter->drawPath(*_path);

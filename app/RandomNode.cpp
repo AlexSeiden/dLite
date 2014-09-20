@@ -144,7 +144,8 @@ void RandomInt::operator()()
 }
 
 // ------------------------------------------------------------------------------
-//  ModuloInt
+//  SequenceInt
+//      Takes a trigger, and every time increments between _min and _max value.
 
 SequenceInt::SequenceInt() :
     _output(0),

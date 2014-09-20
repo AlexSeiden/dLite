@@ -2,9 +2,11 @@
 #include "GuiSettings.h"
 #include <QtWidgets>
 #include "utils.h"
+#include <QLineEdit>
+#include <QDoubleValidator>
+#include <QIntValidator>
+#include <QAbstractSpinBox>
 
-// This is the param view for use in the graph view
-// TODO unify these
 ParamView::ParamView(QWidget *parent, ParamBase *param ) :
     QWidget(parent),
     _name(param->getName()),
@@ -19,27 +21,46 @@ ParamView::ParamView(QWidget *parent, ParamBase *param ) :
     // TODO make range & steps on spinboxes settable
    if (paramType == paramTypeFloat) {
         Param<float> * floatParam = dynamic_cast<Param<float> *>(_param);
-        QDoubleSpinBox *editorWidget = new QDoubleSpinBox;
-        editorWidget->setRange(0, 10.0);
-        editorWidget->setSingleStep(.01);
-        _genericEditorWidget = editorWidget;
         float val = 0.0;
         floatParam->getValue(val);
+#if 1
+        QDoubleSpinBox *editorWidget = new QDoubleSpinBox;
+        if (param->_useminmax) {
+            editorWidget->setRange(param->_minVal, param->_maxVal);
+            editorWidget->setSingleStep(param->_stepVal);
+        }
+        editorWidget->setButtonSymbols(QAbstractSpinBox::NoButtons);
+
         editorWidget->setValue(val);
-        _genericEditorWidget->setFixedSize(60,22); // XXX is this causing the zoom to break? NOPE
         CHECKED_CONNECT(editorWidget, SIGNAL(valueChanged(double)), this, SLOT(setValue(double)));
+#else
+        QLineEdit *editorWidget = new QLineEdit;
+        QDoubleValidator *validator = new QDoubleValidator(editorWidget);
+        editorWidget->setValidator(validator);
+        editorWidget->insert(QString::number(val));
+        CHECKED_CONNECT(editorWidget, SIGNAL(textChanged(QString)), this, SLOT(textChanged(QString)));
+#endif
+        _genericEditorWidget = editorWidget;
+        _genericEditorWidget->setFixedSize(60,22); // XXX is this causing the zoom to break? NOPE
     }
     else if (paramType == paramTypeInt){
         Param<int> * intParam = dynamic_cast<Param<int> *>(_param);
+        int val = 0;
+        intParam->getValue(val);
+#if 0
         QSpinBox *editorWidget = new QSpinBox;
         editorWidget->setRange(0, 10000);   // XXX need some way to set ranges etc.
         editorWidget->setSingleStep(1);
+        editorWidget->setValue(val);
+#else
+        QLineEdit *editorWidget = new QLineEdit;
+        QIntValidator *validator = new QIntValidator(editorWidget);
+        editorWidget->setValidator(validator);
+        editorWidget->insert(QString::number(val));
+        CHECKED_CONNECT(editorWidget, SIGNAL(textChanged(QString)), this, SLOT(textChanged(QString)));
+#endif
         _genericEditorWidget = editorWidget;
         _genericEditorWidget->setFixedSize(60,22);
-        int val = 0;
-        intParam->getValue(val);
-        editorWidget->setValue(val);
-        CHECKED_CONNECT(editorWidget, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
     }
     else if (paramType == paramTypeLightcolor) {
         Param<Lightcolor> * colorParam = dynamic_cast<Param<Lightcolor> *>(_param);
@@ -75,6 +96,8 @@ ParamView::ParamView(QWidget *parent, ParamBase *param ) :
 }
 
 
+// launchColorDialog
+//      Launches a color-picker window when the color chip is clicked.
 void ParamView::launchColorDialog() {
     QToolButton *colorButton = qobject_cast<QToolButton *>(this->_genericEditorWidget);
     Param<Lightcolor> * colorParam = dynamic_cast<Param<Lightcolor> *>(_param);
@@ -90,16 +113,18 @@ void ParamView::launchColorDialog() {
     setButtonColor(colorButton, outcol);
 }
 
-// It would be nice to template these, but that won't work with QObject
-// derived classes and the Qt moc.
-// ??? Could use qvariants?
+// ------------------------------------------------------------------------------
+// setValue callbacks
+//      It would be nice to template these, but that won't work with QObject
+//      derived classes and the Qt moc.
+//      ??? Could use qvariants?
+
 void ParamView::setValue(double val) {
     Param<float> *p = dynamic_cast<Param<float> *>(this->_param);
     Q_ASSERT(p);
     p->setValue(val);
     p->getParent()->paramHasBeenEdited();
 }
-
 
 void ParamView::setValue(int val) {
     Param<int> *p = dynamic_cast<Param<int> *>(this->_param);
@@ -113,6 +138,28 @@ void ParamView::setValue(Lightcolor val) {
     Q_ASSERT(p);
     p->setValue(val);
     p->getParent()->paramHasBeenEdited();
+}
+
+void ParamView::textChanged(QString text)
+{
+    Param<int> *pi = dynamic_cast<Param<int> *>(this->_param);
+    if (pi) {
+        int val = text.toInt();
+        pi->setValue(val);
+        pi->getParent()->paramHasBeenEdited();
+        return;
+    }
+
+    Param<float> *pf = dynamic_cast<Param<float> *>(this->_param);
+    if (pf) {
+        float val = text.toFloat();
+        pf->setValue(val);
+        pf->getParent()->paramHasBeenEdited();
+        return;
+    }
+
+    Q_ASSERT(false);
+    // ErrorHandling
 }
 
 // Need to have this be a separate "setBoolFunction" with an int argument,

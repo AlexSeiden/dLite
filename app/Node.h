@@ -25,7 +25,19 @@ public:
     // marked "output", and can include multiples of these types.
     // Style:  that might be a good enough reason for replacing this enum--
     // as well as the _type field--with lists for the Cuelibrary directly.
-    enum node_t {CUE, FLOAT, INT, COLOR, BEAT, POSITION, UNDEFINED};
+    enum node_t {CUE, FLOAT, INT, COLOR, BEAT, POSITION, REGION, UNDEFINED};
+    // The node types defined:
+    //  CUE     --  Called directly by the dance floor; can set values on the floor.
+    //  FLOAT   --  A floating point numeric value.
+    //  INT     --  An integer numeric value.
+    //  COLOR   --  A color
+    //  BEAT    --  A boolean "trigger" value, that goes momentarily "true" when a
+    //              condition is met.  e.g., every beat or measure
+    //  POSITION--  May be obsolete? An x,y postion...could be int or float...
+    //              Provides an x & y output that need to be independently connected.
+    //  REGION  --  A selected region of cells.
+    //  UNDEFINED -- Shouldn't happen; only a temporary designation when the abstract
+    //               Node class has initialized, but the concrete class has not.
 
     Node();
     virtual ~Node();

@@ -27,12 +27,11 @@ class QMenu;
 class QPushButton;
 class QSpinBox;
 class QLineEdit;
+class QShortcut;
 QT_END_NAMESPACE
 
-/**
- * Main application widget, responsible for connecting the various UI
- * elements to the Engine.
- */
+// Main application widget, responsible for connecting the various UI
+// elements to the Engine.
 class MainWidget : public QWidget
 {
     Q_OBJECT
@@ -68,6 +67,7 @@ private slots:
 
 private:
     void createUi();
+    void createShortcuts();
     void createMenus();
     void connectUi();
     void reset();
@@ -78,6 +78,7 @@ private:
     Transport*              m_transport;
     Spectrograph*           m_spectrograph;
 
+    // Atomic UI items for the controllerwindow
     QPushButton*            m_fileButton;
     QPushButton*            m_saveButton;
     QPushButton*            m_openButton;
@@ -87,6 +88,10 @@ private:
     QIcon                   m_playIcon;
     QPushButton*            m_settingsButton;
     QIcon                   m_settingsIcon;
+
+    QShortcut*              m_spaceShortcut;
+    QShortcut*              m_frameAllShortcut;
+    QShortcut*              m_frameSelectedShortcut;
 
 #if 1 // NUKEMEMAYBE
     QLabel*                 m_infoMessage;

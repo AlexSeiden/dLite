@@ -21,6 +21,7 @@ QPen    GuiSettings::socketOutlinePen     = QPen(GuiSettings::socketOutlineColor
 QColor  GuiSettings::connectorColor       = QColor(20,20,80);
 QColor  GuiSettings::connectorCenterColor = QColor(0,0,0);
 QPen    GuiSettings::connectorPen         = QPen(GuiSettings::connectorColor, 2, Qt::SolidLine);
+QPen    GuiSettings::connectorPenSelected = QPen(GuiSettings::selectedNodePenColor, 4, Qt::SolidLine);
 QBrush  GuiSettings::connectorBrush       = QBrush(GuiSettings::connectorCenterColor);
 int     GuiSettings::connectorEndSize     = 5;
 int     GuiSettings::iconSize             = 16;

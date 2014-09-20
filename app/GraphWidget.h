@@ -3,12 +3,18 @@
 
 #include <QWidget>
 #include <QList>
-#include "CuesheetScene.h"
-#include "CuesheetView.h"
+//#include "CuesheetScene.h"
+//#include "CuesheetView.h"
 #include "Param.h"
 
 class Node;
 class Subrange;
+class CuesheetScene;
+class CuesheetView;
+
+QT_BEGIN_NAMESPACE
+class QGraphicsItem;
+QT_END_NAMESPACE
 
 class GraphWidget : public QWidget
 {
@@ -22,10 +28,13 @@ public:
 public slots:
     void addNode(Node *node);
     void selectionChanged();
+    void frameAll();
+    void frameSelection();
 
     void subrangeHasChanged(Subrange *subrange);
 
 private:
+    void frameItems(QList<QGraphicsItem*> items);
     void addConnection(ParamBase *, ParamBase*);
     void deleteSelection();
 

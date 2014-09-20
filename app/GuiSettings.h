@@ -36,6 +36,7 @@ public:
     static QColor   connectorColor;
     static QColor   connectorCenterColor;
     static QPen     connectorPen;
+    static QPen     connectorPenSelected;
     static QBrush   connectorBrush;
     static int      connectorEndSize;
     static int      iconSize;

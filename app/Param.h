@@ -26,7 +26,11 @@ public:
         _isOutput(false),
         _isConnectable(true),
         _type(typeid(this)),
-        _uuid(QUuid::createUuid())  { }
+        _uuid(QUuid::createUuid()),
+        _useminmax(false),
+        _minVal(0.),
+        _maxVal(1.)
+    { }
     virtual ~ParamBase() { }
 
     QString     getName() const                {return _name;}
@@ -91,9 +95,15 @@ protected:
     bool                    _isOutput;
     bool                    _isConnectable;
     const std::type_info &  _type;
-    /*const*/ QUuid             _uuid; // Can't be const bc of assignment during file read
+    /*const*/ QUuid         _uuid; // Can't be const bc of assignment during file read
+
+    // GROSS ! only used for ranges on numeric types.  And then, when using int types,
+    // the values are cast.
+    bool                    _useminmax;
+    float                   _minVal, _maxVal, _stepVal;
 
     friend class NodeFactory;
+    friend class ParamView;
 };
 
 
@@ -119,7 +129,7 @@ public:
 
     virtual void getValue(PARAMT &value)  {
         // All values are returned by reference, even for fundamental types like ints and
-        // floats, for generality with all types, such as Lightcolor & regions.
+        // floats. This is for generality with all types, such as Lightcolor & regions.
         value = _value;
     }
 
@@ -141,6 +151,7 @@ public:
     virtual void writeToJSONObj(QJsonObject &json) const;
 };
 
+// ------------------------------------------------------------------------------
 // For convinience & speed when doing RTTI
 extern const std::type_info & paramTypeFloat;
 extern const std::type_info & paramTypeInt;
