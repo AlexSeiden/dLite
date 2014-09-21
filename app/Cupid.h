@@ -42,9 +42,9 @@ public:
     static int      getCurrentFrame()
                         {return Singleton()->_dancefloor->getFrame();}
     static int      getPlaybackPositionUSecs()
-                        {return Singleton()->_engine->_uSecs;}
+                        {return Singleton()->_engine->getCurrentTime();}
     static QString  getAudioFilename()
-                        {return Singleton()->_engine->m_audiofilename;}
+                        {return Singleton()->_engine->getAudioFilename();}
 
 private:
     QObject*         _spectrograph;

@@ -1,6 +1,7 @@
 #include <QAudioFormat>
 #include "utils.h"
 
+// Returns position in microseconds, given position in bytes
 qint64 audioDuration(const QAudioFormat &format, qint64 bytes)
 {
     return (bytes * 1000000) /

@@ -23,13 +23,12 @@ QT_END_NAMESPACE
 
 /*
  * This class interfaces with the Qt Multimedia audio classes, and also with
- * the SpectrumAnalyser class.  Its role is to manage the capture and playback
- * of audio data, meanwhile performing real-time analysis of the audio level
- * and frequency spectrum.
+ * the SpectrumAnalyser class.  Its role is to manage the playback
+ * of audio data, while performing real-time analysis of the audio
+ * frequency spectrum.
  */
 class Engine : public QObject
 {
-    friend class Cupid;
 
     Q_OBJECT
 
@@ -52,14 +51,15 @@ public:
 
     // Position of the audio output device.
     // \return Position in bytes.
-    qint64 playPosition() const {return m_playPosition;}
+//    qint64 playPosition() const {return m_playPosition;}
 
     // Position of the audio output device.
     // \return Position in microseconds.
-    qint64 getCurrentTime() const {return _uSecs;}
+//    qint64 getCurrentTime() const {return _uSecs;}
+    qint64 getCurrentTime() const;
+    QString getAudioFilename() const {return m_audiofilename;}
 
-    // Length of the internal engine buffer.
-    // \return Buffer length in bytes.
+    // Length of the song in bytes.
     qint64 bufferLength() const;
 
     // Amount of data held in the buffer.
@@ -68,15 +68,14 @@ public:
 
     // Set window function applied to audio data before spectral analysis.
     void setWindowFunction(WindowFunction type);
-
     void setDancefloormodel(Dancefloor *df) {_dfModel = df;}
 
 public slots:
     void startPlayback();
     void suspend();
     void togglePlayback();
-    // Set update interval
-    void setInterval(int val);
+    void movePlaybackHead(double positionfraction);
+    void setUpdateInterval(int val);
 
 signals:
     void stateChanged(QAudio::State state);
@@ -140,8 +139,8 @@ private:
 
     QByteArray          m_buffer;
     qint64              m_bufferPosition;
-    qint64              m_bufferLength;
     qint64              m_dataLength;
+    QBuffer             _qbuf;
 
     int                 m_levelBufferLength;
 
@@ -156,11 +155,8 @@ private:
     //  Only needed to call evaluate.  Perhaps should use signals?  XXX
     Dancefloor          *_dfModel;
 
-protected:
-    // Used directly by Cupid.
     qint64              _uSecs;
     QString             m_audiofilename;
-    QString             m_onsetfilename;
 };
 
 #endif // ENGINE_H

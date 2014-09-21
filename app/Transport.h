@@ -18,12 +18,13 @@ public:
     void reset();
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
 
 public slots:
     void bufferLengthChanged(qint64 length);
     void playPositionChanged(qint64 playPosition);
+
+signals:
+    void movePlaybackHead(double pos);
 
 private:
     qint64 m_bufferLength;

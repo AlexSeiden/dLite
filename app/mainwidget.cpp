@@ -197,7 +197,7 @@ void MainWidget::showSettingsDialog()
     m_settingsDialog->exec();
     if (m_settingsDialog->result() == QDialog::Accepted) {
         m_engine->setWindowFunction(m_settingsDialog->windowFunction());
-        m_engine->setInterval(m_settingsDialog->interval());
+        m_engine->setUpdateInterval(m_settingsDialog->interval());
     }
 }
 
@@ -295,8 +295,6 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_engine, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(stateChanged(QAudio::State)));
 
-    m_transport->bufferLengthChanged(m_engine->bufferLength());
-
     CHECKED_CONNECT(m_engine, SIGNAL(bufferLengthChanged(qint64)),
             this, SLOT(bufferLengthChanged(qint64)));
 
@@ -318,6 +316,8 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
             this, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
 
+    CHECKED_CONNECT(m_transport, SIGNAL(movePlaybackHead(double)),
+            m_engine, SLOT(movePlaybackHead(double)));
 
 #ifdef NUKEME
     // Info & error messages--now obsolete?

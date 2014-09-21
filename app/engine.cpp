@@ -4,7 +4,6 @@
 
 #include <math.h>
 
-#include <QAudioInput>
 #include <QAudioOutput>
 #include <QCoreApplication>
 #include <QDebug>
@@ -12,17 +11,6 @@
 #include <QMetaObject>
 #include <QSet>
 #include <QThread>
-
-//-----------------------------------------------------------------------------
-// Constants
-//-----------------------------------------------------------------------------
-
-// Size of the level calculation window in microseconds
-const int    LevelWindowUs          = 0.1 * 1000000;
-
-//-----------------------------------------------------------------------------
-// Constructor and destructor
-//-----------------------------------------------------------------------------
 
 Engine::Engine(QObject *parent)
     :   QObject(parent)
@@ -33,9 +21,7 @@ Engine::Engine(QObject *parent)
     ,   m_audioOutput(0)
     ,   m_playPosition(0)
     ,   m_bufferPosition(0)
-    ,   m_bufferLength(0)
     ,   m_dataLength(0)
-    ,   m_levelBufferLength(0)
     ,   m_spectrumBufferLength(0)
     ,   m_spectrumAnalyser()
     ,   m_spectrumPosition(0)
@@ -70,10 +56,24 @@ bool Engine::loadFile(const QString &fileName)
         } else {
             emit errorMessage(tr("Audio format not supported"),
                               formatToString(m_wavFileHandle->fileFormat()));
+            return false;
         }
     } else {
         emit errorMessage(tr("Could not open file"), fileName);
+        return false;
     }
+
+    // Load whole file here.
+    qint64 bytesToRead = m_wavFileHandle->size() - m_wavFileHandle->headerLength();
+    m_buffer.resize(bytesToRead);
+    int bytesRead = m_wavFileHandle->read(m_buffer.data(), bytesToRead);
+    qDebug() << bytesRead << bytesToRead << m_wavFileHandle->size() << m_wavFileHandle->headerLength();
+    _qbuf.setBuffer(&m_buffer);
+    _qbuf.open(QIODevice::ReadOnly);
+    _qbuf.seek(0);
+    emit bufferLengthChanged(bufferLength());
+    emit dataLengthChanged(dataLength());
+
     if (result) {
         // XXX why do we need both?
         m_analysisFile = new WavFile(this);
@@ -82,17 +82,16 @@ bool Engine::loadFile(const QString &fileName)
     return result;
 }
 
-// wtf?
 qint64 Engine::bufferLength() const
 {
-    return m_wavFileHandle ? m_wavFileHandle->size() : m_bufferLength;
+//    return m_wavFileHandle ? m_wavFileHandle->size() : -1;
+    return _qbuf.buffer().size();
 }
 
 void Engine::setWindowFunction(WindowFunction type)
 {
     m_spectrumAnalyser.setWindowFunction(type);
 }
-
 
 //-----------------------------------------------------------------------------
 // Public slots
@@ -113,8 +112,28 @@ void Engine::startPlayback()
         m_wavFileHandle->seek(0);
         m_bufferPosition = 0;
         m_dataLength = 0;
-        m_audioOutput->start(m_wavFileHandle);
+        _qbuf.seek(0);
+        m_audioOutput->start(&_qbuf);
+//        m_audioOutput->start(m_wavFileHandle);
     }
+}
+
+
+void Engine::movePlaybackHead(double positionfraction)
+{
+    // Sets playback position to somewhere in middle of recording.
+    // position == 0.0 means the beginning,
+    // position == 1.0 means the end.
+
+    qint64 byteposition = positionfraction * bufferLength();
+
+    // Round off to start of the channel 0.
+    byteposition -= byteposition % (m_format.channelCount() * m_format.sampleSize());
+    playPositionChanged(byteposition);
+
+//    bool result = m_wavFileHandle->seek(byteposition);
+    bool result = _qbuf.seek(byteposition);
+    Q_ASSERT(result);
 }
 
 void Engine::suspend()
@@ -141,30 +160,29 @@ void Engine::togglePlayback()
 void Engine::audioNotify()
 {
 
+
     _uSecs = m_audioOutput->processedUSecs();
     // Find current playPosition in bytes
-    const qint64 playPosition = audioLength(m_format, _uSecs);
+//    const qint64 playPosition = audioLength(m_format, _uSecs);
+    const qint64 playPosition = _qbuf.pos();
 
     // Why would we be beyond the bufferLength???
     setPlayPosition(qMin(bufferLength(), playPosition));
 
     // Look backwards from the playPosition when computing the spectrum
-    const qint64 levelPosition = playPosition - m_levelBufferLength;
     const qint64 spectrumPosition = playPosition - m_spectrumBufferLength;
 
     Q_ASSERT(m_wavFileHandle);
 
-    if (levelPosition > m_bufferPosition || spectrumPosition > m_bufferPosition ||
-        qMax(m_levelBufferLength, m_spectrumBufferLength) > m_dataLength) {
+#if 0
+    if (spectrumPosition > m_bufferPosition || m_spectrumBufferLength > m_dataLength) {
         m_bufferPosition = 0;
         m_dataLength = 0;
         // Data needs to be read into m_buffer in order to be analysed
         // GROSS.  should read into one buffer, and play from that buffer.
-        const qint64 readPos = qMax(qint64(0), qMin(levelPosition, spectrumPosition));
-        const qint64 readEnd = qMin(m_analysisFile->size(), qMax(levelPosition + m_levelBufferLength, spectrumPosition + m_spectrumBufferLength));
+        const qint64 readPos = qMax(qint64(0), spectrumPosition);
+        const qint64 readEnd = qMin(m_analysisFile->size(), spectrumPosition + m_spectrumBufferLength);
         const qint64 readLen = readEnd - readPos + audioLength(m_format, WaveformWindowDuration);
-
-        ENGINE_DEBUG << "Engine::audioNotify [1]" << "analysisFileSize" << m_analysisFile->size() << "readPos" << readPos << "readLen" << readLen;
 
         if (m_analysisFile->seek(readPos + m_analysisFile->headerLength())) {
             m_buffer.resize(readLen);  // TODO wtf??? resize?? shouldn't this always be the same size? or at least, big enough?
@@ -189,17 +207,19 @@ void Engine::audioNotify()
                         << "m_dataLength "<< m_dataLength;
     }
 
+#endif
+
+
+
     // ==============================
     // OKAY!
     // THIS IS IT!  ARE YOU READY?  It all happens here:
 
     _dfModel->evaluate();
     // TODO move elsewhere?  perhaps it's own timer loop?
-    // Although, it want's to be on a timer synced with audio playback...
-
+    // Although, it wants to be on a timer synced with audio playback...
     // TA-DA !
     // ==============================
-
 }
 
 void Engine::audioStateChanged(QAudio::State state)
@@ -264,7 +284,6 @@ void Engine::reset()
     m_analysisFile = 0;
     m_buffer.clear();
     m_bufferPosition = 0;
-    m_bufferLength = 0;
     m_dataLength = 0;
     emit dataLengthChanged(0);
     resetAudioDevices();
@@ -278,8 +297,6 @@ bool Engine::initialize()
 
     if (selectFormat()) {
         resetAudioDevices();
-        emit bufferLengthChanged(bufferLength());
-        emit dataLengthChanged(dataLength());
         result = true;
         m_audioOutput = new QAudioOutput(m_audioOutputDevice, m_format, this);
         m_audioOutput->setNotifyInterval(m_notifyIntervalMs);
@@ -294,7 +311,6 @@ bool Engine::initialize()
         qDebug() << "                  " << "actual    notify interval" << m_audioOutput->notifyInterval();
     }
 
-    ENGINE_DEBUG << "Engine::initialize" << "m_bufferLength" << m_bufferLength;
     ENGINE_DEBUG << "Engine::initialize" << "m_dataLength" << m_dataLength;
     ENGINE_DEBUG << "Engine::initialize" << "format" << m_format;
 
@@ -372,7 +388,6 @@ void Engine::setFormat(const QAudioFormat &format)
 {
     const bool changed = (format != m_format);
     m_format = format;
-    m_levelBufferLength = audioLength(m_format, LevelWindowUs);
     m_spectrumBufferLength = SpectrumLengthSamples *
                             (m_format.sampleSize() / 8) * m_format.channelCount();
     if (changed)
@@ -384,8 +399,15 @@ void Engine::setFormat(const QAudioFormat &format)
  * TODO:  this is also the interval at which the whole floor is
  * updated, and the two should probably be decoupled.
  */
-void Engine::setInterval(int val)
+void Engine::setUpdateInterval(int val)
 {
     m_notifyIntervalMs = val;
     m_audioOutput->setNotifyInterval(m_notifyIntervalMs);
+}
+
+// return time in microseconds
+qint64 Engine::getCurrentTime() const
+{
+    qint64 positionInBytes = _qbuf.pos();
+    return audioDuration(m_format, positionInBytes);
 }
