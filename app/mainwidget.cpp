@@ -298,8 +298,11 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_engine, SIGNAL(bufferLengthChanged(qint64)),
             this, SLOT(bufferLengthChanged(qint64)));
 
+#if 0
     CHECKED_CONNECT(m_engine, SIGNAL(dataLengthChanged(qint64)),
             this, SLOT(updateButtonStates()));
+#endif
+    // TODO There should be a "song changed" signal/slot
 
     CHECKED_CONNECT(m_engine, SIGNAL(playPositionChanged(qint64)),
             m_transport, SLOT(playPositionChanged(qint64)));

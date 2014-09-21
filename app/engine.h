@@ -64,7 +64,7 @@ public:
 
     // Amount of data held in the buffer.
     // \return Data length in bytes.
-    qint64 dataLength() const { return m_dataLength; }
+//    qint64 dataLength() const { return m_dataLength; }
 
     // Set window function applied to audio data before spectral analysis.
     void setWindowFunction(WindowFunction type);
@@ -95,7 +95,7 @@ signals:
 
     // Amount of data in buffer has changed.
     // \param Length of data in bytes
-    void dataLengthChanged(qint64 duration);
+//    void dataLengthChanged(qint64 duration);
 
     // Position of the audio output device has changed.
     // \param position Position in bytes
@@ -122,7 +122,10 @@ private:
     void setFormat(const QAudioFormat &format);
     void setPlayPosition(qint64 position, bool forceEmit = false);
     void calculateLevel(qint64 position, qint64 length);
+#if 0
     void calculateSpectrum(qint64 position);
+#endif
+    void calculateSpectrum(qint64 start, qint64 end);
 
 private:
     QAudio::State       m_state;
@@ -139,7 +142,6 @@ private:
 
     QByteArray          m_buffer;
     qint64              m_bufferPosition;
-    qint64              m_dataLength;
     QBuffer             _qbuf;
 
     int                 m_levelBufferLength;

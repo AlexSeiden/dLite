@@ -21,7 +21,6 @@ Engine::Engine(QObject *parent)
     ,   m_audioOutput(0)
     ,   m_playPosition(0)
     ,   m_bufferPosition(0)
-    ,   m_dataLength(0)
     ,   m_spectrumBufferLength(0)
     ,   m_spectrumAnalyser()
     ,   m_spectrumPosition(0)
@@ -72,7 +71,7 @@ bool Engine::loadFile(const QString &fileName)
     _qbuf.open(QIODevice::ReadOnly);
     _qbuf.seek(0);
     emit bufferLengthChanged(bufferLength());
-    emit dataLengthChanged(dataLength());
+//    emit dataLengthChanged(dataLength());
 
     if (result) {
         // XXX why do we need both?
@@ -111,13 +110,10 @@ void Engine::startPlayback()
                         this, SLOT(audioNotify()));
         m_wavFileHandle->seek(0);
         m_bufferPosition = 0;
-        m_dataLength = 0;
         _qbuf.seek(0);
         m_audioOutput->start(&_qbuf);
-//        m_audioOutput->start(m_wavFileHandle);
     }
 }
-
 
 void Engine::movePlaybackHead(double positionfraction)
 {
@@ -159,55 +155,23 @@ void Engine::togglePlayback()
 
 void Engine::audioNotify()
 {
-
-
-    _uSecs = m_audioOutput->processedUSecs();
+    _uSecs = m_audioOutput->processedUSecs();  // NUKEME
     // Find current playPosition in bytes
-//    const qint64 playPosition = audioLength(m_format, _uSecs);
     const qint64 playPosition = _qbuf.pos();
 
     // Why would we be beyond the bufferLength???
-    setPlayPosition(qMin(bufferLength(), playPosition));
+    setPlayPosition(qMin(bufferLength(), playPosition));  // NUKEME
+
+//   NUKEME  Q_ASSERT(m_wavFileHandle);
 
     // Look backwards from the playPosition when computing the spectrum
     const qint64 spectrumPosition = playPosition - m_spectrumBufferLength;
 
-    Q_ASSERT(m_wavFileHandle);
+    const qint64 specWindowStart = qMax(qint64(0), spectrumPosition);
+    const qint64 specWindowEnd   = qMin(_qbuf.size(), spectrumPosition + m_spectrumBufferLength);
 
-#if 0
-    if (spectrumPosition > m_bufferPosition || m_spectrumBufferLength > m_dataLength) {
-        m_bufferPosition = 0;
-        m_dataLength = 0;
-        // Data needs to be read into m_buffer in order to be analysed
-        // GROSS.  should read into one buffer, and play from that buffer.
-        const qint64 readPos = qMax(qint64(0), spectrumPosition);
-        const qint64 readEnd = qMin(m_analysisFile->size(), spectrumPosition + m_spectrumBufferLength);
-        const qint64 readLen = readEnd - readPos + audioLength(m_format, WaveformWindowDuration);
+    calculateSpectrum(specWindowStart, specWindowEnd);
 
-        if (m_analysisFile->seek(readPos + m_analysisFile->headerLength())) {
-            m_buffer.resize(readLen);  // TODO wtf??? resize?? shouldn't this always be the same size? or at least, big enough?
-            m_bufferPosition = readPos;
-            m_dataLength = m_analysisFile->read(m_buffer.data(), readLen);
-            ENGINE_DEBUG << "Engine::audioNotify [2]" << "bufferPosition" << m_bufferPosition << "dataLength" << m_dataLength;
-        } else {
-            ENGINE_DEBUG << "Engine::audioNotify [2E]" << "file seek error";
-        }
-    }
-
-    if ( (spectrumPosition >= 0) &&
-         (spectrumPosition + m_spectrumBufferLength) < (m_bufferPosition + m_dataLength)
-         )
-        calculateSpectrum(spectrumPosition);
-    else {
-        // This seems to happen at the beginning of a song, where there isn't enough buffer
-        // behind the playhead to calculate a full window.
-        ENGINE_DEBUG << "Engine::audioNotify [3]" << "buffer confusion" << "spectrumPosition:" << spectrumPosition
-                        << "m_spectrumBufferLength "<< m_spectrumBufferLength
-                        << "m_bufferPosition "<< m_bufferPosition
-                        << "m_dataLength "<< m_dataLength;
-    }
-
-#endif
 
 
 
@@ -284,8 +248,8 @@ void Engine::reset()
     m_analysisFile = 0;
     m_buffer.clear();
     m_bufferPosition = 0;
-    m_dataLength = 0;
-    emit dataLengthChanged(0);
+//    m_dataLength = 0;
+// NUKEME   emit dataLengthChanged(0); // XXX may want to emit songChanged()
     resetAudioDevices();
 }
 
@@ -311,7 +275,7 @@ bool Engine::initialize()
         qDebug() << "                  " << "actual    notify interval" << m_audioOutput->notifyInterval();
     }
 
-    ENGINE_DEBUG << "Engine::initialize" << "m_dataLength" << m_dataLength;
+//    ENGINE_DEBUG << "Engine::initialize" << "m_dataLength" << m_dataLength;
     ENGINE_DEBUG << "Engine::initialize" << "format" << m_format;
 
     return result;
@@ -364,21 +328,23 @@ void Engine::setPlayPosition(qint64 position, bool forceEmit)
         emit playPositionChanged(m_playPosition);
 }
 
-void Engine::calculateSpectrum(qint64 position)
+void Engine::calculateSpectrum(qint64 start, qint64 end)
 {
-    Q_ASSERT(position + m_spectrumBufferLength <= m_bufferPosition + m_dataLength);
-
     // QThread::currentThread is marked 'for internal use only', but
     // we're only using it for debug output here, so it's probably OK :)
     ENGINE_DEBUG << "Engine::calculateSpectrum" << QThread::currentThread()
-                 << "pos" << position << "len" << m_spectrumBufferLength
                  << "spectrumAnalyser.isReady" << m_spectrumAnalyser.isReady();
 
     if (m_spectrumAnalyser.isReady()) {
-        // XXX this seems like unneeded copying.
-        m_spectrumBuffer = QByteArray::fromRawData(m_buffer.constData() + position - m_bufferPosition,
+        // XXX are we sizing & clearing correctly???
+        // Must copy data into spectrum buffer because Hahn window will be applied.
+        // Note fromRawData uses implicit shared array.
+        m_spectrumBuffer = QByteArray::fromRawData(m_buffer.constData() + start,
                                                    m_spectrumBufferLength);
-        m_spectrumPosition = position;
+        qint64 len = end-start+1;
+        if (len < m_spectrumBufferLength) {
+            qDebug() << Q_FUNC_INFO << "len" << len << "m_specbuflen" << m_spectrumBufferLength;
+        }
         m_spectrumAnalyser.calculate(m_spectrumBuffer, m_format);
     }
 
