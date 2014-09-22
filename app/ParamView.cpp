@@ -47,11 +47,12 @@ ParamView::ParamView(QWidget *parent, ParamBase *param ) :
         Param<int> * intParam = dynamic_cast<Param<int> *>(_param);
         int val = 0;
         intParam->getValue(val);
-#if 0
+#if 1
         QSpinBox *editorWidget = new QSpinBox;
         editorWidget->setRange(0, 10000);   // XXX need some way to set ranges etc.
         editorWidget->setSingleStep(1);
         editorWidget->setValue(val);
+        CHECKED_CONNECT(editorWidget, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
 #else
         QLineEdit *editorWidget = new QLineEdit;
         QIntValidator *validator = new QIntValidator(editorWidget);

@@ -53,12 +53,11 @@ void Transport::playPositionChanged(qint64 playPosition)
 {
     Q_ASSERT(playPosition >= 0);
 //    Q_ASSERT(playPosition <= m_bufferLength);
-    if  (playPosition <= m_bufferLength)
-        qDebug() << playPosition <<m_bufferLength;
+    if  (playPosition > m_bufferLength)
+        qDebug() << "ASSERTION FAIL" << Q_FUNC_INFO << playPosition <<m_bufferLength;
     m_playPosition = playPosition;
     repaint();
 }
-
 
 void Transport::mousePressEvent(QMouseEvent *event)
 {

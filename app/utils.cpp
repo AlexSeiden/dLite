@@ -102,3 +102,12 @@ qint16 realToPcm(qreal real)
 {
     return real * PCMS16MaxValue;
 }
+
+double clamp(double min, double max, double val)
+{
+    if (val < min)
+        return min;
+    if (val > max)
+        return max;
+    return val;
+}

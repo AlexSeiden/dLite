@@ -7,6 +7,7 @@
 #include "engine.h"
 
 class GraphWidget;
+class Dancefloorwidget;
 
 // Cupid
 //      How things get hooked together.
@@ -29,6 +30,10 @@ public:
                         { return _dancefloor;}
     void            setDancefloor(Dancefloor* dfmodel)
                         {_dancefloor = dfmodel;}
+    Dancefloorwidget*     getDancefloorwidget()
+                        { return _dancefloorwidget;}
+    void            setDancefloorwidget(Dancefloorwidget* dfwidget)
+                        {_dancefloorwidget = dfwidget;}
     Engine*         getEngine()
                         { return _engine;}
     void            setEngine(Engine* engine)
@@ -47,10 +52,13 @@ public:
                         {return Singleton()->_engine->getAudioFilename();}
 
 private:
-    QObject*         _spectrograph;
+    // Display widgets
+    QObject*              _spectrograph;
+    GraphWidget*          _graphWidget;
+    Dancefloorwidget*     _dancefloorwidget;
+
     Dancefloor*      _dancefloor;
     Engine*          _engine;
-    GraphWidget*     _graphWidget;
 };
 
 #endif // CUPID_H

@@ -12,7 +12,7 @@
 //  Node
 //  base class
 
-int Node::_nodeCount = 0;
+QList<Node*> Node::_allNodes;
 
 Node::Node() :
     _name(QString()),
@@ -20,14 +20,17 @@ Node::Node() :
     _type(UNDEFINED),
     _uuid(QUuid::createUuid())
 {
-    _nodeCount++;
+    _allNodes.append(this);
 }
 
-Node::~Node() {}
+Node::~Node() {
+    _allNodes.removeAll(this);
+}
 
-// The "beenSelected" method is virtual so that nodes like Sublevels
+// The "beenSelected" methods are virtual so that nodes like Sublevels
 // & Paths can communicate with special editors.
 void Node::beenSelected() {}
+void Node::beenDeselected() {}
 
 Node::node_t Node::getType()
 {
@@ -45,6 +48,8 @@ void Node::setParamParent()
     }
 }
 
+// evalAllInputs()
+//      Evaluates the providers connected to any input parameters.
 void Node::evalAllInputs()
 {
     foreach (ParamBase *p, getParams()) {
@@ -54,6 +59,9 @@ void Node::evalAllInputs()
     }
 }
 
+// evaluatedThisFrame()
+//      Predicate that returns true if the node has already been evaluated
+//      on this frame, and therefore shouldn't be evaluted again.
 bool Node::evaluatedThisFrame()
 {
     int frame =  Cupid::getCurrentFrame();
@@ -64,11 +72,11 @@ bool Node::evaluatedThisFrame()
     return false;
 }
 
+// Serialization
 void Node::readFromJSONObj(const QJsonObject &json)
 {
     _name      = json["name"].toString();
     _active    = json["active"].toBool();
-
 }
 
 void Node::writeToJSONObj(QJsonObject &json) const
@@ -93,6 +101,8 @@ void Node::writeToJSONObj(QJsonObject &json) const
      // TODO write graph view info
 }
 
+// getParamByName()
+//      Utility function that's used when reading a file from disk.
 ParamBase *Node::getParamByName(QString paramname)
 {
     // Return the parameter called "paramname"
@@ -104,8 +114,9 @@ ParamBase *Node::getParamByName(QString paramname)
     return nullptr;
 }
 
+
 // ------------------------------------------------------------------------------
-//  Node Factory
+//  NodeFactory
 
 NodeFactory::NodeFactory() {}
 
@@ -140,7 +151,13 @@ Node * NodeFactory::instatiateNode(QString classname, QUuid uuid)
     if (! uuid.isNull())
         instance->_uuid = uuid;  // GROSS this keeps uuid from being const.
     instance->_className = classname; // GROSS should get classname automatically in ctor
-    _allNodes.append(instance); // XXX Hmmm, this might be a good place to use a weak ptr.
+
+    // Add to list of all nodes instantiated so far.
+    // XXX Hmmm, this might be a good place to use a weak ptr.
+    // Alternatively, would it be better to maintain this list as a static
+    // member of the Node class, and have the ctors and dtors deal with this?
+    // I think yes.
+//    _allNodes.append(instance);
 
 #if 0
     // wrap instance in a shared ptr and return
@@ -190,6 +207,7 @@ bool NodeFactory::saveToFile(QString filename)
 
     QJsonDocument jsonDoc(sceneObject);
     qfile.write(jsonDoc.toJson());
+    _dirty = false;
 
     return true;
 }
@@ -198,7 +216,7 @@ void NodeFactory::writeToJSONObj(QJsonObject &json) const
 {
 
     QJsonArray nodeJsonArray;
-    foreach (const Node *node, _allNodes) {
+    foreach (const Node *node, allNodes()) {
          QJsonObject nodeJson;
          node->writeToJSONObj(nodeJson);
          nodeJsonArray.append(nodeJson);

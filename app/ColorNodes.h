@@ -26,6 +26,7 @@ class BriteColor : public Node
 public:
     BriteColor();
     void operator() ();
+    void paramHasBeenEdited();
 
 private:
     // Parameters
@@ -39,5 +40,18 @@ private:
     std::uniform_real_distribution<float> *_distVal;
 };
 
+class Palette : public Node
+{
+public:
+    Palette();
+    void operator() ();
+
+private:
+    // Parameters
+    Param<Lightcolor> _output;
+    Param<int> _selector;
+    QList<Param<Lightcolor> * > _allcolors;
+
+};
 
 #endif // COLORNODES_H

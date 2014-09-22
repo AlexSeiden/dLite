@@ -9,7 +9,7 @@
 PathNode::PathNode(QObject *parent) :
     QObject(parent)
 {
-    setName(QString("Path %1").arg(_nodeCount));
+    setName(QString("Path %1").arg(nodeCount()));
     _type = POSITION;
 
     _x.setName("x out");
@@ -42,6 +42,18 @@ void PathNode::beenSelected()
     // e.g.
     //  a current sublevelnode for the spectrograph,
     //  a current path editor or region editor for the dance floor
+    qDebug() << "path been selected";
+}
+
+void PathNode::beenDeselected()
+{
+    // Tells the path editor to display the current subrange.
+//    TODO emit iveBeenSelected(this);
+    // Do we need the notion of currently selected nodes for editors of various kinds?
+    // e.g.
+    //  a current sublevelnode for the spectrograph,
+    //  a current path editor or region editor for the dance floor
+    qDebug() << "path been deselected";
 }
 
 void PathNode::writeToJSONObj(QJsonObject &json) const
@@ -74,4 +86,4 @@ void PathNode::readFromJSONObj(const QJsonObject &json)
 }
 
 
-static Registrar<PathNode>   registrar("PathNode", Node::POSITION);
+static Registrar<PathNode>   registrar("Path", Node::POSITION);

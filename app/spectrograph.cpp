@@ -11,11 +11,8 @@ Spectrograph::Spectrograph(QWidget *parent)
     ,   m_lowFreq(10.0)
     ,   m_highFreq(1000.0)
     ,   m_printspectrum(false)
-    ,   m_isDragging(false)
     ,   m_dragStart(QPoint(0,0))
     ,   m_rubberBand(NULL)
-    ,   _selectedSublevelNode(nullptr)
-    ,   _showSubrange(false)
 {
     setMinimumHeight(100);
 }
@@ -57,7 +54,6 @@ void Spectrograph::setFreqHi(int val)
 
 // -----------------------------------------------------------------------------
 // paintEvent
-
 void Spectrograph::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
@@ -88,7 +84,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
         painter.drawLine(line);
     }
 
-    if (numBars == 0)   // Ummm, something is seriously wrong if numBars==0
+    if (numBars == 0)   // ErrorHandling Something is seriously wrong if numBars==0
         return;
 
     // Calculate width of bars and gaps
@@ -146,8 +142,8 @@ void Spectrograph::paintEvent(QPaintEvent *event)
     }
 
     // Do we have a subrange that should be drawn?
-    if (_showSubrange) {
-        QRectF subrangewindow = _subrange.getWindow();
+    if (showSubrange()) {
+        QRectF subrangewindow = getSubrangeWindow();
         QRectF subwin;
         subwin.setTop   (rect().height() * subrangewindow.top());
         subwin.setBottom(rect().height() * subrangewindow.bottom());
@@ -213,13 +209,11 @@ void Spectrograph::mouseReleaseEvent(QMouseEvent *event)
     amin = 1.0 - amin;
     amax = 1.0 - amax;
 
-    _subrange.setMinMax(fmin, fmax, amin, amax);
-    _subrange.setWin(subrect);
+    Subrange subr;
+    subr.setMinMax(fmin, fmax, amin, amax);
+    subr.setWin(subrect);
 
-    // Make sure appropriate SublevelNode & SublevelNodeItem are listening!
-    emit subrangeHasChanged(&_subrange);
-//    if (_selectedSublevelNode)
-//        _selectedSublevelNode->setSubrange(_subrange);
+    setSubrangeWindow(subr);
 
     // Cleanup & redraw.
     m_rubberBand->hide();
@@ -229,7 +223,6 @@ void Spectrograph::mouseReleaseEvent(QMouseEvent *event)
 void Spectrograph::reset()
 {
     m_spectrum.reset();
-    m_isDragging = false;
     spectrumChanged(m_spectrum);
 }
 
@@ -395,6 +388,19 @@ void Spectrograph::printSpectrum() {
     m_printspectrum = true;
 }
 
+void Spectrograph::submeterSelected(SublevelNode *chosen)
+{
+    _selectedSublevels.insert(chosen);
+    update();  // XXX Can optimize
+}
+
+void Spectrograph::submeterDeselected(SublevelNode *chosen)
+{
+    _selectedSublevels.remove(chosen);
+    update();  // XXX Can optimize
+}
+
+#if 0
 void Spectrograph::submeterSelectionChanged(SublevelNode *chosen)
 {
     _selectedSublevelNode = chosen;
@@ -411,6 +417,31 @@ void Spectrograph::displayThisSubrange(Subrange *subrange)
         _showSubrange = false;
 
     update();
+}
+#endif
+
+bool Spectrograph::showSubrange()
+{
+    if (_selectedSublevels.size() == 1)
+        return true;
+    return false;
+}
+
+QRectF Spectrograph::getSubrangeWindow()
+{
+    if (_selectedSublevels.size() == 1) {
+        QSet<SublevelNode*>::const_iterator i = _selectedSublevels.constBegin();
+        return (*i)->getSubrange()->getWindow();
+    }
+    return QRectF();
+}
+
+void Spectrograph::setSubrangeWindow(Subrange &subrange)
+{
+    if (_selectedSublevels.size() == 1) {
+        QSet<SublevelNode*>::const_iterator i = _selectedSublevels.constBegin();
+        (*i)->setSubrange(&subrange);
+    }
 }
 
 #if 0

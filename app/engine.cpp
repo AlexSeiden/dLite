@@ -16,14 +16,11 @@ Engine::Engine(QObject *parent)
     :   QObject(parent)
     ,   m_state(QAudio::StoppedState)
     ,   m_wavFileHandle(0)
-    ,   m_analysisFile(0)
     ,   m_audioOutputDevice(QAudioDeviceInfo::defaultOutputDevice())
     ,   m_audioOutput(0)
     ,   m_playPosition(0)
-    ,   m_bufferPosition(0)
     ,   m_spectrumBufferLength(0)
     ,   m_spectrumAnalyser()
-    ,   m_spectrumPosition(0)
     ,   m_notifyIntervalMs(10)      // TODO have some place to set this.
 {
     qRegisterMetaType<FrequencySpectrum>("FrequencySpectrum");
@@ -38,16 +35,16 @@ Engine::~Engine() { }
 
 //-----------------------------------------------------------------------------
 // Public functions
-//-----------------------------------------------------------------------------
 
-bool Engine::loadFile(const QString &fileName)
+bool Engine::loadSong(const QString &fileName)
 {
+    // TODO cleanup any already loaded file.
     ENGINE_DEBUG << fileName;
     m_audiofilename = fileName;
     reset();
     bool result = false;
-    Q_ASSERT(!m_wavFileHandle);
     Q_ASSERT(!fileName.isEmpty());
+
     m_wavFileHandle = new WavFile(this);
     if (m_wavFileHandle->open(fileName)) {
         if (isPCMS16LE(m_wavFileHandle->fileFormat())) {
@@ -66,18 +63,14 @@ bool Engine::loadFile(const QString &fileName)
     qint64 bytesToRead = m_wavFileHandle->size() - m_wavFileHandle->headerLength();
     m_buffer.resize(bytesToRead);
     int bytesRead = m_wavFileHandle->read(m_buffer.data(), bytesToRead);
-    qDebug() << bytesRead << bytesToRead << m_wavFileHandle->size() << m_wavFileHandle->headerLength();
+    // ErrorHandling
+
+    m_wavFileHandle->close();
     _qbuf.setBuffer(&m_buffer);
     _qbuf.open(QIODevice::ReadOnly);
     _qbuf.seek(0);
     emit bufferLengthChanged(bufferLength());
-//    emit dataLengthChanged(dataLength());
 
-    if (result) {
-        // XXX why do we need both?
-        m_analysisFile = new WavFile(this);
-        m_analysisFile->open(fileName);
-    }
     return result;
 }
 
@@ -94,7 +87,6 @@ void Engine::setWindowFunction(WindowFunction type)
 
 //-----------------------------------------------------------------------------
 // Public slots
-//-----------------------------------------------------------------------------
 
 void Engine::startPlayback()
 {
@@ -108,11 +100,14 @@ void Engine::startPlayback()
                         this, SLOT(audioStateChanged(QAudio::State)));
         CHECKED_CONNECT(m_audioOutput, SIGNAL(notify()),
                         this, SLOT(audioNotify()));
-        m_wavFileHandle->seek(0);
-        m_bufferPosition = 0;
         _qbuf.seek(0);
         m_audioOutput->start(&_qbuf);
     }
+}
+
+void Engine::rewind()
+{
+    movePlaybackHead(0.0);
 }
 
 void Engine::movePlaybackHead(double positionfraction)
@@ -151,7 +146,6 @@ void Engine::togglePlayback()
 
 //-----------------------------------------------------------------------------
 // Private slots
-//-----------------------------------------------------------------------------
 
 void Engine::audioNotify()
 {
@@ -161,8 +155,6 @@ void Engine::audioNotify()
 
     // Why would we be beyond the bufferLength???
     setPlayPosition(qMin(bufferLength(), playPosition));  // NUKEME
-
-//   NUKEME  Q_ASSERT(m_wavFileHandle);
 
     // Look backwards from the playPosition when computing the spectrum
     const qint64 spectrumPosition = playPosition - m_spectrumBufferLength;
@@ -193,13 +185,14 @@ void Engine::audioStateChanged(QAudio::State state)
     // Check error
     QAudio::Error error = QAudio::NoError;
     error = m_audioOutput->error();
-    if (QAudio::NoError != error)
+    if (error != QAudio::NoError)
         ENGINE_DEBUG << "Engine::audioStateChanged [0] error " << error ;
 
-    if (QAudio::IdleState == state && m_wavFileHandle && m_wavFileHandle->pos() == m_wavFileHandle->size()) {
+    if (state == QAudio::IdleState && _qbuf.pos() == _qbuf.size()) {
+        // The song is over!
         stopPlayback();
     } else {
-        if (QAudio::StoppedState == state) {
+        if (state == QAudio::StoppedState) {
             // Check error
             QAudio::Error error = QAudio::NoError;
             error = m_audioOutput->error();
@@ -220,21 +213,20 @@ void Engine::audioStateChanged(QAudio::State state)
 
 void Engine::spectrumChanged(const FrequencySpectrum &spectrum)
 {
-    ENGINE_DEBUG << "Engine::spectrumChanged" << "pos" << m_spectrumPosition;
-    emit spectrumChanged(m_spectrumPosition, m_spectrumBufferLength, spectrum);
+//    ENGINE_DEBUG << "Engine::spectrumChanged" << "pos" << m_spectrumPosition;
+    // XXX position excluded
+    emit spectrumChanged(0, m_spectrumBufferLength, spectrum);
 }
 
 
 //-----------------------------------------------------------------------------
 // Private functions
-//-----------------------------------------------------------------------------
 
 void Engine::resetAudioDevices()
 {
     delete m_audioOutput;
     m_audioOutput = 0;
     setPlayPosition(0);
-    m_spectrumPosition = 0;
 }
 
 void Engine::reset()
@@ -244,12 +236,7 @@ void Engine::reset()
     setFormat(QAudioFormat());
     delete m_wavFileHandle;
     m_wavFileHandle = 0;
-    delete m_analysisFile;
-    m_analysisFile = 0;
     m_buffer.clear();
-    m_bufferPosition = 0;
-//    m_dataLength = 0;
-// NUKEME   emit dataLengthChanged(0); // XXX may want to emit songChanged()
     resetAudioDevices();
 }
 
@@ -275,7 +262,6 @@ bool Engine::initialize()
         qDebug() << "                  " << "actual    notify interval" << m_audioOutput->notifyInterval();
     }
 
-//    ENGINE_DEBUG << "Engine::initialize" << "m_dataLength" << m_dataLength;
     ENGINE_DEBUG << "Engine::initialize" << "format" << m_format;
 
     return result;
@@ -320,6 +306,8 @@ void Engine::setState(QAudio::State state)
     }
 }
 
+// XXX should we nuke this, and get play position 'live'?
+// or does the check-for-pos-changed save updates?
 void Engine::setPlayPosition(qint64 position, bool forceEmit)
 {
     const bool changed = (m_playPosition != position);
@@ -343,7 +331,8 @@ void Engine::calculateSpectrum(qint64 start, qint64 end)
                                                    m_spectrumBufferLength);
         qint64 len = end-start+1;
         if (len < m_spectrumBufferLength) {
-            qDebug() << Q_FUNC_INFO << "len" << len << "m_specbuflen" << m_spectrumBufferLength;
+            // TODO make sure this reads correct shortened buffer
+            ENGINE_DEBUG << Q_FUNC_INFO << "len" << len << "m_specbuflen" << m_spectrumBufferLength;
         }
         m_spectrumAnalyser.calculate(m_spectrumBuffer, m_format);
     }

@@ -4,7 +4,6 @@
 #include "spectrum.h"
 #include "spectrumanalyser.h"
 #include "wavfile.h"
-#include "Cue.h"
 
 #include <QAudioDeviceInfo>
 #include <QAudioFormat>
@@ -16,16 +15,18 @@
 
 class FrequencySpectrum;
 class Dancefloor;
+
 QT_BEGIN_NAMESPACE
 class QAudioInput;
 class QAudioOutput;
 QT_END_NAMESPACE
 
 /*
- * This class interfaces with the Qt Multimedia audio classes, and also with
- * the SpectrumAnalyser class.  Its role is to manage the playback
- * of audio data, while performing real-time analysis of the audio
+ * This class interfaces with the Qt Multimedia audio classes, and
+ * the SpectrumAnalyser class.  Its manages audio playback
+ * and sends data to the SpectrumAnalyser to calculate the
  * frequency spectrum.
+ * It calls the Dancefloor when it's time to evaluate.
  */
 class Engine : public QObject
 {
@@ -43,28 +44,18 @@ public:
     // note May be QAudioFormat() if engine is not initialized
     const QAudioFormat& format() const { return m_format; }
 
-    // Stop any ongoing recording or playback, and reset to ground state.
+    // Stop playback and reset to ground state.
     void reset();
 
     // Load data from WAV file
-    bool loadFile(const QString &fileName);
+    bool loadSong(const QString &fileName);
 
-    // Position of the audio output device.
-    // \return Position in bytes.
-//    qint64 playPosition() const {return m_playPosition;}
-
-    // Position of the audio output device.
-    // \return Position in microseconds.
-//    qint64 getCurrentTime() const {return _uSecs;}
+    // Playback position in microseconds.
     qint64 getCurrentTime() const;
     QString getAudioFilename() const {return m_audiofilename;}
 
     // Length of the song in bytes.
     qint64 bufferLength() const;
-
-    // Amount of data held in the buffer.
-    // \return Data length in bytes.
-//    qint64 dataLength() const { return m_dataLength; }
 
     // Set window function applied to audio data before spectral analysis.
     void setWindowFunction(WindowFunction type);
@@ -74,6 +65,7 @@ public slots:
     void startPlayback();
     void suspend();
     void togglePlayback();
+    void rewind();
     void movePlaybackHead(double positionfraction);
     void setUpdateInterval(int val);
 
@@ -92,10 +84,6 @@ signals:
     // Length of buffer has changed.
     // \param duration Duration in microseconds
     void bufferLengthChanged(qint64 duration);
-
-    // Amount of data in buffer has changed.
-    // \param Length of data in bytes
-//    void dataLengthChanged(qint64 duration);
 
     // Position of the audio output device has changed.
     // \param position Position in bytes
@@ -122,18 +110,12 @@ private:
     void setFormat(const QAudioFormat &format);
     void setPlayPosition(qint64 position, bool forceEmit = false);
     void calculateLevel(qint64 position, qint64 length);
-#if 0
-    void calculateSpectrum(qint64 position);
-#endif
     void calculateSpectrum(qint64 start, qint64 end);
 
 private:
     QAudio::State       m_state;
 
     WavFile*            m_wavFileHandle;
-    // We need a second file handle via which to read data into m_buffer for analysis
-    WavFile*            m_analysisFile;
-
     QAudioFormat        m_format;
 
     QAudioDeviceInfo    m_audioOutputDevice;
@@ -141,15 +123,11 @@ private:
     qint64              m_playPosition;
 
     QByteArray          m_buffer;
-    qint64              m_bufferPosition;
-    QBuffer             _qbuf;
-
-    int                 m_levelBufferLength;
+    QBuffer             _qbuf;  // TODO better name
 
     int                 m_spectrumBufferLength;	// in bytes
     QByteArray          m_spectrumBuffer;
     SpectrumAnalyser    m_spectrumAnalyser;
-    qint64              m_spectrumPosition;
 
     // Interval in milliseconds between calls that update the spectrum, etc.
     int    				m_notifyIntervalMs;

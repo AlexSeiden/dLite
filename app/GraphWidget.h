@@ -3,11 +3,14 @@
 
 #include <QWidget>
 #include <QList>
+#include <QSet>
+
 //#include "CuesheetScene.h"
 //#include "CuesheetView.h"
 #include "Param.h"
 
 class Node;
+class NodeItem;
 class Subrange;
 class CuesheetScene;
 class CuesheetView;
@@ -23,7 +26,7 @@ public:
     explicit GraphWidget(QWidget *parent = 0);
     ~GraphWidget() {}
 
-    void addAllNodes(QList<Node*> allNodes);
+    void addTheseNodes(QList<Node*> aBunchOfNodes);
 
 public slots:
     void addNode(Node *node);
@@ -40,6 +43,8 @@ private:
 
     CuesheetScene *     _scene;
     CuesheetView *      _csview;
+    QSet<NodeItem*>     _wasSelected;
+
 
 protected:
     void    keyPressEvent(QKeyEvent *event);

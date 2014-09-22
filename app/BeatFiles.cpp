@@ -5,11 +5,8 @@
 #include <fstream>
 #include <sstream>
 
-
 // TODO master todo here (because it's the first src file.)
 /*
-
- AudioNotify drop
 
  Hardware interface!
  Saving!
@@ -17,21 +14,20 @@
 
  Node Types:
    color nodes:
-        palette
+        palette  -- improve
         spline
    beats!
         segmentino
         breakdown viewer
+        multiply beats
    Regions
    Paths
 
- Grid BG option in graph view
 
  Compositing modes
  Firing decay modes
 
  playback controller
-      progress bar with clicking
       multiple queued songs
 
  multiple tabbed cue sheets
@@ -39,11 +35,22 @@
  more Shape rendering with QPainter
 
 global hotkeys:
-  space to start/stop
   frame all / frame selected  (Still a little funky)
-  rewind
 
  compmode & decaymode pups on cuewidgets
+ edit nodenames in graph
+
+ Drawing:
+     Grid BG option in graph view
+     spectrograph Hz labels
+     dance floor cell numbers
+     nicer colors
+     color-coded paramitems
+     color-coded connectors
+     param-view transparent bg
+     Collapsed mode
+
+"_dirty" bit
 
 Cleaning:
     Remnants of original spectrum audio recording stuff in bufferlength and
@@ -51,8 +58,15 @@ Cleaning:
     Clean up object model & separation-of-concerns
 
 Bugs:
+    AudioNotify drop
 
 */
+
+// ------------------------------------------------------------------------------
+//  BeatFiles
+//
+//      Nodes that read precomputed beat and bar info, and generate triggers
+//      based on that.
 
 // ------------------------------------------------------------------------------
 //  TriggerEvery

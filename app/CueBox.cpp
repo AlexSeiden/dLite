@@ -74,4 +74,4 @@ void CueBox::evaluate()
 }
 
 
-static Registrar<CueBox>     registrar("BoxCue", Node::CUE);
+static Registrar<CueBox>     registrar("Box", Node::CUE);

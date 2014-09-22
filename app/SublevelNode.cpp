@@ -9,7 +9,7 @@
 SublevelNode::SublevelNode(QObject *parent) :
     QObject(parent)
 {
-    setName(QString("SublevelNode%1").arg(_nodeCount));
+    setName(QString("SublevelNode%1").arg(nodeCount()));
     _type = FLOAT;
 
     _output.setName("out");
@@ -19,19 +19,23 @@ SublevelNode::SublevelNode(QObject *parent) :
     _paramList << &_output;
     setParamParent();
 
+    // connect level to rangemeter widget for display
     CHECKED_CONNECT(Cupid::Singleton()->getEngine(),
                     SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
                     this,
                     SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
-    // New subranges are sent back to the nodes inside GraphWidget, at the moment.
-//    CHECKED_CONNECT(Cupid::Singleton()->getSpectrograph(),
-//                    SIGNAL(subrangeHasChanged(Subrange *)),
-//                    this,
-//                    SLOT(setSubrange(Subrange *)));
+
+    // Update the spectrograph with selections, so that
+    // it can display selected window, as well as send changes
+    // back to this node.
     CHECKED_CONNECT(this,
-                    SIGNAL(iveBeenSelected(SublevelNode*)),
+                    SIGNAL(sublevelSelected(SublevelNode*)),
                     Cupid::Singleton()->getSpectrograph(),
-                    SLOT(submeterSelectionChanged(SublevelNode *)));
+                    SLOT(submeterSelected(SublevelNode *)));
+    CHECKED_CONNECT(this,
+                    SIGNAL(sublevelDeselected(SublevelNode*)),
+                    Cupid::Singleton()->getSpectrograph(),
+                    SLOT(submeterDeselected(SublevelNode *)));
 }
 
 void SublevelNode::spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum)
@@ -98,9 +102,12 @@ void SublevelNode::operator()()
 
 void SublevelNode::beenSelected()
 {
-    // Tells the spectrograph to display the current subrange.
-    emit displayThisSubrange(_range);
-    emit iveBeenSelected(this);
+    emit sublevelSelected(this);
+}
+
+void SublevelNode::beenDeselected()
+{
+    emit sublevelDeselected(this);
 }
 
 void SublevelNode::writeToJSONObj(QJsonObject &json) const
@@ -124,4 +131,4 @@ void SublevelNode::readFromJSONObj(const QJsonObject &json)
 }
 
 
-static Registrar<SublevelNode>   registrar("SublevelNode", Node::FLOAT);
+static Registrar<SublevelNode>   registrar("Spectral Range", Node::FLOAT);

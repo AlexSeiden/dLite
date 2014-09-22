@@ -22,6 +22,7 @@ public:
     SublevelNode(QObject *parent = 0);
     void operator() ();
     void beenSelected();
+    void beenDeselected();
 
     Subrange *getSubrange() {return &_range;}
     virtual void readFromJSONObj(const QJsonObject &json);
@@ -30,15 +31,15 @@ public:
 
 public slots:
     void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
-    void setSubrange(Subrange *range) {_range = *range;}
+    void setSubrange(Subrange *range) {_range = *range;}    // NUKEMEMAYBE obsolete?
 
 signals:
-    // used by RangeMeter widget:
+    // used for display, by the RangeMeter widget:
     void levelChanged(qreal level);
 
-    // used by Spectrograph widget:
-    void displayThisSubrange(const Subrange &subrange);
-    void iveBeenSelected(SublevelNode *me);
+    // used for editing, by Spectrograph widget:
+    void sublevelSelected(SublevelNode *me);
+    void sublevelDeselected(SublevelNode *me);
 
 private:
     void calculateLevel();
@@ -50,9 +51,8 @@ private:
     Subrange            _range;
 };
 
-// XXX dunno why this doesn't compile;
-// Perhaps automatic b/c derived from QObject?
-// may not be needed--are we actually using the iveBeenSelected method?
+// XXX this doesn't compile; but also doesn't seem needed. Dunno why.
+// Perhaps its automatic when from QObject?
 // Q_DECLARE_METATYPE(SublevelNode)
 
 #endif // SUBLEVELNODE_H

@@ -77,7 +77,7 @@ RandomInt::RandomInt() :
     _max(20),
     _trigger(true)
 {
-    setName(QString("RandomInt%1").arg(_nodeCount));
+    setName(QString("RandomInt%1").arg(nodeCount()));
     _type = INT;
 
     // Declare params.
@@ -153,7 +153,7 @@ SequenceInt::SequenceInt() :
     _max(12),
     _trigger(true)
 {
-    setName(QString("SequenceInt%1").arg(_nodeCount));
+    setName(QString("SequenceInt%1").arg(nodeCount()));
     _type = INT;
 
     // Declare params.

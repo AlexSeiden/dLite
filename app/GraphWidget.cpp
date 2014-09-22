@@ -46,14 +46,24 @@ GraphWidget::GraphWidget(QWidget *parent) :
 void GraphWidget::selectionChanged()
 {
     QList<QGraphicsItem *> selection = _scene->selectedItems();
+    QSet<NodeItem*> newSelection;
     foreach (QGraphicsItem *item, selection) {
         NodeItem *nodeItem = dynamic_cast<NodeItem *>(item);
-        if (nodeItem){
-            nodeItem->beenSelected();
-        }
+        if (nodeItem)
+            newSelection.insert(nodeItem);
     }
+    QSet<NodeItem*> itemsDeselected = _wasSelected - newSelection;
+    QSet<NodeItem*> itemsNewlySelected = newSelection - _wasSelected;
+
+    foreach (NodeItem* item, itemsDeselected)
+        item->beenDeselected();
+
+    foreach (NodeItem* item, itemsNewlySelected)
+        item->beenSelected();
+
     // TODO if no SublevelNode selected, setSubrange = NULL
-    // TODO Allow selection of Connections
+
+    _wasSelected = newSelection;
 }
 
 void GraphWidget::subrangeHasChanged(Subrange *subrange)
@@ -75,14 +85,14 @@ void GraphWidget::subrangeHasChanged(Subrange *subrange)
     }
 }
 
-void GraphWidget::addAllNodes(QList<Node*> allNodes)
+void GraphWidget::addTheseNodes(QList<Node*> aBunchOfNodes)
 {
     // First add all the nodes...
-    foreach (Node *node, allNodes)
+    foreach (Node *node, aBunchOfNodes)
         addNode(node);
 
     // ...then make all the connections.
-    foreach (Node *node, allNodes) {
+    foreach (Node *node, aBunchOfNodes) {
         foreach (ParamBase *param, node->getParams()) {
             if (param->connectedParam()) {
                 addConnection(param->connectedParam(), param);

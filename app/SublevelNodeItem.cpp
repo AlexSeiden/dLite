@@ -12,9 +12,8 @@ SublevelNodeItem::SublevelNodeItem(Node *node, QGraphicsItem *parent) :
     _sln = dynamic_cast<SublevelNode *>(node);
     _slm = new RangeMeter();
     CHECKED_CONNECT(_sln, SIGNAL(levelChanged(qreal)), _slm, SLOT(levelChanged(qreal)));
-    QGraphicsProxyWidget *proxy = scene()->addWidget(_slm);
-    proxy->setParentItem(this);
-//    proxy->setPos(0, this->boundingRect().height());
+    QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
+    proxy->setWidget(_slm);
     proxy->setPos(0, GuiSettings::paramHeight*2);
 }
 
@@ -31,17 +30,14 @@ QRectF SublevelNodeItem::boundingRect() const
 // RangeMeter
 
 RangeMeter::RangeMeter(QWidget *parent)
-    :   QWidget(parent)
+    :   QWidget(parent),
+      _level(0.0)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    //setFixedSize(GuiSettings::nodeWidth, GuiSettings::SublevelHeight);
     setFixedSize(GuiSettings::nodeWidth, GuiSettings::sl_barHeight);
 }
 
-RangeMeter::~RangeMeter()
-{
-
-}
+RangeMeter::~RangeMeter() {  }
 
 void RangeMeter::paintEvent(QPaintEvent *event)
 {
@@ -59,7 +55,10 @@ void RangeMeter::paintEvent(QPaintEvent *event)
     QRect squareRect = rect();
     squareRect.setLeft(rect().right()-rect().height());
     QColor pulseColor;
-    pulseColor.setHsvF(0.0, 0.0, _level);
+    double clampedLevel = _level;
+    clampedLevel = qMin(0.,clampedLevel);
+    clampedLevel = qMax(1.,clampedLevel);
+    pulseColor.setHsvF(0.0, 0.0, clampedLevel);
     painter.fillRect(squareRect, pulseColor);
     painter.drawRect(squareRect);
 }

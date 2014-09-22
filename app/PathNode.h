@@ -11,6 +11,8 @@
 
 class PathNode : public QObject, public Node
 {
+    Q_OBJECT
+
     struct Position {
         int x,y;
     };
@@ -19,6 +21,7 @@ public:
     PathNode(QObject *parent = 0);
     void operator() ();
     void beenSelected();
+    void beenDeselected();
 
     virtual void readFromJSONObj(const QJsonObject &json);
     virtual void writeToJSONObj(QJsonObject &json) const;

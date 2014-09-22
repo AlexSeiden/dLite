@@ -29,8 +29,9 @@ bool isPCM(const QAudioFormat &format);
 // Check whether the audio format is signed, little-endian, 16-bit PCM
 bool isPCMS16LE(const QAudioFormat &format);
 
-// Compile-time calculation of powers of two
-// WTF
+double clamp(double min, double max, double val);
+
+// WTF Compile-time calculation of powers of two
 template<int N> class PowerOfTwo
 { public: static const int Result = PowerOfTwo<N-1>::Result * 2; };
 

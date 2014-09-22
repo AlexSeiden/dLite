@@ -41,6 +41,7 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_settingsDialog(new SettingsDialog(m_engine->interval(), this))
     ,   m_dancefloor(new Dancefloor)  // TODO should be allocated in main?
     ,   m_cueLibView(NULL)
+    ,   _filename()
 {
 
     // numBands, lowfreq, hifreq.
@@ -74,13 +75,15 @@ MainWidget::MainWidget(QWidget *parent)
 
     // TODO default to last played.
     //m_engine->loadFile(QString("/Users/alex/Documents/lights/Jam On It/Jam On It.wav"));
-    m_engine->loadFile(QString("/Users/alex/Documents/WAVS/Awesome/Awesome.wav"));
+    m_engine->loadSong(QString("/Users/alex/Documents/WAVS/Awesome/Awesome.wav"));
 
 
     // OK, these are essentially globals:  GROSS
-    Cupid::Singleton()->setSpectrograph(m_spectrograph);
-    Cupid::Singleton()->setDancefloor(m_dancefloor);
     Cupid::Singleton()->setEngine(m_engine);
+    Cupid::Singleton()->setDancefloor(m_dancefloor);
+
+    Cupid::Singleton()->setSpectrograph(m_spectrograph);
+    Cupid::Singleton()->setDancefloorwidget(m_dancefloorwidget);
     Cupid::Singleton()->setGraphWidget(m_graphWidget);
 
     createShortcuts();
@@ -111,6 +114,14 @@ void MainWidget::spectrumChanged(qint64 position, qint64 length,
     Q_UNUSED(length)
     // ??? Why is this a function call, instead of a signal?
     m_spectrograph->spectrumChanged(spectrum);
+}
+
+void MainWidget::save()
+{
+    if (_filename.isEmpty() || _filename.isNull())
+        showSaveDialog();
+    else
+        NodeFactory::Singleton()->saveToFile(_filename);
 }
 
 #if 0 // NUKEMEMAYBE
@@ -159,14 +170,14 @@ void MainWidget::bufferLengthChanged(qint64 length)
 // Private slots
 //-----------------------------------------------------------------------------
 
-void MainWidget::showFileDialog()
+void MainWidget::showLoadSongDialog()
 {
     // TODO Load & queue multiple files
     const QString dir;
     const QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open WAV file"), dir, "*.wav");
     if (fileNames.count()) {
         reset();
-        m_engine->loadFile(fileNames.front()); // TODO open multiple files
+        m_engine->loadSong(fileNames.front()); // TODO open multiple files
         updateButtonStates();
     }
 }
@@ -174,20 +185,25 @@ void MainWidget::showFileDialog()
 void MainWidget::showSaveDialog()
 {
     const QString dir = QDir::homePath(); // XXX
-    const QString fileName = QFileDialog::getSaveFileName(this, tr("Save file"), dir);
-    if (! fileName.isEmpty()) {
-        NodeFactory::Singleton()->saveToFile(fileName);
+    _filename = QFileDialog::getSaveFileName(this, tr("Save file"), dir);
+    if (! _filename.isEmpty()) {
+        if (! _filename.endsWith(".dlite"))
+            _filename.append(".dlite");
+        NodeFactory::Singleton()->saveToFile(_filename);
     }
 }
 
 void MainWidget::showOpenDialog()
 {
     const QString dir = QDir::homePath(); // XXX
-    const QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open dLite file"), dir, "*.json *.dLite");
-    if (fileNames.count()) {
-        QString fileName = fileNames.front(); // TODO open multiple files
-        NodeFactory::Singleton()->readFromFile(fileName);
-        m_graphWidget->addAllNodes(NodeFactory::Singleton()->allNodes());
+    const QString fileName = QFileDialog::getOpenFileName(this, tr("Open dLite file"), dir, "*.json *.dLite");
+    // TODO open multiple files
+    if (! fileName.isEmpty() && ! fileName.isNull()) {
+        bool result = NodeFactory::Singleton()->readFromFile(fileName);
+        if (result) {
+            _filename = fileName;
+            m_graphWidget->addTheseNodes(NodeFactory::Singleton()->allNodes());
+        }
         updateButtonStates();
     }
 }
@@ -281,7 +297,7 @@ void MainWidget::connectUi()
             m_engine, SLOT(startPlayback()));
 
     CHECKED_CONNECT(m_fileButton, SIGNAL(clicked()),
-            this, SLOT(showFileDialog()));
+            this, SLOT(showLoadSongDialog()));
 
     CHECKED_CONNECT(m_saveButton, SIGNAL(clicked()),
             this, SLOT(showSaveDialog()));
@@ -298,10 +314,6 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_engine, SIGNAL(bufferLengthChanged(qint64)),
             this, SLOT(bufferLengthChanged(qint64)));
 
-#if 0
-    CHECKED_CONNECT(m_engine, SIGNAL(dataLengthChanged(qint64)),
-            this, SLOT(updateButtonStates()));
-#endif
     // TODO There should be a "song changed" signal/slot
 
     CHECKED_CONNECT(m_engine, SIGNAL(playPositionChanged(qint64)),
@@ -348,6 +360,7 @@ void MainWidget::createShortcuts()
     m_spaceShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_spaceShortcut, SIGNAL(activated()), m_engine, SLOT(togglePlayback()));
 
+    // Graph view shortcuts
     m_frameAllShortcut = new QShortcut(Qt::Key_A, this);
     m_frameAllShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_frameAllShortcut, SIGNAL(activated()), m_graphWidget, SLOT(frameAll()));
@@ -355,6 +368,25 @@ void MainWidget::createShortcuts()
     m_frameSelectedShortcut = new QShortcut(Qt::Key_F, this);
     m_frameSelectedShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_frameSelectedShortcut, SIGNAL(activated()), m_graphWidget, SLOT(frameSelection()));
+
+    // Saving
+    m_saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
+    m_saveShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_saveShortcut, SIGNAL(activated()), this, SLOT(save()));
+
+    m_saveAsShortcut = new QShortcut(QKeySequence("Ctrl+Shift+S"), this);
+    m_saveAsShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_saveAsShortcut, SIGNAL(activated()), this, SLOT(showSaveDialog()));
+
+    m_openFileShortcut = new QShortcut(QKeySequence("Ctrl+O"), this);
+    m_openFileShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_openFileShortcut, SIGNAL(activated()), this, SLOT(showOpenDialog()));
+
+    // rewind
+    m_rewindShortcut = new QShortcut(QKeySequence("Ctrl+0"), this);
+    m_rewindShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_rewindShortcut, SIGNAL(activated()), m_engine, SLOT(rewind()));
+
 }
 
 void MainWidget::updateButtonStates()

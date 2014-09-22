@@ -8,11 +8,10 @@
 
 #include <QWidget>
 #include <QRubberBand>
+#include <QSet>
 
-/**
- * Widget which displays a spectrograph showing the frequency spectrum
- * of the window of audio samples most recently analyzed by the Engine.
- */
+// Widget which displays a spectrograph showing the frequency spectrum
+// of the window of audio samples most recently analyzed by the Engine.
 class Spectrograph : public QWidget
 {
     Q_OBJECT
@@ -43,8 +42,8 @@ public slots:
     void setFreqLo(int val);
     void setFreqHi(int val);
     void printSpectrum();
-    void submeterSelectionChanged(SublevelNode *chosen);
-    void displayThisSubrange(Subrange *subrange);
+    void submeterSelected(SublevelNode *chosen);
+    void submeterDeselected(SublevelNode *chosen);
 
 private:
     int barIndex(qreal frequency) const;
@@ -54,6 +53,9 @@ private:
     QPair<qreal, qreal> barRange(int barIndex, bool logspace) const;
     QPair<qreal, qreal> barRangeLog(int barIndex) const;
     void updateBars();
+    bool showSubrange();
+    QRectF getSubrangeWindow();
+    void setSubrangeWindow(Subrange &subr);
 
 protected:
     qreal frac2freq(qreal frac) const;
@@ -79,13 +81,10 @@ private:
     bool   				m_printspectrum;
 
     // For dragging out subregions
-    bool   				m_isDragging;
     QPoint				m_dragStart;
     QRubberBand*		m_rubberBand;
 
-    SublevelNode *      _selectedSublevelNode;
-    bool                _showSubrange;
-    Subrange            _subrange;
+    QSet<SublevelNode*> _selectedSublevels;
 
 };
 

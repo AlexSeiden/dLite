@@ -33,11 +33,7 @@ class RandomInt : public Node
 {
 public:
     RandomInt();
-
-    // Functor that provides closure over instance object,
-    // and allows downstream clients to evaluate.
     void operator() ();
-
     void paramHasBeenEdited();
 
 private:

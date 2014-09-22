@@ -50,7 +50,6 @@ public:
 
     virtual node_t      getType();
     QList<ParamBase *>  getParams()        {return _paramList;}
-
     virtual QString     getClass()         {return _className;}
 
     // Functor that provides closure over instance object,
@@ -75,6 +74,8 @@ private:
     virtual void doEvalOperation() = 0;
 #endif
 
+    static int nodeCount() {return _allNodes.size();}
+
     // Called by editor widgets when a parameter has been changed.
     // Most nodes don't need this--only onces like RandomInt where
     // setup has to be re-run when parameters change.
@@ -84,6 +85,7 @@ private:
     // (such as the SubrangeNode) where selection matters to other
     // widgets in editors.  (GROSS--a view thing in the model?)
     virtual void        beenSelected();
+    virtual void        beenDeselected();
 
     // Boilerplate call in every operator(); checks to make sure
     // that the operator hasn't been run already for a given frame.
@@ -93,15 +95,13 @@ private:
     // Serialization
     virtual void readFromJSONObj(const QJsonObject &json);
     virtual void writeToJSONObj(QJsonObject &json) const;
+    static QList<Node*>    allNodes() {return _allNodes;}
 
 protected:
     // Boilerplate call in every ctor; sets a pointer from
     // the parameter back to the parent.
     void                setParamParent();
     ParamBase *         getParamByName(QString paramname);
-
-
-    static  int         _nodeCount; // TODO remove this
 
     void                evalAllInputs();
 
@@ -112,6 +112,8 @@ protected:
     int                   _frameLastEvaluated;
     /*const */QUuid       _uuid;        // Could be const except for need to assign in NodeFactory::instantiateNode when reading from file.
     QString               _className;
+
+    static QList<Node *>  _allNodes;
 
     // This is so instantiateNode can set classname:
     //friend Node* NodeFactory::instatiateNode(QString classname);
@@ -129,15 +131,10 @@ public:
 
     typedef  std::function<Node*(void)> NodeInstatiator_t;
 
-#if 0
-    std::shared_ptr<Node> instatiateNode(QString name);
-#else
-    Node *instatiateNode(QString classname, QUuid uuid=0);
-#endif
-
-    void registerNodetype(QString classname, Node::node_t typeInfo, NodeInstatiator_t instantiatorFunction);
-    const QStringList & getNodesOfType(Node::node_t typeInfo);
-    QList<Node*>        allNodes() {return _allNodes;}
+    Node*           instatiateNode(QString classname, QUuid uuid=0);
+    void            registerNodetype(QString classname, Node::node_t typeInfo, NodeInstatiator_t instantiatorFunction);
+    const QStringList& getNodesOfType(Node::node_t typeInfo);
+    QList<Node*>    allNodes() const {return Node::allNodes();}
 
     static NodeFactory *Singleton();
 
@@ -149,8 +146,6 @@ public:
     void writeToJSONObj(QJsonObject &json) const;
 
 private:
-
-
     // Registry
     std::map<std::string, NodeInstatiator_t>    _registry;
     QMap<Node::node_t, QStringList>             _registryByType;
@@ -158,9 +153,7 @@ private:
     QMap<QUuid, ParamBase*>                     _registryUUIDtoParam;
     QMap<ParamBase *, QUuid>                    _connectionsToMake;
 
-    // Inventory
-    // GROSS Maybe this belongs to dancefloor???
-    QList<Node *>   _allNodes;
+    bool            _dirty;     // TODO set this, or maybe move it
 };
 
 

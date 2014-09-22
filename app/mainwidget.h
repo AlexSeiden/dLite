@@ -51,16 +51,20 @@ public slots:
     void errorMessage(const QString &heading, const QString &detail);
 #endif
 
+    void save();
+    void showSaveDialog();
+
+    // XXX is this still needed?
     void audioPositionChanged(qint64 position);
 
+    // XXX is this needed?  only for new songs--which should be a separate slot
     void bufferLengthChanged(qint64 length);
 
     // XXX This is more of a "model" or "controller" issue than a view/widget one.
     void newNodeRequest(QString name);
 
 private slots:
-    void showFileDialog();
-    void showSaveDialog();
+    void showLoadSongDialog();
     void showOpenDialog();
     void showSettingsDialog();
     void updateButtonStates();
@@ -92,6 +96,10 @@ private:
     QShortcut*              m_spaceShortcut;
     QShortcut*              m_frameAllShortcut;
     QShortcut*              m_frameSelectedShortcut;
+    QShortcut*              m_saveShortcut;
+    QShortcut*              m_saveAsShortcut;
+    QShortcut*              m_openFileShortcut;
+    QShortcut*              m_rewindShortcut;
 
 #if 1 // NUKEMEMAYBE
     QLabel*                 m_infoMessage;
@@ -104,6 +112,8 @@ private:
     Dancefloorwidget *      m_dancefloorwidget;
     CueLibView *            m_cueLibView;
     GraphWidget *           m_graphWidget;
+
+    QString                 _filename;
 };
 
 #endif // MAINWIDGET_H

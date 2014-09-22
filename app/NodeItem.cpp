@@ -70,14 +70,13 @@ QRectF NodeItem::boundingRect() const
 
 void NodeItem::paint(QPainter *painter,
            const QStyleOptionGraphicsItem *option, QWidget *widget)
-// XXX I don't think I'm handling the QStyleOptions stuff correctly.
 {
-    Q_UNUSED(option);
+    Q_UNUSED(option); // XXX I don't think I'm handling the QStyleOptions stuff correctly.
     Q_UNUSED(widget);
     painter->save();
 
     //painter->setBrush(dragOver ? color.light(130) : GuiColors::nodeBGColor);
-    // TODO drag-over highlighting
+    // TODO hover highlighting
     painter->setBrush(GuiSettings::nodeBGColor); // TODO color by type
 
     QBrush b = painter->brush();
@@ -124,7 +123,6 @@ void NodeItem::keyPressEvent(QKeyEvent *event)
     qDebug() << "keypress " << event->key();
     switch (event->key()) {
     case Qt::Key_Delete:
-        // XXX this will probably break. need to make sure dtors do right thing.
         delete this->_node;
         this->scene()->removeItem(this);
         deleteLater();
@@ -135,12 +133,17 @@ void NodeItem::keyPressEvent(QKeyEvent *event)
     }
 }
 
+// Forward selection to node, in case there's anything special to do
+// (e.g. Sublevel nodes need to interact with the spectrograph;
+//  path nodes will interact with the floor display.)
 void NodeItem::beenSelected()
 {
-    // Forward selection to node, in case there's anything special to do
-    // (e.g. Sublevel nodes need to interact with the spectrograph;
-    //  path nodes will interact with the floor display.)
     _node->beenSelected();
+}
+
+void NodeItem::beenDeselected()
+{
+    _node->beenDeselected();
 }
 
 // Find an empty space in the graph to display a new node:
@@ -196,9 +199,11 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
 
         // Display an editor widget for the parameter value.
         ParamView *pv = new ParamView(nullptr, param);
+        // Proxy widget will automatically be added to the scene because it's a child
+        // of an object in the scene.
         QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
         proxy->setWidget(pv);
-        proxy->setPos(GuiSettings::socketWidth * 2 + 70, 0);
+        proxy->setPos(GuiSettings::socketWidth * 2 + 70, 0);  // Hardw
 #if 0
         // XXX this is broken; for some reason, it's setting the value on other connections
         // as well.

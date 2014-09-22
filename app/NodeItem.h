@@ -30,6 +30,7 @@ public:
     void    avoidCollisions();
     Node*   getNode() const {return _node;}
     virtual void beenSelected();
+    virtual void beenDeselected();
     QList<ConnectionItem*>  getConnectionItems();
 
     CuesheetScene *csScene() {return dynamic_cast<CuesheetScene*>(scene());}

@@ -30,6 +30,7 @@ void CueLibView::createUi()
     mainLayout->addWidget(createGroup("Colors", Node::COLOR),1,0);
     mainLayout->addWidget(createGroup("Beats", Node::BEAT),1,1);
     mainLayout->addWidget(createGroup("Paths", Node::POSITION),1,2);
+    mainLayout->addWidget(createGroup("Regions", Node::REGION),1,3);
     setLayout(mainLayout);
 
     setWindowTitle(tr("Cue Library"));
@@ -37,10 +38,9 @@ void CueLibView::createUi()
 
     CHECKED_CONNECT(_signalMapper, SIGNAL(mapped(QString)),
                     this, SIGNAL(newNodeRequest(QString)));
-    // The newNodeRequest signal from here is monitored by mainwidget,
-    // which does the instantiation, XXX partly by calling back here,
-    // and partly by calling XXX graphWidget->addNode()
-
+    // GROSS The newNodeRequest signal from here is monitored by mainwidget,
+    // which does the instantiation, partly by calling back here,
+    // and partly by calling graphWidget->addNode()
 }
 
 QGroupBox *CueLibView::createGroup(QString typeName, Node::node_t nodeType)
