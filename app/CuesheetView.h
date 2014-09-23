@@ -39,8 +39,8 @@ public:
     QGraphicsView *view() const;
 
 public slots:
-    void zoomIn(int level = 1);
-    void zoomOut(int level = 1);
+    void zoomIn(int level = 10);
+    void zoomOut(int level = 10);
 
 private slots:
     void resetView();

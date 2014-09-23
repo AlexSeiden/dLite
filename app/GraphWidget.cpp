@@ -20,7 +20,7 @@ GraphWidget::GraphWidget(QWidget *parent) :
     _scene(new CuesheetScene),
     _csview(new CuesheetView)
 {
-    _scene->setSceneRect(-3000.,-3000.,6000.,6000.);
+    _scene->setSceneRect(QRectF());        // TODO dynamic resize
     _csview->view()->setScene(_scene);
 
     CHECKED_CONNECT(_scene, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));

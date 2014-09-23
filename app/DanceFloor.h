@@ -20,9 +20,12 @@ class Dancefloor : public QObject
 public:
     explicit Dancefloor(QObject *parent = 0);
     ~Dancefloor();
-
     bool        ImportLayout(std::string & layoutCsvFile);
-    void        printLayout();
+
+    void        addCue(Cue *cue);
+    void        removeCue(Cue *cue);
+    int         getNumCues() const    {return _cues.size();}
+    void        fireLight(int x, int y, Firing *f);
 
     bool        hasPixel(int x, int y);
     Lightcolor  getPixel(int x, int y);
@@ -30,20 +33,16 @@ public:
 
     int         getXsize() const {return _xsize;}
     int         getYsize() const {return _ysize;}
-
-    void        addCue(Cue *cue);
-    void        removeCue(Cue *cue);
-    int         getNumCues() const    {return _cues.size();}
-
-    int         getFrame() const      {return _frame;}
+    int         getFrame() const {return _frame;}
 
     void        setView(Dancefloorwidget *dfwidget) { _dfWidget = dfwidget;}
+    void        printLayout();
 
 public slots:
     void evaluate();
     void evaluateAllCues();
     void sendToDevice();
-    void fireLight(int x, int y, Firing *f);
+    void setHardwareStatus(bool status);
 
 protected:
     int                 _xsize, _ysize;

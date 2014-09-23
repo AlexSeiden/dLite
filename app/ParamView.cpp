@@ -82,22 +82,27 @@ ParamView::ParamView(QWidget *parent, ParamBase *param ) :
         editorWidget->setChecked(val);
         CHECKED_CONNECT(editorWidget, SIGNAL(stateChanged(int)), this, SLOT(setBoolValue(int)));
     }
+    else if (paramType == paramTypeRegion) {
+        // There's no editor widget for regions--we use the dance floor window.
+        _genericEditorWidget = nullptr;
+    }
     else {
         qDebug() << "ERROR: could not match typeid(param)";
         Q_ASSERT(false);
         // ErrorHandling
-   }
+    }
+    if (_genericEditorWidget) {
+        if (param->isOutput())
+            _genericEditorWidget->setEnabled(false);
 
-    if (param->isOutput())
-        _genericEditorWidget->setEnabled(false);
-
-    _genericEditorWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    layout->addWidget(_genericEditorWidget);
+        _genericEditorWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        layout->addWidget(_genericEditorWidget);
+    }
     this->setLayout(layout);
 }
 
 
-// launchColorDialog
+// launchColorDialog()
 //      Launches a color-picker window when the color chip is clicked.
 void ParamView::launchColorDialog() {
     QToolButton *colorButton = qobject_cast<QToolButton *>(this->_genericEditorWidget);
@@ -118,8 +123,7 @@ void ParamView::launchColorDialog() {
 // setValue callbacks
 //      It would be nice to template these, but that won't work with QObject
 //      derived classes and the Qt moc.
-//      ??? Could use qvariants?
-
+//      Could use function templates?  or qvariants?
 void ParamView::setValue(double val) {
     Param<float> *p = dynamic_cast<Param<float> *>(this->_param);
     Q_ASSERT(p);

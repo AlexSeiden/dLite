@@ -14,11 +14,11 @@ RegionNode::RegionNode(QObject *parent) :
     setName(QString("Region%1").arg(nodeCount()));
     _type = REGION;
 
-    _out.setName("out");
-    _out.setConnectable(true);
-    _out.setOutput(true);
+    _region.setName("out");
+    _region.setConnectable(true);
+    _region.setOutput(true);
 
-    _paramList << &_out;
+    _paramList << &_region;
     setParamParent();
 
     CHECKED_CONNECT(this,
@@ -37,12 +37,7 @@ void RegionNode::operator()()
     if (evaluatedThisFrame())
         return;
 
-    // Don't need to evalAllInputs() here because we know there are none!
-#if 0
-
-    _x._qvOutput = _x._value;
-    _y._qvOutput = _y._value;
-#endif
+    _region._qvOutput.setValue(_region._value);
 }
 
 void RegionNode::beenSelected()
@@ -61,56 +56,30 @@ void RegionNode::writeToJSONObj(QJsonObject &json) const
     Node::writeToJSONObj(json);
 
     // Override for serialization
-    QJsonArray regionJsonArray;
-    foreach (const QPoint cell, _cells) {
-         QJsonObject posJ;
-         posJ["x"] = cell.x();
-         posJ["y"] = cell.y();
-         regionJsonArray.append(posJ);
-     }
-    json["cells"] = regionJsonArray;
+    _region._value.writeToJSONObj(json);
 }
 
 void RegionNode::readFromJSONObj(const QJsonObject &json)
 {
-    // Override for serialization
     Node::readFromJSONObj(json);
-    QJsonArray positionsArray = json["cells"].toArray();
-    for (int i=0; i<positionsArray.size(); ++i) {
-        QJsonObject posJsonObject = positionsArray[i].toObject();
-        int x = posJsonObject["x"].toInt();
-        int y = posJsonObject["y"].toInt();
-        _cells.push_back(QPoint(x,y));
-        // (Hopefully) this uses copy to push onto QList of cells.
-    }
+    _region._value.readFromJSONObj(json);
 }
 
 bool RegionNode::hasCell(QPoint p)
 {
-    return _cells.contains(p);
+    return _region._value.hasCell(p);
 }
 
 void RegionNode::setCell(QPoint p, bool status)
 {
-    // $$$ inefficient!!
-    _cells.removeAll(p);
-    if (status)
-        _cells.append(p);
+    _region._value.setCell(p, status);
 }
 
 PixelQueryDelegate_t RegionNode::getQueryDelegate()
 {
-// test delegate:
-#if 0
-    auto out = [] (QPoint p) {
-        return ((p.x()+p.y())%2) ? QColor(255,255,255): QColor(0,0,0);
-    } ;
-#else
-
     auto out = [&] (QPoint p) {
         return (this->hasCell(p) ? QColor(255,255,255): QColor(0,0,0));
     } ;
-#endif
     return out;
 }
 

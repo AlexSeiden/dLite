@@ -3,8 +3,6 @@
 #include <QDebug>
 #include "Node.h"
 
-Dancefloor *Cue::_dfModel = nullptr;
-
 CueBox::CueBox() :
     _x(10),
     _y(8),

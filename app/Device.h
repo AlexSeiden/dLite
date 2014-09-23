@@ -23,16 +23,15 @@ public:
     ~Device();
 
     void setlight(int controllerIndex, int lightIndex, unsigned char *rgb);
-    void setpixel(int x, int y, unsigned char *rgb);
     void send();
-    void setActive(bool status = true)  {_isActive = status;}
-    bool isActive()                     {return _isActive;}
+    void setActive(bool status = true);
+    bool isActive() {return _isActive;}
     bool connect();
 
-    static const int xsize =24;     //XXX
-    static const int ysize =18;     //XXX
-
 private:
+    void turnOn();
+    void turnOff();
+
     bool    _isActive;
     static const int IPPort = 6038;
 
@@ -44,9 +43,6 @@ private:
 
     unsigned char dmx0[DMX_LEN];
     unsigned char dmx1[DMX_LEN];
-
-    // Maps pixel x,y to lightID:
-    static int remap[18][24];
 };
 
 #endif // DEVICE_H

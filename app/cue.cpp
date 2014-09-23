@@ -5,6 +5,8 @@
 //  Cue
 //  Abstract base class
 
+Dancefloor *Cue::_dfModel = nullptr;
+
 Cue::Cue() :
     _compMode(ADD),
     _decayMode(IMMEDIATE)

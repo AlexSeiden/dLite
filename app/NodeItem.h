@@ -21,11 +21,11 @@ class NodeItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    explicit NodeItem(Node *node, QGraphicsItem *parent = 0);
+    explicit NodeItem(Node* node, QGraphicsItem* parent = 0);
     ~NodeItem();
 
     virtual QRectF  boundingRect() const;
-    void    paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    void    paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
 
     void    avoidCollisions();
     Node*   getNode() const {return _node;}
@@ -33,20 +33,23 @@ public:
     virtual void beenDeselected();
     QList<ConnectionItem*>  getConnectionItems();
 
-    CuesheetScene *csScene() {return dynamic_cast<CuesheetScene*>(scene());}
+    CuesheetScene* csScene() {return dynamic_cast<CuesheetScene*>(scene());}
 
     // Serialization
     virtual void readFromJSONObj(const QJsonObject &json);
     virtual void writeToJSONObj(QJsonObject &json) const;
 
+public slots:
+    void    nameEdit(QString newname);
+
 signals:
     void    nodeMovedEventSignal();
 
 protected:
-    void    mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void    keyPressEvent(QKeyEvent *event);
+    void    mouseMoveEvent(QGraphicsSceneMouseEvent* event);
+    void    keyPressEvent(QKeyEvent* event);
 
-    Node    *_node;
+    Node*   _node;
     QMarginsF  _margins; // for padding on the bounding rect
 };
 
@@ -55,12 +58,12 @@ class ParamItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    explicit ParamItem(ParamBase *param, QGraphicsObject *parent);
+    explicit ParamItem(ParamBase* param, QGraphicsObject* parent);
 
     QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
 
-    void            setSocket(SocketItem *sock) {_socket = sock;}
+    void            setSocket(SocketItem* sock) {_socket = sock;}
     SocketItem*     getSocket()                 {return _socket;}
     ParamBase*      getParam()                  {return _param;}
 
@@ -74,16 +77,16 @@ class SocketItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    explicit    SocketItem(ParamBase *param, QGraphicsObject *parent);
+    explicit    SocketItem(ParamBase* param, QGraphicsObject* parent);
 
     QRectF      boundingRect() const;
-    void        paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
-    ParamBase * getParam() {return _param;}
+    void        paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
+    ParamBase*  getParam() {return _param;}
 
-    void        mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void        mousePressEvent(QGraphicsSceneMouseEvent* event);
 
 private:
-    ParamBase   *_param;
+    ParamBase*  _param;
 };
 
 #endif // NODEITEM_H

@@ -17,11 +17,16 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     QGraphicsObject(parent),
     _node(node)
 {
-//    setAcceptDrops(true);
-    //setZValue((x + y) % 2); // TODO
     _margins = QMarginsF(9,5,9,5);
-
     setFlags(ItemIsSelectable | ItemIsMovable);
+
+    // Name editor
+    QLineEdit *nameEdit = new QLineEdit;
+    nameEdit->setText(_node->getName());
+    QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
+    proxy->setWidget(nameEdit);
+    proxy->setPos(5,5);  // Hardw
+    CHECKED_CONNECT(nameEdit, SIGNAL(textChanged(QString)), this, SLOT(nameEdit(QString)));
 
     // Make a ParamItem for every param in the node:
     int y = 0;
@@ -29,10 +34,8 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
         y+=GuiSettings::paramHeight;
         ParamItem *parItem = new ParamItem(param, this);
         parItem->setPos(0,y);
-
     }
 }
-
 
 NodeItem::~NodeItem()
 {
@@ -41,6 +44,7 @@ NodeItem::~NodeItem()
     foreach (QGraphicsItem *kid, kiddos) {
         ParamItem* pi = dynamic_cast<ParamItem*>(kid);
         if (! pi) {
+            // ErrorHandling
             qDebug() << Q_FUNC_INFO << "hmm, non-paramitem child of nodeitem";
             continue;
         }
@@ -55,8 +59,6 @@ NodeItem::~NodeItem()
     }
 
     scene()->removeItem(this);
-
-    // Delete node
     delete _node;
 }
 
@@ -71,8 +73,9 @@ QRectF NodeItem::boundingRect() const
 void NodeItem::paint(QPainter *painter,
            const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(option); // XXX I don't think I'm handling the QStyleOptions stuff correctly.
+    Q_UNUSED(option);
     Q_UNUSED(widget);
+
     painter->save();
 
     //painter->setBrush(dragOver ? color.light(130) : GuiColors::nodeBGColor);
@@ -87,7 +90,9 @@ void NodeItem::paint(QPainter *painter,
     painter->setBrush(GuiSettings::nodeNameColor);
     painter->drawRect(bigrect);
     painter->setBrush(b);
+
     if (isSelected()) {
+        // Draw bright red rect around selected node.
         painter->save();
         painter->setBrush(QBrush());
         QPen selectedPen = QPen(GuiSettings::selectedNodePenColor);
@@ -98,16 +103,16 @@ void NodeItem::paint(QPainter *painter,
         painter->restore();
     }
 
-
+#if 0
     // Draw node name
     QRect rr(0,0,GuiSettings::nodeWidth,GuiSettings::paramHeight);
     painter->setPen(GuiSettings::nodeTextColor);
     rr.translate(5, 5);
     painter->drawText(rr,_node->getName());
     painter->setPen(p);
+#endif
 
     painter->restore();
-
 }
 
 void NodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -146,11 +151,16 @@ void NodeItem::beenDeselected()
     _node->beenDeselected();
 }
 
+// Since Nodes are not QObjects, we can't send a signal to them directly.
+void NodeItem::nameEdit(QString newname)
+{
+    _node->setName(newname);
+}
+
 // Find an empty space in the graph to display a new node:
 void NodeItem::avoidCollisions()
 {
    QList<QGraphicsItem *>colliders = collidingItems(Qt::IntersectsItemBoundingRect);
-//   QList<QGraphicsItem *>colliders = collidingItems();
 
    foreach (QGraphicsItem *item, colliders) {
        NodeItem *ni = dynamic_cast<NodeItem *>(item);

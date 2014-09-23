@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QPoint>
 #include "dancefloorwidget.h"   // For pixelquerydelegate_t
+#include "Region.h"
 
 // Nodes that interact with custom view widgets need to inherit from both
 //   "QObject" (so they can have signals & slots)
@@ -27,16 +28,14 @@ public:
     virtual void readFromJSONObj(const QJsonObject &json);
     virtual void writeToJSONObj(QJsonObject &json) const;
 
-public slots:
-
 signals:
     void regionNodeSelected(RegionNode *me);
     void regionNodeDeselected(RegionNode *me);
 
 private:
-    Param<float>    _out;   // XXX need region datatype
+    Param<Region> _region;
 
-    QList<QPoint> _cells;
+//    Region  _region;
 
     bool hasCell(QPoint p);
     void setCell(QPoint p, bool status);

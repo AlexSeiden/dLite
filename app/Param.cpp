@@ -1,5 +1,6 @@
 #include "Param.h"
 #include "lightcolor.h"
+#include "Region.h"
 #include <QDebug>
 #include "Node.h"
 #include <QJsonObject>
@@ -11,6 +12,7 @@ const std::type_info & paramTypeFloat       = typeid(Param<float>);
 const std::type_info & paramTypeInt         = typeid(Param<int>);
 const std::type_info & paramTypeLightcolor  = typeid(Param<Lightcolor>);
 const std::type_info & paramTypeBool        = typeid(Param<bool>);
+const std::type_info & paramTypeRegion      = typeid(Param<Region>);
 
 std::function<void()> ParamBase::getProvider()
 {
@@ -99,6 +101,15 @@ void ParamBase::connectTo(ParamBase *server)
     }
     }
 
+    {
+    Param<Region> *s = dynamic_cast<Param<Region> *>(server);
+    Param<Region> *c = dynamic_cast<Param<Region> *>(this);
+    if (s && c) {
+        c->setProvider(s->getProvider());
+        return;
+    }
+    }
+
     qDebug() << "ERROR" << Q_FUNC_INFO;
 
     qDebug() << "as per typeid(*this/server):";
@@ -122,7 +133,6 @@ void ParamBase::connectTo(ParamBase *server)
 // Writing (base class)
 void ParamBase::writeToJSONObj(QJsonObject &json) const
 {
-//    json["type"] = _type; // TODO translate
     json["name"] = _name;
     json["uuid"] = _uuid.toString();
     if (_connectedParam)
@@ -132,6 +142,7 @@ void ParamBase::writeToJSONObj(QJsonObject &json) const
     // we don't output them.
     json["isOutput"] = _isOutput;
     json["isConnectable"] = _isConnectable;
+//    json["type"] = _type; // TODO translate
 #endif
     // Values of params are written by the type-specialized versions below.
 }
@@ -172,6 +183,13 @@ template <> void Param<int>::writeToJSONObj(QJsonObject &json) const
     json["value"] = _value;
 }
 
+template <> void Param<Region>::writeToJSONObj(QJsonObject &json) const
+{
+    ParamBase::writeToJSONObj(json);
+    if (isOutput())
+        return;
+}
+
 // Reading (base class)
 void ParamBase::readFromJSONObj(const QJsonObject &json)
 {
@@ -210,4 +228,11 @@ template <> void Param<Lightcolor>::readFromJSONObj(const QJsonObject &json)
     if (isOutput())
         return;
     _value = Lightcolor(json["red"].toInt(), json["green"].toInt(), json["blue"].toInt());
+}
+
+
+template <> void Param<Region>::readFromJSONObj(const QJsonObject &json)
+{
+    ParamBase::readFromJSONObj(json);
+    // XXX Node override handling this now.
 }

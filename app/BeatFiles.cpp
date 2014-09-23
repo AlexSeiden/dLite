@@ -8,9 +8,11 @@
 // TODO master todo here (because it's the first src file.)
 /*
 
- Hardware interface!
+ Hardware interface!  test
  Saving!
       restore graphwidget positions
+
+  Grouping
 
  Node Types:
    color nodes:
@@ -19,7 +21,8 @@
    beats!
         segmentino
         breakdown viewer
-        multiply beats
+        multiply & divide beats (double/half)
+        offsets
    Regions
    Paths
 
@@ -38,17 +41,19 @@ global hotkeys:
   frame all / frame selected  (Still a little funky)
 
  compmode & decaymode pups on cuewidgets
- edit nodenames in graph
 
  Drawing:
      Grid BG option in graph view
      spectrograph Hz labels
+     put spectrograph options back in somewhere.
      dance floor cell numbers
      nicer colors
      color-coded paramitems
      color-coded connectors
      param-view transparent bg
      Collapsed mode
+     auto layout
+     x,y align & distribute selected
 
 "_dirty" bit
 

@@ -81,8 +81,17 @@ bool Dancefloor::ImportLayout(std::string &layoutCsvFile)
                 // GROSS
                 int lightID = std::atoi(cell.c_str());
                 _lights[index]._lightID = lightID;
-                _lights[index]._controllerIndex = lightID /100 - 1;
-                _lights[index]._lightIndex = lightID % 100;
+                int stringNum = lightID / 100 - 1;
+                int lightIndex = lightID % 100;
+
+                _lights[index]._controllerIndex = stringNum/2;
+                _lights[index]._lightIndex = lightIndex + stringNum%2*50;
+
+                qDebug() <<"\t lightID"         <<  _lights[index]._lightID
+                         <<"\t stringnum"       << stringNum
+                         <<"\t controllerindex" << _lights[index]._controllerIndex
+                         <<"\t initLightIndex"  << lightIndex
+                         <<"\t lightIndex"      << _lights[index]._lightIndex ;
             }
             _lights[index]._value = Lightcolor();
         }
@@ -176,8 +185,10 @@ void Dancefloor::evaluate()
             }
 
             // Remove firing from list if the event is over.
-            if (! keep)
+            if (! keep) {
+                delete (*firing);
                 firing = light->_firings.erase(firing);
+            }
             else
                 firing++;
         }
@@ -231,4 +242,9 @@ void Dancefloor::sendToDevice()
     }
     // Output to network.
     _device.send();
+}
+
+void Dancefloor::setHardwareStatus(bool status)
+{
+    _device.setActive(status);
 }

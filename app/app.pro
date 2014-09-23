@@ -39,7 +39,9 @@ SOURCES  += \
     PathNode.cpp \
     RegionNode.cpp \
     Firing.cpp \
-    Device.cpp
+    Device.cpp \
+    Region.cpp \
+    RegionCue.cpp
 
 HEADERS  += \
     engine.h \
@@ -64,7 +66,9 @@ HEADERS  += \
     PathNode.h \
     RegionNode.h \
     Firing.h \
-    Device.h
+    Device.h \
+    Region.h \
+    RegionCue.h
 
 fftreal_dir = ../3rdparty/fftreal
 

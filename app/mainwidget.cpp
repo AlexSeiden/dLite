@@ -214,6 +214,7 @@ void MainWidget::showSettingsDialog()
     if (m_settingsDialog->result() == QDialog::Accepted) {
         m_engine->setWindowFunction(m_settingsDialog->windowFunction());
         m_engine->setUpdateInterval(m_settingsDialog->interval());
+        m_dancefloor->setHardwareStatus(m_settingsDialog->useHardware());
     }
 }
 

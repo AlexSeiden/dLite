@@ -53,7 +53,7 @@ CuesheetView::CuesheetView(QWidget *parent)
     zoomSlider = new QSlider;
     zoomSlider->setMinimum(0);
     zoomSlider->setMaximum(500);
-    zoomSlider->setValue(250);
+    zoomSlider->setValue(500);
     zoomSlider->setTickPosition(QSlider::TicksRight);
 
     resetButton = new QToolButton;
@@ -89,18 +89,22 @@ QGraphicsView *CuesheetView::view() const
 
 void CuesheetView::resetView()
 {
-    zoomSlider->setValue(250);
+    zoomSlider->setValue(500);
     setupMatrix();
     // TODO this doesn't work so great.
     graphicsView->ensureVisible(QRectF(0, 0, 0, 0));
-
-//    resetButton->setEnabled(false);
 }
 
 void CuesheetView::setupMatrix()
 {
-    qreal scale = qPow(qreal(2), (zoomSlider->value() - 250) / qreal(50));
+    qreal scale = qPow(qreal(2), (zoomSlider->value() - 500) / qreal(200));
 
+    /*
+    125-250 = -125
+    -125/50 = -2.5
+    -500/x = -2.5
+    x= 500/2.5 = 20
+    */
     QMatrix matrix;
     matrix.scale(scale, scale);
 

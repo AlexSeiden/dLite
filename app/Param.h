@@ -157,4 +157,5 @@ extern const std::type_info & paramTypeFloat;
 extern const std::type_info & paramTypeInt;
 extern const std::type_info & paramTypeLightcolor;
 extern const std::type_info & paramTypeBool;
+extern const std::type_info & paramTypeRegion;
 #endif // PARAM_H

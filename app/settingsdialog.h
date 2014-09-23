@@ -15,8 +15,10 @@ class QLineEdit;
 QT_END_NAMESPACE
 
 /*
- * Dialog used to control settings such as the audio input / output device
- * and the windowing function.
+ * Dialog used to control global settings:
+ *      the windowing function used by the spectum analyser
+ *      the update interval for spectral analysis and dance floor
+ *      whether to send info to the LED hardware  TODO: add separate update interval
  */
 class SettingsDialog : public QDialog
 {
@@ -28,22 +30,24 @@ public:
 
     WindowFunction windowFunction() const { return m_windowFunction; }
     int interval() const { return m_interval; }
+    bool useHardware() const { return m_useHardware; }
 
 private slots:
     void windowFunctionChanged(int index);
     void intervalChanged(const QString text);
+    void useHardwareChanged(int index);
 
 private:
     WindowFunction          m_windowFunction;
     int                     m_interval;
-//    int      				m_spectrumNumBands;
-//    int      				m_spectrumLow;
-//    int      				m_spectrumHi;
-    QComboBox *m_windowFunctionComboBox;
-    QLineEdit *m_intervalLineEdit;
-    QSpinBox *				m_numBandsSpinBox;
-    QSpinBox *				m_specMinSpinBox;
-    QSpinBox *				m_specMaxSpinBox;
+    bool                    m_useHardware;
+
+    QComboBox*              m_windowFunctionComboBox;
+    QLineEdit*              m_intervalLineEdit;
+    QSpinBox*				m_numBandsSpinBox;
+    QSpinBox*				m_specMinSpinBox;
+    QSpinBox*				m_specMaxSpinBox;
+    QCheckBox*              m_useHardwareCheckbox;
 
 };
 
