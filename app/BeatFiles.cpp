@@ -7,10 +7,7 @@
 
 // TODO master todo here (because it's the first src file.)
 /*
-
- Hardware interface!  test
- Saving!
-      restore graphwidget positions
+  restore graphwidget positions from saved file
 
   Grouping
 
@@ -42,9 +39,10 @@ global hotkeys:
 
  compmode & decaymode pups on cuewidgets
 
+ duplicate
+
  Drawing:
      Grid BG option in graph view
-     spectrograph Hz labels
      put spectrograph options back in somewhere.
      dance floor cell numbers
      nicer colors
@@ -61,6 +59,7 @@ Cleaning:
     Remnants of original spectrum audio recording stuff in bufferlength and
     windowchanged things
     Clean up object model & separation-of-concerns
+    Get rid of Lightcolor and use QColor
 
 Bugs:
     AudioNotify drop
@@ -452,10 +451,11 @@ void NodeBarBeat::operator()() {
 
 // ------------------------------------------------------------------------------
 // Utility function
+
+// The onset and BarBeats files are indexed based on samples.
+// We use milliseconds.  Convert a vector of from sample-indices to ms.
 void convertSamplesToMS(std::vector<int> &samples)
 {
-    // The onset and BarBeats files are indexed based on samples.
-    // We use milliseconds.
     double conversion = 1000. / Cupid::Singleton()->getEngine()->format().sampleRate();
     for (auto &sample : samples ) {
         sample *= conversion;

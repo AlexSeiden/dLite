@@ -19,6 +19,7 @@ public:
     explicit GuiSettings(QObject *parent = 0);
     // Graph widget
     static QColor   nodeNameColor;
+    static QFont    nodeNameFont;
     static QColor   nodeBGColor;
     static QColor   nodeTextColor;
     static int      nodeWidth;
@@ -30,6 +31,7 @@ public:
     static QColor   paramFillColor;
     static QColor   outputParamFillColor;
     static QColor   paramTextColor;
+    static QFont    paramTextFont;
     static int      socketWidth;
     static int      paramHeight;
     static QPen     socketOutlinePen;
@@ -61,6 +63,7 @@ public:
     static int     sg_sublevelPenwidth;
     static int     sg_textHeight;
     static int     sg_textOffset;
+    static QFont   sg_HzFont;
 
     // Sublevel meter
     static QColor  sl_bgColor;

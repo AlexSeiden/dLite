@@ -87,11 +87,11 @@ bool Dancefloor::ImportLayout(std::string &layoutCsvFile)
                 _lights[index]._controllerIndex = stringNum/2;
                 _lights[index]._lightIndex = lightIndex + stringNum%2*50;
 
-                qDebug() <<"\t lightID"         <<  _lights[index]._lightID
-                         <<"\t stringnum"       << stringNum
-                         <<"\t controllerindex" << _lights[index]._controllerIndex
-                         <<"\t initLightIndex"  << lightIndex
-                         <<"\t lightIndex"      << _lights[index]._lightIndex ;
+//                qDebug() <<"\t lightID"         <<  _lights[index]._lightID
+//                         <<"\t stringnum"       << stringNum
+//                         <<"\t controllerindex" << _lights[index]._controllerIndex
+//                         <<"\t initLightIndex"  << lightIndex
+//                         <<"\t lightIndex"      << _lights[index]._lightIndex ;
             }
             _lights[index]._value = Lightcolor();
         }

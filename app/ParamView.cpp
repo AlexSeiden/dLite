@@ -25,7 +25,7 @@ ParamView::ParamView(QWidget *parent, ParamBase *param ) :
         floatParam->getValue(val);
 #if 1
         QDoubleSpinBox *editorWidget = new QDoubleSpinBox;
-        if (param->_useminmax) {
+        if (param->_useminmax) {    // TODO finish this
             editorWidget->setRange(param->_minVal, param->_maxVal);
             editorWidget->setSingleStep(param->_stepVal);
         }

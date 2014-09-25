@@ -99,7 +99,7 @@ private:
 
 protected:
     // Boilerplate call in every ctor; sets a pointer from
-    // the parameter back to the parent.
+    // each param back to the its parent node.
     void                setParamParent();
     ParamBase *         getParamByName(QString paramname);
 
@@ -139,21 +139,20 @@ public:
     static NodeFactory *Singleton();
 
     // Serialization
-    bool saveToFile(QString filename);
-    bool readFromFile(QString filename);
-    void readNodeFromJSONObj(const QJsonObject &json);
-    void readAllNodes(const QJsonObject &json);
-    void writeToJSONObj(QJsonObject &json) const;
+    bool    saveToFile(QString filename);
+    bool    readFromFile(QString filename);
+    Node*   readNodeFromJSONObj(const QJsonObject &json);
+    void    readAllNodes(const QJsonObject &json);
+    void    writeToJSONObj(QJsonObject &json) const;
 
 private:
     // Registry
     std::map<std::string, NodeInstatiator_t>    _registry;
     QMap<Node::node_t, QStringList>             _registryByType;
-    QMap<QUuid, Node*>                          _registryUUIDtoNodep;
     QMap<QUuid, ParamBase*>                     _registryUUIDtoParam;
     QMap<ParamBase *, QUuid>                    _connectionsToMake;
 
-    bool            _dirty;     // TODO set this, or maybe move it
+    bool            _dirty;     // TODO set this, and maybe move it to static node
 };
 
 

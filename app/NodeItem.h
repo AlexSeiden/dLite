@@ -67,6 +67,15 @@ public:
     SocketItem*     getSocket()                 {return _socket;}
     ParamBase*      getParam()                  {return _param;}
 
+public slots:
+    // It would be nice to template these, but that won't work with QObject
+    // derived classes and the Qt moc.
+    void setValue(double val);
+    void setBoolValue(int val);
+    void setValue(int val);
+    void setValue(Lightcolor val);
+    void textChanged(QString val);
+
 private:
     ParamBase*      _param;
     SocketItem*     _socket;

@@ -77,6 +77,7 @@ void Node::readFromJSONObj(const QJsonObject &json)
 {
     _name      = json["name"].toString();
     _active    = json["active"].toBool();
+
 }
 
 void Node::writeToJSONObj(QJsonObject &json) const
@@ -98,7 +99,8 @@ void Node::writeToJSONObj(QJsonObject &json) const
      }
     json["paramList"] = paramJsonArray;
 
-     // TODO write graph view info
+     // write graph view info
+    Cupid::Singleton()->getGraphWidget()->writeNodeUiToJSONObj(this, json);
 }
 
 // getParamByName()
@@ -146,8 +148,10 @@ Node * NodeFactory::instatiateNode(QString classname, QUuid uuid)
         // ErrorHandling
 
     instance = instancer();
-    // When we're reading in from a file, there will already be a uuid.
-    // If we call this with a uuid, then assign it:
+    // When instatiating from the CueLibrary, the uuid will be null,
+    // which means a new one should be created.
+    // When we're reading in from a file, there will already be a uuid
+    // which connections may refer to, and we need to assign it here.
     if (! uuid.isNull())
         instance->_uuid = uuid;  // GROSS this keeps uuid from being const.
     instance->_className = classname; // GROSS should get classname automatically in ctor
@@ -214,7 +218,6 @@ bool NodeFactory::saveToFile(QString filename)
 
 void NodeFactory::writeToJSONObj(QJsonObject &json) const
 {
-
     QJsonArray nodeJsonArray;
     foreach (const Node *node, allNodes()) {
          QJsonObject nodeJson;
@@ -226,8 +229,6 @@ void NodeFactory::writeToJSONObj(QJsonObject &json) const
      // TODO write:
      //     audioFilename
      //     onset, beat, etc., files
-     //     UI settings
-
 }
 
 // -------------------
@@ -249,6 +250,9 @@ bool NodeFactory::readFromFile(QString filename)
     return true;
 }
 
+// XXX right now, we read all the nodes then instatiate all the
+// graph stuff.  but to restore saved ui from the json file,
+// it'd be easier to have the graph nodes instatiated as-we-go-along.
 void NodeFactory::readAllNodes(const QJsonObject &json)
 {
     // TODO something like this:
@@ -261,7 +265,8 @@ void NodeFactory::readAllNodes(const QJsonObject &json)
     QJsonArray nodesArray = json["nodes"].toArray();
     for (int i = 0; i < nodesArray.size(); ++i) {
         QJsonObject nodeObject = nodesArray[i].toObject();
-        readNodeFromJSONObj(nodeObject);
+        Node* newnode = readNodeFromJSONObj(nodeObject);
+        Cupid::Singleton()->getGraphWidget()->addNode(newnode, &nodeObject);
     }
 
     // Make connections
@@ -269,15 +274,16 @@ void NodeFactory::readAllNodes(const QJsonObject &json)
         QUuid serverUuid =  _connectionsToMake[param];
         ParamBase* server = _registryUUIDtoParam[serverUuid];
         param->connectTo(server);
+        Cupid::Singleton()->getGraphWidget()->addConnection(server, param);
     }
 }
 
-void NodeFactory::readNodeFromJSONObj(const QJsonObject &json)
+Node* NodeFactory::readNodeFromJSONObj(const QJsonObject &json)
 {
     QString classname   = json["classname"].toString();
     QUuid uuid          = QUuid(json["uuid"].toString());
 
-    Node * newnode      = Singleton()->instatiateNode(classname, uuid);
+    Node* newnode      = Singleton()->instatiateNode(classname, uuid);
     newnode->readFromJSONObj(json);
 
     QJsonArray paramsArray = json["paramList"].toArray();
@@ -306,4 +312,6 @@ void NodeFactory::readNodeFromJSONObj(const QJsonObject &json)
             _connectionsToMake[param] = connectedUUID;
         }
     }
+
+    return newnode;
 }

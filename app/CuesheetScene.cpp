@@ -178,7 +178,7 @@ SocketItem *CuesheetScene::getSocket(QGraphicsItem *item)
 // The following are super inefficient from an algorithmic point of view,
 // but in practical terms it shouldn't be a problem.  If it is, we'll
 // optimize then.
-SocketItem *CuesheetScene::getSocketForParam(ParamBase* param)
+SocketItem *CuesheetScene::getSocketForParam(const ParamBase *param)
 {
     QList<QGraphicsItem*>allItems = items();
     foreach (QGraphicsItem* item, allItems) {
@@ -191,7 +191,8 @@ SocketItem *CuesheetScene::getSocketForParam(ParamBase* param)
     return nullptr;
 }
 
-ConnectorItem *CuesheetScene::getConnectorForClient(ParamBase* client)
+// Returns a connector that is connected to the given input (client) param.
+ConnectorItem *CuesheetScene::getConnectorForClient(const ParamBase *client)
 {
     QList<QGraphicsItem*>allItems = items();
     foreach (QGraphicsItem* item, allItems) {
@@ -204,7 +205,9 @@ ConnectorItem *CuesheetScene::getConnectorForClient(ParamBase* client)
     return nullptr;
 }
 
-ConnectorItem *CuesheetScene::getConnectorForParam(ParamBase* param)
+// Returns a connector that is connected to the given param either as
+// a client or a server.
+ConnectorItem *CuesheetScene::getConnectorForParam(const ParamBase *param)
 {
     QList<QGraphicsItem*>allItems = items();
     foreach (QGraphicsItem* item, allItems) {
@@ -215,6 +218,20 @@ ConnectorItem *CuesheetScene::getConnectorForParam(ParamBase* param)
             return cnctr;
         if (cnctr->getServer()->getParam() == param)
             return cnctr;
+    }
+    return nullptr;
+}
+
+// Returns the NodeItem that represents a given Node.
+NodeItem* CuesheetScene::getNodeItemForNode(const Node* node)
+{
+    QList<QGraphicsItem*>allItems = items();
+    foreach (QGraphicsItem* item, allItems) {
+        NodeItem *ni = dynamic_cast<NodeItem *>(item);
+        if (! ni)
+            continue;
+        if (ni->getNode() == node)
+            return ni;
     }
     return nullptr;
 }

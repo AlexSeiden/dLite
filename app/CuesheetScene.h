@@ -9,8 +9,10 @@
 
 
 // Forward declarations:
+class NodeItem;
 class SocketItem;
 class ConnectorItem;
+class Node;
 class ParamBase;
 
 QT_BEGIN_NAMESPACE
@@ -26,9 +28,10 @@ class CuesheetScene : public QGraphicsScene
 public:
     explicit CuesheetScene(QObject *parent = 0);
     SocketItem*     getSocket(QGraphicsItem *item);
-    SocketItem*     getSocketForParam(ParamBase* param);
-    ConnectorItem*  getConnectorForClient(ParamBase* client);
-    ConnectorItem*  getConnectorForParam(ParamBase* param);
+    SocketItem*     getSocketForParam(const ParamBase* param);
+    ConnectorItem*  getConnectorForClient(const ParamBase* client);
+    ConnectorItem*  getConnectorForParam(const ParamBase* param);
+    NodeItem*       getNodeItemForNode(const Node *node);
 
 public slots:
     void setConnecting(bool status=true) {_isConnecting = status;}

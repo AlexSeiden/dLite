@@ -6,10 +6,12 @@
 QColor  GuiSettings::socketFillColor      = QColor(255,20,80);
 QColor  GuiSettings::socketOutlineColor   = QColor(255,255,255);
 QColor  GuiSettings::nodeNameColor        = QColor(55,55,255);
+QFont   GuiSettings::nodeNameFont         = QFont("Helvetica", 14);
 QColor  GuiSettings::nodeBGColor          = QColor(120,100,60);
 QColor  GuiSettings::nodeTextColor        = QColor(255,255,255);
 QColor  GuiSettings::paramTextColor       = QColor(255,255,255);
 QColor  GuiSettings::paramFillColor       = QColor(120,100,60);
+QFont   GuiSettings::paramTextFont        = QFont("Helvetica", 14);
 QColor  GuiSettings::outputParamFillColor = QColor(100,100,100);
 int     GuiSettings::nodeWidth            = 230;                // Width of the entire node
 int     GuiSettings::nodeSpacing          = 20;                 // Space between nodes
@@ -46,6 +48,7 @@ QColor  GuiSettings::sg_sublevelRegion    = QColor(20,20,255);
 int     GuiSettings::sg_sublevelPenwidth  = 2;
 int     GuiSettings::sg_textHeight        = 20;
 int     GuiSettings::sg_textOffset        = GuiSettings::sg_textHeight/4;
+QFont   GuiSettings::sg_HzFont            = QFont("Helvetica", 10);
 
 QColor  GuiSettings::sl_bgColor           = QColor(0,0,0);
 QColor  GuiSettings::sl_barColor          = GuiSettings::sg_barColor;
@@ -61,7 +64,8 @@ int     GuiSettings::trans_barHeight      = 20;
 
 GuiSettings::GuiSettings(QObject *parent) :
     QObject(parent)
-{ }
+{
+}
 
 void    GuiSettings::editGuiColorsDialog(QObject *parent)
 {

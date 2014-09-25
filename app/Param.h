@@ -16,6 +16,8 @@
 
 class Node;
 class QJsonObject;
+class QWidget;
+class QObject;
 
 class ParamBase
 {
@@ -49,8 +51,7 @@ public:
     virtual void eval() {
         if (_provider)
             _provider();
-        // GROSS.  it evaluates it, but now it's stuck
-        // in the providers "output" variable.
+        // GROSS.  it evaluates it, but now it's stuck in the providers "output" variable.
     }
 
     virtual const std::type_info & getType() {return _type;}
@@ -72,9 +73,15 @@ public:
         return nullptr;
     }
 
+#if 1
+    // TODO this is a better way of doing ParamView
+    virtual QWidget* getEditorWidget(QObject* sendValueChangesHere);
+#endif
+
     // Serialization
     virtual void readFromJSONObj(const QJsonObject &json);
     virtual void writeToJSONObj(QJsonObject &json) const;
+
 
     // Would it be useful to maintain a linked list of connections here?
     // Both for inputs and outputs?  Would that break modularity?
@@ -83,7 +90,7 @@ public:
     //Node *getClients();
 
     // Any OUTPUT params need to stick their value in here.
-    // Kinda GROSS but easiest way to (AFAIK) to pass arbitray datatypes.
+    // Kinda GROSS but easiest way to (AFAIK) to pass arbitrary datatypes.
     QVariant    _qvOutput;
 
 protected:
@@ -103,7 +110,7 @@ protected:
     float                   _minVal, _maxVal, _stepVal;
 
     friend class NodeFactory;
-    friend class ParamView;
+//    friend class ParamView;
 };
 
 
@@ -149,6 +156,10 @@ public:
 
     virtual void readFromJSONObj(const QJsonObject &json);
     virtual void writeToJSONObj(QJsonObject &json) const;
+
+#if 1
+    virtual QWidget* getEditorWidget(QObject* sendValueChangesHere);
+#endif
 };
 
 // ------------------------------------------------------------------------------

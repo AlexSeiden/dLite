@@ -137,8 +137,13 @@ void Spectrograph::paintEvent(QPaintEvent *event)
 
         QPair<qreal, qreal> freqrange = barRange(i, true);
         int centerfreq = (freqrange.first + freqrange.second)/2.0;
-        painter.drawText(textrect, Qt::AlignBottom|Qt::AlignHCenter,
-                         QString::number(centerfreq));
+        QString hz;
+        if (centerfreq<1000)
+            hz = QString::number(centerfreq);
+        else
+            hz = QString("%1K").arg(qreal(centerfreq)/1000,0,'f',1);
+        painter.setFont(GuiSettings::sg_HzFont);
+        painter.drawText(textrect, Qt::AlignBottom|Qt::AlignHCenter, hz);
     }
 
     // Do we have a subrange that should be drawn?

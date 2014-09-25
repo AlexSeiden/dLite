@@ -5,7 +5,6 @@
 #include "CuesheetView.h"
 #include "GuiSettings.h"
 #include "utils.h"
-#include "ParamView.h"
 #include <QHBoxLayout>
 #include <QGraphicsObject>
 #include <QGraphicsProxyWidget>
@@ -20,10 +19,12 @@ GraphWidget::GraphWidget(QWidget *parent) :
     _scene(new CuesheetScene),
     _csview(new CuesheetView)
 {
-    _scene->setSceneRect(QRectF());        // TODO dynamic resize
+    _scene->setSceneRect(QRectF());
     _csview->view()->setScene(_scene);
 
     CHECKED_CONNECT(_scene, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));
+    // This doesn't work, bc (afaik) the widgets (bc they are gfxitems) don't end up being children of the graphview.
+//    setStyleSheet("QLineEdit { background-color: yellow }");
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setSpacing(0);
@@ -91,7 +92,8 @@ void GraphWidget::addTheseNodes(QList<Node*> aBunchOfNodes)
     foreach (Node *node, aBunchOfNodes)
         addNode(node);
 
-    // ...then make all the connections.
+    // ...then make all the connections.  Because you can't make the connections before
+    // the nodes are instanced!
     foreach (Node *node, aBunchOfNodes) {
         foreach (ParamBase *param, node->getParams()) {
             if (param->connectedParam()) {
@@ -116,7 +118,7 @@ void GraphWidget::addConnection(ParamBase* server, ParamBase* client)
 }
 
 // Style:  This is doing a lot of stuff, that might be better implemented elsewhere?
-void GraphWidget::addNode(Node *node)
+void GraphWidget::addNode(Node *node, QJsonObject* json)
 {
     NodeItem *nodeItem;
     // GROSS
@@ -125,6 +127,7 @@ void GraphWidget::addNode(Node *node)
         nodeItem = new SublevelNodeItem(node);
     else
         nodeItem = new NodeItem(node);
+    nodeItem->setParent(this);
 
     // TODO better positioning.
     QPointF  center = _csview->view()->mapToScene(_csview->view()->viewport()->rect().center());
@@ -135,6 +138,41 @@ void GraphWidget::addNode(Node *node)
     _scene->clearSelection();
     nodeItem->setSelected(true);
     _csview->view()->ensureVisible(nodeItem);
+
+    // When restoring from file, read in positon data:
+    if (json)
+        nodeItem->readFromJSONObj(*json);
+}
+
+void GraphWidget::writeNodeUiToJSONObj(const Node* node, QJsonObject& json)
+{
+    NodeItem* ni = _scene->getNodeItemForNode(node);
+    if (ni)
+        ni->writeToJSONObj(json);
+    else
+        qWarning() << Q_FUNC_INFO << "Could not find NodeItem for " << node->getName();
+}
+
+void GraphWidget::readNodeUiFromJSONObj(Node* node, const QJsonObject& json)
+{
+    NodeItem* ni = _scene->getNodeItemForNode(node);
+    // XXX this is called before ni is instatiated....
+    if (ni)
+        ni->readFromJSONObj(json);
+    else
+        qWarning() << Q_FUNC_INFO << "Could not find NodeItem for " << node->getName();
+}
+
+void GraphWidget::zoomOut()
+{
+    _csview->zoomOut(10);
+    update();
+}
+
+void GraphWidget::zoomIn()
+{
+    _csview->zoomIn(10);
+    update();
 }
 
 void GraphWidget::frameItems(QList<QGraphicsItem *> items)
@@ -186,6 +224,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 #endif
     default:
         qDebug() << Q_FUNC_INFO << "keypress " << event->key() << " ; text()" << event->text();
+        event->setAccepted(false);
         QWidget::keyPressEvent(event);
     }
 }

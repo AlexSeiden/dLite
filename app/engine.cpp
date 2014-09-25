@@ -214,7 +214,7 @@ void Engine::audioStateChanged(QAudio::State state)
 void Engine::spectrumChanged(const FrequencySpectrum &spectrum)
 {
 //    ENGINE_DEBUG << "Engine::spectrumChanged" << "pos" << m_spectrumPosition;
-    // XXX position excluded
+    // NOTE:  position excluded; vestigial.
     emit spectrumChanged(0, m_spectrumBufferLength, spectrum);
 }
 

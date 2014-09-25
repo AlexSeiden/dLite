@@ -51,7 +51,7 @@ private:
     Subrange            _range;
 };
 
-// XXX this doesn't compile; but also doesn't seem needed. Dunno why.
+// ??? this doesn't compile; but also doesn't seem needed. Dunno why.
 // Perhaps its automatic when from QObject?
 // Q_DECLARE_METATYPE(SublevelNode)
 

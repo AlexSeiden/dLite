@@ -19,7 +19,6 @@ class ParamView : public QWidget
 {
     Q_OBJECT
 public:
-    ParamView(QWidget *parent, QString name, ParamBase *param);
     ParamView(QWidget *parent, ParamBase *param);
 
 public slots:

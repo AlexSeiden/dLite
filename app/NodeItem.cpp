@@ -4,7 +4,7 @@
 #include "utils.h"
 #include <QtWidgets>
 #include <QPainterPath>
-#include "ParamView.h"
+//#include "ParamView.h"
 #include <QGraphicsProxyWidget>
 #include "ConnectorItem.h"
 
@@ -176,16 +176,22 @@ void NodeItem::readFromJSONObj(const QJsonObject &json)
 {
     // ErrorHandling
     qreal x, y;
-    x = json["xPos"].toDouble();
-    y = json["yPos"].toDouble();
-    setPos(x,y);
+
+    if (json.contains("uisettings")) {
+        QJsonObject jsonUiSettings = json["uisettings"].toObject();
+        x = jsonUiSettings["xPos"].toDouble();
+        y = jsonUiSettings["yPos"].toDouble();
+        setPos(x,y);
+    }
 }
 
 void NodeItem::writeToJSONObj(QJsonObject &json) const
 {
     // ErrorHandling
-    json["xPos"] = x();
-    json["yPos"] = y();
+    QJsonObject jsonUiSettings;
+    jsonUiSettings["xPos"] = x();
+    jsonUiSettings["yPos"] = y();
+    json["uisettings"] = jsonUiSettings;
 }
 
 //-----------------------------------------------------------------------------
@@ -208,12 +214,21 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
         _socket->setPos(GuiSettings::socketWidth,yOffset);
 
         // Display an editor widget for the parameter value.
+//        pv->setStyleSheet("background-color:transparent");
+#if 0
         ParamView *pv = new ParamView(nullptr, param);
+#else
+        QWidget* pv = param->getEditorWidget(this);
+        // Problem here is that now we need a whole bunch of setValue methods for ParamItem.
+        // But that's probably better than the current state.
+#endif
+
         // Proxy widget will automatically be added to the scene because it's a child
         // of an object in the scene.
         QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
         proxy->setWidget(pv);
         proxy->setPos(GuiSettings::socketWidth * 2 + 70, 0);  // Hardw
+
 #if 0
         // XXX this is broken; for some reason, it's setting the value on other connections
         // as well.
@@ -250,8 +265,72 @@ void ParamItem::paint(QPainter *painter,
     // Draw name
     painter->setPen(GuiSettings::paramTextColor);
     rr.translate(GuiSettings::socketWidth*2 + 20, 5);
+    painter->setFont(GuiSettings::paramTextFont);
     painter->drawText(rr,_param->getName());
     painter->restore();
+}
+
+// ------------------------------------------------------------------------------
+// setValue callbacks
+//      It would be nice to template these, but that won't work with QObject
+//      derived classes and the Qt moc.  Fortunately, it's not a lot of stuff.
+//
+void ParamItem::setValue(double val) {
+    Param<float> *p = dynamic_cast<Param<float> *>(this->_param);
+    Q_ASSERT(p);
+    p->setValue(val);
+    p->getParent()->paramHasBeenEdited();
+}
+
+void ParamItem::setValue(int val) {
+    Param<int> *p = dynamic_cast<Param<int> *>(this->_param);
+    Q_ASSERT(p);
+    p->setValue(val);
+    p->getParent()->paramHasBeenEdited();
+}
+
+void ParamItem::setValue(Lightcolor val) {
+    Param<Lightcolor> *p = dynamic_cast<Param<Lightcolor> *>(this->_param);
+    Q_ASSERT(p);
+    p->setValue(val);
+    p->getParent()->paramHasBeenEdited();
+}
+
+// For use with QLineEdit
+void ParamItem::textChanged(QString text)
+{
+    Param<int> *pi = dynamic_cast<Param<int> *>(this->_param);
+    if (pi) {
+        int val = text.toInt();
+        pi->setValue(val);
+        pi->getParent()->paramHasBeenEdited();
+        return;
+    }
+
+    Param<float> *pf = dynamic_cast<Param<float> *>(this->_param);
+    if (pf) {
+        float val = text.toFloat();
+        pf->setValue(val);
+        pf->getParent()->paramHasBeenEdited();
+        return;
+    }
+
+    Q_ASSERT(false);
+    // ErrorHandling
+}
+
+// Need to have this be a separate "setBoolFunction" with an int argument,
+// rather than simply "setValue(bool val)", because Qt checkboxes return
+// ints--Checked, unchecked, and "Partially Checked" when in a hierarchy.
+void ParamItem::setBoolValue(int val) {
+    Param<bool> *p = dynamic_cast<Param<bool> *>(this->_param);
+    Q_ASSERT(p);
+    if (val == 0)
+        p->setValue(false);
+    else
+        p->setValue(true);
+
+    p->getParent()->paramHasBeenEdited();
 }
 
 //-----------------------------------------------------------------------------

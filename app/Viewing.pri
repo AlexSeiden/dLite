@@ -3,7 +3,6 @@
 SOURCES += \
     mainwidget.cpp \
     dancefloorwidget.cpp \
-    ParamView.cpp \
     GraphWidget.cpp \
     CuesheetScene.cpp \
     NodeItem.cpp    \
@@ -14,12 +13,12 @@ SOURCES += \
     SublevelNodeItem.cpp \
     $$PWD/ConnectorItem.cpp \
     $$PWD/Transport.cpp \
-    $$PWD/GuiSettings.cpp
+    $$PWD/GuiSettings.cpp \
+    $$PWD/ColorChip.cpp
 
 HEADERS += \
     mainwidget.h \
     dancefloorwidget.h  \
-    ParamView.h         \
     GraphWidget.h       \
     CuesheetScene.h     \
     NodeItem.h          \
@@ -30,4 +29,5 @@ HEADERS += \
     SublevelNodeItem.h \
     $$PWD/ConnectorItem.h \
     $$PWD/Transport.h \
-    $$PWD/GuiSettings.h
+    $$PWD/GuiSettings.h \
+    $$PWD/ColorChip.h

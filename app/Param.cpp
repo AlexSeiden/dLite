@@ -6,6 +6,13 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
+// These view things are for the editor widget callback at the bottom
+#include <QSpinBox>
+#include <QCheckBox>
+#include <QToolButton>
+#include "utils.h"
+#include "ColorChip.h"
+
 // These constants defined for convinience & speed when doing type checks.
 // ??? Are these still needed?  Would it be better just to have use an enum?
 const std::type_info & paramTypeFloat       = typeid(Param<float>);
@@ -235,4 +242,88 @@ template <> void Param<Region>::readFromJSONObj(const QJsonObject &json)
 {
     ParamBase::readFromJSONObj(json);
     // XXX Node override handling this now.
+}
+
+
+// ------------------------------------------------------------------------------
+// Editor widgetry
+//      Although we partly break the separation between "model" and "view" here
+//      (Since editors are clearly part of the view, and the params themselves
+//      could be view-agnostic), it makes the code more cohesive,  rather
+//      than implementing the editors in another class.
+QWidget* ParamBase::getEditorWidget(QObject *sendValueChangesHere)
+{
+    Q_UNUSED(sendValueChangesHere);
+    return nullptr;
+}
+
+template <> QWidget* Param<float>::getEditorWidget(QObject* sendValueChangesHere)
+{
+    QDoubleSpinBox *editorWidget = new QDoubleSpinBox;
+    if (_useminmax) {    // TODO finish this
+        editorWidget->setRange(_minVal, _maxVal);
+        editorWidget->setSingleStep(_stepVal);
+    }
+    editorWidget->setButtonSymbols(QAbstractSpinBox::NoButtons);
+
+    float val = 0.0;
+    getValue(val);
+    editorWidget->setValue(val);
+    //CHECKED_CONNECT(editorWidget, SIGNAL(valueChanged(double)), sendValueChangesHere, SLOT(setValue(double)));
+    // TODO vet connection
+    editorWidget->connect(editorWidget, SIGNAL(valueChanged(double)),
+                          sendValueChangesHere, SLOT(setValue(double)));
+
+    editorWidget->setFixedSize(60,22); // hardw
+    return editorWidget;
+}
+
+template <> QWidget* Param<int>::getEditorWidget(QObject* sendValueChangesHere)
+{
+    QSpinBox *editorWidget = new QSpinBox;
+    if (_useminmax) {    // TODO finish this
+        editorWidget->setRange(_minVal, _maxVal);
+        editorWidget->setSingleStep(_stepVal);
+    }
+//    editorWidget->setButtonSymbols(QAbstractSpinBox::NoButtons);
+
+    int val = 0;
+    getValue(val);
+    editorWidget->setValue(val);
+    editorWidget->connect(editorWidget, SIGNAL(valueChanged(int)),
+                          sendValueChangesHere, SLOT(setValue(int)));
+
+    editorWidget->setFixedSize(60,22); // hardw
+    return editorWidget;
+}
+
+template <> QWidget* Param<bool>::getEditorWidget(QObject* sendValueChangesHere)
+{
+    QCheckBox *editorWidget = new QCheckBox;
+    bool val = true;
+    getValue(val);
+    editorWidget->setChecked(val);
+    editorWidget->connect(editorWidget, SIGNAL(stateChanged(int)),
+                          sendValueChangesHere, SLOT(setBoolValue(int)));
+    return editorWidget;
+}
+
+template <> QWidget* Param<Region>::getEditorWidget(QObject* sendValueChangesHere)
+{
+    Q_UNUSED(sendValueChangesHere);
+    // There's no editor widget for regions--we use the dance floor window.
+    return nullptr;
+}
+
+template <> QWidget* Param<Lightcolor>::getEditorWidget(QObject* sendValueChangesHere)
+{
+    ColorChip *editorWidget =  new ColorChip;
+    Lightcolor val;
+    getValue(val);
+    QColor qc = val.toQColor();
+    editorWidget->setButtonColor(qc);
+    editorWidget->connect(editorWidget, SIGNAL(valueChanged(Lightcolor)),
+                          sendValueChangesHere, SLOT(setValue(Lightcolor)));
+
+    return editorWidget;
 }

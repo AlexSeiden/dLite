@@ -5,8 +5,6 @@
 #include <QList>
 #include <QSet>
 
-//#include "CuesheetScene.h"
-//#include "CuesheetView.h"
 #include "Param.h"
 
 class Node;
@@ -27,18 +25,22 @@ public:
     ~GraphWidget() {}
 
     void addTheseNodes(QList<Node*> aBunchOfNodes);
+    void writeNodeUiToJSONObj(const Node *node, QJsonObject& json);
+    void readNodeUiFromJSONObj(Node* node, const QJsonObject &json);
 
 public slots:
-    void addNode(Node *node);
+    void addNode(Node *node, QJsonObject* json = nullptr);
+    void addConnection(ParamBase *, ParamBase*);
     void selectionChanged();
     void frameAll();
     void frameSelection();
+    void zoomOut();
+    void zoomIn();
 
     void subrangeHasChanged(Subrange *subrange);
 
 private:
     void frameItems(QList<QGraphicsItem*> items);
-    void addConnection(ParamBase *, ParamBase*);
     void deleteSelection();
 
     CuesheetScene *     _scene;

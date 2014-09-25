@@ -202,7 +202,7 @@ void MainWidget::showOpenDialog()
         bool result = NodeFactory::Singleton()->readFromFile(fileName);
         if (result) {
             _filename = fileName;
-            m_graphWidget->addTheseNodes(NodeFactory::Singleton()->allNodes());
+//            m_graphWidget->addTheseNodes(NodeFactory::Singleton()->allNodes());
         }
         updateButtonStates();
     }
@@ -369,6 +369,14 @@ void MainWidget::createShortcuts()
     m_frameSelectedShortcut = new QShortcut(Qt::Key_F, this);
     m_frameSelectedShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_frameSelectedShortcut, SIGNAL(activated()), m_graphWidget, SLOT(frameSelection()));
+
+    m_zoomOut = new QShortcut(Qt::Key_Minus, this);
+    m_zoomOut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_zoomOut, SIGNAL(activated()), m_graphWidget, SLOT(zoomOut()));
+
+    m_zoomIn = new QShortcut(Qt::Key_Equal, this);
+    m_zoomIn->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_zoomIn, SIGNAL(activated()), m_graphWidget, SLOT(zoomIn()));
 
     // Saving
     m_saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
