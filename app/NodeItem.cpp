@@ -4,7 +4,6 @@
 #include "utils.h"
 #include <QtWidgets>
 #include <QPainterPath>
-//#include "ParamView.h"
 #include <QGraphicsProxyWidget>
 #include "ConnectorItem.h"
 
@@ -12,7 +11,6 @@
 
 //-----------------------------------------------------------------------------
 // NodeItem
-
 NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     QGraphicsObject(parent),
     _node(node)
@@ -122,6 +120,13 @@ void NodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mouseMoveEvent(event);
 }
 
+void NodeItem::rePos(const QPointF &pos)
+{
+    setPos(pos);
+    // Used for updating any attached connectors.
+    emit nodeMovedEventSignal();
+}
+
 void NodeItem::keyPressEvent(QKeyEvent *event)
 {
     // XXX  this isn't working
@@ -172,6 +177,25 @@ void NodeItem::avoidCollisions()
    }
 }
 
+// Another $$$ routine that probably isn't a big deal.
+QList<NodeItem*> NodeItem::getUpstreamNodeItems()
+{
+    QList<NodeItem*> upstream;
+    for (ParamBase *param : _node->getParams()) {
+        ParamBase *cnctParam = param->connectedParam();
+        if (cnctParam) {
+            Node *cnctNode = cnctParam->getParent();
+            Q_ASSERT(cnctNode);
+            NodeItem *cnctNodeItem = this->csScene()->getNodeItemForNode(cnctNode);
+            upstream << cnctNodeItem;
+        }
+    }
+
+    return upstream;
+}
+
+// ------------------------------------------------------------------------------
+// Serialization
 void NodeItem::readFromJSONObj(const QJsonObject &json)
 {
     // ErrorHandling
@@ -196,7 +220,6 @@ void NodeItem::writeToJSONObj(QJsonObject &json) const
 
 //-----------------------------------------------------------------------------
 // ParamItem
-
 ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
     QGraphicsObject(parent),
     _param(param)
@@ -215,13 +238,7 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
 
         // Display an editor widget for the parameter value.
 //        pv->setStyleSheet("background-color:transparent");
-#if 0
-        ParamView *pv = new ParamView(nullptr, param);
-#else
         QWidget* pv = param->getEditorWidget(this);
-        // Problem here is that now we need a whole bunch of setValue methods for ParamItem.
-        // But that's probably better than the current state.
-#endif
 
         // Proxy widget will automatically be added to the scene because it's a child
         // of an object in the scene.
@@ -237,7 +254,6 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
 #endif
     }
 }
-
 
 QRectF ParamItem::boundingRect() const
 {

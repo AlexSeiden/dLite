@@ -26,12 +26,13 @@ class CuesheetScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    explicit CuesheetScene(QObject *parent = 0);
-    SocketItem*     getSocket(QGraphicsItem *item);
-    SocketItem*     getSocketForParam(const ParamBase* param);
-    ConnectorItem*  getConnectorForClient(const ParamBase* client);
-    ConnectorItem*  getConnectorForParam(const ParamBase* param);
-    NodeItem*       getNodeItemForNode(const Node *node);
+    explicit            CuesheetScene(QObject *parent = 0);
+    SocketItem*         getSocket(QGraphicsItem *item);
+    SocketItem*         getSocketForParam(const ParamBase* param);
+    ConnectorItem*      getConnectorForClient(const ParamBase* client);
+    ConnectorItem*      getConnectorForParam(const ParamBase* param);
+    NodeItem*           getNodeItemForNode(const Node *node);
+    QList<NodeItem*>    getAllCueNodeItems();
 
 public slots:
     void setConnecting(bool status=true) {_isConnecting = status;}

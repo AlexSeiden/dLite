@@ -86,6 +86,10 @@ void GraphWidget::subrangeHasChanged(Subrange *subrange)
     }
 }
 
+// Adds a list of nodes & their connections to the scene.
+// Right now this isn't used; the file read stuff calls
+// addNode & addConnection directly so that NodeItem positions
+// can be restored.
 void GraphWidget::addTheseNodes(QList<Node*> aBunchOfNodes)
 {
     // First add all the nodes...
@@ -131,7 +135,7 @@ void GraphWidget::addNode(Node *node, QJsonObject* json)
 
     // TODO better positioning.
     QPointF  center = _csview->view()->mapToScene(_csview->view()->viewport()->rect().center());
-    nodeItem->setPos(center);
+    nodeItem->rePos(center);
     _scene->addItem(nodeItem);
     // Moves the node so it isn't right on top of one that's already displayed.
     nodeItem->avoidCollisions();
@@ -144,6 +148,8 @@ void GraphWidget::addNode(Node *node, QJsonObject* json)
         nodeItem->readFromJSONObj(*json);
 }
 
+// ------------------------------------------------------------------------------
+// Serialization
 void GraphWidget::writeNodeUiToJSONObj(const Node* node, QJsonObject& json)
 {
     NodeItem* ni = _scene->getNodeItemForNode(node);
@@ -163,6 +169,8 @@ void GraphWidget::readNodeUiFromJSONObj(Node* node, const QJsonObject& json)
         qWarning() << Q_FUNC_INFO << "Could not find NodeItem for " << node->getName();
 }
 
+// ------------------------------------------------------------------------------
+// Viewing
 void GraphWidget::zoomOut()
 {
     _csview->zoomOut(10);
@@ -185,7 +193,11 @@ void GraphWidget::frameItems(QList<QGraphicsItem *> items)
     foreach (QGraphicsItem *selection, items) {
         bbox = bbox.united(selection->boundingRect());
     }
-    _csview->view()->ensureVisible(bbox);
+    if (items.length() == 1)
+        _csview->view()->ensureVisible(bbox);
+    else
+        _csview->fitBbox(bbox);
+
 }
 
 void GraphWidget::frameSelection()
@@ -208,20 +220,13 @@ void GraphWidget::frameAll()
 
 void GraphWidget::keyPressEvent(QKeyEvent *event)
 {
+    // frameAll & frameSelected events are handled by a global app shortcut.
     switch (event->key()) {
     case Qt::Key_Delete:
     case Qt::Key_Backspace:
         deleteSelection();
         update();
         break;
-#if 0
-    case Qt::Key_A:     // Handled by global shortcuts
-        frameAll();
-        break;
-    case Qt::Key_F:
-        frameSelection();
-        break;
-#endif
     default:
         qDebug() << Q_FUNC_INFO << "keypress " << event->key() << " ; text()" << event->text();
         event->setAccepted(false);
@@ -234,4 +239,35 @@ void GraphWidget::deleteSelection() {
     foreach (QGraphicsItem *item, selection) {
         delete item;
     }
+}
+
+void GraphWidget::layoutAll()
+{
+    // TODO lots of hardw
+    const int yspacing = 20;
+
+    // Start with Cues, which will be the root of the dag:
+    QList<NodeItem*>allCues = _scene->getAllCueNodeItems();
+    QPointF nextPos = QPointF(2000., -1000.);
+    foreach (NodeItem*ni, allCues) {
+        QPointF finalPos = positionNodeItem(ni, nextPos);
+        nextPos += QPointF(0, ni->boundingRect().height() + yspacing);
+        nextPos.setY(qMax(nextPos.y(), finalPos.y()));
+    }
+}
+
+QPointF GraphWidget::positionNodeItem(NodeItem* ni, QPointF startPos)
+{
+    ni->rePos(startPos);
+    const int xspacing = 10;
+    const int yspacing = 10;
+    // Move to the left
+    QPointF nextPos = startPos - QPointF(GuiSettings::nodeWidth + xspacing, 0);
+
+    foreach (NodeItem* upstreamItem, ni->getUpstreamNodeItems()) {
+        QPointF finalPos = positionNodeItem(upstreamItem, nextPos);
+        nextPos += QPointF(0, upstreamItem->boundingRect().height() + yspacing);
+        nextPos.setY(qMax(nextPos.y(), finalPos.y()));
+    }
+    return nextPos;
 }

@@ -31,7 +31,10 @@ public:
     Node*   getNode() const {return _node;}
     virtual void beenSelected();
     virtual void beenDeselected();
-    QList<ConnectionItem*>  getConnectionItems();
+    QList<NodeItem*>  getUpstreamNodeItems();
+    void rePos(const QPointF &pos);
+
+    QList<ConnectionItem*>  getConnectionItems();       // NOTE this isn't implemented
 
     CuesheetScene* csScene() {return dynamic_cast<CuesheetScene*>(scene());}
 
@@ -40,17 +43,17 @@ public:
     virtual void writeToJSONObj(QJsonObject &json) const;
 
 public slots:
-    void    nameEdit(QString newname);
+    void        nameEdit(QString newname);
 
 signals:
-    void    nodeMovedEventSignal();
+    void        nodeMovedEventSignal();
 
 protected:
-    void    mouseMoveEvent(QGraphicsSceneMouseEvent* event);
-    void    keyPressEvent(QKeyEvent* event);
+    void        mouseMoveEvent(QGraphicsSceneMouseEvent* event);
+    void        keyPressEvent(QKeyEvent* event);
 
-    Node*   _node;
-    QMarginsF  _margins; // for padding on the bounding rect
+    Node*       _node;
+    QMarginsF   _margins; // for padding on the bounding rect
 };
 
 
@@ -58,10 +61,10 @@ class ParamItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    explicit ParamItem(ParamBase* param, QGraphicsObject* parent);
+    explicit        ParamItem(ParamBase* param, QGraphicsObject* parent);
 
-    QRectF boundingRect() const;
-    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
+    QRectF          boundingRect() const;
+    void            paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
 
     void            setSocket(SocketItem* sock) {_socket = sock;}
     SocketItem*     getSocket()                 {return _socket;}

@@ -171,7 +171,7 @@ SocketItem *CuesheetScene::getSocket(QGraphicsItem *item)
 #endif
 
     // Fuck it, must be something we can't connect to anyway.
-    qDebug() << "can't connect to type: " << typeid(item).name() << " of item " << item;
+    qWarning() <<Q_FUNC_INFO<< "can't connect to type: " << typeid(item).name() << " of item " << item;
     return nullptr;
 }
 
@@ -223,6 +223,8 @@ ConnectorItem *CuesheetScene::getConnectorForParam(const ParamBase *param)
 }
 
 // Returns the NodeItem that represents a given Node.
+// Again, O(n) in number of nodes; could use hash map, could attach NodeItem ptr to
+// Node, probably doesn't matter.
 NodeItem* CuesheetScene::getNodeItemForNode(const Node* node)
 {
     QList<QGraphicsItem*>allItems = items();
@@ -234,4 +236,18 @@ NodeItem* CuesheetScene::getNodeItemForNode(const Node* node)
             return ni;
     }
     return nullptr;
+}
+
+QList<NodeItem*> CuesheetScene::getAllCueNodeItems()
+{
+    QList<QGraphicsItem*>allItems = items();
+    QList<NodeItem*>allCues;
+    foreach (QGraphicsItem* item, allItems) {
+        NodeItem *ni = dynamic_cast<NodeItem *>(item);
+        if (! ni)
+            continue;
+        if (ni->getNode()->getType() == Node::CUE)
+            allCues << ni;
+    }
+    return allCues;
 }

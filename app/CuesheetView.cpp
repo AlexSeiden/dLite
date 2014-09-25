@@ -1,6 +1,7 @@
 #include "CuesheetView.h"
 #include "GuiSettings.h"
 #include <QtWidgets>
+#include "utils.h"
 
 #ifndef QT_NO_WHEELEVENT
 void GraphicsView::wheelEvent(QWheelEvent *e)
@@ -95,20 +96,35 @@ void CuesheetView::resetView()
     graphicsView->ensureVisible(QRectF(0, 0, 0, 0));
 }
 
+void CuesheetView::fitBbox(const QRectF &bbox)
+{
+    view()->fitInView(bbox, Qt::KeepAspectRatio);
+    setSliderFromTransform();
+}
+
+void CuesheetView::setSliderFromTransform()
+{
+    // Find scale from xform matrix:
+    QTransform xform = graphicsView->transform();
+    qreal scale = xform.m11();
+    // m22 should be the same... could check....
+    int slider = 200 * log2(scale) + 500;
+    slider = clamp(0,500,slider);
+    zoomSlider->setValue(slider);       // XXX will recurse???
+}
+
 void CuesheetView::setupMatrix()
 {
     qreal scale = qPow(qreal(2), (zoomSlider->value() - 500) / qreal(200));
-
-    /*
-    125-250 = -125
-    -125/50 = -2.5
-    -500/x = -2.5
-    x= 500/2.5 = 20
-    */
+#if 1
+    graphicsView->setTransform(QTransform());
+    graphicsView->scale(scale, scale);
+#else
     QMatrix matrix;
-    matrix.scale(scale, scale);
-
+    matrix.scale(scale,scale);
     graphicsView->setMatrix(matrix);
+#endif
+
 }
 
 void CuesheetView::zoomIn(int level)
@@ -119,4 +135,5 @@ void CuesheetView::zoomIn(int level)
 void CuesheetView::zoomOut(int level)
 {
     zoomSlider->setValue(zoomSlider->value() - level);
+//    qDebug() << Q_FUNC_INFO << zoomSlider->value();
 }

@@ -370,13 +370,17 @@ void MainWidget::createShortcuts()
     m_frameSelectedShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_frameSelectedShortcut, SIGNAL(activated()), m_graphWidget, SLOT(frameSelection()));
 
-    m_zoomOut = new QShortcut(Qt::Key_Minus, this);
-    m_zoomOut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_zoomOut, SIGNAL(activated()), m_graphWidget, SLOT(zoomOut()));
+    m_zoomOutShortcut = new QShortcut(Qt::Key_Minus, this);
+    m_zoomOutShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_zoomOutShortcut, SIGNAL(activated()), m_graphWidget, SLOT(zoomOut()));
 
-    m_zoomIn = new QShortcut(Qt::Key_Equal, this);
-    m_zoomIn->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_zoomIn, SIGNAL(activated()), m_graphWidget, SLOT(zoomIn()));
+    m_zoomInShortcut = new QShortcut(Qt::Key_Equal, this);
+    m_zoomInShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_zoomInShortcut, SIGNAL(activated()), m_graphWidget, SLOT(zoomIn()));
+
+    m_layoutAllShortcut = new QShortcut(Qt::Key_L, this);
+    m_layoutAllShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_layoutAllShortcut, SIGNAL(activated()), m_graphWidget, SLOT(layoutAll()));
 
     // Saving
     m_saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);

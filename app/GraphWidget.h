@@ -36,12 +36,14 @@ public slots:
     void frameSelection();
     void zoomOut();
     void zoomIn();
+    void layoutAll();
 
     void subrangeHasChanged(Subrange *subrange);
 
 private:
-    void frameItems(QList<QGraphicsItem*> items);
-    void deleteSelection();
+    void    frameItems(QList<QGraphicsItem*> items);
+    void    deleteSelection();
+    QPointF positionNodeItem(NodeItem* ni, QPointF startPos);
 
     CuesheetScene *     _scene;
     CuesheetView *      _csview;

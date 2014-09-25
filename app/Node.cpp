@@ -86,10 +86,9 @@ void Node::writeToJSONObj(QJsonObject &json) const
 
     json["name"] = _name;
     json["active"] = _active;
-    // "classname" here is the name used in the NodeFactory registry.
+    // by "classname", I mean the name used as used in the NodeFactory registry.
     json["classname"] = _className;
     json["uuid"] = _uuid.toString();
-    //json["type"] = _type; // Type is unchanging per class.
 
     QJsonArray paramJsonArray;
     foreach (const ParamBase *param, _paramList) {

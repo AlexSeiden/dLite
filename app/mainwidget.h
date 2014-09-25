@@ -95,9 +95,10 @@ private:
 
     QShortcut*              m_spaceShortcut;
     QShortcut*              m_frameAllShortcut;
+    QShortcut*              m_layoutAllShortcut;
     QShortcut*              m_frameSelectedShortcut;
-    QShortcut*              m_zoomOut;
-    QShortcut*              m_zoomIn;
+    QShortcut*              m_zoomOutShortcut;
+    QShortcut*              m_zoomInShortcut;
     QShortcut*              m_saveShortcut;
     QShortcut*              m_saveAsShortcut;
     QShortcut*              m_openFileShortcut;

@@ -41,8 +41,10 @@ public:
 public slots:
     void zoomIn(int level = 10);
     void zoomOut(int level = 10);
+    void fitBbox(const QRectF& bbox);
 
 private slots:
+    void setSliderFromTransform();
     void resetView();
     void setupMatrix();
 
