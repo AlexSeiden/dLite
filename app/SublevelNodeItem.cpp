@@ -55,9 +55,7 @@ void RangeMeter::paintEvent(QPaintEvent *event)
     QRect squareRect = rect();
     squareRect.setLeft(rect().right()-rect().height());
     QColor pulseColor;
-    double clampedLevel = _level;
-    clampedLevel = qMin(0.,clampedLevel);
-    clampedLevel = qMax(1.,clampedLevel);
+    double clampedLevel = clamp(0.,1.0, _level);
     pulseColor.setHsvF(0.0, 0.0, clampedLevel);
     painter.fillRect(squareRect, pulseColor);
     painter.drawRect(squareRect);
