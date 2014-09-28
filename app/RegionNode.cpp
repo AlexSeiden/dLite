@@ -40,6 +40,14 @@ void RegionNode::operator()()
     _region._qvOutput.setValue(_region._value);
 }
 
+RegionNode* RegionNode::clone()
+{
+    RegionNode* lhs = new RegionNode;
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
+}
+
 void RegionNode::beenSelected()
 {
     emit regionNodeSelected(this);

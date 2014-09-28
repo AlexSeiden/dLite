@@ -14,6 +14,7 @@ public:
 
     void setTriggerInterval(int interval) {_interval.setValue(interval);}
     void operator() ();
+    virtual TriggerEvery* clone();
 
 private:
     void    reset() {_output.setValue(false);}
@@ -32,6 +33,31 @@ private:
 
 
 // ------------------------------------------------------------------------------
+//  Multiply
+class Multiply : public Node
+{
+public:
+    Multiply();
+    void operator() ();
+    virtual Multiply* clone();
+
+private:
+    void    reset() {_output.setValue(false);}
+
+    Param<bool>    _output;
+
+    // Parameters
+    Param<int>     _multiple;
+    Param<bool>    _input;
+
+    // Internal timekeepers, in milliseconds
+    int     _nextRefresh;
+    int     _lastInputBeat;
+    int     _delta;
+};
+
+
+// ------------------------------------------------------------------------------
 //  NodeOnset
 
 // Imports "onset" data from sonic-annotator
@@ -43,6 +69,7 @@ class NodeOnset : public Node
 public:
     NodeOnset();
     void operator() (void);
+    virtual NodeOnset* clone();
 
     int     getNextBeat(int sample);
 
@@ -74,6 +101,7 @@ class NodeBar : public Node
 public:
     NodeBar();
     void    operator() (void);
+    virtual NodeBar* clone();
 
     void    loadFile();
     void    loadFile(QString filename);
@@ -101,6 +129,7 @@ class NodeBarBeat : public Node
 public:
     NodeBarBeat();
     void    operator() (void);
+    virtual NodeBarBeat* clone();
 
     void    loadFile();
     void    loadFile(QString filename);

@@ -27,14 +27,14 @@ void Cue::writeToJSONObj(QJsonObject &json) const
 {
     // Override for serialization
     Node::writeToJSONObj(json);
-    json["compMode"] = _compMode;       // XXX
-    json["decaymode"] = _decayMode;     // XXX
+    json["compMode"] = _compMode;
+    json["decaymode"] = _decayMode;
 }
 
 void Cue::readFromJSONObj(const QJsonObject &json)
 {
     // Override for serialization
     Node::readFromJSONObj(json);
-    _compMode = compMode_t(qRound(json["compMode"].toDouble()));   // XXX
-    _decayMode = decayMode_t(qRound(json["decayMode"].toDouble()));   // XXX
+    _compMode = compMode_t(qRound(json["compMode"].toDouble()));
+    _decayMode = decayMode_t(qRound(json["decayMode"].toDouble()));
 }

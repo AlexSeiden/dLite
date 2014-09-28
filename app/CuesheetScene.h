@@ -32,6 +32,8 @@ public:
     ConnectorItem*      getConnectorForClient(const ParamBase* client);
     ConnectorItem*      getConnectorForParam(const ParamBase* param);
     NodeItem*           getNodeItemForNode(const Node *node);
+    QList<NodeItem*>    getAllNodeItems();
+    QList<NodeItem*>    getSelectedNodeItems();
     QList<NodeItem*>    getAllCueNodeItems();
 
 public slots:

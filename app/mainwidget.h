@@ -93,16 +93,20 @@ private:
     QPushButton*            m_settingsButton;
     QIcon                   m_settingsIcon;
 
-    QShortcut*              m_spaceShortcut;
+    QShortcut*              m_playPauseShortcut;
+    QShortcut*              m_rewindShortcut;
     QShortcut*              m_frameAllShortcut;
-    QShortcut*              m_layoutAllShortcut;
     QShortcut*              m_frameSelectedShortcut;
+    QShortcut*              m_layoutAllShortcut;
+    QShortcut*              m_xAlignShortcut;
+    QShortcut*              m_yAlignShortcut;
     QShortcut*              m_zoomOutShortcut;
     QShortcut*              m_zoomInShortcut;
     QShortcut*              m_saveShortcut;
     QShortcut*              m_saveAsShortcut;
     QShortcut*              m_openFileShortcut;
-    QShortcut*              m_rewindShortcut;
+    QShortcut*              m_duplicateShortcut;
+    QShortcut*              m_groupShortcut;
 
 #if 1 // NUKEMEMAYBE
     QLabel*                 m_infoMessage;

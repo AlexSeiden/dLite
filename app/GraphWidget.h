@@ -33,16 +33,19 @@ public slots:
     void addConnection(ParamBase *, ParamBase*);
     void selectionChanged();
     void frameAll();
+    void xAlign();
+    void yAlign();
     void frameSelection();
     void zoomOut();
     void zoomIn();
     void layoutAll();
-
-    void subrangeHasChanged(Subrange *subrange);
+    void deleteSelection();
+    void group();
+    void duplicate();
 
 private:
+    void    align(bool xaxis);
     void    frameItems(QList<QGraphicsItem*> items);
-    void    deleteSelection();
     QPointF positionNodeItem(NodeItem* ni, QPointF startPos);
 
     CuesheetScene *     _scene;

@@ -10,9 +10,9 @@ public:
 
     // Functor that provides closure over instance object,
     // and allows downstream clients to evaluate.
-    void operator() ();
-
-    void paramHasBeenEdited();
+    void    operator() ();
+    virtual RandomFloat* clone();
+    void    paramHasBeenEdited();
 
 private:
     // Parameters
@@ -33,8 +33,9 @@ class RandomInt : public Node
 {
 public:
     RandomInt();
-    void operator() ();
-    void paramHasBeenEdited();
+    void    operator() ();
+    virtual RandomInt* clone();
+    void    paramHasBeenEdited();
 
 private:
     // Parameters
@@ -56,17 +57,16 @@ class SequenceInt : public Node
 public:
     SequenceInt();
 
-    // Functor that provides closure over instance object,
-    // and allows downstream clients to evaluate.
-    void operator() ();
-
-    void paramHasBeenEdited();
+    void    operator() ();
+    virtual SequenceInt* clone();
+    void    paramHasBeenEdited();
 
 private:
     // Parameters
     Param<int> _output;
     Param<int> _min;
     Param<int> _max;
+    Param<int> _step;
     Param<bool> _trigger;
 
 private:

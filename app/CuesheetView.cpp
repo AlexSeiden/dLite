@@ -3,23 +3,6 @@
 #include <QtWidgets>
 #include "utils.h"
 
-#ifndef QT_NO_WHEELEVENT
-void GraphicsView::wheelEvent(QWheelEvent *e)
-{
-    // This is only here to help implement zooming with wheel events.
-    // LATER pinch-to-zoom work.
-    if (e->modifiers() & Qt::ControlModifier) {
-        if (e->delta() > 0)
-            view->zoomIn(6);
-        else
-            view->zoomOut(6);
-        e->accept();
-    } else {
-        QGraphicsView::wheelEvent(e);
-    }
-}
-#endif
-
 CuesheetView::CuesheetView(QWidget *parent)
     : QFrame(parent)
 {
@@ -30,13 +13,15 @@ CuesheetView::CuesheetView(QWidget *parent)
     graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
     graphicsView->setInteractive(true);
 
+    setStyleSheet("QFrame { background-color: #433F3B }");
+
     // ??? Not sure about these flags...they came from the example stuff
     graphicsView->setOptimizationFlags(QGraphicsView::DontSavePainterState);
     graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
     graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
 //    int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
-    QSize iconSize(GuiSettings::iconSize, GuiSettings::iconSize);
+    QSize iconSize(GuiSettings::zoomIconSize, GuiSettings::zoomIconSize);
 
     // Create zoom slider
     QToolButton *zoomInIcon = new QToolButton;
@@ -110,21 +95,14 @@ void CuesheetView::setSliderFromTransform()
     // m22 should be the same... could check....
     int slider = 200 * log2(scale) + 500;
     slider = clamp(0,500,slider);
-    zoomSlider->setValue(slider);       // XXX will recurse???
+    zoomSlider->setValue(slider);
 }
 
 void CuesheetView::setupMatrix()
 {
     qreal scale = qPow(qreal(2), (zoomSlider->value() - 500) / qreal(200));
-#if 1
     graphicsView->setTransform(QTransform());
     graphicsView->scale(scale, scale);
-#else
-    QMatrix matrix;
-    matrix.scale(scale,scale);
-    graphicsView->setMatrix(matrix);
-#endif
-
 }
 
 void CuesheetView::zoomIn(int level)
@@ -137,3 +115,20 @@ void CuesheetView::zoomOut(int level)
     zoomSlider->setValue(zoomSlider->value() - level);
 //    qDebug() << Q_FUNC_INFO << zoomSlider->value();
 }
+
+#ifndef QT_NO_WHEELEVENT
+void GraphicsView::wheelEvent(QWheelEvent *e)
+{
+    // This is only here to help implement zooming with wheel events.
+    // LATER pinch-to-zoom work.
+    if (e->modifiers() & Qt::ControlModifier) {
+        if (e->delta() > 0)
+            view->zoomIn(6);
+        else
+            view->zoomOut(6);
+        e->accept();
+    } else {
+        QGraphicsView::wheelEvent(e);
+    }
+}
+#endif

@@ -10,7 +10,6 @@
 
 // ------------------------------------------------------------------------------
 //  Node
-//  base class
 
 QList<Node*> Node::_allNodes;
 
@@ -18,17 +17,45 @@ Node::Node() :
     _name(QString()),
     _active(true),
     _type(UNDEFINED),
+    _frameLastEvaluated(-1),
     _uuid(QUuid::createUuid())
 {
+    // Style Hmmm, this might be a good place to use a weak ptr.
     _allNodes.append(this);
+
+    _active.setName("active");
+    _active.setOutput(false);
+    _active.setConnectable(false);      // Could potentially be connectable,
+                                        // but would have to make sure
+                                        // that connection was evaluated
+                                        // prior to use.
+    _paramList << &_active;
 }
 
 Node::~Node() {
     _allNodes.removeAll(this);
 }
 
-// The "beenSelected" methods are virtual so that nodes like Sublevels
-// & Paths can communicate with special editors.
+void Node::cloneHelper(Node& lhs)
+{
+    // Things that are simply copied
+    // (this is probably redundant because implicit copy constructor will do this)
+    lhs._type       = _type;
+    lhs._className  = _className;
+
+    // Things that are modified
+    lhs._name     = _name + "COPY";  // XXX better uniquenames
+    lhs._frameLastEvaluated = -1;
+    lhs._uuid     = QUuid::createUuid();
+
+#if 0
+    // XXX copy parameter values
+    foreach (ParamBase* param, lhs._paramList) {
+        param->
+    }
+#endif
+}
+
 void Node::beenSelected() {}
 void Node::beenDeselected() {}
 
@@ -36,7 +63,6 @@ Node::node_t Node::getType()
 {
     return _type;
 }
-
 
 // GROSS.  at least, should be a better way to init this.
 // should be a better way to find out without having to maintain this.
@@ -72,20 +98,20 @@ bool Node::evaluatedThisFrame()
     return false;
 }
 
+// ---------------------------
 // Serialization
 void Node::readFromJSONObj(const QJsonObject &json)
 {
-    _name      = json["name"].toString();
-    _active    = json["active"].toBool();
-
+    setName(json["name"].toString());
+    setActive(json["active"].toBool());
 }
 
 void Node::writeToJSONObj(QJsonObject &json) const
 {
     // ErrorHandling
 
-    json["name"] = _name;
-    json["active"] = _active;
+    json["name"] = getName();
+//    json["active"] = isActive();
     // by "classname", I mean the name used as used in the NodeFactory registry.
     json["classname"] = _className;
     json["uuid"] = _uuid.toString();
@@ -114,7 +140,6 @@ ParamBase *Node::getParamByName(QString paramname)
     // ErrorHandling
     return nullptr;
 }
-
 
 // ------------------------------------------------------------------------------
 //  NodeFactory
@@ -155,24 +180,7 @@ Node * NodeFactory::instatiateNode(QString classname, QUuid uuid)
         instance->_uuid = uuid;  // GROSS this keeps uuid from being const.
     instance->_className = classname; // GROSS should get classname automatically in ctor
 
-    // Add to list of all nodes instantiated so far.
-    // XXX Hmmm, this might be a good place to use a weak ptr.
-    // Alternatively, would it be better to maintain this list as a static
-    // member of the Node class, and have the ctors and dtors deal with this?
-    // I think yes.
-//    _allNodes.append(instance);
-
-#if 0
-    // wrap instance in a shared ptr and return
-    // XXX not sure if I'm handling the shared_ptr stuff correctly.
-    // also not sure if it's needed.
-    if (instance != nullptr)
-        return std::shared_ptr<Node>(instance);
-    else
-        return nullptr;
-#else
     return instance;
-#endif
 }
 
 NodeFactory * NodeFactory::Singleton() {
@@ -192,6 +200,19 @@ const QStringList & NodeFactory::getNodesOfType(Node::node_t typeInfo) {
     return _registryByType[typeInfo];
 }
 
+void NodeFactory::duplicateNodes(QList<Node*> dupeThese)
+{
+    // find internal connections
+
+    // Duplicate each node
+    QList<Node*> newnodes;
+    foreach (Node* node, dupeThese) {
+        Node* newnode = node->clone();
+        Cupid::Singleton()->getGraphWidget()->addNode(newnode);
+        newnodes << newnode;
+    }
+
+}
 
 // -------------------
 // File writing
@@ -222,8 +243,8 @@ void NodeFactory::writeToJSONObj(QJsonObject &json) const
          QJsonObject nodeJson;
          node->writeToJSONObj(nodeJson);
          nodeJsonArray.append(nodeJson);
-     }
-     json["nodes"] = nodeJsonArray;
+    }
+    json["nodes"] = nodeJsonArray;
 
      // TODO write:
      //     audioFilename
@@ -249,9 +270,6 @@ bool NodeFactory::readFromFile(QString filename)
     return true;
 }
 
-// XXX right now, we read all the nodes then instatiate all the
-// graph stuff.  but to restore saved ui from the json file,
-// it'd be easier to have the graph nodes instatiated as-we-go-along.
 void NodeFactory::readAllNodes(const QJsonObject &json)
 {
     // TODO something like this:
@@ -262,13 +280,19 @@ void NodeFactory::readAllNodes(const QJsonObject &json)
     // Or maybe this should be a switch in the file open dialog?
 
     QJsonArray nodesArray = json["nodes"].toArray();
+    // Instatiate a node for every node in the json file.
+    // Keep track of any connections that will need to be made in
+    // the _connectionsToMake[] map.
     for (int i = 0; i < nodesArray.size(); ++i) {
+        // Parse and instatiate each node:
         QJsonObject nodeObject = nodesArray[i].toObject();
         Node* newnode = readNodeFromJSONObj(nodeObject);
+
+        // Add to the graph, and restore graph position:
         Cupid::Singleton()->getGraphWidget()->addNode(newnode, &nodeObject);
     }
 
-    // Make connections
+    // Make connections between nodes:
     foreach (ParamBase* param, _connectionsToMake.keys()) {
         QUuid serverUuid =  _connectionsToMake[param];
         ParamBase* server = _registryUUIDtoParam[serverUuid];

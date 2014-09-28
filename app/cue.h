@@ -20,6 +20,7 @@ public:
     decayMode_t     getDecayMode()                 {return _decayMode;}
 
     virtual void    evaluate() = 0;
+    virtual Cue*    clone() = 0;
 
     static void     setDancefloor(Dancefloor *dfmodel) {_dfModel = dfmodel;}
 

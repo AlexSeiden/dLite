@@ -1,9 +1,9 @@
-#include "CueBox.h"
+#include "DotCue.h"
 #include "DanceFloor.h"
 #include <QDebug>
 #include "Node.h"
 
-CueBox::CueBox() :
+DotCue::DotCue() :
     _x(10),
     _y(8),
     _scale(1.0),
@@ -42,13 +42,22 @@ CueBox::CueBox() :
 // Is this actually called?  I don't think so, but I guess since Node is
 // pure virtual and operator() must be defined so that the class is concrete,
 // this is here...
-void CueBox::operator()() {
+void DotCue::operator()() {
     evaluate();
 }
 
-void CueBox::evaluate()
+DotCue* DotCue::clone()
 {
-    if (!_active) return;
+    DotCue* lhs = new DotCue;
+    cloneHelper(*lhs);
+    setParamParent();
+
+    return lhs;
+}
+
+void DotCue::evaluate()
+{
+    if (! isActive()) return;
 
     evalAllInputs();
 
@@ -72,4 +81,4 @@ void CueBox::evaluate()
 }
 
 
-static Registrar<CueBox>     registrar("Box", Node::CUE);
+static Registrar<DotCue>     registrar("Dot", Node::CUE);

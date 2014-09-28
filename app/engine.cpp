@@ -324,7 +324,7 @@ void Engine::calculateSpectrum(qint64 start, qint64 end)
                  << "spectrumAnalyser.isReady" << m_spectrumAnalyser.isReady();
 
     if (m_spectrumAnalyser.isReady()) {
-        // XXX are we sizing & clearing correctly???
+        // ??? are we sizing & clearing correctly???
         // Must copy data into spectrum buffer because Hahn window will be applied.
         // Note fromRawData uses implicit shared array.
         m_spectrumBuffer = QByteArray::fromRawData(m_buffer.constData() + start,

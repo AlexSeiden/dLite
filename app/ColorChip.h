@@ -2,6 +2,7 @@
 #define COLORCHIP_H
 
 #include <QToolButton>
+#include <QPushButton>
 #include "lightcolor.h"
 
 class ColorChip : public QToolButton

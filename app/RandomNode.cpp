@@ -68,6 +68,14 @@ void RandomFloat::operator()()
     _output._qvOutput = _output._value;
 }
 
+RandomFloat* RandomFloat::clone()
+{
+    RandomFloat* lhs = new RandomFloat;
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
+}
+
 // ------------------------------------------------------------------------------
 //  RandomInt
 
@@ -118,7 +126,6 @@ void RandomInt::setRandomEngine()
     _max.getValue(max);
     // TODO re-run this when distributions change.
     // XXX if these are connections, this is going to break.
-    // Do we want a "non-animating" parameter class, or flag?
     _distribution = new std::uniform_int_distribution<int>(min, max);
 }
 
@@ -143,6 +150,14 @@ void RandomInt::operator()()
     _output._qvOutput = _output._value;
 }
 
+RandomInt* RandomInt::clone()
+{
+    RandomInt* lhs = new RandomInt();
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
+}
+
 // ------------------------------------------------------------------------------
 //  SequenceInt
 //      Takes a trigger, and every time increments between _min and _max value.
@@ -151,6 +166,7 @@ SequenceInt::SequenceInt() :
     _output(0),
     _min(6),
     _max(12),
+    _step(1),
     _trigger(true)
 {
     setName(QString("SequenceInt%1").arg(nodeCount()));
@@ -169,12 +185,16 @@ SequenceInt::SequenceInt() :
     _max.setOutput(false);
     _max.setConnectable(true);
 
+    _step.setName("step");
+    _step.setOutput(false);
+    _step.setConnectable(true);
+
     _trigger.setName("trigger");
     _trigger.setOutput(false);
     _trigger.setConnectable(true);
 
     _counter = _min._value;
-    _paramList << &_output << &_min << &_max << &_trigger;
+    _paramList << &_output << &_min << &_max << &_step << &_trigger;
     setParamParent();
 }
 
@@ -198,7 +218,7 @@ void SequenceInt::operator()()
     // First, check the trigger to see if it's time for a new number
     // XXX also breaks when scrubbing.
     if (_trigger._value) {
-        _counter++;
+        _counter += _step._value;
         if (_counter > _max._value)
             _counter = _min._value;
         _output._value =  _counter;
@@ -206,6 +226,14 @@ void SequenceInt::operator()()
 
     // Boilerplate end of operator:
     _output._qvOutput = _output._value;
+}
+
+SequenceInt* SequenceInt::clone()
+{
+    SequenceInt* lhs = new SequenceInt;
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
 }
 
 static Registrar<RandomFloat>   registrar1("RandomFloat", Node::FLOAT);

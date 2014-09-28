@@ -11,7 +11,7 @@ CueLibView::CueLibView(QWidget *parent) :
     QWidget(parent)
 {
     createUi();
-    move(520, 10);
+    move(610, 10);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 

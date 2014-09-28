@@ -14,7 +14,7 @@ SublevelNodeItem::SublevelNodeItem(Node *node, QGraphicsItem *parent) :
     CHECKED_CONNECT(_sln, SIGNAL(levelChanged(qreal)), _slm, SLOT(levelChanged(qreal)));
     QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
     proxy->setWidget(_slm);
-    proxy->setPos(0, GuiSettings::paramHeight*2);
+    proxy->setPos(0, (_node->getParams().size()+1)*GuiSettings::paramHeight);
 }
 
 QRectF SublevelNodeItem::boundingRect() const

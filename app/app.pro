@@ -26,7 +26,6 @@ SOURCES  += \
     lightcolor.cpp \
     Param.cpp \
     Cue.cpp \
-    CueBox.cpp \
     BeatFiles.cpp \
     Node.cpp \
     SublevelNode.cpp \
@@ -41,7 +40,9 @@ SOURCES  += \
     Firing.cpp \
     Device.cpp \
     Region.cpp \
-    RegionCue.cpp
+    RegionCue.cpp \
+    DotCue.cpp \
+    Remap.cpp
 
 HEADERS  += \
     engine.h \
@@ -53,7 +54,6 @@ HEADERS  += \
     lightcolor.h \
     Param.h \
     Cue.h \
-    CueBox.h \
     BeatFiles.h \
     Node.h \
     SublevelNode.h \
@@ -68,7 +68,9 @@ HEADERS  += \
     Firing.h \
     Device.h \
     Region.h \
-    RegionCue.h
+    RegionCue.h \
+    DotCue.h \
+    Remap.h
 
 fftreal_dir = ../3rdparty/fftreal
 

@@ -44,6 +44,7 @@ public:
 
 public slots:
     void        nameEdit(QString newname);
+    void        minimize(int status);  // TODO
 
 signals:
     void        nodeMovedEventSignal();
@@ -53,6 +54,7 @@ protected:
     void        keyPressEvent(QKeyEvent* event);
 
     Node*       _node;
+    bool        _minimized;
     QMarginsF   _margins; // for padding on the bounding rect
 };
 

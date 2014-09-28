@@ -34,6 +34,8 @@ public:
     static QFont    paramTextFont;
     static int      socketWidth;
     static int      paramHeight;
+    static int      paramTextOffset;
+    static int      paramEditorOffset;
     static QPen     socketOutlinePen;
     static QColor   connectorColor;
     static QColor   connectorCenterColor;
@@ -41,7 +43,8 @@ public:
     static QPen     connectorPenSelected;
     static QBrush   connectorBrush;
     static int      connectorEndSize;
-    static int      iconSize;
+    static int      zoomIconSize;
+    static int      colorChipSize;
 
     // Dance floor widget
     static QColor  df_cellSepColor;

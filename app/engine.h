@@ -123,7 +123,7 @@ private:
     qint64              m_playPosition;
 
     QByteArray          m_buffer;
-    QBuffer             _qbuf;  // TODO better name
+    QBuffer             _qbuf;  // TODO better name for qbuf
 
     int                 m_spectrumBufferLength;	// in bytes
     QByteArray          m_spectrumBuffer;
@@ -132,7 +132,7 @@ private:
     // Interval in milliseconds between calls that update the spectrum, etc.
     int    				m_notifyIntervalMs;
 
-    //  Only needed to call evaluate.  Perhaps should use signals?  XXX
+    //  Style : dfModel only needed to call evaluate.  Perhaps should use signals?
     Dancefloor          *_dfModel;
 
     qint64              _uSecs;

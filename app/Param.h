@@ -63,20 +63,17 @@ public:
     void setProvider(std::function<void()> provider) {_provider = provider;}
 
     // Returns a pointer of the Node that this is a parameter for.
-    Node *  getParent() {return _parentNode;}
+    Node *  getParentNode() {return _parentNode;}
     void    setParent(Node *parent) {_parentNode = parent;}
 
     // Valid only for input nodes
     Node *getServer() {
         if (_connectedParam)
-            return _connectedParam->getParent();
+            return _connectedParam->getParentNode();
         return nullptr;
     }
 
-#if 1
-    // TODO this is a better way of doing ParamView
     virtual QWidget* getEditorWidget(QObject* sendValueChangesHere);
-#endif
 
     // Serialization
     virtual void readFromJSONObj(const QJsonObject &json);
@@ -110,7 +107,6 @@ protected:
     float                   _minVal, _maxVal, _stepVal;
 
     friend class NodeFactory;
-//    friend class ParamView;
 };
 
 
@@ -157,9 +153,7 @@ public:
     virtual void readFromJSONObj(const QJsonObject &json);
     virtual void writeToJSONObj(QJsonObject &json) const;
 
-#if 1
     virtual QWidget* getEditorWidget(QObject* sendValueChangesHere);
-#endif
 };
 
 // ------------------------------------------------------------------------------

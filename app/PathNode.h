@@ -20,6 +20,7 @@ class PathNode : public QObject, public Node
 public:
     PathNode(QObject *parent = 0);
     void operator() ();
+    virtual PathNode* clone();
     void beenSelected();
     void beenDeselected();
 

@@ -11,6 +11,7 @@ public:
     // Functor that provides closure over instance object,
     // and allows downstream clients to evaluate.
     void operator() ();
+    virtual ColorRamp* clone();
 
 private:
     // Parameters
@@ -26,6 +27,7 @@ class BriteColor : public Node
 public:
     BriteColor();
     void operator() ();
+    virtual BriteColor* clone();
     void paramHasBeenEdited();
 
 private:
@@ -45,6 +47,7 @@ class Palette : public Node
 public:
     Palette();
     void operator() ();
+    virtual Palette* clone();
 
 private:
     // Parameters

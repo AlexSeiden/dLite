@@ -23,8 +23,6 @@ GraphWidget::GraphWidget(QWidget *parent) :
     _csview->view()->setScene(_scene);
 
     CHECKED_CONNECT(_scene, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));
-    // This doesn't work, bc (afaik) the widgets (bc they are gfxitems) don't end up being children of the graphview.
-//    setStyleSheet("QLineEdit { background-color: yellow }");
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setSpacing(0);
@@ -67,25 +65,6 @@ void GraphWidget::selectionChanged()
     _wasSelected = newSelection;
 }
 
-void GraphWidget::subrangeHasChanged(Subrange *subrange)
-{
-    QList<QGraphicsItem *> selection = _scene->selectedItems();
-    foreach (QGraphicsItem *item, selection) {
-        SublevelNodeItem *nodeItem = dynamic_cast<SublevelNodeItem *>(item);
-        int nSublevelNodes = 0;
-        if (nodeItem) {
-            nSublevelNodes++;
-            SublevelNode *node= dynamic_cast<SublevelNode *>(nodeItem->getNode());
-            node->setSubrange(subrange);
-        }
-
-        if (nSublevelNodes > 1) {
-            // ErrorHandling
-            qDebug() << "Error: multiple subranges simulatnously selected " << Q_FUNC_INFO << nSublevelNodes;
-        }
-    }
-}
-
 // Adds a list of nodes & their connections to the scene.
 // Right now this isn't used; the file read stuff calls
 // addNode & addConnection directly so that NodeItem positions
@@ -121,7 +100,6 @@ void GraphWidget::addConnection(ParamBase* server, ParamBase* client)
    }
 }
 
-// Style:  This is doing a lot of stuff, that might be better implemented elsewhere?
 void GraphWidget::addNode(Node *node, QJsonObject* json)
 {
     NodeItem *nodeItem;
@@ -162,7 +140,6 @@ void GraphWidget::writeNodeUiToJSONObj(const Node* node, QJsonObject& json)
 void GraphWidget::readNodeUiFromJSONObj(Node* node, const QJsonObject& json)
 {
     NodeItem* ni = _scene->getNodeItemForNode(node);
-    // XXX this is called before ni is instatiated....
     if (ni)
         ni->readFromJSONObj(json);
     else
@@ -217,6 +194,69 @@ void GraphWidget::frameAll()
     frameItems(allItems);
 }
 
+// Automatically layout all nodes.
+void GraphWidget::layoutAll()
+{
+    // Start with Cues, which will be the root of the dag:
+    QList<NodeItem*>allCues = _scene->getAllCueNodeItems();
+    QPointF nextPos = QPointF(2000., -1000.);
+    foreach (NodeItem*ni, allCues) {
+        QPointF finalPos = positionNodeItem(ni, nextPos);
+        nextPos += QPointF(0, ni->boundingRect().height() + GuiSettings::nodeSpacing);
+        nextPos.setY(qMax(nextPos.y(), finalPos.y()));
+    }
+
+    // TODO orphan nodes (ones not connected) aren't handled.
+}
+
+// Recursively layout a node and its connections.
+QPointF GraphWidget::positionNodeItem(NodeItem* ni, QPointF startPos)
+{
+    ni->rePos(startPos);
+    // Move to the left
+    QPointF nextPos = startPos - QPointF(GuiSettings::nodeWidth + GuiSettings::nodeSpacing/2, 0);
+
+    foreach (NodeItem* upstreamItem, ni->getUpstreamNodeItems()) {
+        QPointF finalPos = positionNodeItem(upstreamItem, nextPos);
+        nextPos += QPointF(0, upstreamItem->boundingRect().height() + GuiSettings::nodeSpacing);
+        nextPos.setY(qMax(nextPos.y(), finalPos.y()));
+    }
+    return nextPos;
+}
+
+// Align selected nodes horizontally or vertically.
+void GraphWidget::align(bool xaxis)
+{
+    QList<NodeItem*> selection = _scene->getSelectedNodeItems();
+    // Find center:
+    qreal center = 0;
+    foreach (NodeItem* ni, selection)
+        if (xaxis)
+            center += ni->pos().x();
+        else
+            center += ni->pos().y();
+    center /= selection.size();
+
+    // Move each node to center along that axis
+    foreach (NodeItem* ni, selection) {
+        QPointF newpos = ni->pos();
+        if (xaxis)
+            newpos.setX(center);
+        else
+            newpos.setY(center);
+        ni->rePos(newpos);
+    }
+}
+
+void GraphWidget::yAlign()
+{
+    align(false);
+}
+
+void GraphWidget::xAlign()
+{
+    align(true);
+}
 
 void GraphWidget::keyPressEvent(QKeyEvent *event)
 {
@@ -241,33 +281,16 @@ void GraphWidget::deleteSelection() {
     }
 }
 
-void GraphWidget::layoutAll()
-{
-    // TODO lots of hardw
-    const int yspacing = 20;
-
-    // Start with Cues, which will be the root of the dag:
-    QList<NodeItem*>allCues = _scene->getAllCueNodeItems();
-    QPointF nextPos = QPointF(2000., -1000.);
-    foreach (NodeItem*ni, allCues) {
-        QPointF finalPos = positionNodeItem(ni, nextPos);
-        nextPos += QPointF(0, ni->boundingRect().height() + yspacing);
-        nextPos.setY(qMax(nextPos.y(), finalPos.y()));
-    }
+void GraphWidget::group() {
+    QList<NodeItem *> selection = _scene->getSelectedNodeItems();
 }
 
-QPointF GraphWidget::positionNodeItem(NodeItem* ni, QPointF startPos)
-{
-    ni->rePos(startPos);
-    const int xspacing = 10;
-    const int yspacing = 10;
-    // Move to the left
-    QPointF nextPos = startPos - QPointF(GuiSettings::nodeWidth + xspacing, 0);
-
-    foreach (NodeItem* upstreamItem, ni->getUpstreamNodeItems()) {
-        QPointF finalPos = positionNodeItem(upstreamItem, nextPos);
-        nextPos += QPointF(0, upstreamItem->boundingRect().height() + yspacing);
-        nextPos.setY(qMax(nextPos.y(), finalPos.y()));
+void GraphWidget::duplicate() {
+    QList<NodeItem *> selection = _scene->getSelectedNodeItems();
+    // Convert to list of nodes:
+    QList<Node*> out;
+    foreach (NodeItem* item, selection) {
+        out << item->getNode();
     }
-    return nextPos;
+    NodeFactory::Singleton()->duplicateNodes(out);
 }

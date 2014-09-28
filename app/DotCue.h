@@ -1,17 +1,16 @@
-#ifndef CUEBOX_H
-#define CUEBOX_H
+#ifndef DOTCUE_H
+#define DOTCUE_H
 
 #include "Cue.h"
 
-class CueBox : public Cue
+class DotCue : public Cue
 {
 public:
-    CueBox();
+    DotCue();
     void evaluate();
 
     void operator() (void);
-
-    friend class CueBoxView;
+    virtual DotCue* clone();
 
 protected:
     Param<int>      _x;
@@ -21,4 +20,4 @@ protected:
     Param<Lightcolor>      _color;
 };
 
-#endif // CUEBOX_H
+#endif // DOTCUE_H

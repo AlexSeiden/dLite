@@ -69,7 +69,7 @@ QRectF ConnectorItem::boundingRect() const
 
     QRectF bbox(QPointF(left,top),QPointF(right, bottom));
 
-    qreal extra = 20.; // XXX kinda arbitrary
+    qreal extra = 20.; // XXX kinda arbitrary, doesn't fully work
     bbox.adjust(-extra, -extra, extra, extra);
     return bbox;
 }

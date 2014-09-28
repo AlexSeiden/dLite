@@ -3,18 +3,69 @@
 #include "Cupid.h"
 #include <QPainter>
 
+// ------------------------------------------------------------------------------
+// Imager base class
 Imager::Imager() :
-    _x(10),
-    _y(8),
-    _scale(1.0),
     _alpha(1.0),
     _color(Lightcolor(255,255,255))
 {
-    setName(QString("ImageCue"));
     _type = CUE;
     int xsize = Cupid::Singleton()->getDancefloor()->getXsize();
     int ysize = Cupid::Singleton()->getDancefloor()->getYsize();
     _image = new QImage(xsize, ysize, QImage::Format_ARGB32_Premultiplied);
+}
+
+void Imager::draw()
+{
+}
+
+void Imager::operator()() {
+    evaluate();
+}
+
+Imager* Imager::clone()
+{
+    Imager* lhs = new Imager;
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
+}
+
+void Imager::evaluate()
+{
+    if (!isActive()) return;
+
+    evalAllInputs();
+    draw();
+    fire();
+}
+
+void Imager::fire()
+{
+    for (int y=0; y<_image->height(); ++y)
+        for (int x=0; x<_image->width(); ++x) {
+            // TODO XXX $$$ this is super-inefficient
+            Firing *firing = new Firing;
+            Lightcolor color(_image->pixel(x,y));
+            color *= _alpha._value;
+
+            firing->_color = color;
+            firing->_alpha = _alpha._value;
+            firing->setDecayMode(_decayMode);           // TODO
+            firing->setCompMode(_compMode);
+            _dfModel->fireLight(x, y, firing);
+        }
+}
+
+// ------------------------------------------------------------------------------
+// Circle
+Circle::Circle() :
+    Imager(),
+    _x(10),
+    _y(8),
+    _scale(1.0)
+{
+    setName(QString("CircleCue"));
 
     // Declare params.
     _x.setName("x");
@@ -42,7 +93,7 @@ Imager::Imager() :
 
 }
 
-void Imager::draw()
+void Circle::draw()
 {
     QPainter painter(_image);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -55,34 +106,88 @@ void Imager::draw()
     painter.end();
 }
 
-void Imager::operator()() {
-    evaluate();
-}
-
-void Imager::evaluate()
+Circle* Circle::clone()
 {
-    if (!_active) return;
-
-    evalAllInputs();
-    draw();
-    fire();
+    Circle* lhs = new Circle;
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
 }
 
-void Imager::fire()
+
+// ------------------------------------------------------------------------------
+// Box
+Box::Box() :
+    Imager(),
+    _x(10),
+    _y(8),
+    _width(1.0),
+    _height(1.0),
+    _rotation(0.0),
+    _antialiased(false)
 {
-    for (int y=0; y<_image->height(); ++y)
-        for (int x=0; x<_image->width(); ++x) {
-            // TODO XXX $$$ this is super-inefficient
-            Firing *firing = new Firing;
-            Lightcolor color(_image->pixel(x,y));
-            color *= _alpha._value;
+    setName(QString("Box"));
 
-            firing->_color = color;
-            firing->_alpha = _alpha._value;
-            firing->setDecayMode(_decayMode);           // TODO
-            firing->setCompMode(_compMode);
-            _dfModel->fireLight(x, y, firing);
-        }
+    // Declare params.
+    _x.setName("x");
+    _x.setOutput(false);
+    _x.setConnectable(true);
+
+    _y.setName("y");
+    _y.setOutput(false);
+    _y.setConnectable(true);
+
+    _width.setName("width");
+    _width.setOutput(false);
+    _width.setConnectable(true);
+
+    _height.setName("height");
+    _height.setOutput(false);
+    _height.setConnectable(true);
+
+    _rotation.setName("rotation");
+    _rotation.setOutput(false);
+    _rotation.setConnectable(true);
+
+    _antialiased.setName("antialiased");
+    _antialiased.setOutput(false);
+    _antialiased.setConnectable(true);
+
+    _alpha.setName("alpha");
+    _alpha.setOutput(false);
+    _alpha.setConnectable(true);
+
+    _color.setName("color");
+    _color.setOutput(false);
+    _color.setConnectable(true);
+
+    _paramList << &_x << &_y << &_width << &_height << &_rotation <<&_antialiased << &_alpha << &_color;
+    setParamParent();
 }
 
-static Registrar<Imager>     registrar("Imager", Node::CUE);
+void Box::draw()
+{
+    QPainter painter(_image);
+    painter.setRenderHint(QPainter::Antialiasing, _antialiased._value);
+
+    painter.fillRect(_image->rect(), Qt::black);
+    painter.setBrush(QBrush(_color._value.toQColor()));
+
+    QPointF topLeft(_x._value, _y._value);
+    QSizeF sizef(_width._value+1., _height._value+1.);
+    QRectF rr(topLeft, sizef);
+    painter.drawRect(rr);
+
+    painter.end();
+}
+
+Box* Box::clone()
+{
+    Box* lhs = new Box;
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
+}
+//static Registrar<Imager>     registrar0("Imager", Node::CUE);
+static Registrar<Circle>     registrar1("Circle", Node::CUE);
+static Registrar<Box>        registrar2("Box", Node::CUE);

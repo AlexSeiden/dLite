@@ -7,8 +7,6 @@
 
 // TODO master todo here (because it's the first src file.)
 /*
-  restore graphwidget positions from saved file
-
   Grouping
 
  Node Types:
@@ -37,21 +35,22 @@
 global hotkeys:
   frame all / frame selected  (Still a little funky)
 
- compmode & decaymode pups on cuewidgets
+active, compmode & decaymode pups on cuewidgets
 
- duplicate
+duplicate
 
- Drawing:
-     Grid BG option in graph view
-     put spectrograph options back in somewhere.
-     dance floor cell numbers
-     nicer colors
-     color-coded paramitems
-     color-coded connectors
-     param-view transparent bg
-     Collapsed mode
-     auto layout
-     x,y align & distribute selected
+put spectrograph options back in somewhere.
+
+Drawing:
+    LOD
+    Grid BG option in graph view
+    dance floor cell numbers
+    nicer colors
+    color-coded paramitems
+    color-coded connectors
+    param-view transparent bg
+    Collapsed mode
+    x,y distribute selected
 
 "_dirty" bit
 
@@ -63,6 +62,7 @@ Cleaning:
 
 Bugs:
     AudioNotify drop
+    moving playhead back in time breaks beat nodes.
 
 */
 
@@ -117,6 +117,97 @@ void TriggerEvery::operator()()
     _output._qvOutput.setValue(_output._value);
 }
 
+TriggerEvery* TriggerEvery::clone()
+{
+    TriggerEvery* lhs = new TriggerEvery;
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
+}
+
+// ------------------------------------------------------------------------------
+//  Multiply
+//      Interpolates beats
+
+Multiply::Multiply() :
+    _output(true),
+    _multiple(2)
+{
+    setName("Multiply");
+    _type = BEAT;
+
+    _output.setName("out");
+    _output.setOutput(true);
+    _output.setConnectable(true);
+
+    _multiple.setName("multiple");
+    _multiple.setOutput(false);
+    _multiple.setConnectable(true);
+
+    _input.setName("input");
+    _input.setOutput(false);
+    _input.setConnectable(true);
+
+    // Set refresh to current time, so when we make a new one in the middle
+    // of playing, it won't have to catch up.
+    _nextRefresh = Cupid::getPlaybackPositionUSecs() / 1000;
+    _paramList << &_output << &_multiple << &_input;
+    setParamParent();
+}
+
+void Multiply::operator()()
+{
+    // Only run any operator once per frame:
+    if (evaluatedThisFrame())
+        return;
+    evalAllInputs();
+
+    // Automatically reset after triggering.
+    _output._value = false;
+
+    // XXX this breaks if we move the audio playhead back in time.
+    qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
+
+    // Input trigger
+    if (_input._value) {
+        _output._value = true;
+        if (_lastInputBeat != 0) {
+            _delta = mSecs - _lastInputBeat;
+            _delta /= _multiple._value;
+            _nextRefresh = mSecs + _delta;
+            _lastInputBeat = mSecs;
+        }
+        goto done;
+    }
+
+    // Interpolated trigger
+    if (mSecs > _nextRefresh) {
+       _output._value = true;
+
+       // Find new refresh value
+#if 0
+       ParamBase* inputParam = _input.connectedParam();
+       if (! inputParam) goto done;
+       Node* inputNode = inputParam->getParentNode();
+       if (! inputNode) goto done;
+       int nextInputRefresh = inputNode->_nextRefresh; // XXX this is private, and not available on most nodes.
+       int delta = nextInputRefresh - _nextRefresh;
+       delta /= _multiple._value;
+#endif
+       _nextRefresh += _delta;
+    }
+
+    done:
+    _output._qvOutput.setValue(_output._value);
+}
+
+Multiply* Multiply::clone()
+{
+    Multiply* lhs = new Multiply;
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
+}
 
 // ------------------------------------------------------------------------------
 // NodeOnset
@@ -224,6 +315,14 @@ void NodeOnset::operator()()
     _output._qvOutput = _output._value;
 }
 
+NodeOnset* NodeOnset::clone()
+{
+    NodeOnset* lhs = new NodeOnset;
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
+}
+
 // ------------------------------------------------------------------------------
 // NodeBar
 //      Loads bar (measure) info from precomputed file.
@@ -320,6 +419,14 @@ void NodeBar::operator()() {
 
     // Boilerplate end of operator:
     _output._qvOutput = _output._value;
+}
+
+NodeBar* NodeBar::clone()
+{
+    NodeBar* lhs = new NodeBar;
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
 }
 
 // ------------------------------------------------------------------------------
@@ -448,6 +555,13 @@ void NodeBarBeat::operator()() {
     _beatNumberOutput._qvOutput  = _beatNumberOutput._value;
 }
 
+NodeBarBeat* NodeBarBeat::clone()
+{
+    NodeBarBeat* lhs = new NodeBarBeat;
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
+}
 
 // ------------------------------------------------------------------------------
 // Utility function
@@ -490,6 +604,7 @@ void convertSamplesToMS(std::vector<int> &samples)
 // ------------------------------------------------------------------------------
 // Register
 static Registrar<TriggerEvery>  registrar0("TriggerEvery", Node::BEAT);
+static Registrar<Multiply>      registrar5("Multiply", Node::BEAT);
 static Registrar<NodeOnset>     registrar1("Onset", Node::BEAT);
 static Registrar<NodeBar>       registrar2("Bar", Node::BEAT);
 static Registrar<NodeBarBeat>   registrar3("Bars&&Beats", Node::BEAT);

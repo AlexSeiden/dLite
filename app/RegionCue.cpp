@@ -29,9 +29,17 @@ void RegionCue::operator()() {
     evaluate();
 }
 
+RegionCue* RegionCue::clone()
+{
+    RegionCue* lhs = new RegionCue;
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
+}
+
 void RegionCue::evaluate()
 {
-    if (!_active) return;
+    if (!isActive()) return;
 
     evalAllInputs();
 

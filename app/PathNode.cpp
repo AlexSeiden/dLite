@@ -34,6 +34,14 @@ void PathNode::operator()()
     _y._qvOutput = _y._value;
 }
 
+PathNode* PathNode::clone()
+{
+    PathNode* lhs = new PathNode;
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
+}
+
 void PathNode::beenSelected()
 {
     // Tells the path editor to display the current subrange.

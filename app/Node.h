@@ -42,23 +42,25 @@ public:
     Node();
     virtual ~Node();
 
+    virtual Node*       clone() = 0;
+
     const QString &     getName() const {return _name;}
     void                setName(const QString name) {_name = name;}
 
-    bool                isActive() {return _active;}
-    void                setActive(bool active) {_active = active;}
+    bool                isActive() const {return _active._value;}
+    void                setActive(bool active) {_active._value = active;}
 
     virtual node_t      getType();
     QList<ParamBase *>  getParams()        {return _paramList;}
-    virtual QString     getClass()         {return _className;}
+    virtual QString     getClass() const   {return _className;}
 
     // Functor that provides closure over instance object,
     // and allows downstream clients to evaluate.
     virtual void operator() (void) = 0;
 
+//
 #if 0
-    // LATER
-    // Suggested by Myers item 35
+    // LATER:   Suggested by Myers item 35
     void operator() (void) {
         if (evaluatedThisFrame())
             return;
@@ -67,7 +69,6 @@ public:
         doEvalOperation();
 
         // Boilerplate end of operator:
-        // (this was
         _output._qvOutput.setValue(_output._value);
     }
 private:
@@ -105,13 +106,16 @@ protected:
 
     void                evalAllInputs();
 
+    void                cloneHelper(Node &lhs);
+
     QString               _name;
-    bool                  _active;
+    Param<bool>           _active;
     QList<ParamBase *>    _paramList;
     node_t                _type;
     int                   _frameLastEvaluated;
     /*const */QUuid       _uuid;        // Could be const except for need to assign in NodeFactory::instantiateNode when reading from file.
-    QString               _className;
+    QString               _className;   // Assigned by NodeFactory
+
 
     static QList<Node *>  _allNodes;
 
@@ -120,7 +124,7 @@ protected:
     friend class NodeFactory;
 };
 
-
+//
 // ------------------------------------------------------------------------------
 // NodeFactory
 // Singleton class to list & instantiate all available nodes.
@@ -135,6 +139,7 @@ public:
     void            registerNodetype(QString classname, Node::node_t typeInfo, NodeInstatiator_t instantiatorFunction);
     const QStringList& getNodesOfType(Node::node_t typeInfo);
     QList<Node*>    allNodes() const {return Node::allNodes();}
+    void            duplicateNodes(QList<Node*> dupeThese);
 
     static NodeFactory *Singleton();
 

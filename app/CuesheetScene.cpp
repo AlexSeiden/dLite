@@ -13,21 +13,14 @@ CuesheetScene::CuesheetScene(QObject *parent) :
 {
 }
 
+// ------------------------------------------------------------------------------
+// Overrides
 void CuesheetScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if (_isConnecting) {
         startLine(mouseEvent, _startSocket);
     }
     QGraphicsScene::mousePressEvent(mouseEvent);
-}
-
-void CuesheetScene::startLine(QGraphicsSceneMouseEvent *mouseEvent, SocketItem *srcItem) {
-    setConnecting();
-    _startSocket = srcItem;
-    _startPoint = mouseEvent->scenePos();
-    _line = new QGraphicsLineItem(QLineF(_startPoint, _startPoint));
-    _line->setPen(QPen(GuiSettings::connectorColor, 2));
-    addItem(_line);
 }
 
 void CuesheetScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -41,44 +34,6 @@ void CuesheetScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     } else {
         QGraphicsScene::mouseMoveEvent(mouseEvent);
     }
-}
-
-QGraphicsItem *CuesheetScene::findFirstReleventItem(QList<QGraphicsItem *> &endItems)
-{
-    QGraphicsItem *out = nullptr;
-    foreach (out, endItems) {
-        // Don't want to hit the line we're drawing
-        if (out == _line)
-            continue;
-
-        // Ignore any connectors that we hit
-        if (dynamic_cast<ConnectorItem *>(out))
-            continue;
-
-        // Can't connect to ourselves
-        if (out == dynamic_cast<QGraphicsItem *>(_startSocket))
-            // Return nullptr rather than continue, because we've actually
-            // hit something--ourselves--that's invalid.  We could check to see
-            // if there's a *valid* hit behind us, but that's probably more confusing
-            // than just making the user drag to what's visible.
-            return nullptr;
-
-        SocketItem *targetSocket = getSocket(out);
-        // Test for type compatability, source & sink, etc.
-        if (! targetSocket)
-            return nullptr;
-
-        if (! _startSocket->getParam()->isConnectableTo(targetSocket->getParam()))
-            // Same return logic as above
-            return nullptr;
-
-
-        // OK, nothing wrong with this one.
-        return out;
-    }
-
-    // Couldn't find any that work
-    return nullptr;
 }
 
 void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -140,6 +95,55 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
 
+QGraphicsItem *CuesheetScene::findFirstReleventItem(QList<QGraphicsItem *> &endItems)
+{
+    QGraphicsItem *out = nullptr;
+    foreach (out, endItems) {
+        // Don't want to hit the line we're drawing
+        if (out == _line)
+            continue;
+
+        // Ignore any connectors that we hit
+        if (dynamic_cast<ConnectorItem *>(out))
+            continue;
+
+        // Can't connect to ourselves
+        if (out == dynamic_cast<QGraphicsItem *>(_startSocket))
+            // Return nullptr rather than continue, because we've actually
+            // hit something--ourselves--that's invalid.  We could check to see
+            // if there's a *valid* hit behind us, but that's probably more confusing
+            // than just making the user drag to what's visible.
+            return nullptr;
+
+        SocketItem *targetSocket = getSocket(out);
+        // Test for type compatability, source & sink, etc.
+        if (! targetSocket)
+            return nullptr;
+
+        if (! _startSocket->getParam()->isConnectableTo(targetSocket->getParam()))
+            // Same return logic as above
+            return nullptr;
+
+
+        // OK, nothing wrong with this one.
+        return out;
+    }
+
+    // Couldn't find any that work
+    return nullptr;
+}
+
+void CuesheetScene::startLine(QGraphicsSceneMouseEvent *mouseEvent, SocketItem *srcItem) {
+    setConnecting();
+    _startSocket = srcItem;
+    _startPoint = mouseEvent->scenePos();
+    _line = new QGraphicsLineItem(QLineF(_startPoint, _startPoint));
+    _line->setPen(QPen(GuiSettings::connectorColor, 2));
+    addItem(_line);
+}
+
+// ------------------------------------------------------------------------------
+// Query routines
 void CuesheetScene::connectSockets(SocketItem *server, SocketItem *client)
 {
     ConnectorItem *connection = new ConnectorItem(server, client);
@@ -250,4 +254,30 @@ QList<NodeItem*> CuesheetScene::getAllCueNodeItems()
             allCues << ni;
     }
     return allCues;
+}
+
+QList<NodeItem*> CuesheetScene::getAllNodeItems()
+{
+    QList<QGraphicsItem*>allItems = items();
+    QList<NodeItem*>allNodes;
+    foreach (QGraphicsItem* item, allItems) {
+        NodeItem *ni = dynamic_cast<NodeItem *>(item);
+        if (! ni)
+            continue;
+        allNodes << ni;
+    }
+    return allNodes;
+}
+
+QList<NodeItem*> CuesheetScene::getSelectedNodeItems()
+{
+    QList<QGraphicsItem*>allItems = selectedItems();
+    QList<NodeItem*>allNodes;
+    foreach (QGraphicsItem* item, allItems) {
+        NodeItem *ni = dynamic_cast<NodeItem *>(item);
+        if (! ni)
+            continue;
+        allNodes << ni;
+    }
+    return allNodes;
 }

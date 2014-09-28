@@ -11,6 +11,7 @@ public:
     void evaluate();
 
     void operator() (void);
+    virtual RegionCue* clone();
 
 protected:
     Param<Lightcolor>  _color;

@@ -50,6 +50,14 @@ void ColorRamp::operator()()
     _output._qvOutput.setValue(_output._value);
 }
 
+ColorRamp* ColorRamp::clone()
+{
+    ColorRamp* lhs = new ColorRamp;
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
+}
+
 // ------------------------------------------------------------------------------
 //  BriteColor
 //      Creates a new hi-brightness, hi-sat color every trigger
@@ -131,6 +139,16 @@ void BriteColor::operator()()
     _output._qvOutput.setValue(_output._value);
 }
 
+BriteColor* BriteColor::clone()
+{
+    BriteColor* lhs = new BriteColor;
+    cloneHelper(*lhs);
+    setParamParent();
+    setRandomEngine();
+
+    return lhs;
+}
+
 // ------------------------------------------------------------------------------
 //  Palette
 //      Choose between a bunch of colors
@@ -177,6 +195,14 @@ void Palette::operator()()
     _output._qvOutput.setValue(_output._value);
 }
 
+Palette* Palette::clone()
+{
+    Palette* lhs = new Palette;
+    cloneHelper(*lhs);
+    setParamParent();
+
+    return lhs;
+}
 #if 0
 
 void Palette::writeToJSONObj(QJsonObject &json) const

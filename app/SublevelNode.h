@@ -20,7 +20,9 @@ class SublevelNode : public QObject, public Node
 
 public:
     SublevelNode(QObject *parent = 0);
+
     void operator() ();
+    virtual SublevelNode* clone();
     void beenSelected();
     void beenDeselected();
 

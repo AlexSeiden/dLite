@@ -19,6 +19,7 @@ class RegionNode : public QObject, public Node
 public:
     RegionNode(QObject *parent = 0);
     void operator() ();
+    virtual RegionNode* clone();
     void beenSelected();
     void beenDeselected();
 

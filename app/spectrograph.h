@@ -33,7 +33,6 @@ public:
 
 signals:
     void infoMessage(const QString &message, int intervalMs);
-    void subrangeHasChanged(Subrange *subrange);
 
 public slots:
     void reset();

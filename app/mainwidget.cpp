@@ -51,6 +51,7 @@ MainWidget::MainWidget(QWidget *parent)
     createUi();
 
     setMinimumSize(500, 400);
+    resize(600, 450);
     move(5,10);  // TODO restore from last saved
 
     // TODO move to settings/prefs  & allow setting this
@@ -76,9 +77,10 @@ MainWidget::MainWidget(QWidget *parent)
     // TODO default to last played.
     //m_engine->loadFile(QString("/Users/alex/Documents/lights/Jam On It/Jam On It.wav"));
     m_engine->loadSong(QString("/Users/alex/Documents/WAVS/Awesome/Awesome.wav"));
+    updateButtonStates();
 
 
-    // OK, these are essentially globals:  GROSS
+    // GROSS  These are essentially globals:
     Cupid::Singleton()->setEngine(m_engine);
     Cupid::Singleton()->setDancefloor(m_dancefloor);
 
@@ -184,7 +186,7 @@ void MainWidget::showLoadSongDialog()
 
 void MainWidget::showSaveDialog()
 {
-    const QString dir = QDir::homePath(); // XXX
+    const QString dir = QDir::homePath(); // XXX better default path
     _filename = QFileDialog::getSaveFileName(this, tr("Save file"), dir);
     if (! _filename.isEmpty()) {
         if (! _filename.endsWith(".dlite"))
@@ -195,15 +197,13 @@ void MainWidget::showSaveDialog()
 
 void MainWidget::showOpenDialog()
 {
-    const QString dir = QDir::homePath(); // XXX
+    const QString dir = QDir::homePath(); // XXX better default path
     const QString fileName = QFileDialog::getOpenFileName(this, tr("Open dLite file"), dir, "*.json *.dLite");
     // TODO open multiple files
     if (! fileName.isEmpty() && ! fileName.isNull()) {
         bool result = NodeFactory::Singleton()->readFromFile(fileName);
-        if (result) {
+        if (result)
             _filename = fileName;
-//            m_graphWidget->addTheseNodes(NodeFactory::Singleton()->allNodes());
-        }
         updateButtonStates();
     }
 }
@@ -323,19 +323,13 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_engine, SIGNAL(playPositionChanged(qint64)),
             this, SLOT(audioPositionChanged(qint64)));
 
-    CHECKED_CONNECT(m_spectrograph, SIGNAL(subrangeHasChanged(Subrange *)),
-                    m_graphWidget, SLOT(subrangeHasChanged(Subrange*)));
-
-    CHECKED_CONNECT(m_spectrograph, SIGNAL(subrangeHasChanged(Subrange*)),
-            m_graphWidget, SLOT(subrangeHasChanged(Subrange*)));
-
     CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
             this, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
 
     CHECKED_CONNECT(m_transport, SIGNAL(movePlaybackHead(double)),
             m_engine, SLOT(movePlaybackHead(double)));
 
-#ifdef NUKEME
+#if 0 // NUKEMEMAYBE
     // Info & error messages--now obsolete?
     CHECKED_CONNECT(m_engine, SIGNAL(infoMessage(QString, int)),
             this, SLOT(infoMessage(QString, int)));
@@ -348,20 +342,23 @@ void MainWidget::connectUi()
 #endif
 
 
-
     CHECKED_CONNECT(m_cueLibView, SIGNAL(newNodeRequest(QString)),
                     this, SLOT(newNodeRequest(QString)));
-
 }
 
 void MainWidget::createShortcuts()
 {
+    // Transport shortcuts ----------
     // Toggle audio playback
-    m_spaceShortcut = new QShortcut(Qt::Key_Space, this);
-    m_spaceShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_spaceShortcut, SIGNAL(activated()), m_engine, SLOT(togglePlayback()));
+    m_playPauseShortcut = new QShortcut(Qt::Key_Space, this);
+    m_playPauseShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_playPauseShortcut, SIGNAL(activated()), m_engine, SLOT(togglePlayback()));
 
-    // Graph view shortcuts
+    m_rewindShortcut = new QShortcut(QKeySequence("Ctrl+0"), this);
+    m_rewindShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_rewindShortcut, SIGNAL(activated()), m_engine, SLOT(rewind()));
+
+    // Graph view shortcuts ----------
     m_frameAllShortcut = new QShortcut(Qt::Key_A, this);
     m_frameAllShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_frameAllShortcut, SIGNAL(activated()), m_graphWidget, SLOT(frameAll()));
@@ -382,7 +379,23 @@ void MainWidget::createShortcuts()
     m_layoutAllShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_layoutAllShortcut, SIGNAL(activated()), m_graphWidget, SLOT(layoutAll()));
 
-    // Saving
+    m_xAlignShortcut = new QShortcut(Qt::Key_X, this);
+    m_xAlignShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_xAlignShortcut, SIGNAL(activated()), m_graphWidget, SLOT(xAlign()));
+
+    m_yAlignShortcut = new QShortcut(Qt::Key_Y, this);
+    m_yAlignShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_yAlignShortcut, SIGNAL(activated()), m_graphWidget, SLOT(yAlign()));
+
+    m_duplicateShortcut = new QShortcut(Qt::Key_D, this);
+    m_duplicateShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_duplicateShortcut, SIGNAL(activated()), m_graphWidget, SLOT(duplicate()));
+
+    m_groupShortcut = new QShortcut(Qt::Key_G, this);
+    m_groupShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_groupShortcut, SIGNAL(activated()), m_graphWidget, SLOT(group()));
+
+    // File I/O shortcuts ----------
     m_saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
     m_saveShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_saveShortcut, SIGNAL(activated()), this, SLOT(save()));
@@ -394,11 +407,6 @@ void MainWidget::createShortcuts()
     m_openFileShortcut = new QShortcut(QKeySequence("Ctrl+O"), this);
     m_openFileShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_openFileShortcut, SIGNAL(activated()), this, SLOT(showOpenDialog()));
-
-    // rewind
-    m_rewindShortcut = new QShortcut(QKeySequence("Ctrl+0"), this);
-    m_rewindShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_rewindShortcut, SIGNAL(activated()), m_engine, SLOT(rewind()));
 
 }
 

@@ -275,6 +275,7 @@ template <> QWidget* Param<float>::getEditorWidget(QObject* sendValueChangesHere
                           sendValueChangesHere, SLOT(setValue(double)));
 
     editorWidget->setFixedSize(60,22); // hardw
+//    editorWidget->move(0, -editorWidget->rect().bottom());
     return editorWidget;
 }
 
@@ -305,6 +306,7 @@ template <> QWidget* Param<bool>::getEditorWidget(QObject* sendValueChangesHere)
     editorWidget->setChecked(val);
     editorWidget->connect(editorWidget, SIGNAL(stateChanged(int)),
                           sendValueChangesHere, SLOT(setBoolValue(int)));
+    editorWidget->move(0, -editorWidget->rect().bottom());
     return editorWidget;
 }
 
