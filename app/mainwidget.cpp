@@ -395,6 +395,10 @@ void MainWidget::createShortcuts()
     m_groupShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_groupShortcut, SIGNAL(activated()), m_graphWidget, SLOT(group()));
 
+    m_minimizeSelectedShortcut = new QShortcut(Qt::Key_M, this);
+    m_minimizeSelectedShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_minimizeSelectedShortcut, SIGNAL(activated()), m_graphWidget, SLOT(minimizeSelected()));
+
     // File I/O shortcuts ----------
     m_saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
     m_saveShortcut->setContext(Qt::ApplicationShortcut);

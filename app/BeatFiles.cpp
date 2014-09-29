@@ -44,13 +44,13 @@ put spectrograph options back in somewhere.
 Drawing:
     LOD
     Grid BG option in graph view
-    dance floor cell numbers
     nicer colors
     color-coded paramitems
     color-coded connectors
     param-view transparent bg
     Collapsed mode
     x,y distribute selected
+    arrows on connectors
 
 "_dirty" bit
 

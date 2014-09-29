@@ -42,6 +42,7 @@ public slots:
     void deleteSelection();
     void group();
     void duplicate();
+    void minimizeSelected();
 
 private:
     void    align(bool xaxis);

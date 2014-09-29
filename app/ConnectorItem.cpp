@@ -44,8 +44,8 @@ void ConnectorItem::gotMoved()
 
 QRectF ConnectorItem::boundingRect() const
 {
-    QPointF nStart = _serverSocket->scenePos();
-    QPointF nEnd = _clientSocket->scenePos();
+    QPointF nStart = _serverSocket->socketPos();
+    QPointF nEnd = _clientSocket->socketPos();
 
     // Compute two rects when dragging.  The first is the rect
     // that connects _pStart & _pEnd -- the PREVIOUS positions.
@@ -83,8 +83,8 @@ void ConnectorItem::updatePath()
 {
     // Makes a new path when one of the ends has been moved.
 
-    _pStart = _serverSocket->scenePos();
-    _pEnd   = _clientSocket->scenePos();
+    _pStart = _serverSocket->socketPos();
+    _pEnd   = _clientSocket->socketPos();
 
     if (_path)
         delete _path;

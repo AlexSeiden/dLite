@@ -268,7 +268,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         update();
         break;
     default:
-        qDebug() << Q_FUNC_INFO << "keypress " << event->key() << " ; text()" << event->text();
+//        qDebug() << Q_FUNC_INFO << "keypress " << event->key() << " ; text()" << event->text();
         event->setAccepted(false);
         QWidget::keyPressEvent(event);
     }
@@ -293,4 +293,23 @@ void GraphWidget::duplicate() {
         out << item->getNode();
     }
     NodeFactory::Singleton()->duplicateNodes(out);
+}
+
+
+void GraphWidget::minimizeSelected() {
+    QList<NodeItem *> selection = _scene->getSelectedNodeItems();
+    // Find current minimize status:
+    //      If all are minimized, then de-minimize the nodes.
+    //      Otherwise, minimize all the nodes.
+    bool areMinimized = true;
+    foreach (NodeItem* item, selection) {
+        if (! item->isMinimized()) {
+            areMinimized = false;
+            break;
+        }
+    }
+
+    bool setThemToMinimized = !areMinimized;
+    foreach (NodeItem* item, selection)
+        item->minimize(setThemToMinimized);
 }

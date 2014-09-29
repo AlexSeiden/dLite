@@ -14,6 +14,7 @@ class QJsonObject;
 QT_END_NAMESPACE
 
 // Forward declarations
+class ParamItem;
 class SocketItem;
 class ConnectionItem;
 
@@ -29,9 +30,11 @@ public:
 
     void    avoidCollisions();
     Node*   getNode() const {return _node;}
+    bool    isMinimized() const {return _minimized;}
     virtual void beenSelected();
     virtual void beenDeselected();
-    QList<NodeItem*>  getUpstreamNodeItems();
+    QList<NodeItem*>    getUpstreamNodeItems();
+    QList<ParamItem*>   getChildParamItems();
     void rePos(const QPointF &pos);
 
     QList<ConnectionItem*>  getConnectionItems();       // NOTE this isn't implemented
@@ -96,6 +99,7 @@ public:
     QRectF      boundingRect() const;
     void        paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
     ParamBase*  getParam() {return _param;}
+    QPointF     socketPos();
 
     void        mousePressEvent(QGraphicsSceneMouseEvent* event);
 

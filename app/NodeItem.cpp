@@ -50,14 +50,8 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
 NodeItem::~NodeItem()
 {
     // Look for connections, and remove them:
-    QList<QGraphicsItem *> kiddos = childItems();
-    foreach (QGraphicsItem *kid, kiddos) {
-        ParamItem* pi = dynamic_cast<ParamItem*>(kid);
-        if (! pi) {
-            // ErrorHandling
-            qDebug() << Q_FUNC_INFO << "hmm, non-paramitem child of nodeitem";
-            continue;
-        }
+    QList<ParamItem*> kiddos = getChildParamItems();
+    foreach (ParamItem *pi, kiddos) {
         ConnectorItem *cnctr = csScene()->getConnectorForParam(pi->getParam());
         if (cnctr) {
             // Only need to disconnect clients; if this is a server,
@@ -74,7 +68,11 @@ NodeItem::~NodeItem()
 
 QRectF NodeItem::boundingRect() const
 {
-    int nRows = _node->getParams().size() + 1;
+    int nRows;
+    if (_minimized)
+        nRows = 1;
+    else
+        nRows = _node->getParams().size() + 1;
     QRectF bbox =  QRectF(0,0,GuiSettings::nodeWidth,
                           GuiSettings::paramHeight*nRows);
     return bbox.marginsAdded(_margins);
@@ -190,8 +188,15 @@ void NodeItem::avoidCollisions()
 void NodeItem::minimize(int status)
 {
     _minimized = status;
+    QList<ParamItem*> kiddos = getChildParamItems();
     // TODO Hide all paramitems:
-
+    foreach (ParamItem *pi, kiddos) {
+        if (_minimized)
+            pi->hide();
+        else
+            pi->show();
+    }
+    emit nodeMovedEventSignal();
     update();
 }
 
@@ -213,6 +218,18 @@ QList<NodeItem*> NodeItem::getUpstreamNodeItems()
     }
 
     return upstream;
+}
+
+QList<ParamItem*> NodeItem::getChildParamItems()
+{
+    QList<ParamItem*> out;
+    QList<QGraphicsItem *> kiddos = childItems();
+    foreach (QGraphicsItem *kid, kiddos) {
+        ParamItem* pi = dynamic_cast<ParamItem*>(kid);
+        if (pi)
+            out << pi;
+    }
+    return out;
 }
 
 // ---------------------------
@@ -409,4 +426,19 @@ void SocketItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     // Start drawing out a connector line
     qobject_cast<CuesheetScene*>(scene())->startLine(event, this);
     update();
+}
+
+QPointF SocketItem::socketPos()
+{
+    // Like scene pos, except when minimized.
+    if (isVisible()) {      // XXX does this consider parent hidden status?
+//        qDebug() << "yes visible";
+        return scenePos();
+    }
+
+//    qDebug() << "no, invisible";
+    QPointF nodePos = parentItem()->parentItem()->scenePos();
+    QPointF out = scenePos();
+    out.setY(nodePos.y() + GuiSettings::paramHeight/2);
+    return out;
 }

@@ -107,6 +107,7 @@ private:
     QShortcut*              m_openFileShortcut;
     QShortcut*              m_duplicateShortcut;
     QShortcut*              m_groupShortcut;
+    QShortcut*              m_minimizeSelectedShortcut;
 
 #if 1 // NUKEMEMAYBE
     QLabel*                 m_infoMessage;
