@@ -21,9 +21,21 @@ QRectF SublevelNodeItem::boundingRect() const
 {
     // + 1 for the node name
     int nRows = _node->getParams().size() + 1;
-    QRectF bbox =  QRectF(0,0,GuiSettings::nodeWidth,
-                          GuiSettings::paramHeight*nRows + GuiSettings::sl_barHeight);
+    QRectF bbox;
+    if (isMinimized())
+        bbox =  QRectF(0,0,GuiSettings::nodeWidth, GuiSettings::paramHeight);
+    else
+        bbox =  QRectF(0,0,GuiSettings::nodeWidth, GuiSettings::paramHeight*nRows + GuiSettings::sl_barHeight);
     return bbox.marginsAdded(_margins);
+}
+
+void SublevelNodeItem::minimize(int status)
+{
+    if (status)
+        _slm->hide();
+    else
+        _slm->show();
+    NodeItem::minimize(status);
 }
 
 // -----------------------------------------------------------------------------

@@ -46,8 +46,8 @@ public:
     virtual void writeToJSONObj(QJsonObject &json) const;
 
 public slots:
-    void        nameEdit(QString newname);
-    void        minimize(int status);  // TODO
+    void            nameEdit(QString newname);
+    virtual void    minimize(int status);
 
 signals:
     void        nodeMovedEventSignal();

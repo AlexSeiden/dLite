@@ -148,6 +148,29 @@ void GraphWidget::readNodeUiFromJSONObj(Node* node, const QJsonObject& json)
 
 // ------------------------------------------------------------------------------
 // Viewing
+void GraphWidget::keyPressEvent(QKeyEvent *event)
+{
+    // frameAll & frameSelected events are handled by a global app shortcut.
+    switch (event->key()) {
+    case Qt::Key_Delete:
+    case Qt::Key_Backspace:
+        deleteSelection();
+        update();
+        break;
+    default:
+//        qDebug() << Q_FUNC_INFO << "keypress " << event->key() << " ; text()" << event->text();
+        event->setAccepted(false);
+        QWidget::keyPressEvent(event);
+    }
+}
+
+void GraphWidget::deleteSelection() {
+    QList<QGraphicsItem *> selection = _scene->selectedItems();
+    foreach (QGraphicsItem *item, selection) {
+        delete item;
+    }
+}
+
 void GraphWidget::zoomOut()
 {
     _csview->zoomOut(10);
@@ -258,29 +281,6 @@ void GraphWidget::xAlign()
     align(true);
 }
 
-void GraphWidget::keyPressEvent(QKeyEvent *event)
-{
-    // frameAll & frameSelected events are handled by a global app shortcut.
-    switch (event->key()) {
-    case Qt::Key_Delete:
-    case Qt::Key_Backspace:
-        deleteSelection();
-        update();
-        break;
-    default:
-//        qDebug() << Q_FUNC_INFO << "keypress " << event->key() << " ; text()" << event->text();
-        event->setAccepted(false);
-        QWidget::keyPressEvent(event);
-    }
-}
-
-void GraphWidget::deleteSelection() {
-    QList<QGraphicsItem *> selection = _scene->selectedItems();
-    foreach (QGraphicsItem *item, selection) {
-        delete item;
-    }
-}
-
 void GraphWidget::group() {
     QList<NodeItem *> selection = _scene->getSelectedNodeItems();
 }
@@ -294,7 +294,6 @@ void GraphWidget::duplicate() {
     }
     NodeFactory::Singleton()->duplicateNodes(out);
 }
-
 
 void GraphWidget::minimizeSelected() {
     QList<NodeItem *> selection = _scene->getSelectedNodeItems();

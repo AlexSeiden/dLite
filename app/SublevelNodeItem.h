@@ -34,6 +34,7 @@ public:
     explicit SublevelNodeItem(Node *node, QGraphicsItem *parent = 0);
 
     QRectF  boundingRect() const;
+    void    minimize(int status);
 
 private:
     RangeMeter *_slm;

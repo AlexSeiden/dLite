@@ -35,7 +35,7 @@
 global hotkeys:
   frame all / frame selected  (Still a little funky)
 
-active, compmode & decaymode pups on cuewidgets
+compmode & decaymode pups on cuewidgets
 
 duplicate
 
@@ -43,12 +43,12 @@ put spectrograph options back in somewhere.
 
 Drawing:
     LOD
+    nicer active-mode control widget
     Grid BG option in graph view
     nicer colors
     color-coded paramitems
     color-coded connectors
     param-view transparent bg
-    Collapsed mode
     x,y distribute selected
     arrows on connectors
 

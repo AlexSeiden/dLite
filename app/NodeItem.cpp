@@ -237,13 +237,16 @@ QList<ParamItem*> NodeItem::getChildParamItems()
 void NodeItem::readFromJSONObj(const QJsonObject &json)
 {
     // ErrorHandling
-    qreal x, y;
 
     if (json.contains("uisettings")) {
+        qreal x, y;
+        bool minimized = false;
         QJsonObject jsonUiSettings = json["uisettings"].toObject();
         x = jsonUiSettings["xPos"].toDouble();
         y = jsonUiSettings["yPos"].toDouble();
         setPos(x,y);
+        minimized = jsonUiSettings["minimized"].toBool();
+        minimize(minimized);
     }
 }
 
@@ -253,6 +256,7 @@ void NodeItem::writeToJSONObj(QJsonObject &json) const
     QJsonObject jsonUiSettings;
     jsonUiSettings["xPos"] = x();
     jsonUiSettings["yPos"] = y();
+    jsonUiSettings["minimized"] = _minimized;
     json["uisettings"] = jsonUiSettings;
 }
 
