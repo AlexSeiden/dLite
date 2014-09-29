@@ -61,8 +61,9 @@ Cleaning:
     Get rid of Lightcolor and use QColor
 
 Bugs:
-    AudioNotify drop
     moving playhead back in time breaks beat nodes.
+    editor widgets should give up focus when enter is hit
+    AudioNotify drop
 
 */
 

@@ -3,6 +3,10 @@
 #include <QImage>
 #include "Cue.h"
 
+// ------------------------------------------------------------------------------
+// Imager
+//      Abstract base class for Cues that use a Qt Painter for drawing.
+
 class Imager : public Cue
 {
 public:
@@ -21,6 +25,9 @@ protected:
     QImage  *_image;
 };
 
+// ------------------------------------------------------------------------------
+// Circle
+//      Draws a circle
 class Circle : public Imager
 {
 public:
@@ -35,6 +42,9 @@ protected:
     void    draw();
 };
 
+// ------------------------------------------------------------------------------
+// Box
+//      Draws a rectangle
 class Box : public Imager
 {
 public:

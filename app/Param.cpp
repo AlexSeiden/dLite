@@ -132,6 +132,16 @@ void ParamBase::connectTo(ParamBase *server)
     qDebug() << "serverType  " << server->getType().name() << endl;
 }
 
+// ------------------------------------------------------------------------------
+// setRange
+//      Sets min and max range used by numeric params.
+void ParamBase::setRange(bool userange, double min, double max, double step)
+{
+    _useminmax = userange;
+    _minVal = min;
+    _maxVal = max;
+    _stepVal = step;
+}
 
 // ------------------------------------------------------------------------------
 // Serialization
@@ -257,6 +267,8 @@ QWidget* ParamBase::getEditorWidget(QObject *sendValueChangesHere)
     return nullptr;
 }
 
+// TODO subclass Spin Boxes
+// and capture editingFinished signal to perform clearFocus()
 template <> QWidget* Param<float>::getEditorWidget(QObject* sendValueChangesHere)
 {
     QDoubleSpinBox *editorWidget = new QDoubleSpinBox;
@@ -275,6 +287,11 @@ template <> QWidget* Param<float>::getEditorWidget(QObject* sendValueChangesHere
                           sendValueChangesHere, SLOT(setValue(double)));
 
     editorWidget->setFixedSize(60,22); // hardw
+    // can't do this bc clearFocus is not a slot.
+//    editorWidget->connect(editorWidget, SIGNAL(editingFinished()),
+//                          editorWidget, SLOT(clearFocus()));
+
+    // was trying to get centered widget...
 //    editorWidget->move(0, -editorWidget->rect().bottom());
     return editorWidget;
 }
@@ -307,6 +324,7 @@ template <> QWidget* Param<bool>::getEditorWidget(QObject* sendValueChangesHere)
     editorWidget->connect(editorWidget, SIGNAL(stateChanged(int)),
                           sendValueChangesHere, SLOT(setBoolValue(int)));
     editorWidget->move(0, -editorWidget->rect().bottom());
+//    editorWidget->setAutoFillBackground(false);  // doesn't work
     return editorWidget;
 }
 

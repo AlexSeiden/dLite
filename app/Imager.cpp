@@ -148,6 +148,7 @@ Box::Box() :
     _rotation.setName("rotation");
     _rotation.setOutput(false);
     _rotation.setConnectable(true);
+    _rotation.setRange(true, -10000., 10000., 1.0);
 
     _antialiased.setName("antialiased");
     _antialiased.setOutput(false);
@@ -175,8 +176,20 @@ void Box::draw()
 
     QPointF topLeft(_x._value, _y._value);
     QSizeF sizef(_width._value+1., _height._value+1.);
+#if 0
     QRectF rr(topLeft, sizef);
     painter.drawRect(rr);
+#else
+//    QRectF rr(topLeft, sizef);
+//    QRectF rr(0.0,0.0,_width._value+1.,_height._value+1.);
+    QRectF rr(0.0,0.0,_width._value,_height._value);
+    painter.save();
+    painter.translate(topLeft);
+    painter.rotate(_rotation._value);
+//    painter.drawRect(rr);
+    painter.fillRect(rr, _color._value.toQColor());
+    painter.restore();
+#endif
 
     painter.end();
 }

@@ -57,6 +57,7 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
     // Draw the outline
     QPen cellPen(GuiSettings::df_cellSepColor);
     painter.setPen(cellPen);
+    painter.setFont(GuiSettings::sg_HzFont);    // hardw give own guisetting
 
     QRect cell(0,0, _cellsize, _cellsize);
     for (int y=0; y<_ysize; ++y) {
@@ -73,6 +74,22 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
             else
                 painter.fillRect(cell, GuiSettings::df_noCellColor);
             painter.drawRect(cell);
+
+            if (y==0) {
+                painter.save();
+                painter.setPen(GuiSettings::sg_textColor);  // hardw give own guisetting
+//                painter.drawText(cell, Qt::AlignTop|Qt::AlignRight, QString::number(x));
+                painter.drawText(cell, Qt::AlignTop|Qt::AlignLeft, QString::number(x));
+                painter.restore();
+            }
+
+            if (x==0) {
+                painter.save();
+                painter.setPen(GuiSettings::sg_textColor);  // hardw give own guisetting
+//                painter.drawText(cell, Qt::AlignBottom|Qt::AlignLeft, QString::number(y));
+                painter.drawText(cell, Qt::AlignTop|Qt::AlignLeft, QString::number(y));
+                painter.restore();
+            }
 
             // GROSS HACK!! Hardwired bars
             // Vertical bars

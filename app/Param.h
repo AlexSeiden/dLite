@@ -44,9 +44,11 @@ public:
     ParamBase*  connectedParam()               {return _connectedParam;}
     QUuid&      getUuid()                      {return _uuid;}
 
-    bool    isConnectableTo(ParamBase *otherParam);
-    void    connectTo(ParamBase *server);
-    void    disconnect() {_connectedParam = nullptr; _provider = nullptr;}
+    bool        isConnectableTo(ParamBase *otherParam);
+    void        connectTo(ParamBase *server);
+    void        disconnect() {_connectedParam = nullptr; _provider = nullptr;}
+
+    void        setRange(bool userange, double min, double max, double step);
 
     virtual void eval() {
         if (_provider)
