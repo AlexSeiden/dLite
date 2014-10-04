@@ -13,6 +13,7 @@
 #include "SublevelNodeItem.h"
 #include "sublevel.h"
 #include <QPushButton>
+#include "GroupNodeItem.h"
 
 GraphWidget::GraphWidget(QWidget *parent) :
     QWidget(parent),
@@ -283,6 +284,21 @@ void GraphWidget::xAlign()
 
 void GraphWidget::group() {
     QList<NodeItem *> selection = _scene->getSelectedNodeItems();
+#if 0
+    QList<QGraphicsItem *> qgiSelection;
+    foreach (QGraphicsItem *qgi, selection)
+        qgiSelection << qgi;
+
+    QGraphicsItemGroup *grp = _scene->createItemGroup(qgiSelection);
+#else
+    GroupNodeItem *grp = new GroupNodeItem();
+    _scene->addItem(grp);
+    foreach (NodeItem *ni, selection)
+        grp->addToNodeItemGroup(ni);
+#endif
+    grp->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+    grp->setSelected(true);
+
 }
 
 void GraphWidget::duplicate() {

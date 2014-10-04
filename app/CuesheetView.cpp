@@ -6,6 +6,7 @@
 CuesheetView::CuesheetView(QWidget *parent)
     : QFrame(parent)
 {
+    setContentsMargins(0,0,0,0);
     setFrameStyle(NoFrame);
     graphicsView = new GraphicsView(this);
     graphicsView->setRenderHint(QPainter::Antialiasing, true);
@@ -56,6 +57,7 @@ CuesheetView::CuesheetView(QWidget *parent)
     QGridLayout *topLayout = new QGridLayout;
     topLayout->addWidget(graphicsView, 1, 0);
     topLayout->addLayout(zoomSliderLayout, 1, 1);
+    topLayout->setContentsMargins(4,4,2,4);
     setLayout(topLayout);
 
     connect(resetButton, SIGNAL(clicked()), this, SLOT(resetView()));

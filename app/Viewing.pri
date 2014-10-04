@@ -14,7 +14,8 @@ SOURCES += \
     $$PWD/ConnectorItem.cpp \
     $$PWD/Transport.cpp \
     $$PWD/GuiSettings.cpp \
-    $$PWD/ColorChip.cpp
+    $$PWD/ColorChip.cpp \
+    $$PWD/GroupNodeItem.cpp
 
 HEADERS += \
     mainwidget.h \
@@ -30,4 +31,5 @@ HEADERS += \
     $$PWD/ConnectorItem.h \
     $$PWD/Transport.h \
     $$PWD/GuiSettings.h \
-    $$PWD/ColorChip.h
+    $$PWD/ColorChip.h \
+    $$PWD/GroupNodeItem.h

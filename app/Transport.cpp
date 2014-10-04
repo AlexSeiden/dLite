@@ -43,7 +43,6 @@ void Transport::paintEvent(QPaintEvent * event)
 
 void Transport::bufferLengthChanged(qint64 bufferSize)
 {
-    qDebug() <<Q_FUNC_INFO << bufferSize;
     m_bufferLength = bufferSize;
     m_playPosition = 0;
     repaint();
@@ -63,7 +62,5 @@ void Transport::mousePressEvent(QMouseEvent *event)
 {
     int xpos = event->pos().x();
     float frac = float(xpos)/rect().width();
-
-    qDebug() << "Press:  " << frac;
     emit movePlaybackHead(frac);
 }

@@ -147,6 +147,29 @@ private:
     int _nextIndex;
 };
 
+// ------------------------------------------------------------------------------
+//  Segmentino
+
+class Segmentino : public Node
+{
+public:
+    Segmentino();
+    void    operator() (void);
+    virtual Segmentino* clone();
+
+    void    loadFile();
+    void    loadFile(QString filename);
+
+    Param<int>  _segmentIndexOutput;
+//    Param<int>  _segmentVariantOutput;
+
+private:
+
+    std::vector<std::pair<int, int> > _segments;
+
+    int findSegment(int msecs);
+};
+
 // Free function proto
 void convertSamplesToMS(std::vector<int> &samples);
 

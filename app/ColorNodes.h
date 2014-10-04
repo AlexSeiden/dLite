@@ -32,8 +32,14 @@ public:
 
 private:
     // Parameters
-    Param<Lightcolor> _output;
-    Param<bool> _trigger;
+    Param<Lightcolor>   _output;
+    Param<float>        _hueMin;
+    Param<float>        _hueMax;
+    Param<float>        _satMin;
+    Param<float>        _satMax;
+    Param<float>        _valMin;
+    Param<float>        _valMax;
+    Param<bool>         _trigger;
 
     void  setRandomEngine();
     std::mt19937 *_randGenerator;

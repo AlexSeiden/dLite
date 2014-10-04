@@ -324,6 +324,7 @@ template <> QWidget* Param<bool>::getEditorWidget(QObject* sendValueChangesHere)
     editorWidget->connect(editorWidget, SIGNAL(stateChanged(int)),
                           sendValueChangesHere, SLOT(setBoolValue(int)));
     editorWidget->move(0, -editorWidget->rect().bottom());
+    editorWidget->setContentsMargins(0,0,0,0);
 //    editorWidget->setAutoFillBackground(false);  // doesn't work
     return editorWidget;
 }

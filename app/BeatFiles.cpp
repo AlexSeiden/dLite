@@ -29,6 +29,7 @@
       multiple queued songs
 
  multiple tabbed cue sheets
+
  Export/bake
  more Shape rendering with QPainter
 
@@ -367,7 +368,6 @@ NodeBar::NodeBar()
 //  We read the first number and discard the second.
 //  Our bar files have names like:
 //      Awesome_vamp_qm-vamp-plugins_qm-barbeattracker_bars.csv
-//  Where in this case, "Awesome.wav" was the wave file originally processed.
 
 void NodeBar::loadFile()
 {
@@ -489,7 +489,6 @@ NodeBarBeat::NodeBarBeat()
 //  We read the first and second columns and discard the third..
 //  Our barbeat files have names like:
 //      Awesome_vamp_qm-vamp-plugins_qm-barbeattracker_beatcounts.csv
-//  Where in this case, "Awesome.wav" was the wave file originally processed.
 
 void NodeBarBeat::loadFile()
 {
@@ -564,21 +563,9 @@ NodeBarBeat* NodeBarBeat::clone()
     return lhs;
 }
 
-// ------------------------------------------------------------------------------
-// Utility function
-
-// The onset and BarBeats files are indexed based on samples.
-// We use milliseconds.  Convert a vector of from sample-indices to ms.
-void convertSamplesToMS(std::vector<int> &samples)
-{
-    double conversion = 1000. / Cupid::Singleton()->getEngine()->format().sampleRate();
-    for (auto &sample : samples ) {
-        sample *= conversion;
-    }
-}
 
 // ------------------------------------------------------------------------------
-// TODO Segmentino files
+// Segmentino files
 //      Loads segment info from precomputed file.
 
 //  Here's a complete segmention file:
@@ -594,13 +581,116 @@ void convertSamplesToMS(std::vector<int> &samples)
 //        5772288,589312,3,"C"
 //        6361600,571392,1,"A"
 //        6932992,243712,0,"N8"
-//      The first and second columns are the start and end (in samples) of each segment.
+//      The first and second columns are the start and duration (in samples) of each segment.
 //      The third column is an int describing the segment; matching values correspond
 //      to sonically similar sections.
 //      The fourth column is a string.  It seems to correspond to the type of segment,
 //      but with some extra info....TODO I need to research a litte more.
 //    The suffix is "_vamp_segmentino_segmentino_segmentation.csv"
 
+Segmentino::Segmentino()
+{
+    setName("Segmentino");
+    _type = BEAT;
+
+    _segmentIndexOutput.setName("Segment Index");
+    _segmentIndexOutput.setOutput(true);
+    _segmentIndexOutput.setConnectable(true);
+
+    loadFile();  // ErrorHandling
+
+    _paramList << &_segmentIndexOutput;
+    setParamParent();
+}
+
+void Segmentino::loadFile()
+{
+    // Guess filename from audio file:
+    QString audioFilename = Cupid::getAudioFilename();
+    QFileInfo finfo = QFileInfo(audioFilename);
+    QString path = finfo.path();
+    QString basename = finfo.completeBaseName();
+    QString filename = path + "/" + basename
+            + "_vamp_segmentino_segmentino_segmentation.csv";
+    loadFile(filename);
+}
+
+void Segmentino::loadFile(QString filename)
+{
+    std::ifstream filestream;
+    filestream.open(filename.toStdString(), std::ios::in);
+    double conversion = 1000. / Cupid::Singleton()->getEngine()->format().sampleRate();
+
+    if (! filestream.is_open())
+        return; // ErrorHandling
+
+    std::string line;
+    while ( getline (filestream,line) ) {
+        // Split at comma
+        std::istringstream ss(line);
+        std::string token;
+        getline(ss, token, ',');
+        int startTime = std::atoi(token.c_str());
+        startTime  *= conversion;
+
+        getline(ss, token, ',');
+        int duration = std::atoi(token.c_str());
+        Q_UNUSED(duration);
+        // We don't use duration; we assume each segment lasts until
+        // the start of the next segment.
+
+        getline(ss, token, ',');
+        int index = std::atoi(token.c_str());
+        _segments.push_back(std::pair<int, int>(startTime, index));
+
+        //TODO read and output segment variant indices
+    }
+    filestream.close();
+}
+
+int Segmentino::findSegment(int msecs)
+{
+    for (auto i = _segments.begin(); i < _segments.end(); ++i) {
+        if ((*i).first > msecs)
+            return (*(i-1)).second;
+    }
+    // ErrorHandling
+    return 0;
+}
+
+void Segmentino::operator()() {
+    // Boilerplate start of operator:
+    if (evaluatedThisFrame())
+        return;
+    evalAllInputs();
+
+    qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
+    _segmentIndexOutput._value = findSegment(mSecs);
+
+    // Boilerplate end of operator:
+    _segmentIndexOutput._qvOutput  = _segmentIndexOutput._value;
+}
+
+Segmentino* Segmentino::clone()
+{
+    Segmentino* lhs = new Segmentino;
+    cloneHelper(*lhs);
+    setParamParent();
+    return lhs;
+}
+
+// ------------------------------------------------------------------------------
+// Utility function
+
+// The onset and BarBeats files are indexed based on samples.
+// We use milliseconds.  Convert a vector of from sample-indices to ms.
+void convertSamplesToMS(std::vector<int> &samples)
+{
+    double conversion = 1000. / Cupid::Singleton()->getEngine()->format().sampleRate();
+    for (auto &sample : samples ) {
+        sample *= conversion;
+    }
+}
 
 // ------------------------------------------------------------------------------
 // Register
@@ -609,3 +699,4 @@ static Registrar<Multiply>      registrar5("Multiply", Node::BEAT);
 static Registrar<NodeOnset>     registrar1("Onset", Node::BEAT);
 static Registrar<NodeBar>       registrar2("Bar", Node::BEAT);
 static Registrar<NodeBarBeat>   registrar3("Bars&&Beats", Node::BEAT);
+static Registrar<Segmentino>    registrar4("Segmentino", Node::BEAT);

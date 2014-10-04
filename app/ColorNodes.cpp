@@ -63,6 +63,12 @@ ColorRamp* ColorRamp::clone()
 //      Creates a new hi-brightness, hi-sat color every trigger
 BriteColor::BriteColor() :
     _output(0),
+    _hueMin(0.0),
+    _hueMax(1.0),
+    _satMin(0.7),
+    _satMax(1.0),
+    _valMin(0.8),
+    _valMax(1.0),
     _trigger(true)
 {
     setName("BriteColor");
@@ -72,11 +78,35 @@ BriteColor::BriteColor() :
     _output.setOutput(true);
     _output.setConnectable(true);
 
+    _hueMin.setName("hue min");
+    _hueMin.setOutput(false);
+    _hueMin.setConnectable(false);
+
+    _hueMax.setName("hue max");
+    _hueMax.setOutput(false);
+    _hueMax.setConnectable(false);
+
+    _satMin.setName("sat min");
+    _satMin.setOutput(false);
+    _satMin.setConnectable(false);
+
+    _satMax.setName("sat max");
+    _satMax.setOutput(false);
+    _satMax.setConnectable(false);
+
+    _valMin.setName("value min");
+    _valMin.setOutput(false);
+    _valMin.setConnectable(false);
+
+    _valMax.setName("value max");
+    _valMax.setOutput(false);
+    _valMax.setConnectable(false);
+
     _trigger.setName("trigger");
     _trigger.setOutput(false);
     _trigger.setConnectable(true);
 
-    _paramList << &_output << &_trigger;
+    _paramList << &_output << &_hueMin << &_hueMax << &_satMin << &_satMax << &_valMin << &_valMax << &_trigger;
     setParamParent();
     setRandomEngine();
 }
@@ -90,24 +120,28 @@ void BriteColor::setRandomEngine()
     // Initialize the distrubution on the range [_min, _max)
     // NOTE:  this is the HALF-OPEN interval--inclusive of min, but exclusive of max
     // XXX if these are connections, this is going to break.
-#if 0
-    // LATER  -- range params for BriteColor
-    float minSat, maxSat;
-    _min.getValue(minSat);
-    _max.getValue(maxSat);
-    _distSat = new std::uniform_real_distribution<float>(minSat, maxSat);
+#if 1
+    float hmin, hmax, smin, smax, vmin, vmax;
+    _hueMin.getValue(hmin);
+    _hueMax.getValue(hmax);
+    _satMin.getValue(smin);
+    _satMax.getValue(smax);
+    _valMin.getValue(vmin);
+    _valMax.getValue(vmax);
+    _distHue = new std::uniform_real_distribution<float>(hmin, hmax);
+    _distSat = new std::uniform_real_distribution<float>(smin, smax);
+    _distVal = new std::uniform_real_distribution<float>(vmin, vmax);
 #else
     _distSat = new std::uniform_real_distribution<float>(.7, 1.0);
-#endif
     _distHue = new std::uniform_real_distribution<float>(0.0, 1.0);
     _distVal = new std::uniform_real_distribution<float>(0.8, 1.0);
+#endif
 }
 
 // This is called whenever a parameter gets edited, so
 // that the random number engine can be reset.
 void BriteColor::paramHasBeenEdited()
 {
-    // Need to reset random engine.
     setRandomEngine();
 }
 
