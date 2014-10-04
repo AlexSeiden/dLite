@@ -4,6 +4,7 @@
 #include "GuiSettings.h"
 #include <QGraphicsSceneMouseEvent>
 #include <QDebug>
+#include "GroupNodeItem.h"
 
 
 CuesheetScene::CuesheetScene(QObject *parent) :
@@ -280,4 +281,37 @@ QList<NodeItem*> CuesheetScene::getSelectedNodeItems()
         allNodes << ni;
     }
     return allNodes;
+}
+
+QList<QGraphicsItem*> CuesheetScene::getSelectedGroupableItems()
+{
+    QList<QGraphicsItem*>allItems = selectedItems();
+    QList<QGraphicsItem*>groupableItems;
+    foreach (QGraphicsItem* item, allItems) {
+        NodeItem *ni = dynamic_cast<NodeItem *>(item);
+        if (ni) {
+            groupableItems << ni;
+            continue;
+        }
+        GroupNodeItem *gni = dynamic_cast<GroupNodeItem *>(item);
+        if (gni) {
+            groupableItems << gni;
+            continue;
+        }
+    }
+    return groupableItems;
+}
+
+QList<GroupNodeItem*> CuesheetScene::getSelectedGroups()
+{
+    QList<QGraphicsItem*>allItems = selectedItems();
+    QList<GroupNodeItem*>groupItems;
+    foreach (QGraphicsItem* item, allItems) {
+        GroupNodeItem *gni = dynamic_cast<GroupNodeItem *>(item);
+        if (gni) {
+            groupItems << gni;
+            continue;
+        }
+    }
+    return groupItems;
 }

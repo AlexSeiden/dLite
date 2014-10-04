@@ -17,6 +17,7 @@ TARGET = dLite
 QT       += multimedia widgets
 
 SOURCES  += \
+    Remap.cpp \
     main.cpp \
     engine.cpp \
     frequencyspectrum.cpp \
@@ -41,8 +42,7 @@ SOURCES  += \
     Device.cpp \
     Region.cpp \
     RegionCue.cpp \
-    DotCue.cpp \
-    Remap.cpp
+    DotCue.cpp
 
 HEADERS  += \
     engine.h \

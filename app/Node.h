@@ -111,6 +111,7 @@ protected:
     QString               _name;
     Param<bool>           _active;
     QList<ParamBase *>    _paramList;
+    QMap<QString, ParamBase*> _paramDict;
     node_t                _type;
     int                   _frameLastEvaluated;
     /*const */QUuid       _uuid;        // Could be const except for need to assign in NodeFactory::instantiateNode when reading from file.
@@ -118,6 +119,37 @@ protected:
 
 
     static QList<Node *>  _allNodes;
+
+    // New style params
+    template <typename T>
+    void addParam(QString name, const T& defValue=T(0), bool output=false, bool connectable=true)
+    {
+        Param<T>* param = new Param<T>;
+        param->setName(name);
+        param->setOutput(output);
+        param->setConnectable(connectable);
+        param->setValue(defValue);
+
+        param->setParentNode(this);
+        _paramList << param;
+        _paramDict[name] = param;
+    }
+
+    template <typename T>
+    void getValue(QString paramName, T& value)
+    {
+        Param<T>*param = dynamic_cast<Param<T>*>(_paramDict[paramName]);
+        Q_ASSERT(param);
+        param->getValue(value);
+    }
+
+    template <typename T>
+    void setValue(QString paramName, T& value)
+    {
+        Param<T>*param = dynamic_cast<Param<T>*>(_paramDict[paramName]);
+        Q_ASSERT(param);
+        param->setValue(value);
+    }
 
     // This is so instantiateNode can set classname:
     //friend Node* NodeFactory::instatiateNode(QString classname);

@@ -70,7 +70,7 @@ Node::node_t Node::getType()
 void Node::setParamParent()
 {
     foreach (ParamBase *p, _paramList) {
-        p->setParent(this);
+        p->setParentNode(this);
     }
 }
 

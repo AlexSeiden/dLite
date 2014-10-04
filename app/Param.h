@@ -19,6 +19,8 @@ class QJsonObject;
 class QWidget;
 class QObject;
 
+enum param_t {NONE, FLOAT, INT, BOOL, COLOR, STRING, REGION};
+
 class ParamBase
 {
 public:
@@ -48,7 +50,8 @@ public:
     void        connectTo(ParamBase *server);
     void        disconnect() {_connectedParam = nullptr; _provider = nullptr;}
 
-    void        setRange(bool userange, double min, double max, double step);
+    // TODO range only works for floats & ints.
+    void        setRange(bool userange, double min=0.0, double max=1.0, double step=1.0);
 
     virtual void eval() {
         if (_provider)
@@ -66,7 +69,7 @@ public:
 
     // Returns a pointer of the Node that this is a parameter for.
     Node *  getParentNode() {return _parentNode;}
-    void    setParent(Node *parent) {_parentNode = parent;}
+    void    setParentNode(Node *parent) {_parentNode = parent;}
 
     // Valid only for input nodes
     Node *getServer() {
@@ -145,7 +148,8 @@ public:
         }
     }
 
-    void setValue(const PARAMT &value) {_value = value;}
+    // GROSS using qvOutput a lot when not needed.
+    void setValue(const PARAMT &value) {_value=value; _qvOutput.setValue(value);}
 
     // ??? do we need this?  Would it be better just to assign a _type field?
     virtual const std::type_info & getType() {return typeid(this);}

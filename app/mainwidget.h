@@ -102,11 +102,13 @@ private:
     QShortcut*              m_yAlignShortcut;
     QShortcut*              m_zoomOutShortcut;
     QShortcut*              m_zoomInShortcut;
+    QShortcut*              m_zoomResetShortcut;
     QShortcut*              m_saveShortcut;
     QShortcut*              m_saveAsShortcut;
     QShortcut*              m_openFileShortcut;
     QShortcut*              m_duplicateShortcut;
     QShortcut*              m_groupShortcut;
+    QShortcut*              m_ungroupShortcut;
     QShortcut*              m_minimizeSelectedShortcut;
 
 #if 1 // NUKEMEMAYBE

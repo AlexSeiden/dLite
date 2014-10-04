@@ -29,7 +29,9 @@ GraphWidget::GraphWidget(QWidget *parent) :
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
     layout->addWidget(_csview);
-    setGeometry(10, 500, 1500, 500);
+    CHECKED_CONNECT(_csview, SIGNAL(newCuesheet()), this, SLOT(newCuesheet()));
+
+    setGeometry(10, 500, 1500, 500);        // hardw
     setLayout(layout);
     setWindowTitle("Cuesheet");
     setWindowFlags( Qt::Window | Qt::WindowMaximizeButtonHint |
@@ -184,6 +186,12 @@ void GraphWidget::zoomIn()
     update();
 }
 
+void GraphWidget::zoomReset()
+{
+    _csview->zoomReset();
+    update();
+}
+
 void GraphWidget::frameItems(QList<QGraphicsItem *> items)
 {
     if (items.length() == 0) {
@@ -283,22 +291,20 @@ void GraphWidget::xAlign()
 }
 
 void GraphWidget::group() {
-    QList<NodeItem *> selection = _scene->getSelectedNodeItems();
-#if 0
-    QList<QGraphicsItem *> qgiSelection;
-    foreach (QGraphicsItem *qgi, selection)
-        qgiSelection << qgi;
-
-    QGraphicsItemGroup *grp = _scene->createItemGroup(qgiSelection);
-#else
+    QList<QGraphicsItem*> selection = _scene->getSelectedGroupableItems();
     GroupNodeItem *grp = new GroupNodeItem();
     _scene->addItem(grp);
-    foreach (NodeItem *ni, selection)
-        grp->addToNodeItemGroup(ni);
-#endif
+    foreach (QGraphicsItem *gi, selection)
+        grp->addToGroup(gi);
     grp->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
     grp->setSelected(true);
+}
 
+void GraphWidget::ungroup() {
+    QList<GroupNodeItem*> selection = _scene->getSelectedGroups();
+
+    foreach (GroupNodeItem *grp, selection)
+        _scene->destroyItemGroup(grp);
 }
 
 void GraphWidget::duplicate() {
@@ -327,4 +333,9 @@ void GraphWidget::minimizeSelected() {
     bool setThemToMinimized = !areMinimized;
     foreach (NodeItem* item, selection)
         item->minimize(setThemToMinimized);
+}
+
+void GraphWidget::newCuesheet()
+{
+
 }

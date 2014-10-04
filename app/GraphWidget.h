@@ -38,11 +38,14 @@ public slots:
     void frameSelection();
     void zoomOut();
     void zoomIn();
+    void zoomReset();
     void layoutAll();
     void deleteSelection();
     void group();
+    void ungroup();
     void duplicate();
     void minimizeSelected();
+    void newCuesheet();
 
 private:
     void    align(bool xaxis);

@@ -14,6 +14,7 @@ class SocketItem;
 class ConnectorItem;
 class Node;
 class ParamBase;
+class GroupNodeItem;
 
 QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
@@ -34,6 +35,8 @@ public:
     NodeItem*           getNodeItemForNode(const Node *node);
     QList<NodeItem*>    getAllNodeItems();
     QList<NodeItem*>    getSelectedNodeItems();
+    QList<QGraphicsItem*>    getSelectedGroupableItems();
+    QList<GroupNodeItem*>    getSelectedGroups();
     QList<NodeItem*>    getAllCueNodeItems();
 
 public slots:

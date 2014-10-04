@@ -375,6 +375,10 @@ void MainWidget::createShortcuts()
     m_zoomInShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_zoomInShortcut, SIGNAL(activated()), m_graphWidget, SLOT(zoomIn()));
 
+    m_zoomResetShortcut = new QShortcut(Qt::Key_1, this);
+    m_zoomResetShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_zoomResetShortcut, SIGNAL(activated()), m_graphWidget, SLOT(zoomReset()));
+
     m_layoutAllShortcut = new QShortcut(Qt::Key_L, this);
     m_layoutAllShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_layoutAllShortcut, SIGNAL(activated()), m_graphWidget, SLOT(layoutAll()));
@@ -395,6 +399,10 @@ void MainWidget::createShortcuts()
     m_groupShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_groupShortcut, SIGNAL(activated()), m_graphWidget, SLOT(group()));
 
+    m_ungroupShortcut = new QShortcut(Qt::Key_U, this);
+    m_ungroupShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_ungroupShortcut, SIGNAL(activated()), m_graphWidget, SLOT(ungroup()));
+
     m_minimizeSelectedShortcut = new QShortcut(Qt::Key_M, this);
     m_minimizeSelectedShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_minimizeSelectedShortcut, SIGNAL(activated()), m_graphWidget, SLOT(minimizeSelected()));
@@ -411,7 +419,6 @@ void MainWidget::createShortcuts()
     m_openFileShortcut = new QShortcut(QKeySequence("Ctrl+O"), this);
     m_openFileShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_openFileShortcut, SIGNAL(activated()), this, SLOT(showOpenDialog()));
-
 }
 
 void MainWidget::updateButtonStates()

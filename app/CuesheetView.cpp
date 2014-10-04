@@ -8,18 +8,18 @@ CuesheetView::CuesheetView(QWidget *parent)
 {
     setContentsMargins(0,0,0,0);
     setFrameStyle(NoFrame);
-    graphicsView = new GraphicsView(this);
-    graphicsView->setRenderHint(QPainter::Antialiasing, true);
+    _graphicsView = new GraphicsView(this);
+    _graphicsView->setRenderHint(QPainter::Antialiasing, true);
 
-    graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
-    graphicsView->setInteractive(true);
+    _graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
+    _graphicsView->setInteractive(true);
 
     setStyleSheet("QFrame { background-color: #433F3B }");
 
     // ??? Not sure about these flags...they came from the example stuff
-    graphicsView->setOptimizationFlags(QGraphicsView::DontSavePainterState);
-    graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
-    graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    _graphicsView->setOptimizationFlags(QGraphicsView::DontSavePainterState);
+    _graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
+    _graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
 //    int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
     QSize iconSize(GuiSettings::zoomIconSize, GuiSettings::zoomIconSize);
@@ -37,31 +37,37 @@ CuesheetView::CuesheetView(QWidget *parent)
     zoomOutIcon->setAutoRepeatDelay(0);
     zoomOutIcon->setIcon(QPixmap(":/images/zoomout.png"));
     zoomOutIcon->setIconSize(iconSize);
-    zoomSlider = new QSlider;
-    zoomSlider->setMinimum(0);
-    zoomSlider->setMaximum(500);
-    zoomSlider->setValue(500);
-    zoomSlider->setTickPosition(QSlider::TicksRight);
+    _zoomSlider = new QSlider;
+    _zoomSlider->setMinimum(0);
+    _zoomSlider->setMaximum(500);
+    _zoomSlider->setValue(500);
+    _zoomSlider->setTickPosition(QSlider::TicksRight);
 
-    resetButton = new QToolButton;
-    resetButton->setText(tr("0"));
-    resetButton->setEnabled(true);
+    _resetButton = new QToolButton;
+    _resetButton->setText(tr("0"));
+    _resetButton->setEnabled(true);
+
+    _newcueButton = new QToolButton;
+    _newcueButton->setText(tr("+"));
+    _newcueButton->setEnabled(true);
 
     // Zoom slider layout
     QVBoxLayout *zoomSliderLayout = new QVBoxLayout;
     zoomSliderLayout->addWidget(zoomInIcon);
-    zoomSliderLayout->addWidget(zoomSlider);
+    zoomSliderLayout->addWidget(_zoomSlider);
     zoomSliderLayout->addWidget(zoomOutIcon);
-    zoomSliderLayout->addWidget(resetButton);
+    zoomSliderLayout->addWidget(_resetButton);
+    zoomSliderLayout->addWidget(_newcueButton);
 
     QGridLayout *topLayout = new QGridLayout;
-    topLayout->addWidget(graphicsView, 1, 0);
+    topLayout->addWidget(_graphicsView, 1, 0);
     topLayout->addLayout(zoomSliderLayout, 1, 1);
     topLayout->setContentsMargins(4,4,2,4);
     setLayout(topLayout);
 
-    connect(resetButton, SIGNAL(clicked()), this, SLOT(resetView()));
-    connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(setupMatrix()));
+    connect(_newcueButton, SIGNAL(clicked()), this, SIGNAL(newCuesheet()));
+    connect(_resetButton, SIGNAL(clicked()), this, SLOT(resetView()));
+    connect(_zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(setupMatrix()));
     connect(zoomInIcon, SIGNAL(clicked()), this, SLOT(zoomIn()));
     connect(zoomOutIcon, SIGNAL(clicked()), this, SLOT(zoomOut()));
 
@@ -72,15 +78,15 @@ QGraphicsView *CuesheetView::view() const
 {
     // This is only here to help implement zooming with wheel events.
     // LATER make pinch-to-zoom work.
-    return static_cast<QGraphicsView *>(graphicsView);
+    return static_cast<QGraphicsView *>(_graphicsView);
 }
 
 void CuesheetView::resetView()
 {
-    zoomSlider->setValue(500);
+    _zoomSlider->setValue(500);
     setupMatrix();
     // TODO this doesn't work so great.
-    graphicsView->ensureVisible(QRectF(0, 0, 0, 0));
+    _graphicsView->ensureVisible(QRectF(0, 0, 0, 0));
 }
 
 void CuesheetView::fitBbox(const QRectF &bbox)
@@ -92,30 +98,34 @@ void CuesheetView::fitBbox(const QRectF &bbox)
 void CuesheetView::setSliderFromTransform()
 {
     // Find scale from xform matrix:
-    QTransform xform = graphicsView->transform();
+    QTransform xform = _graphicsView->transform();
     qreal scale = xform.m11();
     // m22 should be the same... could check....
     int slider = 200 * log2(scale) + 500;
     slider = clamp(0,500,slider);
-    zoomSlider->setValue(slider);
+    _zoomSlider->setValue(slider);
 }
 
 void CuesheetView::setupMatrix()
 {
-    qreal scale = qPow(qreal(2), (zoomSlider->value() - 500) / qreal(200));
-    graphicsView->setTransform(QTransform());
-    graphicsView->scale(scale, scale);
+    qreal scale = qPow(qreal(2), (_zoomSlider->value() - 500) / qreal(200));
+    _graphicsView->setTransform(QTransform());
+    _graphicsView->scale(scale, scale);
 }
 
 void CuesheetView::zoomIn(int level)
 {
-    zoomSlider->setValue(zoomSlider->value() + level);
+    _zoomSlider->setValue(_zoomSlider->value() + level);
 }
 
 void CuesheetView::zoomOut(int level)
 {
-    zoomSlider->setValue(zoomSlider->value() - level);
-//    qDebug() << Q_FUNC_INFO << zoomSlider->value();
+    _zoomSlider->setValue(_zoomSlider->value() - level);
+}
+
+void CuesheetView::zoomReset()
+{
+    _zoomSlider->setValue(500);
 }
 
 #ifndef QT_NO_WHEELEVENT

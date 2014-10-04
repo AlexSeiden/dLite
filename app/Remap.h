@@ -14,12 +14,14 @@ public:
 
 private:
     // Parameters
+#ifdef OLDPARAMS
     Param<float> _output;
     Param<float> _minOut;
     Param<float> _maxOut;
     Param<float> _minIn;
     Param<float> _maxIn;
     Param<float> _input;
+#endif
 
 };
 #endif // REMAP_H

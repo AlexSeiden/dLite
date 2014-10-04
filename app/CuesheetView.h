@@ -41,6 +41,7 @@ public:
 public slots:
     void zoomIn(int level = 10);
     void zoomOut(int level = 10);
+    void zoomReset();
     void fitBbox(const QRectF& bbox);
 
 private slots:
@@ -48,10 +49,14 @@ private slots:
     void resetView();
     void setupMatrix();
 
+signals:
+    void newCuesheet();
+
 private:
-    GraphicsView *graphicsView;
-    QToolButton *resetButton;
-    QSlider *zoomSlider;
+    GraphicsView*   _graphicsView;
+    QToolButton*    _resetButton;
+    QToolButton*    _newcueButton;
+    QSlider*        _zoomSlider;
 };
 
 #endif // CUESHEETVIEW_H

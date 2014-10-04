@@ -17,7 +17,7 @@ GroupNodeItem::GroupNodeItem(QGraphicsItem *parent) :
 QRectF GroupNodeItem::boundingRect() const
 {
     QRectF bbox = QGraphicsItemGroup::boundingRect();
-    bbox.adjust(4,4,4,4);
+    bbox += QMarginsF(4,4+30,4,4);
     return bbox;
 }
 
@@ -37,13 +37,21 @@ void GroupNodeItem::paint(QPainter *painter,
         selectedPen.setWidth(GuiSettings::selectedNodePenWidth);
     }
     painter->setPen(selectedPen);
-    painter->drawRect(QGraphicsItemGroup::boundingRect());
+    QRectF bbox = QGraphicsItemGroup::boundingRect();
+    bbox += QMarginsF(0,30,0,0);
+    painter->drawRect(bbox);
     painter->restore();
 
     QGraphicsItemGroup::paint(painter, option, widget);
 }
 
-void GroupNodeItem::addToNodeItemGroup(NodeItem *ni)
+
+//QList<NodeItem*> GroupNodeItem::getMembers()      // NUKEME
+//{
+//    QList<QGraphicsItem*> members = childItems();
+//}
+
+void GroupNodeItem::addToNodeItemGroup(NodeItem *ni)        // NUKEME
 {
     // HMM maybe better to just get items and filter/cast to nodeitem
     addToGroup(ni);
@@ -53,7 +61,17 @@ void GroupNodeItem::addToNodeItemGroup(NodeItem *ni)
 void GroupNodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
     // Used for updating any attached connectors.
-    foreach (NodeItem *ni, getMembers())
-        ni->nodeMovedEventSignal();
+    foreach (QGraphicsItem *item, childItems()) {
+        NodeItem *ni = dynamic_cast<NodeItem *>(item);
+        if (ni) {
+            ni->nodeMovedEventSignal();
+            continue;
+        }
+        GroupNodeItem *gni = dynamic_cast<GroupNodeItem *>(item);
+        if (gni) {
+            gni->mouseMoveEvent(event);
+            continue;
+        }
+    }
     QGraphicsItemGroup::mouseMoveEvent(event);
 }
