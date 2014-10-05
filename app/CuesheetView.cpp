@@ -14,7 +14,7 @@ CuesheetView::CuesheetView(QWidget *parent)
     _graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
     _graphicsView->setInteractive(true);
 
-    setStyleSheet("QFrame { background-color: #433F3B }");
+//    setStyleSheet("QFrame { background-color: #433F3B }");
 
     // ??? Not sure about these flags...they came from the example stuff
     _graphicsView->setOptimizationFlags(QGraphicsView::DontSavePainterState);
@@ -47,9 +47,9 @@ CuesheetView::CuesheetView(QWidget *parent)
     _resetButton->setText(tr("0"));
     _resetButton->setEnabled(true);
 
-    _newcueButton = new QToolButton;
-    _newcueButton->setText(tr("+"));
-    _newcueButton->setEnabled(true);
+//    _newcueButton = new QToolButton;
+//    _newcueButton->setText(tr("+"));
+//    _newcueButton->setEnabled(true);
 
     // Zoom slider layout
     QVBoxLayout *zoomSliderLayout = new QVBoxLayout;
@@ -57,7 +57,7 @@ CuesheetView::CuesheetView(QWidget *parent)
     zoomSliderLayout->addWidget(_zoomSlider);
     zoomSliderLayout->addWidget(zoomOutIcon);
     zoomSliderLayout->addWidget(_resetButton);
-    zoomSliderLayout->addWidget(_newcueButton);
+//    zoomSliderLayout->addWidget(_newcueButton);
 
     QGridLayout *topLayout = new QGridLayout;
     topLayout->addWidget(_graphicsView, 1, 0);
@@ -65,7 +65,7 @@ CuesheetView::CuesheetView(QWidget *parent)
     topLayout->setContentsMargins(4,4,2,4);
     setLayout(topLayout);
 
-    connect(_newcueButton, SIGNAL(clicked()), this, SIGNAL(newCuesheet()));
+//    connect(_newcueButton, SIGNAL(clicked()), this, SIGNAL(newCuesheet()));
     connect(_resetButton, SIGNAL(clicked()), this, SLOT(resetView()));
     connect(_zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(setupMatrix()));
     connect(zoomInIcon, SIGNAL(clicked()), this, SLOT(zoomIn()));

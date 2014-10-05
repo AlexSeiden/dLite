@@ -12,6 +12,9 @@ class NodeItem;
 class Subrange;
 class CuesheetScene;
 class CuesheetView;
+class QTabWidget;
+class QToolButton;
+class QCheckBox;
 
 QT_BEGIN_NAMESPACE
 class QGraphicsItem;
@@ -24,9 +27,11 @@ public:
     explicit GraphWidget(QWidget *parent = 0);
     ~GraphWidget() {}
 
-    void addTheseNodes(QList<Node*> aBunchOfNodes);
+//    void addTheseNodes(QList<Node*> aBunchOfNodes);
     void writeNodeUiToJSONObj(const Node *node, QJsonObject& json);
     void readNodeUiFromJSONObj(Node* node, const QJsonObject &json);
+
+    bool useAllCues();
 
 public slots:
     void addNode(Node *node, QJsonObject* json = nullptr);
@@ -46,14 +51,23 @@ public slots:
     void duplicate();
     void minimizeSelected();
     void newCuesheet();
+    QList<Cue*> getCurrentCues();
 
 private:
+    void    connectUi();
+
     void    align(bool xaxis);
     void    frameItems(QList<QGraphicsItem*> items);
     QPointF positionNodeItem(NodeItem* ni, QPointF startPos);
 
-    CuesheetScene*     _scene;
-    CuesheetView*      _csview;
+    CuesheetScene*     getCurrentScene();
+    CuesheetView*      getCurrentView();
+
+    QToolButton *       _newCueButton;
+    QCheckBox *       _useAllCues;
+    QTabWidget *       _tabwidget;
+//    CuesheetScene*     _scene;
+//    CuesheetView*      _csview;
 
     // Last selection made--used for updating selections
     QSet<NodeItem*>     _wasSelected;

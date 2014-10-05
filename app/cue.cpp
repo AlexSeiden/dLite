@@ -1,5 +1,6 @@
 #include "Cue.h"
 #include "DanceFloor.h"
+#include "Cupid.h"
 
 // ------------------------------------------------------------------------------
 //  Cue
@@ -15,6 +16,7 @@ Cue::Cue() :
     // Add this to list of cues the model knows about.
     Q_ASSERT(Cue::_dfModel);
     Cue::_dfModel->addCue(this);
+    // TODO should add to cuesheet here rather than through GraphWidget::addNode
 }
 
 Cue::~Cue()

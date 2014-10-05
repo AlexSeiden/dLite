@@ -10,6 +10,8 @@
 #include <QString>
 #include <QStringList>
 #include "dancefloorwidget.h"
+#include "Cupid.h"          // GROSS
+#include "GraphWidget.h"    // GROSS
 
 
 Dancefloor::Dancefloor(QObject *parent) :
@@ -23,9 +25,12 @@ Dancefloor::Dancefloor(QObject *parent) :
 
 Dancefloor::~Dancefloor() { }
 
-// LATER add Foot-squares as well as lights
+// ------------------------------------------------------------------------------
+// Import and setup
 bool Dancefloor::ImportLayout(std::string &layoutCsvFile)
 {
+    // LATER add Foot-squares as well as lights
+
     std::string line;
     std::vector< std::string> lines;
     std::vector< std::vector <std::string> > cells;
@@ -100,6 +105,18 @@ bool Dancefloor::ImportLayout(std::string &layoutCsvFile)
     return true;
 }
 
+void Dancefloor::printLayout()
+{
+    // Test routine to print layout on console.
+    for (int y=0; y<_ysize; ++y){
+        for (int x=0; x<_xsize; ++x)
+            printf("%4d", _lights[_getIndex(x,y)]._lightID);
+        printf("\n");
+    }
+}
+
+// ------------------------------------------------------------------------------
+// Access
 bool Dancefloor::hasPixel(int x, int y)
 {
     int index = _getIndex(x,y);
@@ -107,16 +124,6 @@ bool Dancefloor::hasPixel(int x, int y)
         return false;
     else
         return true;
-}
-
-// Test routine to print layout on console.
-void Dancefloor::printLayout()
-{
-    for (int y=0; y<_ysize; ++y){
-        for (int x=0; x<_xsize; ++x)
-            printf("%4d", _lights[_getIndex(x,y)]._lightID);
-        printf("\n");
-    }
 }
 
 #ifndef INLINE
@@ -136,9 +143,13 @@ Lightcolor Dancefloor::getPixel(int x, int y) {
 }
 
 QColor Dancefloor::getQColor(int x, int y) {
+    // Convinience method to return light value as a QColor rather than a Lightcolor
     return _lights[_getIndex(x,y)]._value.toQColor();
 }
 
+// ------------------------------------------------------------------------------
+// fireLight
+//      Called by the cues to set up firings.
 void Dancefloor::fireLight(int x, int y, Firing *firing)
 {
     // TODO Need to insert the firings correctly into the buffer,
@@ -149,11 +160,14 @@ void Dancefloor::fireLight(int x, int y, Firing *firing)
     light._firings.push_back(firing);
 }
 
+// ------------------------------------------------------------------------------
+// evaluate
 void Dancefloor::evaluate()
 {
 //    qDebug("Time elapsed: %d ms", _timeSinceLastUpdate.elapsed());
     _timeSinceLastUpdate.restart();
 
+    // Calls all active cues, which will set new firings.
     evaluateAllCues();
 
     // For every light, get the firing vector:
@@ -196,7 +210,10 @@ void Dancefloor::evaluate()
     }
 
     // STYLE should this be a signal/slot?
+    // Update the UI
     _dfWidget->update();
+
+    // Send to the hardware
     sendToDevice();
 
 
@@ -209,9 +226,16 @@ void Dancefloor::evaluate()
 }
 
 void Dancefloor::evaluateAllCues() {
-    for (Cue *cue : _cues) {
-        cue->evaluate();
+    if (Cupid::Singleton()->getGraphWidget()->useAllCues())
+        for (Cue *cue : _cues)
+            cue->evaluate();
+    else {
+        // Only get cues on the active cuesheet
+        foreach (Cue *cue,
+                 Cupid::Singleton()->getGraphWidget()->getCurrentCues())
+            cue->evaluate();
     }
+
 }
 
 void Dancefloor::addCue(Cue *cue) {

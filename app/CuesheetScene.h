@@ -23,6 +23,8 @@ class QGraphicsLineItem;
 class QColor;
 QT_END_NAMESPACE
 
+class Cue;
+
 class CuesheetScene : public QGraphicsScene
 {
     Q_OBJECT
@@ -39,6 +41,10 @@ public:
     QList<GroupNodeItem*>    getSelectedGroups();
     QList<NodeItem*>    getAllCueNodeItems();
     void                selectTheseNodes(QList<Node*> selection);
+    QString             getName() const {return _name;}
+    void                setName(QString name) {_name = name;}
+    void                addCue(Cue *cue) {_cues<<cue;}
+    QList<Cue*>         getCues() const {return _cues;}
 
 public slots:
     void setConnecting(bool status=true) {_isConnecting = status;}
@@ -62,6 +68,8 @@ private:
     //  on a socket, but hasn't yet finished the action by clicking on another
     //  socket to connect to.
     bool                _isConnecting;
+    QString             _name;
+    QList<Cue*>         _cues;
 };
 
 #endif // CUESHEETSCENE_H

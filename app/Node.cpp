@@ -360,6 +360,7 @@ bool NodeFactory::readFromFile(QString filename)
     QByteArray fileData = qfile.readAll();
     QJsonDocument jsonDoc(QJsonDocument::fromJson(fileData));
 
+    _connectionsToMake.clear();
     readAllNodes(jsonDoc.object());
 
     return true;
