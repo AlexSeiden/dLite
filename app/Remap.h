@@ -11,17 +11,5 @@ public:
     // and allows downstream clients to evaluate.
     void    operator() ();
     virtual Remap* clone();
-
-private:
-    // Parameters
-#ifdef OLDPARAMS
-    Param<float> _output;
-    Param<float> _minOut;
-    Param<float> _maxOut;
-    Param<float> _minIn;
-    Param<float> _maxIn;
-    Param<float> _input;
-#endif
-
 };
 #endif // REMAP_H

@@ -12,13 +12,6 @@ public:
     // and allows downstream clients to evaluate.
     void operator() ();
     virtual ColorRamp* clone();
-
-private:
-    // Parameters
-    Param<Lightcolor> _output;
-    Param<Lightcolor> _c0;
-    Param<Lightcolor> _c1;
-    Param<float> _mix;
 };
 
 
@@ -31,16 +24,6 @@ public:
     void paramHasBeenEdited();
 
 private:
-    // Parameters
-    Param<Lightcolor>   _output;
-    Param<float>        _hueMin;
-    Param<float>        _hueMax;
-    Param<float>        _satMin;
-    Param<float>        _satMax;
-    Param<float>        _valMin;
-    Param<float>        _valMax;
-    Param<bool>         _trigger;
-
     void  setRandomEngine();
     std::mt19937 *_randGenerator;
     std::uniform_real_distribution<float> *_distHue;
@@ -48,19 +31,13 @@ private:
     std::uniform_real_distribution<float> *_distVal;
 };
 
+
 class Palette : public Node
 {
 public:
     Palette();
     void operator() ();
     virtual Palette* clone();
-
-private:
-    // Parameters
-    Param<Lightcolor> _output;
-    Param<int> _selector;
-    QList<Param<Lightcolor> * > _allcolors;
-
 };
 
 #endif // COLORNODES_H

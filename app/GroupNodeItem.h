@@ -22,7 +22,7 @@ protected:
     void        mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 
 private:
-    bool                _minimized;
+    bool                _minimized;     // TODO
     QString             _name;
     QList<NodeItem*>    _members;
 };

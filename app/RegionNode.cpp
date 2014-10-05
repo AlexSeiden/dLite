@@ -14,12 +14,8 @@ RegionNode::RegionNode(QObject *parent) :
     setName(QString("Region%1").arg(nodeCount()));
     _type = REGION;
 
-    _region.setName("out");
-    _region.setConnectable(true);
-    _region.setOutput(true);
-
-    _paramList << &_region;
-    setParamParent();
+    Param<Region>* prp = addParam<Region>("out", Region(), true);
+    _regionP = &(prp->_value);
 
     CHECKED_CONNECT(this,
                     SIGNAL(regionNodeSelected(RegionNode*)),
@@ -37,7 +33,10 @@ void RegionNode::operator()()
     if (evaluatedThisFrame())
         return;
 
-    _region._qvOutput.setValue(_region._value);
+    Region region;
+    getValue("out", region);
+    // Need to do this to make sure qvOutput gets correct value
+    setValue("out", region);
 }
 
 RegionNode* RegionNode::clone()
@@ -64,23 +63,23 @@ void RegionNode::writeToJSONObj(QJsonObject &json) const
     Node::writeToJSONObj(json);
 
     // Override for serialization
-    _region._value.writeToJSONObj(json);
+    _regionP->writeToJSONObj(json);
 }
 
 void RegionNode::readFromJSONObj(const QJsonObject &json)
 {
     Node::readFromJSONObj(json);
-    _region._value.readFromJSONObj(json);
+    _regionP->readFromJSONObj(json);
 }
 
 bool RegionNode::hasCell(QPoint p)
 {
-    return _region._value.hasCell(p);
+    return _regionP->hasCell(p);
 }
 
 void RegionNode::setCell(QPoint p, bool status)
 {
-    _region._value.setCell(p, status);
+    _regionP->setCell(p, status);
 }
 
 PixelQueryDelegate_t RegionNode::getQueryDelegate()

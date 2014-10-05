@@ -63,6 +63,7 @@ bool Engine::loadSong(const QString &fileName)
     qint64 bytesToRead = m_wavFileHandle->size() - m_wavFileHandle->headerLength();
     m_buffer.resize(bytesToRead);
     int bytesRead = m_wavFileHandle->read(m_buffer.data(), bytesToRead);
+    Q_UNUSED(bytesRead);
     // ErrorHandling
 
     m_wavFileHandle->close();

@@ -28,6 +28,20 @@ std::function<void()> ParamBase::getProvider()
     return [this]() {(*this->_parentNode)();};
 }
 
+#if 0
+void ParamBase::getValueAndConnections(const ParamBase &rhs)
+{
+    this->_connectedParam = rhs._connectedParam;
+}
+#endif
+
+/*
+ParamBase& ParamBase::operator=(const ParamBase& rhs)
+{
+    this->_connectedParam = rhs._connectedParam;
+    return *this;
+}
+*/
 
 // ------------------------------------------------------------------------------
 // isConnectableTo
@@ -130,6 +144,77 @@ void ParamBase::connectTo(ParamBase *server)
     qDebug() << "as per getType:";
     qDebug() << "thisType    " << this->getType().name();
     qDebug() << "serverType  " << server->getType().name() << endl;
+}
+
+// Copy Value
+// XXX  GROSS -- There's got to be a better way to do this.
+void ParamBase::copyValue(ParamBase *rhs)
+{
+    _connectedParam = rhs->_connectedParam;
+
+    {
+    Param<int> *s = dynamic_cast<Param<int> *>(rhs);
+    Param<int> *c = dynamic_cast<Param<int> *>(this);
+    if (s && c) {
+        c->_value = s->_value;
+        return;
+    }
+    }
+
+    {
+    Param<float> *s = dynamic_cast<Param<float> *>(rhs);
+    Param<float> *c = dynamic_cast<Param<float> *>(this);
+    if (s && c) {
+        c->_value = s->_value;
+        return;
+    }
+    }
+
+    {
+    Param<Lightcolor> *s = dynamic_cast<Param<Lightcolor> *>(rhs);
+    Param<Lightcolor> *c = dynamic_cast<Param<Lightcolor> *>(this);
+    if (s && c) {
+        c->_value = s->_value;
+        return;
+    }
+    }
+
+    {
+    Param<bool> *s = dynamic_cast<Param<bool> *>(rhs);
+    Param<bool> *c = dynamic_cast<Param<bool> *>(this);
+    if (s && c) {
+        c->_value = s->_value;
+        return;
+    }
+    }
+
+    {
+    Param<Region> *s = dynamic_cast<Param<Region> *>(rhs);
+    Param<Region> *c = dynamic_cast<Param<Region> *>(this);
+    if (s && c) {
+        // XXX this probably isn't correct
+        c->_value = s->_value;
+        return;
+    }
+    }
+
+    // XXX this won't handle copying of spectral range node's subrange params.
+
+    // ErrorHandling
+
+    qDebug() << "ERROR" << Q_FUNC_INFO;
+
+    qDebug() << "as per typeid(*this/rhs):";
+    qDebug() << "thisType    " << typeid(*this).name();
+    qDebug() << "rhsType  " << typeid(*rhs).name() << endl;
+
+    qDebug() << "as per _type:";
+    qDebug() << "thisType    " << this->_type.name();
+    qDebug() << "rhsType  " << rhs->_type.name() << endl;
+
+    qDebug() << "as per getType:";
+    qDebug() << "thisType    " << this->getType().name();
+    qDebug() << "rhsType  " << rhs->getType().name() << endl;
 }
 
 // ------------------------------------------------------------------------------

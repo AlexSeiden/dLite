@@ -3,7 +3,8 @@
 #include <QJsonArray>
 
 Region::Region()
-{ }
+{
+}
 
 bool Region::hasCell(QPoint p)
 {

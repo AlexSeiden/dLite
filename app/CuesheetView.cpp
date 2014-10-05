@@ -91,7 +91,7 @@ void CuesheetView::resetView()
 
 void CuesheetView::fitBbox(const QRectF &bbox)
 {
-    view()->fitInView(bbox, Qt::KeepAspectRatio);
+    view()->fitInView(bbox, Qt::KeepAspectRatioByExpanding);
     setSliderFromTransform();
 }
 
@@ -101,9 +101,19 @@ void CuesheetView::setSliderFromTransform()
     QTransform xform = _graphicsView->transform();
     qreal scale = xform.m11();
     // m22 should be the same... could check....
+
+    // Compute the slider value from the xform matrix that exists:
     int slider = 200 * log2(scale) + 500;
-    slider = clamp(0,500,slider);
-    _zoomSlider->setValue(slider);
+
+    // Set the slider value, but not so much that it zooms in beyond "500",
+    // which is overkill.
+    if (slider<0 || slider>500) {
+        slider = clamp(0,500,slider);
+        _zoomSlider->setValue(slider);
+        setupMatrix();
+    }
+    else
+        _zoomSlider->setValue(slider);
 }
 
 void CuesheetView::setupMatrix()

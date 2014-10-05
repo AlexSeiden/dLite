@@ -5,11 +5,12 @@
 
 // ------------------------------------------------------------------------------
 // Imager base class
-Imager::Imager() :
-    _alpha(1.0),
-    _color(Lightcolor(255,255,255))
+Imager::Imager()
 {
     _type = CUE;
+    addParam<float>("alpha", 1.0);
+    addParam<Lightcolor>("color", Lightcolor(255,255,255));
+
     int xsize = Cupid::Singleton()->getDancefloor()->getXsize();
     int ysize = Cupid::Singleton()->getDancefloor()->getYsize();
     _image = new QImage(xsize, ysize, QImage::Format_ARGB32_Premultiplied);
@@ -47,12 +48,14 @@ void Imager::fire()
             // TODO XXX $$$ this is super-inefficient
             Firing *firing = new Firing;
             Lightcolor color(_image->pixel(x,y));
-            color *= _alpha._value;
+            float alpha;
+            getValue("alpha", alpha);
+            color *= alpha;
 
             firing->_color = color;
-            firing->_alpha = _alpha._value;
+            firing->_alpha = alpha;
             firing->setDecayMode(_decayMode);           // TODO
-            firing->setCompMode(_compMode);
+            firing->setCompMode(_compMode);             // TODO
             _dfModel->fireLight(x, y, firing);
         }
 }
@@ -60,48 +63,35 @@ void Imager::fire()
 // ------------------------------------------------------------------------------
 // Circle
 Circle::Circle() :
-    Imager(),
-    _x(10),
-    _y(8),
-    _scale(1.0)
+    Imager()
 {
     setName(QString("CircleCue"));
 
     // Declare params.
-    _x.setName("x");
-    _x.setOutput(false);
-    _x.setConnectable(true);
-
-    _y.setName("y");
-    _y.setOutput(false);
-    _y.setConnectable(true);
-
-    _scale.setName("scale");
-    _scale.setOutput(false);
-    _scale.setConnectable(true);
-
-    _alpha.setName("alpha");
-    _alpha.setOutput(false);
-    _alpha.setConnectable(true);
-
-    _color.setName("color");
-    _color.setOutput(false);
-    _color.setConnectable(true);
-
-    _paramList << &_x <<&_y <<&_scale << &_alpha << &_color;
-    setParamParent();
+    addParam<float>("x", 10.);
+    addParam<float>("y", 8.);
+    addParam<float>("scale", 1.0);
+    // alpha & color???
 
 }
 
 void Circle::draw()
 {
+    Lightcolor color;
+    int x,y;
+    float scale;
+    getValue("color", color);
+    getValue("x", x);
+    getValue("y", y);
+    getValue("scale", scale);
+
     QPainter painter(_image);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
     painter.fillRect(_image->rect(), Qt::black);
-    painter.setBrush(QBrush(_color._value.toQColor()));
-    QPointF center(_x._value, _y._value);
-    painter.drawEllipse(center, _scale._value, _scale._value);
+    painter.setBrush(QBrush(color.toQColor()));
+    QPointF center(x, y);
+    painter.drawEllipse(center, scale, scale);
 
     painter.end();
 }
@@ -118,68 +108,47 @@ Circle* Circle::clone()
 // ------------------------------------------------------------------------------
 // Box
 Box::Box() :
-    Imager(),
-    _x(10),
-    _y(8),
-    _width(1.0),
-    _height(1.0),
-    _rotation(0.0),
-    _antialiased(false)
+    Imager()
 {
     setName(QString("Box"));
 
     // Declare params.
-    _x.setName("x");
-    _x.setOutput(false);
-    _x.setConnectable(true);
-
-    _y.setName("y");
-    _y.setOutput(false);
-    _y.setConnectable(true);
-
-    _width.setName("width");
-    _width.setOutput(false);
-    _width.setConnectable(true);
-
-    _height.setName("height");
-    _height.setOutput(false);
-    _height.setConnectable(true);
-
-    _rotation.setName("rotation");
-    _rotation.setOutput(false);
-    _rotation.setConnectable(true);
-    _rotation.setRange(true, -10000., 10000., 1.0);
-
-    _antialiased.setName("antialiased");
-    _antialiased.setOutput(false);
-    _antialiased.setConnectable(true);
-
-    _alpha.setName("alpha");
-    _alpha.setOutput(false);
-    _alpha.setConnectable(true);
-
-    _color.setName("color");
-    _color.setOutput(false);
-    _color.setConnectable(true);
-
-    _paramList << &_x << &_y << &_width << &_height << &_rotation <<&_antialiased << &_alpha << &_color;
-    setParamParent();
+    addParam<float>("x", 10.);
+    addParam<float>("y", 8.);
+    addParam<float>("width", 1.0);
+    addParam<float>("height", 1.0);
+    addParam<float>("rotation", 0.);
+    addParam<bool>("antialiased", false);
+    // TODO _rotation.setRange(true, -10000., 10000., 1.0);
 }
 
 void Box::draw()
 {
+    Lightcolor color;
+    float x,y;
+    float width, height;
+    float rotation;
+    bool antialiased;
+    getValue("color", color);
+    getValue("x", x);
+    getValue("y", y);
+    getValue("width", width);
+    getValue("height", height);
+    getValue("rotation", rotation);
+    getValue("antialiased", antialiased);
+
     QPainter painter(_image);
-    painter.setRenderHint(QPainter::Antialiasing, _antialiased._value);
+    painter.setRenderHint(QPainter::Antialiasing, antialiased);
 
     painter.fillRect(_image->rect(), Qt::black);
-    painter.setBrush(QBrush(_color._value.toQColor()));
+    painter.setBrush(QBrush(color.toQColor()));
 
-    QPointF topLeft(_x._value, _y._value);
-    QRectF rr(0.0,0.0,_width._value,_height._value);
+    QPointF topLeft(x, y);
+    QRectF rr(0.0, 0.0, width, height);
     painter.save();
     painter.translate(topLeft);
-    painter.rotate(_rotation._value);
-    painter.fillRect(rr, _color._value.toQColor());
+    painter.rotate(rotation);
+    painter.fillRect(rr, color.toQColor());
     painter.restore();
 
     painter.end();

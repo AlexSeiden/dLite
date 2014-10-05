@@ -48,6 +48,7 @@ public:
 
     bool        isConnectableTo(ParamBase *otherParam);
     void        connectTo(ParamBase *server);
+    void        copyValue(ParamBase *rhs);
     void        disconnect() {_connectedParam = nullptr; _provider = nullptr;}
 
     // TODO range only works for floats & ints.
@@ -84,6 +85,10 @@ public:
     virtual void readFromJSONObj(const QJsonObject &json);
     virtual void writeToJSONObj(QJsonObject &json) const;
 
+
+    // Copy assignment operator
+//    virtual void getValueAndConnections(const ParamBase &rhs);
+//    virtual ParamBase  & operator=(const ParamBase &rhs) = 0;
 
     // Would it be useful to maintain a linked list of connections here?
     // Both for inputs and outputs?  Would that break modularity?
@@ -155,6 +160,22 @@ public:
     virtual const std::type_info & getType() {return typeid(this);}
 
     PARAMT _value;
+
+    // Copy assignment operator
+#if 0
+    Param<PARAMT>& operator=(Param<PARAMT> &rhs) {
+        this->_connectedParam = rhs._connectedParam;
+        this->_value = rhs._value;
+        return *this;
+    }
+#elif 0
+    void getValueAndConnections(const Param<PARAMT>& rhs)
+    {
+        _connectedParam = rhs._connectedParam;
+        _value = rhs._value;
+    }
+
+#endif
 
     virtual void readFromJSONObj(const QJsonObject &json);
     virtual void writeToJSONObj(QJsonObject &json) const;

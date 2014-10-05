@@ -4,50 +4,37 @@
 // ------------------------------------------------------------------------------
 //  Color ramp
 //      Mix between two colors
-ColorRamp::ColorRamp() :
-    _output(0),
-    _c0(0.0),
-    _c1(1.0),
-    _mix(.5)
+ColorRamp::ColorRamp() 
 {
     setName("ColorRamp");
     _type = COLOR;
 
-    _output.setName("out");
-    _output.setOutput(true);
-    _output.setConnectable(true);
-
-    _c0.setName("Color0");
-    _c0.setOutput(false);
-    _c0.setConnectable(true);
-
-    _c1.setName("Color1");
-    _c1.setOutput(false);
-    _c1.setConnectable(true);
-
-    _mix.setName("mix");
-    _mix.setOutput(false);
-    _mix.setConnectable(true);
-
-    _paramList << &_output << &_c1 << &_c0 << &_mix;
-    setParamParent();
+    addParam<Lightcolor>("out", 0.0, true);
+    addParam<Lightcolor>("Color0", 0.0);
+    addParam<Lightcolor>("Color1", 1.0);
+    addParam<float>("mix", .5);
 }
 
 void ColorRamp::operator()()
 {
     // Boilerplate start of operator:
-    // TODO:  add start & end boilerplate to the generic
     if (evaluatedThisFrame())
         return;
     evalAllInputs();
 
-    Lightcolor part0, part1;
-    part0 = (1.0-_mix._value)*_c0._value;
-    part1 = _c1._value*_mix._value;
-    _output._value = part0 + part1;
+    Lightcolor color0, color1;
+    float mix;
+    getValue("color0", color0);
+    getValue("color1", color1);
+    getValue("mix", mix);
 
-    // Boilerplate end of operator:
-    _output._qvOutput.setValue(_output._value);
+    Lightcolor part0, part1;
+    Lightcolor out;
+    part0 = (1.0-mix)*color0;
+    part1 = color1*mix;
+    out = part0 + part1;
+
+    setValue("out", out);
 }
 
 ColorRamp* ColorRamp::clone()
@@ -61,53 +48,20 @@ ColorRamp* ColorRamp::clone()
 // ------------------------------------------------------------------------------
 //  BriteColor
 //      Creates a new hi-brightness, hi-sat color every trigger
-BriteColor::BriteColor() :
-    _output(0),
-    _hueMin(0.0),
-    _hueMax(1.0),
-    _satMin(0.7),
-    _satMax(1.0),
-    _valMin(0.8),
-    _valMax(1.0),
-    _trigger(true)
+BriteColor::BriteColor()
 {
     setName("BriteColor");
     _type = COLOR;
 
-    _output.setName("out");
-    _output.setOutput(true);
-    _output.setConnectable(true);
+    addParam<Lightcolor>("out", 0.0, true);
+    addParam<float>("hue min", 0.0, false, false);
+    addParam<float>("hue max", 1.0, false, false);
+    addParam<float>("sat min", 0.7, false, false);
+    addParam<float>("sat max", 1.0, false, false);
+    addParam<float>("value min", 0.8, false, false);
+    addParam<float>("value max", 1.0, false, false);
+    addParam<bool>("trigger", true);
 
-    _hueMin.setName("hue min");
-    _hueMin.setOutput(false);
-    _hueMin.setConnectable(false);
-
-    _hueMax.setName("hue max");
-    _hueMax.setOutput(false);
-    _hueMax.setConnectable(false);
-
-    _satMin.setName("sat min");
-    _satMin.setOutput(false);
-    _satMin.setConnectable(false);
-
-    _satMax.setName("sat max");
-    _satMax.setOutput(false);
-    _satMax.setConnectable(false);
-
-    _valMin.setName("value min");
-    _valMin.setOutput(false);
-    _valMin.setConnectable(false);
-
-    _valMax.setName("value max");
-    _valMax.setOutput(false);
-    _valMax.setConnectable(false);
-
-    _trigger.setName("trigger");
-    _trigger.setOutput(false);
-    _trigger.setConnectable(true);
-
-    _paramList << &_output << &_hueMin << &_hueMax << &_satMin << &_satMax << &_valMin << &_valMax << &_trigger;
-    setParamParent();
     setRandomEngine();
 }
 
@@ -119,27 +73,23 @@ void BriteColor::setRandomEngine()
 
     // Initialize the distrubution on the range [_min, _max)
     // NOTE:  this is the HALF-OPEN interval--inclusive of min, but exclusive of max
-    // XXX if these are connections, this is going to break.
-#if 1
     float hmin, hmax, smin, smax, vmin, vmax;
-    _hueMin.getValue(hmin);
-    _hueMax.getValue(hmax);
-    _satMin.getValue(smin);
-    _satMax.getValue(smax);
-    _valMin.getValue(vmin);
-    _valMax.getValue(vmax);
+    getValue("hue min", hmin);
+    getValue("hue max", hmax);
+    getValue("sat min", smin);
+    getValue("sat max", smax);
+    getValue("value min", vmin);
+    getValue("value max", vmax);
     _distHue = new std::uniform_real_distribution<float>(hmin, hmax);
     _distSat = new std::uniform_real_distribution<float>(smin, smax);
     _distVal = new std::uniform_real_distribution<float>(vmin, vmax);
-#else
-    _distSat = new std::uniform_real_distribution<float>(.7, 1.0);
-    _distHue = new std::uniform_real_distribution<float>(0.0, 1.0);
-    _distVal = new std::uniform_real_distribution<float>(0.8, 1.0);
-#endif
 }
 
 // This is called whenever a parameter gets edited, so
 // that the random number engine can be reset.
+// XXX if these are connections, this is going to break, since
+// this doesn't get called when a connection value updates,
+// just when a manual edit happens to the widget.
 void BriteColor::paramHasBeenEdited()
 {
     setRandomEngine();
@@ -152,8 +102,10 @@ void BriteColor::operator()()
     if (evaluatedThisFrame())
         return;
     evalAllInputs();
+    bool trigger;
+    getValue("trigger", trigger);
 
-    if (_trigger._value) {
+    if (trigger) {
         QColor out;
         double sat = (*_distSat)(*_randGenerator);
         double hue = (*_distHue)(*_randGenerator);
@@ -166,11 +118,12 @@ void BriteColor::operator()()
         val = clamp(0.0,1.0,val);
 #endif
         out.setHsvF(hue,sat,val);
-        _output._value = out;
-    }
 
-    // Boilerplate end of operator:
-    _output._qvOutput.setValue(_output._value);
+        // Since the param color type is "lightcolor", we need
+        // to call the setter with an appropriate type.
+        Lightcolor lc(out);
+        setValue("out", lc);
+    }
 }
 
 BriteColor* BriteColor::clone()
@@ -186,29 +139,17 @@ BriteColor* BriteColor::clone()
 // ------------------------------------------------------------------------------
 //  Palette
 //      Choose between a bunch of colors
-Palette::Palette() :
-    _output(0),
-    _selector(0)
+Palette::Palette()
 {
     setName("Palette");
     _type = COLOR;
 
-    _output.setName("out");
-    _output.setOutput(true);
-    _output.setConnectable(true);
+    addParam<Lightcolor>("out", 0.0, true);
+    addParam<int>("selector");
 
-    _selector.setName("selector");
-    _selector.setOutput(false);
-    _selector.setConnectable(true);
-
-    _paramList << &_output << &_selector;
+    // TODO have a "add color" button on editor
     for (int i=0; i<8;++i) {
-        Param<Lightcolor>* paletteEntry = new(Param<Lightcolor>);
-        paletteEntry->setConnectable(true);
-        paletteEntry->setOutput(false);
-        paletteEntry->setName(QString("c%1").arg(i));
-        _paramList << paletteEntry;
-        _allcolors << paletteEntry;
+        addParam<Lightcolor>(QString("c%1").arg(i), 0);
     }
 
     setParamParent();
@@ -217,16 +158,17 @@ Palette::Palette() :
 void Palette::operator()()
 {
     // Boilerplate start-of-operator():
-    // TODO:  add start & end boilerplate to the generic
     if (evaluatedThisFrame())
         return;
     evalAllInputs();
+    int selector;
+    getValue("selector", selector);
 
-    int index = _selector._value % _allcolors.length();
-    _output._value = _allcolors[index]->_value;
+    QString paramname = QString("c%1").arg(selector);
+    Lightcolor out;
+    getValue(paramname, out);
 
-    // Boilerplate end-of-operator():
-    _output._qvOutput.setValue(_output._value);
+    setValue("out", out);
 }
 
 Palette* Palette::clone()
@@ -238,7 +180,7 @@ Palette* Palette::clone()
     return lhs;
 }
 #if 0
-
+// TODO palatte serialization
 void Palette::writeToJSONObj(QJsonObject &json) const
 {
     Node::writeToJSONObj(json);

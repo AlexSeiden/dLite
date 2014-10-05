@@ -12,11 +12,6 @@ public:
 
     void operator() (void);
     virtual RegionCue* clone();
-
-protected:
-    Param<Lightcolor>  _color;
-    Param<float>       _alpha;
-    Param<Region>      _region;
 };
 
 #endif // REGIONCUE_H

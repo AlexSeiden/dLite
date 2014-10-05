@@ -48,8 +48,6 @@ private:
 
     // Calculated by engine
     FrequencySpectrum   _spectrum;
-
-    Param<float>        _output;
     Subrange            _range;
 };
 

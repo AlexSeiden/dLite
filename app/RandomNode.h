@@ -15,13 +15,6 @@ public:
     void    paramHasBeenEdited();
 
 private:
-    // Parameters
-    Param<float> _output;
-    Param<float> _min;
-    Param<float> _max;
-    Param<bool> _trigger;
-
-private:
     void  setRandomEngine();
 
     // Random number generator
@@ -36,13 +29,6 @@ public:
     void    operator() ();
     virtual RandomInt* clone();
     void    paramHasBeenEdited();
-
-private:
-    // Parameters
-    Param<int> _output;
-    Param<int> _min;
-    Param<int> _max;
-    Param<bool> _trigger;
 
 private:
     void  setRandomEngine();
@@ -60,14 +46,6 @@ public:
     void    operator() ();
     virtual SequenceInt* clone();
     void    paramHasBeenEdited();
-
-private:
-    // Parameters
-    Param<int> _output;
-    Param<int> _min;
-    Param<int> _max;
-    Param<int> _step;
-    Param<bool> _trigger;
 
 private:
     int _counter;

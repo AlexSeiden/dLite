@@ -78,26 +78,17 @@ Bugs:
 //  TriggerEvery
 //      Triggers every _interval milliseconds
 
-TriggerEvery::TriggerEvery() :
-    _output(true),
-    _interval(500)
+TriggerEvery::TriggerEvery()
 {
     setName("TriggerEvery");
     _type = BEAT;
 
-    _output.setName("out");
-    _output.setOutput(true);
-    _output.setConnectable(true);
-
-    _interval.setName("interval");
-    _interval.setOutput(false);
-    _interval.setConnectable(false);
+    addParam<bool>("out", true, true);
+    addParam<int>("interval", 500);
 
     // Set refresh to current time, so when we make a new one in the middle
     // of playing, it won't have to catch up.
     _nextRefresh = Cupid::getPlaybackPositionUSecs();
-    _paramList << &_output << &_interval;
-    setParamParent();
 }
 
 void TriggerEvery::operator()()
@@ -107,16 +98,18 @@ void TriggerEvery::operator()()
         return;
 
     // Automatically reset after triggering.
-    _output._value = false;
+    bool out = false;
 
     // XXX this breaks if we move the audio playhead back in time.
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
     if (mSecs > _nextRefresh) {
-       _output._value = true;
-       _nextRefresh += _interval._value;
+       out = true;
+       int interval;
+       getValue("interval", interval);
+       _nextRefresh += interval;
     }
 
-    _output._qvOutput.setValue(_output._value);
+    setValue("out", out);
 }
 
 TriggerEvery* TriggerEvery::clone()
@@ -131,30 +124,18 @@ TriggerEvery* TriggerEvery::clone()
 //  Multiply
 //      Interpolates beats
 
-Multiply::Multiply() :
-    _output(true),
-    _multiple(2)
+Multiply::Multiply()
 {
     setName("Multiply");
     _type = BEAT;
 
-    _output.setName("out");
-    _output.setOutput(true);
-    _output.setConnectable(true);
-
-    _multiple.setName("multiple");
-    _multiple.setOutput(false);
-    _multiple.setConnectable(true);
-
-    _input.setName("input");
-    _input.setOutput(false);
-    _input.setConnectable(true);
+    addParam<bool>("out", true, true);
+    addParam<int>("multiple", 2, false, false);
+    addParam<bool>("input");
 
     // Set refresh to current time, so when we make a new one in the middle
     // of playing, it won't have to catch up.
     _nextRefresh = Cupid::getPlaybackPositionUSecs() / 1000;
-    _paramList << &_output << &_multiple << &_input;
-    setParamParent();
 }
 
 void Multiply::operator()()
@@ -165,17 +146,23 @@ void Multiply::operator()()
     evalAllInputs();
 
     // Automatically reset after triggering.
-    _output._value = false;
+    bool out = false;
 
     // XXX this breaks if we move the audio playhead back in time.
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
 
+    float input;
+    int multiple;
+    getValue("input", input);
+    getValue("multiple", multiple);
+
     // Input trigger
-    if (_input._value) {
-        _output._value = true;
+    if (input) {
+        out = true;
         if (_lastInputBeat != 0) {
+
             _delta = mSecs - _lastInputBeat;
-            _delta /= _multiple._value;
+            _delta /= multiple;
             _nextRefresh = mSecs + _delta;
             _lastInputBeat = mSecs;
         }
@@ -184,7 +171,7 @@ void Multiply::operator()()
 
     // Interpolated trigger
     if (mSecs > _nextRefresh) {
-       _output._value = true;
+       out = true;
 
        // Find new refresh value
 #if 0
@@ -194,13 +181,13 @@ void Multiply::operator()()
        if (! inputNode) goto done;
        int nextInputRefresh = inputNode->_nextRefresh; // XXX this is private, and not available on most nodes.
        int delta = nextInputRefresh - _nextRefresh;
-       delta /= _multiple._value;
+       delta /= multiple;
 #endif
        _nextRefresh += _delta;
     }
 
     done:
-    _output._qvOutput.setValue(_output._value);
+    setValue("out", out);
 }
 
 Multiply* Multiply::clone()
@@ -222,13 +209,7 @@ NodeOnset::NodeOnset()
     setName("NodeOnset");
     _type = BEAT;
 
-    _output.setName("out");
-    _output.setOutput(true);
-    _output.setConnectable(true);
-
-    _offset.setName("offset");
-    _offset.setOutput(false);
-    _offset.setConnectable(false);
+    addParam<bool>("out", true, true);
 
     loadOnsetFile();  // ErrorHandling
     // Do we want to make this some kind of singleton???
@@ -237,9 +218,6 @@ NodeOnset::NodeOnset()
 
     _nextIndex = 0;
     _nextRefresh = 0;
-
-    _paramList << &_output << &_offset;
-    setParamParent();
 }
 
 /*
@@ -303,18 +281,17 @@ void NodeOnset::operator()()
     evalAllInputs();
 
     // Automatically reset after triggering.
-    _output._value = false;
+    bool out = false;
 
     // XXX this breaks if we move the audio playhead back in time.
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
     if (mSecs > _nextRefresh) {
         qDebug() << mSecs << _nextRefresh;
-       _output._value = true;
+       out = true;
        _nextRefresh = _onsets[++_nextIndex];
     }
 
-    // Boilerplate end of operator:
-    _output._qvOutput = _output._value;
+    setValue("out", out);
 }
 
 NodeOnset* NodeOnset::clone()
@@ -328,30 +305,7 @@ NodeOnset* NodeOnset::clone()
 // ------------------------------------------------------------------------------
 // NodeBar
 //      Loads bar (measure) info from precomputed file.
-
-NodeBar::NodeBar()
-{
-    setName("NodeBar");
-    _type = BEAT;
-
-    _output.setName("out");
-    _output.setOutput(true);
-    _output.setConnectable(true);
-
-    _offset.setName("offset");
-    _offset.setOutput(false);
-    _offset.setConnectable(false);
-
-    loadFile();  // ErrorHandling
-
-    _nextIndex = 0;
-    _nextRefresh = 0;
-
-    _paramList << &_output << &_offset;
-    setParamParent();
-}
-
-
+//
 //  Bar files look like this:
 //        51200,"1"
 //        122880,"2"
@@ -368,6 +322,18 @@ NodeBar::NodeBar()
 //  We read the first number and discard the second.
 //  Our bar files have names like:
 //      Awesome_vamp_qm-vamp-plugins_qm-barbeattracker_bars.csv
+
+NodeBar::NodeBar()
+{
+    setName("NodeBar");
+    _type = BEAT;
+
+    addParam<bool>("out", true, true);
+    loadFile();  // ErrorHandling
+
+    _nextIndex = 0;
+    _nextRefresh = 0;
+}
 
 void NodeBar::loadFile()
 {
@@ -409,17 +375,16 @@ void NodeBar::operator()() {
     evalAllInputs();
 
     // Automatically reset after triggering.
-    _output._value = false;
+    bool out = false;
 
     // XXX this breaks if we move the audio playhead back in time.
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
     if (mSecs > _nextRefresh) {
-       _output._value = true;
+       out = true;
        _nextRefresh = _bars[++_nextIndex];
     }
 
-    // Boilerplate end of operator:
-    _output._qvOutput = _output._value;
+    setValue("out", out);
 }
 
 NodeBar* NodeBar::clone()
@@ -433,43 +398,7 @@ NodeBar* NodeBar::clone()
 // ------------------------------------------------------------------------------
 // NodeBar
 //      Loads bar (measure) info from precomputed file.
-
-NodeBarBeat::NodeBarBeat()
-{
-    setName("NodeBarBeat");
-    _type = BEAT;
-
-    _barTriggerOutput.setName("Bar Trigger");
-    _barTriggerOutput.setOutput(true);
-    _barTriggerOutput.setConnectable(true);
-
-    _beatTriggerOutput.setName("Beat Trigger");
-    _beatTriggerOutput.setOutput(true);
-    _beatTriggerOutput.setConnectable(true);
-
-    _barNumberOutput.setName("Bar Number");
-    _barNumberOutput.setOutput(true);
-    _barNumberOutput.setConnectable(true);
-
-    _beatNumberOutput.setName("Beat Number");
-    _beatNumberOutput.setOutput(true);
-    _beatNumberOutput.setConnectable(true);
-
-    _offset.setName("offset");
-    _offset.setOutput(false);
-    _offset.setConnectable(false);
-
-    loadFile();  // ErrorHandling
-
-    _nextIndex = 0;
-    _nextRefresh = 0;
-
-    _paramList << &_barNumberOutput << &_beatNumberOutput <<
-                  &_barTriggerOutput << &_beatTriggerOutput << &_offset;
-    setParamParent();
-}
-
-
+//
 //  BarBeat files look like this:
 //            15360,3,"3"
 //            33280,4,"4"
@@ -489,6 +418,22 @@ NodeBarBeat::NodeBarBeat()
 //  We read the first and second columns and discard the third..
 //  Our barbeat files have names like:
 //      Awesome_vamp_qm-vamp-plugins_qm-barbeattracker_beatcounts.csv
+
+NodeBarBeat::NodeBarBeat()
+{
+    setName("NodeBarBeat");
+    _type = BEAT;
+
+    addParam<bool>("Bar Trigger", true, true);
+    addParam<bool>("Beat Trigger", true, true);
+    addParam<int>("Bar Number", true, true);
+    addParam<int>("Beat Number", true, true);
+
+    loadFile();  // ErrorHandling
+
+    _nextIndex = 0;
+    _nextRefresh = 0;
+}
 
 void NodeBarBeat::loadFile()
 {
@@ -533,26 +478,31 @@ void NodeBarBeat::operator()() {
     evalAllInputs();
 
     // Automatically reset after triggering.
-    _barTriggerOutput._value = false;
-    _beatTriggerOutput._value = false;
+    bool barTrigger = false;
+    bool beatTrigger = false;
+    int barNumber;
+    int beatNumber;
+    getValue("Bar Number", barNumber);
+    getValue("Beat Number", beatNumber);
 
     // XXX this breaks if we move the audio playhead back in time.
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
     if (mSecs > _nextRefresh) {
-        _beatTriggerOutput._value = true;
-        _beatNumberOutput._value = _beatnumber[_nextIndex];
-        if (_beatNumberOutput._value == 1) {
-            _barTriggerOutput._value = true;
-            _barNumberOutput._value++;
+        beatTrigger = true;
+        beatNumber = _beatnumber[_nextIndex];
+
+        if (beatNumber == 1) {
+            barTrigger = true;
+            barNumber++;
         }
         _nextRefresh = _beats[++_nextIndex];
     }
 
     // Boilerplate end of operator:
-    _barTriggerOutput._qvOutput  = _barTriggerOutput._value;
-    _barNumberOutput._qvOutput   = _barNumberOutput._value;
-    _beatTriggerOutput._qvOutput = _beatTriggerOutput._value;
-    _beatNumberOutput._qvOutput  = _beatNumberOutput._value;
+    setValue("Bar Trigger", barTrigger);
+    setValue("Beat Trigger", beatTrigger);
+    setValue("Bar Number", barNumber);
+    setValue("Beat Number", beatNumber);
 }
 
 NodeBarBeat* NodeBarBeat::clone()
@@ -593,14 +543,9 @@ Segmentino::Segmentino()
     setName("Segmentino");
     _type = BEAT;
 
-    _segmentIndexOutput.setName("Segment Index");
-    _segmentIndexOutput.setOutput(true);
-    _segmentIndexOutput.setConnectable(true);
+    addParam<int>("Segment Index", true, true);
 
     loadFile();  // ErrorHandling
-
-    _paramList << &_segmentIndexOutput;
-    setParamParent();
 }
 
 void Segmentino::loadFile()
@@ -665,10 +610,8 @@ void Segmentino::operator()() {
     evalAllInputs();
 
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
-    _segmentIndexOutput._value = findSegment(mSecs);
-
-    // Boilerplate end of operator:
-    _segmentIndexOutput._qvOutput  = _segmentIndexOutput._value;
+    int segmentIndex = findSegment(mSecs);
+    setValue("Segment Index", segmentIndex);
 }
 
 Segmentino* Segmentino::clone()

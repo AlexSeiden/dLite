@@ -12,23 +12,14 @@ class TriggerEvery : public Node
 public:
     TriggerEvery();
 
-    void setTriggerInterval(int interval) {_interval.setValue(interval);}
     void operator() ();
     virtual TriggerEvery* clone();
 
 private:
-    void    reset() {_output.setValue(false);}
-
-    Param<bool>    _output;
-
-    // These are in milliseconds
-    // Parameters
-    Param<int>     _interval;
-    //Param<int>     _refreshOffset; // TODO
+    void    reset() {setValue("out", false); _nextRefresh=-1;}
 
     // Internal timekeepers, in milliseconds
     int     _nextRefresh;
-
 };
 
 
@@ -42,13 +33,7 @@ public:
     virtual Multiply* clone();
 
 private:
-    void    reset() {_output.setValue(false);}
-
-    Param<bool>    _output;
-
-    // Parameters
-    Param<int>     _multiple;
-    Param<bool>    _input;
+    void    reset() {setValue("out", false); _nextRefresh=-1;}
 
     // Internal timekeepers, in milliseconds
     int     _nextRefresh;
@@ -71,13 +56,10 @@ public:
     void operator() (void);
     virtual NodeOnset* clone();
 
-    int     getNextBeat(int sample);
+    // TODO for random access:  int     getNextBeat(int sample);
 
     void    loadOnsetFile();
     void    loadOnsetFile(QString filename);
-
-    Param<bool> _output;
-    Param<int>  _offset; // TODO
 
     // May want to define a "file" param for input file.
     // Could be auto-filled to look in standard locations.
@@ -106,9 +88,6 @@ public:
     void    loadFile();
     void    loadFile(QString filename);
 
-    Param<bool> _output;
-    Param<int>  _offset; // TODO
-
 private:
     std::vector<int> _bars;
     int _nextRefresh;
@@ -134,12 +113,6 @@ public:
     void    loadFile();
     void    loadFile(QString filename);
 
-    Param<bool> _barTriggerOutput;
-    Param<int>  _barNumberOutput;
-    Param<bool> _beatTriggerOutput;
-    Param<int>  _beatNumberOutput;
-    Param<int>  _offset; // TODO
-
 private:
     std::vector<int> _beats;
     std::vector<int> _beatnumber;
@@ -160,13 +133,8 @@ public:
     void    loadFile();
     void    loadFile(QString filename);
 
-    Param<int>  _segmentIndexOutput;
-//    Param<int>  _segmentVariantOutput;
-
 private:
-
     std::vector<std::pair<int, int> > _segments;
-
     int findSegment(int msecs);
 };
 

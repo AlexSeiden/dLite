@@ -202,9 +202,10 @@ void GraphWidget::frameItems(QList<QGraphicsItem *> items)
     foreach (QGraphicsItem *selection, items) {
         bbox = bbox.united(selection->boundingRect());
     }
-    if (items.length() == 1)
-        _csview->view()->ensureVisible(bbox);
-    else
+    if (items.length() == 1) {
+        _csview->fitBbox(bbox);
+        _csview->view()->centerOn(items[0]);
+    } else
         _csview->fitBbox(bbox);
 
 }
@@ -292,6 +293,11 @@ void GraphWidget::xAlign()
 
 void GraphWidget::group() {
     QList<QGraphicsItem*> selection = _scene->getSelectedGroupableItems();
+
+    // Only group when we have more than one item
+    if (selection.size() < 2)
+        return;
+
     GroupNodeItem *grp = new GroupNodeItem();
     _scene->addItem(grp);
     foreach (QGraphicsItem *gi, selection)
@@ -337,5 +343,6 @@ void GraphWidget::minimizeSelected() {
 
 void GraphWidget::newCuesheet()
 {
+    // TODO
 
 }

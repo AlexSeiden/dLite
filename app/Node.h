@@ -9,6 +9,7 @@
 #include <QUuid>
 #include <functional>
 #include <QJsonObject>
+#include <QDebug>
 
 
 // ------------------------------------------------------------------------------
@@ -47,11 +48,11 @@ public:
     const QString &     getName() const {return _name;}
     void                setName(const QString name) {_name = name;}
 
-    bool                isActive() const {return _active._value;}
-    void                setActive(bool active) {_active._value = active;}
+    bool                isActive() const;
+    void                setActive(bool active);
 
     virtual node_t      getType();
-    QList<ParamBase *>  getParams()        {return _paramList;}
+    QList<ParamBase *>  getParams()        {return _paramDict.values();}
     virtual QString     getClass() const   {return _className;}
 
     // Functor that provides closure over instance object,
@@ -109,7 +110,6 @@ protected:
     void                cloneHelper(Node &lhs);
 
     QString               _name;
-    Param<bool>           _active;
     QList<ParamBase *>    _paramList;
     QMap<QString, ParamBase*> _paramDict;
     node_t                _type;
@@ -122,7 +122,7 @@ protected:
 
     // New style params
     template <typename T>
-    void addParam(QString name, const T& defValue=T(0), bool output=false, bool connectable=true)
+    Param<T> *addParam(QString name, const T& defValue=T(0), bool output=false, bool connectable=true)
     {
         Param<T>* param = new Param<T>;
         param->setName(name);
@@ -132,21 +132,31 @@ protected:
 
         param->setParentNode(this);
         _paramList << param;
+        if (_paramDict.contains(name)) {
+            //ErrorHandling
+            qDebug() << Q_FUNC_INFO << QString("adding parameter \"%1\" to node \"%2\" more than once").arg(name, _name);
+        }
         _paramDict[name] = param;
+
+        return(param);
     }
 
     template <typename T>
-    void getValue(QString paramName, T& value)
+    void getValue(QString paramName, T& value) const
     {
-        Param<T>*param = dynamic_cast<Param<T>*>(_paramDict[paramName]);
+        ParamBase *pb = _paramDict[paramName];
+        Q_ASSERT(pb);
+        Param<T>*param = dynamic_cast<Param<T>*>(pb);
         Q_ASSERT(param);
         param->getValue(value);
     }
 
     template <typename T>
-    void setValue(QString paramName, T& value)
+    void setValue(QString paramName, const T value)
     {
-        Param<T>*param = dynamic_cast<Param<T>*>(_paramDict[paramName]);
+        ParamBase *pb = _paramDict[paramName];
+        Q_ASSERT(pb);
+        Param<T>*param = dynamic_cast<Param<T>*>(pb);
         Q_ASSERT(param);
         param->setValue(value);
     }

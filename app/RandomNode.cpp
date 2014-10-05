@@ -4,35 +4,17 @@
 // ------------------------------------------------------------------------------
 //  RandomFloat
 
-RandomFloat::RandomFloat() :
-    _output(0.0),
-    _min(0.0),
-    _max(1.0),
-    _trigger(true)
+RandomFloat::RandomFloat()
 {
     setRandomEngine();
     setName("RandomFloat");
     _type = FLOAT;
 
     // Declare params.
-    _output.setName("out");
-    _output.setOutput(true);
-    _output.setConnectable(true);
-
-    _min.setName("min");
-    _min.setOutput(false);
-    _min.setConnectable(true);
-
-    _max.setName("max");
-    _max.setOutput(false);
-    _max.setConnectable(true);
-
-    _trigger.setName("trigger");
-    _trigger.setOutput(false);
-    _trigger.setConnectable(true);
-
-    _paramList << &_output << &_min << &_max << &_trigger;
-    setParamParent();
+    addParam<float>("out", 0.0, true);
+    addParam<float>("min", 0.0, false, false);
+    addParam<float>("max", 1.0, false, false);
+    addParam<bool>("trigger", true);
 }
 
 void RandomFloat::setRandomEngine()
@@ -43,9 +25,9 @@ void RandomFloat::setRandomEngine()
     // Initialize the distrubution on the range [_min, _max)
     // NOTE:  this is the HALF-OPEN interval--inclusive of min, but exclusive of max
     float min, max;
-    _min.getValue(min);
-    _max.getValue(max);
-    // XXX if these are connections, this is going to break.
+    getValue("min", min);
+    getValue("max", max);
+    // XXX if these are connections, this isn't going to get reset at the correct time.
     _distribution = new std::uniform_real_distribution<float>(min, max);
 }
 
@@ -62,10 +44,15 @@ void RandomFloat::operator()()
         return;
     evalAllInputs();
 
-    if (_trigger._value)
-        _output._value =  (*_distribution)(*_randGenerator);
+    bool trigger;
+    float out;
+    getValue("trigger", trigger);
+    getValue("out", out);
 
-    _output._qvOutput = _output._value;
+    if (trigger)
+        out =  (*_distribution)(*_randGenerator);
+
+    setValue("out", out);
 }
 
 RandomFloat* RandomFloat::clone()
@@ -79,36 +66,16 @@ RandomFloat* RandomFloat::clone()
 // ------------------------------------------------------------------------------
 //  RandomInt
 
-RandomInt::RandomInt() :
-    _output(0),
-    _min(0),
-    _max(20),
-    _trigger(true)
+RandomInt::RandomInt()
 {
     setName(QString("RandomInt%1").arg(nodeCount()));
     _type = INT;
 
     // Declare params.
-    _output.setName("out");
-    _output.setConnectable(true);
-    _output.setOutput(true);
-
-    _min.setName("min");
-    _min.setOutput(false);
-    _min.setConnectable(false);
-    // LATER: conceptually, the random min & max could be set by connections.
-    // But for now, I'm gonna leave them unconnectable.
-
-    _max.setName("max");
-    _max.setOutput(false);
-    _max.setConnectable(false);
-
-    _trigger.setName("trigger");
-    _trigger.setOutput(false);
-    _trigger.setConnectable(true);
-
-    _paramList << &_output << &_min << &_max << &_trigger;
-    setParamParent();
+    addParam<float>("out", 0.0, true);
+    addParam<float>("min", 0.0, false, false);
+    addParam<float>("max", 1.0, false, false);
+    addParam<bool>("trigger", true);
 
     // Specialized init for this node.  Will re-rerun if params edited.
     setRandomEngine();
@@ -122,8 +89,8 @@ void RandomInt::setRandomEngine()
     // Initialize the distrubution on the range [_min, _max]
     // NOTE:  this is the CLOSED interval--inclusive of both min and max.
     int min, max;
-    _min.getValue(min);
-    _max.getValue(max);
+    getValue("min", min);
+    getValue("max", max);
     // TODO re-run this when distributions change.
     // XXX if these are connections, this is going to break.
     _distribution = new std::uniform_int_distribution<int>(min, max);
@@ -142,12 +109,16 @@ void RandomInt::operator()()
         return;
     evalAllInputs();
 
-    // First, check the trigger to see if it's time for a new number
-    if (_trigger._value)
-        _output._value =  (*_distribution)(*_randGenerator);
+    bool trigger;
+    int out;
+    getValue("trigger", trigger);
+    getValue("out", out);
 
-    // Boilerplate end of operator:
-    _output._qvOutput = _output._value;
+    // First, check the trigger to see if it's time for a new number
+    if (trigger)
+        out =  (*_distribution)(*_randGenerator);
+
+    setValue("out", out);
 }
 
 RandomInt* RandomInt::clone()
@@ -162,49 +133,32 @@ RandomInt* RandomInt::clone()
 //  SequenceInt
 //      Takes a trigger, and every time increments between _min and _max value.
 
-SequenceInt::SequenceInt() :
-    _output(0),
-    _min(6),
-    _max(12),
-    _step(1),
-    _trigger(true)
+SequenceInt::SequenceInt()
 {
     setName(QString("SequenceInt%1").arg(nodeCount()));
     _type = INT;
 
     // Declare params.
-    _output.setName("out");
-    _output.setConnectable(true);
-    _output.setOutput(true);
+    addParam<int>("out", 0, true);
+    addParam<int>("min", 6);
+    addParam<int>("max", 12);
+    addParam<int>("step", 1);
+    addParam<bool>("trigger", true);
 
-    _min.setName("min");
-    _min.setOutput(false);
-    _min.setConnectable(true);
-
-    _max.setName("max");
-    _max.setOutput(false);
-    _max.setConnectable(true);
-
-    _step.setName("step");
-    _step.setOutput(false);
-    _step.setConnectable(true);
-
-    _trigger.setName("trigger");
-    _trigger.setOutput(false);
-    _trigger.setConnectable(true);
-
-    _counter = _min._value;
-    _paramList << &_output << &_min << &_max << &_step << &_trigger;
-    setParamParent();
+    getValue("min", _counter);
 }
 
 void SequenceInt::paramHasBeenEdited()
 {
+    int min, max;
+    getValue("min", min);
+    getValue("max", max);
+
     // Need to recheck range.
-    if (_counter > _max._value)
-        _counter = _max._value;
-    else if (_counter < _min._value)
-        _counter = _min._value;
+    if (_counter > max)
+        _counter = max;
+    else if (_counter < min)
+        _counter = min;
 }
 
 void SequenceInt::operator()()
@@ -215,17 +169,25 @@ void SequenceInt::operator()()
         //XXX would need to recheck bounds if min or max changed.
     evalAllInputs();
 
+    bool trigger;
+    int min, max, step;
+    int out;
+    getValue("trigger", trigger);
+    getValue("min", min);
+    getValue("max", max);
+    getValue("step", step);
+    getValue("out", out);
+
     // First, check the trigger to see if it's time for a new number
     // XXX also breaks when scrubbing.
-    if (_trigger._value) {
-        _counter += _step._value;
-        if (_counter > _max._value)
-            _counter = _min._value;
-        _output._value =  _counter;
+    if (trigger) {
+        _counter += step;
+        if (_counter > max)
+            _counter = min;
+        out = _counter;
     }
 
-    // Boilerplate end of operator:
-    _output._qvOutput = _output._value;
+    setValue("out", out);
 }
 
 SequenceInt* SequenceInt::clone()

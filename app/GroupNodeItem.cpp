@@ -7,6 +7,7 @@ GroupNodeItem::GroupNodeItem(QGraphicsItem *parent) :
     QGraphicsItemGroup(parent),
     _minimized(false)
 {
+    Q_UNUSED(_minimized);
     // TODO add title bar object
 
     // TODO add minimize checkbox

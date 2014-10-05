@@ -17,9 +17,6 @@ public:
     virtual Imager* clone();
 
 protected:
-    Param<float>        _alpha;
-    Param<Lightcolor>   _color;
-
     virtual void    draw();
     virtual void    fire();
     QImage  *_image;
@@ -35,10 +32,6 @@ public:
     virtual Circle* clone();
 
 protected:
-    Param<float>        _x;
-    Param<float>        _y;
-    Param<float>        _scale;
-
     void    draw();
 };
 
@@ -52,13 +45,6 @@ public:
     virtual Box* clone();
 
 protected:
-    Param<float>        _x;
-    Param<float>        _y;
-    Param<float>        _width;
-    Param<float>        _height;
-    Param<float>        _rotation;      // XXX add rotation
-    Param<bool>         _antialiased;
-
     void    draw();
 };
 

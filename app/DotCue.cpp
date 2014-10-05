@@ -3,40 +3,17 @@
 #include <QDebug>
 #include "Node.h"
 
-DotCue::DotCue() :
-    _x(10),
-    _y(8),
-    _scale(1.0),
-    _alpha(1.0),
-    _color(Lightcolor(255,255,255))
+DotCue::DotCue()
 {
     int numCues = _dfModel->getNumCues();
     setName(QString("BoxCue%1").arg(numCues));
     _type = CUE;
 
     // Declare params.
-    _x.setName("x");
-    _x.setOutput(false);
-    _x.setConnectable(true);
-
-    _y.setName("y");
-    _y.setOutput(false);
-    _y.setConnectable(true);
-
-    _scale.setName("scale");
-    _scale.setOutput(false);
-    _scale.setConnectable(true);
-
-    _alpha.setName("alpha");
-    _alpha.setOutput(false);
-    _alpha.setConnectable(true);
-
-    _color.setName("color");
-    _color.setOutput(false);
-    _color.setConnectable(true);
-
-    _paramList << &_x <<&_y <<&_scale << &_alpha << &_color;
-    setParamParent();
+    addParam<int>("x", 10);
+    addParam<int>("y", 8);
+    addParam<float>("alpha", 1.0);
+    addParam<Lightcolor>("color", Lightcolor(255,255,255));
 }
 
 // Is this actually called?  I don't think so, but I guess since Node is
@@ -65,10 +42,10 @@ void DotCue::evaluate()
     float alpha;
     int x,y;
 
-    _color.getValue(color);
-    _alpha.getValue(alpha);
-    _x.getValue(x);
-    _y.getValue(y);
+    getValue("color", color);
+    getValue("alpha", alpha);
+    getValue("x", x);
+    getValue("y", y);
     color *= alpha;
 
     // "Fire" the light with the correct parameters

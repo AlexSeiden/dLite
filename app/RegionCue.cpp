@@ -1,28 +1,15 @@
 #include "RegionCue.h"
 #include "DanceFloor.h"
 
-RegionCue::RegionCue() :
-    _color(Lightcolor(255,255,255)),
-    _alpha(1.0)
+RegionCue::RegionCue()
 {
     setName(QString("RegionCue"));
     _type = CUE;
 
     // Declare params.
-    _color.setName("color");
-    _color.setOutput(false);
-    _color.setConnectable(true);
-
-    _alpha.setName("alpha");
-    _alpha.setOutput(false);
-    _alpha.setConnectable(true);
-
-    _region.setName("region");
-    _region.setOutput(false);
-    _region.setConnectable(true);
-
-    _paramList << &_color << &_alpha << &_region;
-    setParamParent();
+    addParam<Lightcolor>("color", Lightcolor(255,255,255));
+    addParam<float>("alpha", 1.0);
+    addParam<Region>("region", Region());
 }
 
 void RegionCue::operator()() {
@@ -45,11 +32,13 @@ void RegionCue::evaluate()
 
     Lightcolor color;
     float alpha;
-    _color.getValue(color);
-    _alpha.getValue(alpha);
+    getValue("color", color);
+    getValue("alpha", alpha);
+    Region region;
+    getValue("region", region); // XXX how heavy is this????
 
     // "Fire" the light with the correct parameters
-    foreach (QPoint p, _region._value.getCells()) {
+    foreach (QPoint p, region.getCells()) {
         Firing *firing = new Firing;
         firing->_color = color*alpha;
         firing->_alpha = alpha;

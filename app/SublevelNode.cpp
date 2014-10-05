@@ -12,12 +12,7 @@ SublevelNode::SublevelNode(QObject *parent) :
     setName(QString("Spectral Range%1").arg(nodeCount()));
     _type = FLOAT;
 
-    _output.setName("out");
-    _output.setConnectable(true);
-    _output.setOutput(true);
-
-    _paramList << &_output;
-    setParamParent();
+    addParam<float>("out", 0.0, true);
 
     // connect level to rangemeter widget for display
     CHECKED_CONNECT(Cupid::Singleton()->getEngine(),
@@ -48,7 +43,9 @@ void SublevelNode::spectrumChanged(qint64 position, qint64 length, const Frequen
         calculateLevel();
         // levelChanged signal is connected to the appropriate slot
         // in any subrangemeter widgets in SublevelNodeItem ctor
-        emit levelChanged(_output._value);
+        float out;
+        getValue("out", out);
+        emit levelChanged(out);
     }
 }
 
@@ -83,8 +80,8 @@ void SublevelNode::calculateLevel()
         clipped = true;
     }
 
-    _output._value = value;
-    emit levelChanged(_output._value);
+    setValue("out", value);
+    emit levelChanged(value);
 }
 
 void SublevelNode::operator()()
@@ -97,7 +94,10 @@ void SublevelNode::operator()()
     // calculateLevel();
     // rather than running whenever the spectrum is updated?
 
-    _output._qvOutput = _output._value;
+    float out;
+    getValue("out",out);
+    // Need to do this to set qvOutput
+    setValue("out",out);
 }
 
 SublevelNode* SublevelNode::clone()

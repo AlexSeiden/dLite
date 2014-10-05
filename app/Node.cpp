@@ -15,7 +15,6 @@ QList<Node*> Node::_allNodes;
 
 Node::Node() :
     _name(QString()),
-    _active(true),
     _type(UNDEFINED),
     _frameLastEvaluated(-1),
     _uuid(QUuid::createUuid())
@@ -23,23 +22,33 @@ Node::Node() :
     // Style Hmmm, this might be a good place to use a weak ptr.
     _allNodes.append(this);
 
-    _active.setName("active");
-    _active.setOutput(false);
-    _active.setConnectable(false);      // Could potentially be connectable,
-                                        // but would have to make sure
-                                        // that connection was evaluated
-                                        // prior to use.
-    _paramList << &_active;
+    addParam<bool>("active", true, false, false);
+    // Could potentially be connectable,
+    // but would have to make sure
+    // that connection was evaluated
+    // prior to use.
 }
 
 Node::~Node() {
     _allNodes.removeAll(this);
 }
 
+bool Node::isActive() const
+{
+    bool active;
+    getValue("active", active);
+    return active;
+}
+
+void Node::setActive(bool status)
+{
+    setValue("active", status);
+}
+
 void Node::cloneHelper(Node& lhs)
 {
     // Things that are simply copied
-    // (this is probably redundant because implicit copy constructor will do this)
+    // (this is possibly redundant?  will implicit copy constructor do this?)
     lhs._type       = _type;
     lhs._className  = _className;
 
@@ -48,12 +57,15 @@ void Node::cloneHelper(Node& lhs)
     lhs._frameLastEvaluated = -1;
     lhs._uuid     = QUuid::createUuid();
 
-#if 0
-    // XXX copy parameter values
-    foreach (ParamBase* param, lhs._paramList) {
-        param->
+    // Copy parameter values and connections.
+    // If connections are within a group that is being
+    // copied together, the caller must handle making the appropriate
+    // reconnections.
+    foreach (ParamBase* lhsParam, lhs._paramList) {
+        ParamBase* rhsParam = getParamByName(lhsParam->getName());
+        lhsParam->copyValue(rhsParam);
     }
-#endif
+
 }
 
 void Node::beenSelected() {}
@@ -132,6 +144,7 @@ void Node::writeToJSONObj(QJsonObject &json) const
 //      Utility function that's used when reading a file from disk.
 ParamBase *Node::getParamByName(QString paramname)
 {
+#if 0  // TODO change this over
     // Return the parameter called "paramname"
     foreach (ParamBase *p, _paramList) {
         if (paramname == p->getName())
@@ -139,6 +152,12 @@ ParamBase *Node::getParamByName(QString paramname)
     }
     // ErrorHandling
     return nullptr;
+#else
+    if (_paramDict.contains(paramname))
+        return _paramDict[paramname];
+    return nullptr;
+    // ErrorHandling
+#endif
 }
 
 // ------------------------------------------------------------------------------
@@ -202,16 +221,49 @@ const QStringList & NodeFactory::getNodesOfType(Node::node_t typeInfo) {
 
 void NodeFactory::duplicateNodes(QList<Node*> dupeThese)
 {
-    // find internal connections
 
     // Duplicate each node
-    QList<Node*> newnodes;
-    foreach (Node* node, dupeThese) {
-        Node* newnode = node->clone();
+    QMap<Node*, Node*> nodeMapping;
+    foreach (Node* orignode, dupeThese) {
+        Node* newnode = orignode->clone();
         Cupid::Singleton()->getGraphWidget()->addNode(newnode);
-        newnodes << newnode;
+        nodeMapping[orignode] = newnode;
     }
 
+    // separate all connections into those that are external
+    // (and need to persist) and those that are internal with the network
+    // being copied (and should be duplicated)
+    QList<ParamBase*> haveInternalConnections;
+    QList<ParamBase*> haveExternalConnections;
+    foreach (Node* node, nodeMapping.values()) {
+        foreach (ParamBase* param, node->getParams()) {
+            Node* server = param->getServer();
+            if (! server) continue;
+
+            if (dupeThese.contains(server)) {
+                haveInternalConnections << param;
+                // Rewire a connection within the network so that it stays within the network
+                Node* newServer = nodeMapping[server];
+                QString name = param->getName();
+                ParamBase* newConnection = newServer->getParamByName(name);
+                param->connectTo(newConnection);
+            }
+            else
+                haveExternalConnections << param;
+        }
+    }
+
+    // Add external connection items to graph
+    // (Purely a display operation)
+    foreach (ParamBase* param, haveExternalConnections) {
+        Cupid::Singleton()->getGraphWidget()->addConnection(param->connectedParam(), param);
+    }
+
+    foreach (ParamBase* param, haveInternalConnections) {
+        Cupid::Singleton()->getGraphWidget()->addConnection(param->connectedParam(), param);
+    }
+
+    // TODO Relative positioning.
 }
 
 // -------------------
@@ -312,13 +364,20 @@ Node* NodeFactory::readNodeFromJSONObj(const QJsonObject &json)
     QJsonArray paramsArray = json["paramList"].toArray();
     for (int i=0; i<paramsArray.size(); ++i) {
         QJsonObject paramJsonObject = paramsArray[i].toObject();
-        // Params don't need to be instantiated, since they are not dynamic;
-        // any given node will automatically instantiate all its params.
+        // Params are already instantiated by the node, at least for now.
+        // (This will change if we make nodes like Palette allow dynamically adding
+        // parameters.)
         // But their values, UUIDs, and connections must be read and assigned appropriately.
         QString paramname = paramJsonObject["name"].toString();
 
         // Find a pointer to the named param in this node:
         ParamBase *param = newnode->getParamByName(paramname);
+
+        if (! param) {
+            // ErrorHandling
+            qDebug() << Q_FUNC_INFO << QString("Node \"%1\" has no parameter \"%2\"").arg(classname, paramname);
+            continue;
+        }
 
         // Read values, which is specialized by type.
         param->readFromJSONObj(paramJsonObject);
