@@ -54,7 +54,7 @@ signals:
 
 protected:
     void        mouseMoveEvent(QGraphicsSceneMouseEvent* event);
-    void        keyPressEvent(QKeyEvent* event);
+//    void        keyPressEvent(QKeyEvent* event);
 
     Node*       _node;
     bool        _minimized;

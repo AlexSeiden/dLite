@@ -316,11 +316,14 @@ void GraphWidget::ungroup() {
 void GraphWidget::duplicate() {
     QList<NodeItem *> selection = _scene->getSelectedNodeItems();
     // Convert to list of nodes:
+//    QList<Node*>* out = new QList<Node*>;
     QList<Node*> out;
     foreach (NodeItem* item, selection) {
         out << item->getNode();
+//        (*out) << item->getNode();
     }
-    NodeFactory::Singleton()->duplicateNodes(out);
+    NodeFactory::Singleton()->duplicateNodes(&out);
+//    qDebug() << "Nodes Duplicated";
 }
 
 void GraphWidget::minimizeSelected() {

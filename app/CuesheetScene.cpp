@@ -243,6 +243,15 @@ NodeItem* CuesheetScene::getNodeItemForNode(const Node* node)
     return nullptr;
 }
 
+void CuesheetScene::selectTheseNodes(QList<Node*> selection)
+{
+    clearSelection();
+    foreach (Node* node, selection) {
+        NodeItem *ni = getNodeItemForNode(node);
+        ni->setSelected(true);
+    }
+}
+
 QList<NodeItem*> CuesheetScene::getAllCueNodeItems()
 {
     QList<QGraphicsItem*>allItems = items();

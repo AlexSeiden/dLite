@@ -52,7 +52,9 @@ public:
     void                setActive(bool active);
 
     virtual node_t      getType();
-    QList<ParamBase *>  getParams()        {return _paramDict.values();}
+//    This doesn't work because order is arbitrary:
+//    QList<ParamBase *>  getParams()        {return _paramDict.values();}
+    QList<ParamBase *>  getParams()        {return _paramList;}
     virtual QString     getClass() const   {return _className;}
 
     // Functor that provides closure over instance object,
@@ -77,6 +79,8 @@ private:
 #endif
 
     static int nodeCount() {return _allNodes.size();}
+    static bool nameIsUnique(QString name);
+    static QString uniqueName(QString name);
 
     // Called by editor widgets when a parameter has been changed.
     // Most nodes don't need this--only onces like RandomInt where
@@ -181,7 +185,7 @@ public:
     void            registerNodetype(QString classname, Node::node_t typeInfo, NodeInstatiator_t instantiatorFunction);
     const QStringList& getNodesOfType(Node::node_t typeInfo);
     QList<Node*>    allNodes() const {return Node::allNodes();}
-    void            duplicateNodes(QList<Node*> dupeThese);
+    void            duplicateNodes(QList<Node *> *dupeThese);
 
     static NodeFactory *Singleton();
 
@@ -191,6 +195,9 @@ public:
     Node*   readNodeFromJSONObj(const QJsonObject &json);
     void    readAllNodes(const QJsonObject &json);
     void    writeToJSONObj(QJsonObject &json) const;
+
+signals:
+//    void    selectNodes(QList<Node*>);
 
 private:
     // Registry

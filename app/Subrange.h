@@ -24,6 +24,7 @@ public:
         _ampMax = amax;
     }
     void    setWin(const QRectF &win) {_subrangeWindow = win;}
+//    void    computeWinFromRange(double minfreq, double maxfreq);
 
     double  amplitudeWithinWindow(double amp);
     bool    isFrequencyWithinWindow(double freq);

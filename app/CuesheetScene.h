@@ -38,6 +38,7 @@ public:
     QList<QGraphicsItem*>    getSelectedGroupableItems();
     QList<GroupNodeItem*>    getSelectedGroups();
     QList<NodeItem*>    getAllCueNodeItems();
+    void                selectTheseNodes(QList<Node*> selection);
 
 public slots:
     void setConnecting(bool status=true) {_isConnecting = status;}

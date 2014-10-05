@@ -124,10 +124,11 @@ void NodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mouseMoveEvent(event);
 }
 
+#if 0
 void NodeItem::keyPressEvent(QKeyEvent *event)
 {
     // XXX  this isn't working
-    qDebug() << "keypress " << event->key();
+//    qDebug() << "keypress " << event->key();
     switch (event->key()) {
     case Qt::Key_Delete:
         delete this->_node;
@@ -139,6 +140,7 @@ void NodeItem::keyPressEvent(QKeyEvent *event)
         QGraphicsItem::keyPressEvent(event);
     }
 }
+#endif
 
 // Forward selection to node, in case there's anything special to do
 // (e.g. Sublevel nodes need to interact with the spectrograph;

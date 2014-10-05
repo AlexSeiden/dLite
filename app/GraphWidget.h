@@ -52,8 +52,10 @@ private:
     void    frameItems(QList<QGraphicsItem*> items);
     QPointF positionNodeItem(NodeItem* ni, QPointF startPos);
 
-    CuesheetScene *     _scene;
-    CuesheetView *      _csview;
+    CuesheetScene*     _scene;
+    CuesheetView*      _csview;
+
+    // Last selection made--used for updating selections
     QSet<NodeItem*>     _wasSelected;
 
 

@@ -48,7 +48,7 @@ public:
 
     bool        isConnectableTo(ParamBase *otherParam);
     void        connectTo(ParamBase *server);
-    void        copyValue(ParamBase *rhs);
+    void        copyValueAndConnection(ParamBase *rhs);
     void        disconnect() {_connectedParam = nullptr; _provider = nullptr;}
 
     // TODO range only works for floats & ints.

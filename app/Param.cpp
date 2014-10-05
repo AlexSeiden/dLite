@@ -16,8 +16,7 @@
 // These constants defined for convinience & speed when doing type checks.
 // ??? Are these still needed?  Would it be better just to have use an enum?
 const std::type_info & paramTypeFloat       = typeid(Param<float>);
-const std::type_info & paramTypeInt         = typeid(Param<int>);
-const std::type_info & paramTypeLightcolor  = typeid(Param<Lightcolor>);
+const std::type_info & paramTypeInt         = typeid(Param<int>); const std::type_info & paramTypeLightcolor  = typeid(Param<Lightcolor>);
 const std::type_info & paramTypeBool        = typeid(Param<bool>);
 const std::type_info & paramTypeRegion      = typeid(Param<Region>);
 
@@ -148,9 +147,10 @@ void ParamBase::connectTo(ParamBase *server)
 
 // Copy Value
 // XXX  GROSS -- There's got to be a better way to do this.
-void ParamBase::copyValue(ParamBase *rhs)
+void ParamBase::copyValueAndConnection(ParamBase *rhs)
 {
     _connectedParam = rhs->_connectedParam;
+    _provider = rhs->_provider;
 
     {
     Param<int> *s = dynamic_cast<Param<int> *>(rhs);

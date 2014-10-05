@@ -6,6 +6,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QUuid>
+#include <QRegularExpression>
 #include "GraphWidget.h"        // GROSS
 
 // ------------------------------------------------------------------------------
@@ -48,28 +49,59 @@ void Node::setActive(bool status)
 void Node::cloneHelper(Node& lhs)
 {
     // Things that are simply copied
-    // (this is possibly redundant?  will implicit copy constructor do this?)
+    // (this is possibly redundant?  will implicit copy constructor do this?
+    // No, because it doesn't exist and is never called!)
+    // (but these first two are set from the regular constructor.)
     lhs._type       = _type;
     lhs._className  = _className;
 
     // Things that are modified
-    lhs._name     = _name + "COPY";  // XXX better uniquenames
+    lhs._name     = Node::uniqueName(_name);
     lhs._frameLastEvaluated = -1;
     lhs._uuid     = QUuid::createUuid();
 
     // Copy parameter values and connections.
     // If connections are within a group that is being
-    // copied together, the caller must handle making the appropriate
-    // reconnections.
+    // copied together, the caller (e.g. NodeFactory::duplicate)
+    // handles making the appropriate reconnections.
     foreach (ParamBase* lhsParam, lhs._paramList) {
         ParamBase* rhsParam = getParamByName(lhsParam->getName());
-        lhsParam->copyValue(rhsParam);
+        lhsParam->copyValueAndConnection(rhsParam);
     }
-
 }
 
 void Node::beenSelected() {}
 void Node::beenDeselected() {}
+
+bool Node::nameIsUnique(QString name)
+{
+    foreach (Node* node, _allNodes) {
+        if (name == node->getName())
+            return false;
+    }
+    return true;
+}
+
+QString Node::uniqueName(QString name)
+{
+    if (nameIsUnique(name))
+        return name;
+
+    QRegularExpression re("(.*)(\\d{1,3})$");
+    QRegularExpressionMatch match = re.match(name);
+    QString newNameCandidate;
+    if (match.hasMatch()) {
+        QString prefix = match.captured(1);
+        QString suffix = match.captured(2);
+        int index = suffix.toInt();
+        index++;
+        newNameCandidate = prefix + QString::number(index);
+    }
+    else {
+        newNameCandidate = name + QString::number(1);
+    }
+    return uniqueName(newNameCandidate);
+}
 
 Node::node_t Node::getType()
 {
@@ -79,11 +111,14 @@ Node::node_t Node::getType()
 // GROSS.  at least, should be a better way to init this.
 // should be a better way to find out without having to maintain this.
 // This kinda breaks encapsulation to have it in the first place.
+// Still needed???
 void Node::setParamParent()
 {
+#if 0
     foreach (ParamBase *p, _paramList) {
         p->setParentNode(this);
     }
+#endif
 }
 
 // evalAllInputs()
@@ -219,12 +254,12 @@ const QStringList & NodeFactory::getNodesOfType(Node::node_t typeInfo) {
     return _registryByType[typeInfo];
 }
 
-void NodeFactory::duplicateNodes(QList<Node*> dupeThese)
+void NodeFactory::duplicateNodes(QList<Node*>* dupeThese)
 {
 
     // Duplicate each node
     QMap<Node*, Node*> nodeMapping;
-    foreach (Node* orignode, dupeThese) {
+    foreach (Node* orignode, *dupeThese) {
         Node* newnode = orignode->clone();
         Cupid::Singleton()->getGraphWidget()->addNode(newnode);
         nodeMapping[orignode] = newnode;
@@ -235,21 +270,26 @@ void NodeFactory::duplicateNodes(QList<Node*> dupeThese)
     // being copied (and should be duplicated)
     QList<ParamBase*> haveInternalConnections;
     QList<ParamBase*> haveExternalConnections;
-    foreach (Node* node, nodeMapping.values()) {
-        foreach (ParamBase* param, node->getParams()) {
-            Node* server = param->getServer();
-            if (! server) continue;
+    foreach (Node* newNode, nodeMapping.values()) {
+        foreach (ParamBase* newParam, newNode->getParams()) {
+            Node* origServer = newParam->getServer();
+            if (! origServer) continue;
 
-            if (dupeThese.contains(server)) {
-                haveInternalConnections << param;
+            if (dupeThese->contains(origServer)) {
+                haveInternalConnections << newParam;
                 // Rewire a connection within the network so that it stays within the network
-                Node* newServer = nodeMapping[server];
-                QString name = param->getName();
+                Node* newServer = nodeMapping[origServer];
+                Q_ASSERT(newServer);
+                ParamBase* oldConnection = newParam->connectedParam();
+                QString name = oldConnection->getName();
                 ParamBase* newConnection = newServer->getParamByName(name);
-                param->connectTo(newConnection);
+                Q_ASSERT(newConnection);
+                newParam->connectTo(newConnection);
             }
-            else
-                haveExternalConnections << param;
+            else {
+                // Connection has already been made
+                haveExternalConnections << newParam;
+            }
         }
     }
 
@@ -264,6 +304,9 @@ void NodeFactory::duplicateNodes(QList<Node*> dupeThese)
     }
 
     // TODO Relative positioning.
+
+    // Select new ones.
+//    emit selectNodes(nodeMapping.values());
 }
 
 // -------------------
