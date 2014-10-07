@@ -6,7 +6,7 @@
 CuesheetView::CuesheetView(QWidget *parent)
     : QFrame(parent)
 {
-    setContentsMargins(0,0,0,0);
+    setContentsMargins(2,1,2,1);
     setFrameStyle(NoFrame);
     _graphicsView = new GraphicsView(this);
     _graphicsView->setRenderHint(QPainter::Antialiasing, true);
@@ -57,6 +57,7 @@ CuesheetView::CuesheetView(QWidget *parent)
     zoomSliderLayout->addWidget(_zoomSlider);
     zoomSliderLayout->addWidget(zoomOutIcon);
     zoomSliderLayout->addWidget(_resetButton);
+    zoomSliderLayout->setAlignment(_zoomSlider, Qt::AlignRight);
 //    zoomSliderLayout->addWidget(_newcueButton);
 
     QGridLayout *topLayout = new QGridLayout;

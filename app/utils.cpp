@@ -1,5 +1,6 @@
 #include <QAudioFormat>
 #include "utils.h"
+#include "Cupid.h"
 
 // Returns position in microseconds, given position in bytes
 qint64 audioDuration(const QAudioFormat &format, qint64 bytes)
@@ -110,4 +111,14 @@ double clamp(double min, double max, double val)
     if (val > max)
         return max;
     return val;
+}
+
+int samples2ms(int samples)
+{
+    return samples * 1000. / Cupid::Singleton()->getEngine()->format().sampleRate();
+}
+
+int bytes2ms(int bytes)
+{
+    return audioDuration(Cupid::Singleton()->getEngine()->format(), bytes)/1000;
 }

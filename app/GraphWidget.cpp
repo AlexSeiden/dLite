@@ -8,10 +8,8 @@
 #include <QHBoxLayout>
 #include <QGraphicsObject>
 #include <QGraphicsProxyWidget>
-
 #include "SublevelNode.h"
 #include "SublevelNodeItem.h"
-#include "sublevel.h"
 #include <QPushButton>
 #include <QTabWidget>
 #include <QToolButton>
@@ -19,14 +17,18 @@
 #include <QStyleFactory>
 #include "GroupNodeItem.h"
 #include "Cue.h"
+#include "Cupid.h"
+#include "SegmentController.h"
+#include "Transport.h"
 
 GraphWidget::GraphWidget(QWidget *parent) :
     QWidget(parent)
 {
-    _tabwidget = new QTabWidget;
+    _tabwidget = new QTabWidget(this);
     newCuesheet();
 //    qDebug() << QStyleFactory::keys();
-    _tabwidget->setStyle(QStyleFactory::create("Fusion"));
+//    _tabwidget->setStyle(QStyleFactory::create("Fusion"));
+//    this->setStyle(QStyleFactory::create("Fusion"));
 //    _tabwidget->setStyle(QStyleFactory::create("Windows"));
 
     _newCueButton = new QToolButton;
@@ -34,14 +36,23 @@ GraphWidget::GraphWidget(QWidget *parent) :
     _newCueButton->setEnabled(true);
 
     // TODO lots more
+    // e.g. compmodes, etc.
     _useAllCues = new QCheckBox;
     _useAllCues->setEnabled(true);
+    _useAllCues->setChecked(true);
+
+    _segmentButton = new QToolButton;
+    _segmentButton->setText(tr("S"));
+    _segmentButton->setEnabled(true);
+    _segmentController = nullptr;
+    _segGui = nullptr;
 
     QVBoxLayout *vlayout = new QVBoxLayout();
     vlayout->setSpacing(0);
     vlayout->setContentsMargins(0,0,0,0);
     vlayout->addWidget(_newCueButton);
     vlayout->addWidget(_useAllCues);
+    vlayout->addWidget(_segmentButton);
     vlayout->addStretch();
 
     QHBoxLayout *layout = new QHBoxLayout(this);
@@ -56,11 +67,19 @@ GraphWidget::GraphWidget(QWidget *parent) :
     setWindowTitle("Cuesheet");
     setWindowFlags( Qt::Window | Qt::WindowMaximizeButtonHint |
                     Qt::CustomizeWindowHint);
+
+    _segmentController = new SegmentController;
+    CHECKED_CONNECT(this, SIGNAL(segmentationChanged(SongSegmentation*)),
+                    Cupid::Singleton()->getTransport(), SLOT(segmentsChanged(SongSegmentation*)));
+    emit segmentationChanged(&(_segmentController->_segmentation));
 }
 
 void GraphWidget::connectUi()
 {
+    CHECKED_CONNECT(Cupid::Singleton()->getEngine(), SIGNAL(newSong(QString)),
+                    this, SLOT(newSong(QString)));
     CHECKED_CONNECT(_newCueButton, SIGNAL(clicked()), this, SLOT(newCuesheet()));
+    CHECKED_CONNECT(_segmentButton, SIGNAL(clicked()), this, SLOT(showSegmentController()));
 }
 
 // ------------------------------------------------------------------------------
@@ -80,6 +99,23 @@ void GraphWidget::newCuesheet()
     css->setName(name);
     _tabwidget->setCurrentWidget(csv);
     update();
+}
+
+void GraphWidget::showSegmentController(){
+    if (! _segmentController) {
+        _segmentController = new SegmentController;
+        CHECKED_CONNECT(this, SIGNAL(segmentationChanged(SongSegmentation*)),
+                        Cupid::Singleton()->getTransport(), SLOT(segmentsChanged(SongSegmentation*)));
+        emit segmentationChanged(&(_segmentController->_segmentation));
+    }
+
+    if (! _segGui) {
+        _segGui = new SegGui(_segmentController);
+        CHECKED_CONNECT(_segGui, SIGNAL(setCuesheet(int)),
+                        this, SLOT(setCuesheet(int)));
+    }
+
+    _segGui->show();
 }
 
 QList<Cue*> GraphWidget::getCurrentCues()
@@ -111,6 +147,11 @@ CuesheetView* GraphWidget::getCurrentView()
 bool GraphWidget::useAllCues()
 {
     return _useAllCues->isChecked();
+}
+
+void GraphWidget::setCuesheet(int index)
+{
+    _tabwidget->setCurrentIndex(index);
 }
 
 void GraphWidget::selectionChanged()
@@ -430,4 +471,25 @@ void GraphWidget::duplicate() {
     }
     NodeFactory::Singleton()->duplicateNodes(&out);
 //    qDebug() << "Nodes Duplicated";
+}
+
+// ------------------------------------------------------------------------------
+// Observer forwarding
+void GraphWidget::newSong(QString filename)
+{
+//    qDebug() << "filename via slot" << filename;
+//    QString audioFilename = Cupid::getAudioFilename();
+//    qDebug() << "filename via cupid" << audioFilename;
+
+    Q_UNUSED(filename);
+    // remember, filename passed into this is audio file,
+    // and node loadFile(QString) methods expect the name of file they
+    // are supposed to load (e.g. beat onset file).  They will
+    // figure out the correct filename in their loadfile method,
+    // and will get the new song file path from Cupid.
+    foreach (Node* node, Node::allNodes())
+        node->loadFile();
+
+    if (_segmentController)
+        _segmentController->loadFile();
 }

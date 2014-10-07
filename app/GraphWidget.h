@@ -12,11 +12,14 @@ class NodeItem;
 class Subrange;
 class CuesheetScene;
 class CuesheetView;
+class SegmentController;
+class SegGui;
+class SongSegmentation;
+
+QT_BEGIN_NAMESPACE
 class QTabWidget;
 class QToolButton;
 class QCheckBox;
-
-QT_BEGIN_NAMESPACE
 class QGraphicsItem;
 QT_END_NAMESPACE
 
@@ -30,6 +33,7 @@ public:
 //    void addTheseNodes(QList<Node*> aBunchOfNodes);
     void writeNodeUiToJSONObj(const Node *node, QJsonObject& json);
     void readNodeUiFromJSONObj(Node* node, const QJsonObject &json);
+    QList<Cue*> getCurrentCues();
 
     bool useAllCues();
 
@@ -51,7 +55,12 @@ public slots:
     void duplicate();
     void minimizeSelected();
     void newCuesheet();
-    QList<Cue*> getCurrentCues();
+    void showSegmentController();
+    void newSong(QString filename);
+    void setCuesheet(int index);
+
+signals:
+    void    segmentationChanged(SongSegmentation *);
 
 private:
     void    connectUi();
@@ -64,8 +73,12 @@ private:
     CuesheetView*      getCurrentView();
 
     QToolButton *       _newCueButton;
-    QCheckBox *       _useAllCues;
-    QTabWidget *       _tabwidget;
+    QCheckBox *         _useAllCues;
+    QToolButton *       _segmentButton;
+    QTabWidget *        _tabwidget;
+    SegmentController * _segmentController;
+    SegGui *            _segGui;
+
 //    CuesheetScene*     _scene;
 //    CuesheetView*      _csview;
 

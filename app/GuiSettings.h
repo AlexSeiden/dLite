@@ -80,6 +80,12 @@ public:
     static QColor  trans_bgColor;
     static QColor  trans_barColor;
     static int     trans_barHeight;
+    static int     trans_playheadWidth;
+    static QColor  trans_playheadColor;
+    static QColor  trans_segmentColor;
+    static QColor  trans_segmentTextColor;
+    static QColor  trans_currentSegmentColor;
+    static QFont   trans_segmentFont;
 
 
 

@@ -93,6 +93,11 @@ private:
     virtual void        beenSelected();
     virtual void        beenDeselected();
 
+    // Only needed on Nodes that use files stored with the song
+    // (such as the beat nodes).
+    virtual void        loadFile();
+    virtual void        loadFile(QString filename);
+
     // Boilerplate call in every operator(); checks to make sure
     // that the operator hasn't been run already for a given frame.
     // This would not only be wasteful, but may well be wrong.

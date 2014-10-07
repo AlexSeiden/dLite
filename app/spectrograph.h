@@ -3,7 +3,6 @@
 
 #include "frequencyspectrum.h"
 #include "Subrange.h"
-#include "sublevel.h"
 #include "SublevelNode.h"
 
 #include <QWidget>

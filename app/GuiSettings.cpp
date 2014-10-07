@@ -28,7 +28,7 @@ QPen    GuiSettings::connectorPen         = QPen(GuiSettings::connectorColor, 2,
 QPen    GuiSettings::connectorPenSelected = QPen(GuiSettings::selectedNodePenColor, 4, Qt::SolidLine);
 QBrush  GuiSettings::connectorBrush       = QBrush(GuiSettings::connectorCenterColor);
 int     GuiSettings::connectorEndSize     = 5;
-int     GuiSettings::zoomIconSize         = 12;
+int     GuiSettings::zoomIconSize         = 16;
 int     GuiSettings::colorChipSize        = 16;
 
 // Dancefloorwidget
@@ -60,9 +60,17 @@ QColor  GuiSettings::sl_selectedColor     = GuiSettings::sg_sublevelRegion;
 QColor  GuiSettings::sl_dragTarget        = QColor(255,20,20);
 int     GuiSettings::sl_barHeight         = 25;
 
-QColor  GuiSettings::trans_bgColor        = QColor(0,0,0);
-QColor  GuiSettings::trans_barColor       = QColor(40,50,255);
-int     GuiSettings::trans_barHeight      = 20;
+QColor  GuiSettings::trans_bgColor        = QColor(24,24,22);
+QColor  GuiSettings::trans_barColor       = QColor(38,50,95);
+int     GuiSettings::trans_barHeight      = 25;
+QColor  GuiSettings::trans_segmentColor   = QColor(226,222,170);
+QColor  GuiSettings::trans_currentSegmentColor   = QColor(255,200,20);
+//QFont   GuiSettings::trans_segmentFont    = QFont("Source Code Pro", 9, 99);
+//QFont   GuiSettings::trans_segmentFont    = QFont("Avenir Heavy Oblique", 9, 50);
+QFont   GuiSettings::trans_segmentFont    = QFont("Futura", 8, 70, true);
+QColor  GuiSettings::trans_segmentTextColor   = QColor(0,0,0);
+QColor  GuiSettings::trans_playheadColor   = QColor(255,255,255);
+int     GuiSettings::trans_playheadWidth   = 2;
 
 
 GuiSettings::GuiSettings(QObject *parent) :

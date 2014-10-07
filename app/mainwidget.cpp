@@ -1,5 +1,4 @@
 #include "engine.h"
-#include "sublevel.h"
 #include "mainwidget.h"
 #include "Transport.h"
 #include "settingsdialog.h"
@@ -43,6 +42,11 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_cueLibView(NULL)
     ,   _filename()
 {
+    // GROSS  These are essentially globals:
+    Cupid::Singleton()->setEngine(m_engine);
+    Cupid::Singleton()->setDancefloor(m_dancefloor);
+    Cupid::Singleton()->setSpectrograph(m_spectrograph);
+    Cupid::Singleton()->setTransport(m_transport);
 
     // numBands, lowfreq, hifreq.
     // TODO move somewhere else....
@@ -58,19 +62,21 @@ MainWidget::MainWidget(QWidget *parent)
     std::string layoutfile = std::string("/Users/alex/src/floorit/layout.csv");
     m_dancefloor->ImportLayout(layoutfile);
     Cue::setDancefloor(m_dancefloor);
+    m_engine->setDancefloormodel(m_dancefloor);
 
     m_dancefloorwidget = new Dancefloorwidget();
     m_dancefloorwidget->setModel(m_dancefloor);
     m_dancefloor->setView(m_dancefloorwidget);  // GROSS
     m_dancefloorwidget->show();
+    Cupid::Singleton()->setDancefloorwidget(m_dancefloorwidget);
 
-    m_engine->setDancefloormodel(m_dancefloor);
 
     m_cueLibView = new CueLibView(NULL);
     m_cueLibView->show();
 
     m_graphWidget = new GraphWidget(NULL);
     m_graphWidget->show();
+    Cupid::Singleton()->setGraphWidget(m_graphWidget);
 
     connectUi();
 
@@ -78,15 +84,6 @@ MainWidget::MainWidget(QWidget *parent)
     //m_engine->loadFile(QString("/Users/alex/Documents/lights/Jam On It/Jam On It.wav"));
     m_engine->loadSong(QString("/Users/alex/Documents/WAVS/Awesome/Awesome.wav"));
     updateButtonStates();
-
-
-    // GROSS  These are essentially globals:
-    Cupid::Singleton()->setEngine(m_engine);
-    Cupid::Singleton()->setDancefloor(m_dancefloor);
-
-    Cupid::Singleton()->setSpectrograph(m_spectrograph);
-    Cupid::Singleton()->setDancefloorwidget(m_dancefloorwidget);
-    Cupid::Singleton()->setGraphWidget(m_graphWidget);
 
     createShortcuts();
 }
@@ -406,6 +403,10 @@ void MainWidget::createShortcuts()
     m_minimizeSelectedShortcut = new QShortcut(Qt::Key_M, this);
     m_minimizeSelectedShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_minimizeSelectedShortcut, SIGNAL(activated()), m_graphWidget, SLOT(minimizeSelected()));
+
+    m_newTabShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_T), this);
+    m_newTabShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_newTabShortcut, SIGNAL(activated()), m_graphWidget, SLOT(newCuesheet()));
 
     // File I/O shortcuts ----------
     m_saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);

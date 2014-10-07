@@ -8,6 +8,7 @@
 
 class GraphWidget;
 class Dancefloorwidget;
+class Transport;
 
 // Cupid
 //      How things get hooked together.
@@ -22,26 +23,18 @@ public:
     // ??? should override new?
     static Cupid *Singleton();
 
-    QObject*        getSpectrograph()
-                        { return _spectrograph;}
-    void            setSpectrograph(QObject* spectrograph)
-                        {_spectrograph = spectrograph;}
-    Dancefloor*     getDancefloor()
-                        { return _dancefloor;}
-    void            setDancefloor(Dancefloor* dfmodel)
-                        {_dancefloor = dfmodel;}
-    Dancefloorwidget*     getDancefloorwidget()
-                        { return _dancefloorwidget;}
-    void            setDancefloorwidget(Dancefloorwidget* dfwidget)
-                        {_dancefloorwidget = dfwidget;}
-    Engine*         getEngine()
-                        { return _engine;}
-    void            setEngine(Engine* engine)
-                        {_engine = engine;}
-    GraphWidget*    getGraphWidget()
-                        { return _graphWidget;}
-    void            setGraphWidget(GraphWidget* gw)
-                        {_graphWidget = gw;}
+    QObject*        getSpectrograph()                       {return _spectrograph;}
+    void            setSpectrograph(QObject* spectrograph)  {_spectrograph = spectrograph;}
+    Dancefloor*     getDancefloor()                         {return _dancefloor;}
+    void            setDancefloor(Dancefloor* dfmodel)      {_dancefloor = dfmodel;}
+    Engine*         getEngine()                     {return _engine;}
+    void            setEngine(Engine* engine)       {_engine = engine;}
+    GraphWidget*    getGraphWidget()                {return _graphWidget;}
+    void            setGraphWidget(GraphWidget* gw) {_graphWidget = gw;}
+    Transport*      getTransport()                  {return _transport;}
+    void            setTransport(Transport* t)      {_transport = t;}
+    Dancefloorwidget*     getDancefloorwidget()                     {return _dancefloorwidget;}
+    void            setDancefloorwidget(Dancefloorwidget* dfwidget) {_dancefloorwidget = dfwidget;}
 
     // Syntactic sugar
     static int      getCurrentFrame()
@@ -53,12 +46,13 @@ public:
 
 private:
     // Display widgets
-    QObject*              _spectrograph;
-    GraphWidget*          _graphWidget;
-    Dancefloorwidget*     _dancefloorwidget;
+    QObject*                _spectrograph;
+    GraphWidget*            _graphWidget;
+    Dancefloorwidget*       _dancefloorwidget;
+    Transport*              _transport;
 
-    Dancefloor*      _dancefloor;
-    Engine*          _engine;
+    Dancefloor*             _dancefloor;
+    Engine*                 _engine;
 };
 
 #endif // CUPID_H

@@ -73,6 +73,9 @@ void Node::cloneHelper(Node& lhs)
 void Node::beenSelected() {}
 void Node::beenDeselected() {}
 
+void Node::loadFile() {}
+void Node::loadFile(QString filename) {Q_UNUSED(filename)}
+
 bool Node::nameIsUnique(QString name)
 {
     foreach (Node* node, _allNodes) {
@@ -112,7 +115,7 @@ Node::node_t Node::getType()
 // should be a better way to find out without having to maintain this.
 // This kinda breaks encapsulation to have it in the first place.
 // Still needed???
-void Node::setParamParent()
+void Node::setParamParent() // TODO NUKEME
 {
 #if 0
     foreach (ParamBase *p, _paramList) {

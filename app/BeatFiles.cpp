@@ -7,9 +7,13 @@
 
 // TODO master todo here (because it's the first src file.)
 /*
-  Grouping
+IP: Grouping
+    display names
+    rename
+    save & restore
+    group-aware duplicate
 
- Node Types:
+Node Types:
    color nodes:
         palette  -- improve
         spline
@@ -18,27 +22,35 @@
         breakdown viewer
         multiply & divide beats (double/half)
         offsets
-   Regions
+        bar float output
+   Conversion nodes between float & int
+   math nodes
    Paths
 
+Compositing modes
+Firing decay modes
 
- Compositing modes
- Firing decay modes
+playback controller
+    multiple queued songs
+    Load dlite file from dir with wave
 
- playback controller
-      multiple queued songs
+IP:  multiple tabbed cue sheets
+    need individual control over ordering
+    rename tabs
+    saving of tabs
+    restore with open, Import into current sheet
+    save only current tab
+    drive via segmentino
 
- multiple tabbed cue sheets
+Export/bake
 
- Export/bake
- more Shape rendering with QPainter
+IP:  more Shape rendering with QPainter
 
 global hotkeys:
   frame all / frame selected  (Still a little funky)
 
 compmode & decaymode pups on cuewidgets
 
-duplicate
 
 put spectrograph options back in somewhere.
 
@@ -52,19 +64,26 @@ Drawing:
     param-view transparent bg
     x,y distribute selected
     arrows on connectors
+    be able to scroll even when current scene is entirely visible.
 
 "_dirty" bit
+
+Menus!
+    Windows menu to restore minimized views
+    Save, etc
 
 Cleaning:
     Remnants of original spectrum audio recording stuff in bufferlength and
     windowchanged things
-    Clean up object model & separation-of-concerns
+    Clean up object model & separation-of-concerns,
+        esp wrt CuesheetView/Scene/GraphWidget
     Get rid of Lightcolor and use QColor
 
 Bugs:
     moving playhead back in time breaks beat nodes.
     editor widgets should give up focus when enter is hit
     AudioNotify drop
+    SublevelNodes don't restore window when re-read from file.
 
 */
 
@@ -204,22 +223,6 @@ Multiply* Multiply::clone()
 //      This node will generate an impulse (bool 'true')
 //      for one frame after each onset.
 
-NodeOnset::NodeOnset()
-{
-    setName("NodeOnset");
-    _type = BEAT;
-
-    addParam<bool>("out", true, true);
-
-    loadOnsetFile();  // ErrorHandling
-    // Do we want to make this some kind of singleton???
-    // I guess it'd be useful to have muliple copies with different offsets.
-    // But that seems rare....maybe there should be a "BeatDelay" node?
-
-    _nextIndex = 0;
-    _nextRefresh = 0;
-}
-
 /*
   Onset files look like this:
         15360
@@ -242,8 +245,20 @@ NodeOnset::NodeOnset()
       Awesome_vamp_qm-vamp-plugins_qm-barbeattracker_beatcounts.csv
 */
 
+NodeOnset::NodeOnset()
+{
+    setName("NodeOnset");
+    _type = BEAT;
 
-void NodeOnset::loadOnsetFile()
+    addParam<bool>("out", true, true);
+
+    loadFile();  // ErrorHandling
+    // Do we want to make this some kind of singleton???
+    // I guess it'd be useful to have muliple copies with different offsets.
+    // But that seems rare....maybe there should be a "BeatDelay" node?
+}
+
+void NodeOnset::loadFile()
 {
     // Guess filename from audio file:
     QString audioFilename = Cupid::getAudioFilename();
@@ -251,11 +266,14 @@ void NodeOnset::loadOnsetFile()
     QString path = finfo.path();
     QString basename = finfo.completeBaseName();
     QString onsetFilename = path + "/" + basename + "_vamp_vamp-aubio_aubioonset_onsets.csv";
-    loadOnsetFile(onsetFilename);
+    loadFile(onsetFilename);
 }
 
-void NodeOnset::loadOnsetFile(QString filename)
+void NodeOnset::loadFile(QString filename)
 {
+    _nextIndex = 0;
+    _nextRefresh = 0;
+    _onsets.clear();
     // Onset files are csv.  Each line has the sample number of the next beat.
     std::ifstream filestream;
     filestream.open(filename.toStdString(), std::ios::in);
@@ -304,24 +322,26 @@ NodeOnset* NodeOnset::clone()
 
 // ------------------------------------------------------------------------------
 // NodeBar
-//      Loads bar (measure) info from precomputed file.
-//
-//  Bar files look like this:
-//        51200,"1"
-//        122880,"2"
-//        194560,"3"
-//        265728,"4"
-//        337408,"5"
-//        409088,"6"
-//        480256,"7"
-//        551936,"8"
-//        623616,"9"
-//      etc...
-//  The first value is the sample number where the given bar starts,
-//  the second (in quotes, for no good reason) is the index of the bar.
-//  We read the first number and discard the second.
-//  Our bar files have names like:
-//      Awesome_vamp_qm-vamp-plugins_qm-barbeattracker_bars.csv
+/*
+    Loads bar (measure) info from precomputed file.
+
+Bar files look like this:
+      51200,"1"
+      122880,"2"
+      194560,"3"
+      265728,"4"
+      337408,"5"
+      409088,"6"
+      480256,"7"
+      551936,"8"
+      623616,"9"
+    etc...
+The first value is the sample number where the given bar starts,
+the second (in quotes, for no good reason) is the index of the bar.
+We read the first number and discard the second.
+Our bar files have names like:
+    Awesome_vamp_qm-vamp-plugins_qm-barbeattracker_bars.csv
+*/
 
 NodeBar::NodeBar()
 {
@@ -330,9 +350,6 @@ NodeBar::NodeBar()
 
     addParam<bool>("out", true, true);
     loadFile();  // ErrorHandling
-
-    _nextIndex = 0;
-    _nextRefresh = 0;
 }
 
 void NodeBar::loadFile()
@@ -349,6 +366,10 @@ void NodeBar::loadFile()
 
 void NodeBar::loadFile(QString filename)
 {
+    _nextIndex = 0;
+    _nextRefresh = 0;
+    _bars.clear();
+
     std::ifstream filestream;
     filestream.open(filename.toStdString(), std::ios::in);
     if (! filestream.is_open())
@@ -398,26 +419,27 @@ NodeBar* NodeBar::clone()
 // ------------------------------------------------------------------------------
 // NodeBar
 //      Loads bar (measure) info from precomputed file.
-//
-//  BarBeat files look like this:
-//            15360,3,"3"
-//            33280,4,"4"
-//            51200,1,"1"
-//            69120,2,"2"
-//            87040,3,"3"
-//            104960,4,"4"
-//            122880,1,"1"
-//            140800,2,"2"
-//            158720,3,"3"
-//            176640,4,"4"
-//            194560,1,"1"
-//      etc...
-//  The first value is the sample number where the beat happens,
-//  the second is the index of the beat. The third is the same as the second
-// (in quotes, for no good reason)
-//  We read the first and second columns and discard the third..
-//  Our barbeat files have names like:
-//      Awesome_vamp_qm-vamp-plugins_qm-barbeattracker_beatcounts.csv
+/*
+BarBeat files look like this:
+          15360,3,"3"
+          33280,4,"4"
+          51200,1,"1"
+          69120,2,"2"
+          87040,3,"3"
+          104960,4,"4"
+          122880,1,"1"
+          140800,2,"2"
+          158720,3,"3"
+          176640,4,"4"
+          194560,1,"1"
+    etc...
+The first value is the sample number where the beat happens,
+the second is the index of the beat. The third is the same as the second
+(in quotes, for no good reason)
+We read the first and second columns and discard the third..
+Our barbeat files have names like:
+    Awesome_vamp_qm-vamp-plugins_qm-barbeattracker_beatcounts.csv
+*/
 
 NodeBarBeat::NodeBarBeat()
 {
@@ -430,9 +452,6 @@ NodeBarBeat::NodeBarBeat()
     addParam<int>("Beat Number", true, true);
 
     loadFile();  // ErrorHandling
-
-    _nextIndex = 0;
-    _nextRefresh = 0;
 }
 
 void NodeBarBeat::loadFile()
@@ -449,10 +468,17 @@ void NodeBarBeat::loadFile()
 
 void NodeBarBeat::loadFile(QString filename)
 {
+    _beats.clear();
+    _beatnumber.clear();
+    _nextIndex = 0;
+    _nextRefresh = 0;
+
     std::ifstream filestream;
     filestream.open(filename.toStdString(), std::ios::in);
-    if (! filestream.is_open())
+    if (! filestream.is_open()) {
+        qDebug() << "Can't open" << filename;
         return; // ErrorHandling
+    }
 
     std::string line;
     while ( getline (filestream,line) ) {
@@ -517,26 +543,27 @@ NodeBarBeat* NodeBarBeat::clone()
 // ------------------------------------------------------------------------------
 // Segmentino files
 //      Loads segment info from precomputed file.
-
-//  Here's a complete segmention file:
-//        0,534016,0,"N1"
-//        534016,893952,2,"B"
-//        1427968,571904,1,"A"
-//        1999872,822784,0,"N3"
-//        2822656,982528,2,"B"
-//        3805184,572928,1,"A"
-//        4378112,249856,0,"N5"
-//        4627968,500736,3,"C"
-//        5128704,643584,0,"N6"
-//        5772288,589312,3,"C"
-//        6361600,571392,1,"A"
-//        6932992,243712,0,"N8"
-//      The first and second columns are the start and duration (in samples) of each segment.
-//      The third column is an int describing the segment; matching values correspond
-//      to sonically similar sections.
-//      The fourth column is a string.  It seems to correspond to the type of segment,
-//      but with some extra info....TODO I need to research a litte more.
-//    The suffix is "_vamp_segmentino_segmentino_segmentation.csv"
+/*
+Here's a complete segmention file:
+      0,534016,0,"N1"
+      534016,893952,2,"B"
+      1427968,571904,1,"A"
+      1999872,822784,0,"N3"
+      2822656,982528,2,"B"
+      3805184,572928,1,"A"
+      4378112,249856,0,"N5"
+      4627968,500736,3,"C"
+      5128704,643584,0,"N6"
+      5772288,589312,3,"C"
+      6361600,571392,1,"A"
+      6932992,243712,0,"N8"
+    The first and second columns are the start and duration (in samples) of each segment.
+    The third column is an int describing the segment; matching values correspond
+    to sonically similar sections.
+    The fourth column is a string.  It seems to correspond to the type of segment,
+    but with some extra info....TODO I need to research a litte more.
+  The suffix is "_vamp_segmentino_segmentino_segmentation.csv"
+*/
 
 Segmentino::Segmentino()
 {
@@ -562,6 +589,8 @@ void Segmentino::loadFile()
 
 void Segmentino::loadFile(QString filename)
 {
+    _segments.clear();
+
     std::ifstream filestream;
     filestream.open(filename.toStdString(), std::ios::in);
     double conversion = 1000. / Cupid::Singleton()->getEngine()->format().sampleRate();

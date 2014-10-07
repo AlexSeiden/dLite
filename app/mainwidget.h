@@ -110,6 +110,7 @@ private:
     QShortcut*              m_groupShortcut;
     QShortcut*              m_ungroupShortcut;
     QShortcut*              m_minimizeSelectedShortcut;
+    QShortcut*              m_newTabShortcut;
 
 #if 1 // NUKEMEMAYBE
     QLabel*                 m_infoMessage;

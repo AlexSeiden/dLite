@@ -58,8 +58,8 @@ public:
 
     // TODO for random access:  int     getNextBeat(int sample);
 
-    void    loadOnsetFile();
-    void    loadOnsetFile(QString filename);
+    void    loadFile();
+    void    loadFile(QString filename);
 
     // May want to define a "file" param for input file.
     // Could be auto-filled to look in standard locations.

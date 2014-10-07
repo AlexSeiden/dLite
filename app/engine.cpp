@@ -21,7 +21,7 @@ Engine::Engine(QObject *parent)
     ,   m_playPosition(0)
     ,   m_spectrumBufferLength(0)
     ,   m_spectrumAnalyser()
-    ,   m_notifyIntervalMs(10)      // TODO have some place to set this.
+    ,   m_notifyIntervalMs(35)
 {
     qRegisterMetaType<FrequencySpectrum>("FrequencySpectrum");
     qRegisterMetaType<WindowFunction>("WindowFunction");
@@ -71,6 +71,7 @@ bool Engine::loadSong(const QString &fileName)
     _qbuf.open(QIODevice::ReadOnly);
     _qbuf.seek(0);
     emit bufferLengthChanged(bufferLength());
+    emit newSong(fileName);
 
     return result;
 }
@@ -123,7 +124,6 @@ void Engine::movePlaybackHead(double positionfraction)
     byteposition -= byteposition % (m_format.channelCount() * m_format.sampleSize());
     playPositionChanged(byteposition);
 
-//    bool result = m_wavFileHandle->seek(byteposition);
     bool result = _qbuf.seek(byteposition);
     Q_ASSERT(result);
 }
@@ -238,6 +238,8 @@ void Engine::reset()
     delete m_wavFileHandle;
     m_wavFileHandle = 0;
     m_buffer.clear();
+    if (_qbuf.isOpen())
+        _qbuf.close();
     resetAudioDevices();
 }
 

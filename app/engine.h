@@ -85,6 +85,8 @@ signals:
     // \param duration Duration in microseconds
     void bufferLengthChanged(qint64 duration);
 
+    void newSong(QString songfile);
+
     // Position of the audio output device has changed.
     // \param position Position in bytes
     void playPositionChanged(qint64 position);

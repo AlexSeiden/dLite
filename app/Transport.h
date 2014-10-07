@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QIcon>
+#include "SegmentController.h"
 
 QT_BEGIN_NAMESPACE
 class QPushButton;
@@ -22,6 +23,7 @@ public:
 public slots:
     void bufferLengthChanged(qint64 length);
     void playPositionChanged(qint64 playPosition);
+    void segmentsChanged(SongSegmentation*);
 
 signals:
     void movePlaybackHead(double pos);
@@ -33,6 +35,8 @@ private:
     QPushButton*            _playPauseButton;
     QIcon                   _pauseIcon;
     QIcon                   _playIcon;
+    SongSegmentation*       _segmentation;
+    int                     _totalDuration;
 };
 
 #endif // TRANSPORT_H

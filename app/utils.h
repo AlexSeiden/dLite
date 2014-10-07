@@ -13,6 +13,9 @@ QT_FORWARD_DECLARE_CLASS(QAudioFormat)
 qint64 audioDuration(const QAudioFormat &format, qint64 bytes);
 qint64 audioLength(const QAudioFormat &format, qint64 microSeconds);
 
+int samples2ms(int samples);
+int bytes2ms(int bytes);
+
 QString formatToString(const QAudioFormat &format);
 
 qreal nyquistFrequency(const QAudioFormat &format);
