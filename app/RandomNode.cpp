@@ -59,7 +59,6 @@ RandomFloat* RandomFloat::clone()
 {
     RandomFloat* lhs = new RandomFloat;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 
@@ -125,7 +124,6 @@ RandomInt* RandomInt::clone()
 {
     RandomInt* lhs = new RandomInt();
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 
@@ -194,7 +192,6 @@ SequenceInt* SequenceInt::clone()
 {
     SequenceInt* lhs = new SequenceInt;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 

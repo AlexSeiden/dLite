@@ -43,7 +43,6 @@ RegionNode* RegionNode::clone()
 {
     RegionNode* lhs = new RegionNode;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 

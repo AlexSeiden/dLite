@@ -19,7 +19,7 @@ Node Types:
         spline
    beats!
         segmentino
-        breakdown viewer
+        IP: breakdown viewer & editor
         multiply & divide beats (double/half)
         offsets
         bar float output
@@ -135,7 +135,6 @@ TriggerEvery* TriggerEvery::clone()
 {
     TriggerEvery* lhs = new TriggerEvery;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 
@@ -213,7 +212,6 @@ Multiply* Multiply::clone()
 {
     Multiply* lhs = new Multiply;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 
@@ -316,7 +314,6 @@ NodeOnset* NodeOnset::clone()
 {
     NodeOnset* lhs = new NodeOnset;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 
@@ -412,7 +409,6 @@ NodeBar* NodeBar::clone()
 {
     NodeBar* lhs = new NodeBar;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 
@@ -535,7 +531,6 @@ NodeBarBeat* NodeBarBeat::clone()
 {
     NodeBarBeat* lhs = new NodeBarBeat;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 
@@ -647,7 +642,6 @@ Segmentino* Segmentino::clone()
 {
     Segmentino* lhs = new Segmentino;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 

@@ -21,7 +21,6 @@ PathNode::PathNode(QObject *parent) :
     _y.setOutput(true);
 
     _paramList << &_x << &_y;
-    setParamParent();
 }
 
 void PathNode::operator()()
@@ -38,7 +37,6 @@ PathNode* PathNode::clone()
 {
     PathNode* lhs = new PathNode;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 

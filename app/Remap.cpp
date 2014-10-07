@@ -49,7 +49,6 @@ Remap* Remap::clone()
 {
     Remap* lhs = new Remap();
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 

@@ -292,6 +292,15 @@ QList<NodeItem*> CuesheetScene::getSelectedNodeItems()
     return allNodes;
 }
 
+QRectF CuesheetScene::getItemsBBox(QList<QGraphicsItem*> items)
+{
+    QRectF bbox;
+    foreach (QGraphicsItem* item, items) {
+        bbox = bbox.united(item->boundingRect());
+    }
+    return bbox;
+}
+
 QList<QGraphicsItem*> CuesheetScene::getSelectedGroupableItems()
 {
     QList<QGraphicsItem*>allItems = selectedItems();

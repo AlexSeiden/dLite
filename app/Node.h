@@ -10,6 +10,7 @@
 #include <functional>
 #include <QJsonObject>
 #include <QDebug>
+#include <QRectF>
 
 
 // ------------------------------------------------------------------------------
@@ -109,9 +110,6 @@ private:
     static QList<Node*>    allNodes() {return _allNodes;}
 
 protected:
-    // Boilerplate call in every ctor; sets a pointer from
-    // each param back to the its parent node.
-    void                setParamParent();
     ParamBase *         getParamByName(QString paramname);
 
     void                evalAllInputs();
@@ -190,7 +188,7 @@ public:
     void            registerNodetype(QString classname, Node::node_t typeInfo, NodeInstatiator_t instantiatorFunction);
     const QStringList& getNodesOfType(Node::node_t typeInfo);
     QList<Node*>    allNodes() const {return Node::allNodes();}
-    void            duplicateNodes(QList<Node *> *dupeThese);
+    void            duplicateNodes(QList<Node *> *dupeThese, QRectF bbox = QRectF());
 
     static NodeFactory *Singleton();
 

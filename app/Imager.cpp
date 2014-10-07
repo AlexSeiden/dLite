@@ -28,7 +28,6 @@ Imager* Imager::clone()
 {
     Imager* lhs = new Imager;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 
@@ -100,7 +99,6 @@ Circle* Circle::clone()
 {
     Circle* lhs = new Circle;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 
@@ -158,7 +156,6 @@ Box* Box::clone()
 {
     Box* lhs = new Box;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 //static Registrar<Imager>     registrar0("Imager", Node::CUE);

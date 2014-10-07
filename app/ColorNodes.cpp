@@ -41,7 +41,6 @@ ColorRamp* ColorRamp::clone()
 {
     ColorRamp* lhs = new ColorRamp;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 
@@ -130,7 +129,6 @@ BriteColor* BriteColor::clone()
 {
     BriteColor* lhs = new BriteColor;
     cloneHelper(*lhs);
-    setParamParent();
     setRandomEngine();
 
     return lhs;
@@ -151,8 +149,6 @@ Palette::Palette()
     for (int i=0; i<8;++i) {
         addParam<Lightcolor>(QString("c%1").arg(i), 0);
     }
-
-    setParamParent();
 }
 
 void Palette::operator()()
@@ -175,7 +171,6 @@ Palette* Palette::clone()
 {
     Palette* lhs = new Palette;
     cloneHelper(*lhs);
-    setParamParent();
 
     return lhs;
 }

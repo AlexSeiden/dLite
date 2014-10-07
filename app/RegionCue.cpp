@@ -20,7 +20,6 @@ RegionCue* RegionCue::clone()
 {
     RegionCue* lhs = new RegionCue;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 

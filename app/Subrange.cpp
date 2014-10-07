@@ -1,4 +1,6 @@
 #include "Subrange.h"
+#include <math.h>
+#include <QDebug>
 
 Subrange::Subrange() :
     _freqMin(100.0),
@@ -41,4 +43,32 @@ bool Subrange::isFrequencyWithinWindow(double freq)
     return true;
 }
 
+double freq2frac(double freq, double minOverallFreq, double maxOverallFreq)
+{
+    const double log_min = log10(minOverallFreq);
+    const double log_max = log10(maxOverallFreq);
+    const double log_freq = log10(freq);
+    const double delta_log = log_max - log_min;
 
+    return (log_freq/delta_log);
+}
+
+void Subrange::computeWinFromRange(double minWindowFreq, double maxWindowFreq)
+{
+    // Invert amplitudes, since drawing is y increases downwards.
+    double ampMin = 1.0 - _ampMin;
+    double ampMax = 1.0 - _ampMax;
+
+    double minSubwindowFreq = freq2frac(_freqMin, minWindowFreq, maxWindowFreq);
+    double maxSubwindowFreq = freq2frac(_freqMax, minWindowFreq, maxWindowFreq);
+
+    QRectF calcWindow;
+    calcWindow.setCoords(minSubwindowFreq, ampMax, maxSubwindowFreq, ampMin);
+#if 0
+    _subrangeWindow = calcWindow;
+#else
+    qDebug() << "orig window" << _subrangeWindow;
+    qDebug() << "calc window" << calcWindow;
+#endif
+
+}

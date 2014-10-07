@@ -111,19 +111,6 @@ Node::node_t Node::getType()
     return _type;
 }
 
-// GROSS.  at least, should be a better way to init this.
-// should be a better way to find out without having to maintain this.
-// This kinda breaks encapsulation to have it in the first place.
-// Still needed???
-void Node::setParamParent() // TODO NUKEME
-{
-#if 0
-    foreach (ParamBase *p, _paramList) {
-        p->setParentNode(this);
-    }
-#endif
-}
-
 // evalAllInputs()
 //      Evaluates the providers connected to any input parameters.
 void Node::evalAllInputs()
@@ -136,10 +123,12 @@ void Node::evalAllInputs()
 }
 
 // evaluatedThisFrame()
-//      Predicate that returns true if the node has already been evaluated
-//      on this frame, and therefore shouldn't be evaluted again.
 bool Node::evaluatedThisFrame()
 {
+/*
+    Predicate that returns true if the node has already been evaluated
+    on this frame, and therefore shouldn't be evaluted again.
+*/
     int frame =  Cupid::getCurrentFrame();
     if (frame == _frameLastEvaluated)
         return true;
@@ -179,23 +168,15 @@ void Node::writeToJSONObj(QJsonObject &json) const
 }
 
 // getParamByName()
-//      Utility function that's used when reading a file from disk.
 ParamBase *Node::getParamByName(QString paramname)
 {
-#if 0  // TODO change this over
-    // Return the parameter called "paramname"
-    foreach (ParamBase *p, _paramList) {
-        if (paramname == p->getName())
-            return p;
-    }
-    // ErrorHandling
-    return nullptr;
-#else
+/* Utility function that's used when reading a file from disk,
+ * and when matching parameters during duplication.
+ */
     if (_paramDict.contains(paramname))
         return _paramDict[paramname];
     return nullptr;
     // ErrorHandling
-#endif
 }
 
 // ------------------------------------------------------------------------------
@@ -203,7 +184,9 @@ ParamBase *Node::getParamByName(QString paramname)
 
 NodeFactory::NodeFactory() {}
 
-void NodeFactory::registerNodetype(QString classname, Node::node_t typeInfo,
+void NodeFactory::registerNodetype(
+        QString classname,
+        Node::node_t typeInfo,
         NodeInstatiator_t instantiatorFunction)
 {
     // Register the ctor for the given classname.
@@ -215,11 +198,12 @@ void NodeFactory::registerNodetype(QString classname, Node::node_t typeInfo,
 }
 
 
-// STYLE ? could be: std::shared_ptr<Node> NodeFactory::instatiateNode(QString name)
 // Given the name of a node type, finds its ctor in the registry,
 // and instantiates an instance of that node.
 Node * NodeFactory::instatiateNode(QString classname, QUuid uuid)
 {
+    /* STYLE ? could be: std::shared_ptr<Node> NodeFactory::instatiateNode(QString name) */
+
     Node *instance = nullptr;
 
     // find name in the registry and call factory method.
@@ -257,9 +241,8 @@ const QStringList & NodeFactory::getNodesOfType(Node::node_t typeInfo) {
     return _registryByType[typeInfo];
 }
 
-void NodeFactory::duplicateNodes(QList<Node*>* dupeThese)
+void NodeFactory::duplicateNodes(QList<Node*>* dupeThese, QRectF bbox)
 {
-
     // Duplicate each node
     QMap<Node*, Node*> nodeMapping;
     foreach (Node* orignode, *dupeThese) {
@@ -268,9 +251,8 @@ void NodeFactory::duplicateNodes(QList<Node*>* dupeThese)
         nodeMapping[orignode] = newnode;
     }
 
-    // separate all connections into those that are external
-    // (and need to persist) and those that are internal with the network
-    // being copied (and should be duplicated)
+    // connections that are internal to the network should be made to
+    // the new nodes.
     QList<ParamBase*> haveInternalConnections;
     QList<ParamBase*> haveExternalConnections;
     foreach (Node* newNode, nodeMapping.values()) {
@@ -307,6 +289,23 @@ void NodeFactory::duplicateNodes(QList<Node*>* dupeThese)
     }
 
     // TODO Relative positioning.
+    // First, pick a position for the new nodes
+    //to the right of the bbox of the originals:
+
+    if (bbox.isNull()) return;
+
+#if 0
+    QPointF origOrigin = bbox.topLeft();
+    QPointF newOrigin = bbox.topRight() + QPointF(20, 20);
+    foreach (Node* origNode, *dupeThese) {
+        Node* newNode = nodeMapping[origNode];
+        QPointF deltaOrig = origNode->Pos() - origOrigin;  // XXX Need orignodeItem->pos()
+        QPointF newPos = newOrigin + deltaOrig;
+        newNode->setPos(newPos);        // XXX need newNodeItem->setPos
+    }
+#endif
+
+
 
     // Select new ones.
 //    emit selectNodes(nodeMapping.values());

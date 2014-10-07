@@ -45,6 +45,7 @@ public:
     void                setName(QString name) {_name = name;}
     void                addCue(Cue *cue) {_cues<<cue;}
     QList<Cue*>         getCues() const {return _cues;}
+    QRectF              getItemsBBox(QList<QGraphicsItem*> items);
 
 public slots:
     void setConnecting(bool status=true) {_isConnecting = status;}

@@ -27,8 +27,6 @@ DotCue* DotCue::clone()
 {
     DotCue* lhs = new DotCue;
     cloneHelper(*lhs);
-    setParamParent();
-
     return lhs;
 }
 

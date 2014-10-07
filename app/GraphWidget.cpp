@@ -68,6 +68,8 @@ GraphWidget::GraphWidget(QWidget *parent) :
     setWindowFlags( Qt::Window | Qt::WindowMaximizeButtonHint |
                     Qt::CustomizeWindowHint);
 
+    // GROSS this doesn't really belong here in GraphWidget
+    // GROSS this duplicates code below.
     _segmentController = new SegmentController;
     CHECKED_CONNECT(this, SIGNAL(segmentationChanged(SongSegmentation*)),
                     Cupid::Singleton()->getTransport(), SLOT(segmentsChanged(SongSegmentation*)));

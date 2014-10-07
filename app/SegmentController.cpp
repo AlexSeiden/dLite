@@ -59,16 +59,14 @@ void SegmentController::loadFile(QString filename)
         int duration = std::atoi(token.c_str());
         duration  *= conversion;
         seg.duration = duration;
-        // We don't use duration; we assume each segment lasts until
-        // the start of the next segment.
 
+        // Segment "index" -- an integer
         getline(ss, token, ',');
         int index = std::atoi(token.c_str());
-//        _segments.push_back(std::pair<int, int>(startTime, index));
         seg.segmentIndex = index;
         segmentSet << index;
 
-        // segment variant
+        // segment "variant" -- a string
         getline(ss, token);
         QString variant=QString::fromStdString(token);
         variant.remove(QChar('"'));
@@ -77,7 +75,6 @@ void SegmentController::loadFile(QString filename)
         _segmentation._segments << seg;
     }
     filestream.close();
-//    _numSegs = segmentSet.count();
     _segmentation._segmentIndices = segmentSet.values();
 
     qSort(_segmentation._segmentIndices);
@@ -85,17 +82,10 @@ void SegmentController::loadFile(QString filename)
 
 int SegmentController::findSegment(int msecs)
 {
-#if 0
-    for (auto i = _segments.begin(); i < _segments.end(); ++i) {
-        if ((*i).first > msecs)
-            return (*(i-1)).second;
-    }
-#else
     foreach (Segment seg, _segmentation._segments) {
         if (seg.startTime <= msecs && (seg.startTime + seg.duration) >= msecs)
             return seg.segmentIndex;
     }
-#endif
 
     // ErrorHandling
     return 0;

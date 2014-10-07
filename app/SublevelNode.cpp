@@ -104,7 +104,6 @@ SublevelNode* SublevelNode::clone()
 {
     SublevelNode* lhs = new SublevelNode;
     cloneHelper(*lhs);
-    setParamParent();
     return lhs;
 }
 

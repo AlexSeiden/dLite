@@ -51,7 +51,6 @@ void Spectrograph::setFreqHi(int val)
     updateBars();
 }
 
-
 // -----------------------------------------------------------------------------
 // paintEvent
 void Spectrograph::paintEvent(QPaintEvent *event)
@@ -219,6 +218,7 @@ void Spectrograph::mouseReleaseEvent(QMouseEvent *event)
     subr.setWin(subrect);
 
     setSubrangeWindow(subr);
+    subr.computeWinFromRange(m_lowFreq, m_highFreq);
 
     // Cleanup & redraw.
     m_rubberBand->hide();
@@ -239,6 +239,8 @@ void Spectrograph::spectrumChanged(const FrequencySpectrum &spectrum)
     updateBars();
 }
 
+// -----------------------------------------------------------------------------
+// Math & shit
 /*
  * Given a frequency, returns the bar that covers it.
  */
