@@ -50,7 +50,7 @@ double freq2frac(double freq, double minOverallFreq, double maxOverallFreq)
     const double log_freq = log10(freq);
     const double delta_log = log_max - log_min;
 
-    return (log_freq/delta_log);
+    return ((log_freq - log_min)/delta_log);
 }
 
 void Subrange::computeWinFromRange(double minWindowFreq, double maxWindowFreq)
