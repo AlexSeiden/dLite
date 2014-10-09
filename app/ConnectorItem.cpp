@@ -38,7 +38,6 @@ ConnectorItem::~ConnectorItem()
 
 void ConnectorItem::gotMoved()
 {
-    qDebug() << "gotMoved";
     updatePath();
     update();
 }

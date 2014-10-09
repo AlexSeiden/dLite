@@ -2,6 +2,7 @@
 #include "NodeItem.h"
 #include "GuiSettings.h"
 #include <QPainter>
+#include <QStyleOption>
 
 GroupNodeItem::GroupNodeItem(QGraphicsItem *parent) :
     QGraphicsItemGroup(parent),
@@ -28,35 +29,26 @@ void GroupNodeItem::paint(QPainter *painter,
     painter->save();
     painter->setBrush(QBrush(QColor(200,200,200,100))); // HARDW
     QPen selectedPen;
+
     if (isSelected()) {
         // Draw bright red rect around selected node.
+        // Make penWidth constant in screen space
+        const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
+        const qreal penWidth = qreal(GuiSettings::selectedNodePenWidth) / lod;
         selectedPen = QPen(GuiSettings::selectedNodePenColor);
-        selectedPen.setWidth(GuiSettings::selectedNodePenWidth);
+        selectedPen.setWidth(penWidth);
     } else {
-        // Draw bright red rect around selected node.
         selectedPen = QPen(Qt::black);                          // HARDW
         selectedPen.setWidth(GuiSettings::selectedNodePenWidth);
     }
     painter->setPen(selectedPen);
     QRectF bbox = QGraphicsItemGroup::boundingRect();
-    bbox += QMarginsF(0,30,0,0);
+    bbox += QMarginsF(0,30,0,0); // hardw   for name
     painter->drawRect(bbox);
     painter->restore();
 
-    QGraphicsItemGroup::paint(painter, option, widget);
-}
-
-
-//QList<NodeItem*> GroupNodeItem::getMembers()      // NUKEME
-//{
-//    QList<QGraphicsItem*> members = childItems();
-//}
-
-void GroupNodeItem::addToNodeItemGroup(NodeItem *ni)        // NUKEME
-{
-    // HMM maybe better to just get items and filter/cast to nodeitem
-    addToGroup(ni);
-    _members << ni;
+    // don't need or want this:
+//    QGraphicsItemGroup::paint(painter, option, widget);
 }
 
 void GroupNodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)

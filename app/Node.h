@@ -53,8 +53,6 @@ public:
     void                setActive(bool active);
 
     virtual node_t      getType();
-//    This doesn't work because order is arbitrary:
-//    QList<ParamBase *>  getParams()        {return _paramDict.values();}
     QList<ParamBase *>  getParams()        {return _paramList;}
     virtual QString     getClass() const   {return _className;}
 
@@ -62,7 +60,6 @@ public:
     // and allows downstream clients to evaluate.
     virtual void operator() (void) = 0;
 
-//
 #if 0
     // LATER:   Suggested by Myers item 35
     void operator() (void) {
@@ -169,7 +166,6 @@ protected:
     }
 
     // This is so instantiateNode can set classname:
-    //friend Node* NodeFactory::instatiateNode(QString classname);
     friend class NodeFactory;
 };
 
@@ -179,8 +175,10 @@ protected:
 // Singleton class to list & instantiate all available nodes.
 class NodeFactory
 {
+
 public:
     NodeFactory();
+    ~NodeFactory();
 
     typedef  std::function<Node*(void)> NodeInstatiator_t;
 
@@ -199,7 +197,7 @@ public:
     void    readAllNodes(const QJsonObject &json);
     void    writeToJSONObj(QJsonObject &json) const;
 
-signals:
+//signals:
 //    void    selectNodes(QList<Node*>);
 
 private:

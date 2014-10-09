@@ -196,9 +196,9 @@ SocketItem *CuesheetScene::getSocketForParam(const ParamBase *param)
     return nullptr;
 }
 
-// Returns a connector that is connected to the given input (client) param.
 ConnectorItem *CuesheetScene::getConnectorForClient(const ParamBase *client)
 {
+    // Returns a connector that is connected to the given input (client) param.
     QList<QGraphicsItem*>allItems = items();
     foreach (QGraphicsItem* item, allItems) {
         ConnectorItem *cnctr = dynamic_cast<ConnectorItem *>(item);
@@ -210,10 +210,10 @@ ConnectorItem *CuesheetScene::getConnectorForClient(const ParamBase *client)
     return nullptr;
 }
 
-// Returns a connector that is connected to the given param either as
-// a client or a server.
 ConnectorItem *CuesheetScene::getConnectorForParam(const ParamBase *param)
 {
+    // Returns a connector that is connected to the given param either as
+    // a client or a server.
     QList<QGraphicsItem*>allItems = items();
     foreach (QGraphicsItem* item, allItems) {
         ConnectorItem *cnctr = dynamic_cast<ConnectorItem *>(item);

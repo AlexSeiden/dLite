@@ -33,9 +33,10 @@ public:
 //    void addTheseNodes(QList<Node*> aBunchOfNodes);
     void writeNodeUiToJSONObj(const Node *node, QJsonObject& json);
     void readNodeUiFromJSONObj(Node* node, const QJsonObject &json);
-    QList<Cue*> getCurrentCues();
 
-    bool useAllCues();
+    QList<Cue*> getCurrentCues();
+    bool        useAllCues();
+    void        selectNodes(QList<Node*>);
 
 public slots:
     void addNode(Node *node, QJsonObject* json = nullptr);
@@ -62,7 +63,7 @@ public slots:
     void setCuesheet(int index);
 
 signals:
-    void    segmentationChanged(SongSegmentation *);
+    void segmentationChanged(SongSegmentation *);
 
 private:
     void    connectUi();

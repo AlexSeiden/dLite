@@ -187,6 +187,11 @@ void GraphWidget::selectionChanged()
     _wasSelected = newSelection;
 }
 
+void GraphWidget::selectNodes(QList<Node *>nodes)
+{
+    getCurrentScene()->selectTheseNodes(nodes);
+}
+
 #if 0
 // Not used with current reading-from-file paradigm
 void GraphWidget::addTheseNodes(QList<Node*> aBunchOfNodes)

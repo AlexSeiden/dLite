@@ -182,7 +182,8 @@ ParamBase *Node::getParamByName(QString paramname)
 // ------------------------------------------------------------------------------
 //  NodeFactory
 
-NodeFactory::NodeFactory() {}
+NodeFactory::NodeFactory()  {}
+NodeFactory::~NodeFactory() {}
 
 void NodeFactory::registerNodetype(
         QString classname,
@@ -288,13 +289,13 @@ void NodeFactory::duplicateNodes(QList<Node*>* dupeThese, QRectF bbox)
         Cupid::Singleton()->getGraphWidget()->addConnection(param->connectedParam(), param);
     }
 
+#if 0
     // TODO Relative positioning.
     // First, pick a position for the new nodes
     //to the right of the bbox of the originals:
 
     if (bbox.isNull()) return;
 
-#if 0
     QPointF origOrigin = bbox.topLeft();
     QPointF newOrigin = bbox.topRight() + QPointF(20, 20);
     foreach (Node* origNode, *dupeThese) {
@@ -305,10 +306,7 @@ void NodeFactory::duplicateNodes(QList<Node*>* dupeThese, QRectF bbox)
     }
 #endif
 
-
-
-    // Select new ones.
-//    emit selectNodes(nodeMapping.values());
+    Cupid::Singleton()->getGraphWidget()->selectNodes(nodeMapping.values());
 }
 
 // -------------------

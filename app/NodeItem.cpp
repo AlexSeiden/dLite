@@ -104,9 +104,14 @@ void NodeItem::paint(QPainter *painter,
         // Draw bright red rect around selected node.
         painter->save();
         painter->setBrush(QBrush());
+
+        // Make penWidth constant in screen space
+        const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
+        const qreal penWidth = qreal(GuiSettings::selectedNodePenWidth) / lod;
         QPen selectedPen = QPen(GuiSettings::selectedNodePenColor);
-        selectedPen.setWidth(GuiSettings::selectedNodePenWidth);
+        selectedPen.setWidth(penWidth);
         painter->setPen(selectedPen);
+
         QRectF biggerRect = bigrect.marginsAdded(QMarginsF(2,2,2,2));
         painter->drawRect(biggerRect);
         painter->restore();
