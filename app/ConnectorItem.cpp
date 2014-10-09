@@ -38,6 +38,7 @@ ConnectorItem::~ConnectorItem()
 
 void ConnectorItem::gotMoved()
 {
+    qDebug() << "gotMoved";
     updatePath();
     update();
 }
@@ -51,6 +52,10 @@ QRectF ConnectorItem::boundingRect() const
     // that connects _pStart & _pEnd -- the PREVIOUS positions.
     // The second rect connects the NEW positions of the sockets--
     // nStart & nEnd. This matters when we are dragging quickly.
+    // Hey, do I still have to do this? or was the problem all along the
+    // lack of a "prepareGeometryChange()"?
+
+
     float leftprev = qMin(_pStart.x(), _pEnd.x()-100);
     float leftnext = qMin( nStart.x(),  nEnd.x()-100);
     float left     = qMin( leftprev,    leftnext);
@@ -69,7 +74,8 @@ QRectF ConnectorItem::boundingRect() const
 
     QRectF bbox(QPointF(left,top),QPointF(right, bottom));
 
-    qreal extra = 20.; // XXX kinda arbitrary, doesn't fully work
+//    qDebug() << pos() << nStart << nEnd << bbox;
+    qreal extra = GuiSettings::connectorEndSize + 5;
     bbox.adjust(-extra, -extra, extra, extra);
     return bbox;
 }
@@ -86,6 +92,7 @@ void ConnectorItem::updatePath()
     _pStart = _serverSocket->socketPos();
     _pEnd   = _clientSocket->socketPos();
 
+    prepareGeometryChange();
     if (_path)
         delete _path;
 

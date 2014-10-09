@@ -28,6 +28,11 @@ RegionNode::RegionNode(QObject *parent) :
                     SLOT(regionDeselected(RegionNode*)));
 }
 
+RegionNode::~RegionNode()
+{
+    beenDeselected();
+}
+
 void RegionNode::operator()()
 {
     if (evaluatedThisFrame())

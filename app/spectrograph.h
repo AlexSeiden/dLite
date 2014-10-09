@@ -56,7 +56,9 @@ private:
     void setSubrangeWindow(Subrange &subr);
 
 protected:
-    qreal frac2freq(qreal frac) const;
+    double frac2freq(qreal frac) const;
+    double freq2frac(qreal freq) const;
+    QRectF computeWinFromRange(Subrange *subrange);
 
 private:
     struct Bar {
@@ -83,6 +85,7 @@ private:
     QRubberBand*		m_rubberBand;
 
     QSet<SublevelNode*> _selectedSublevels;
+    QRectF              _subrangeRect;
 
 };
 

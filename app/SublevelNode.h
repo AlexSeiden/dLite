@@ -20,6 +20,7 @@ class SublevelNode : public QObject, public Node
 
 public:
     SublevelNode(QObject *parent = 0);
+    ~SublevelNode();
 
     void operator() ();
     virtual SublevelNode* clone();
@@ -33,7 +34,7 @@ public:
 
 public slots:
     void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
-    void setSubrange(Subrange *range) {_range = *range;}    // NUKEMEMAYBE obsolete?
+    void setSubrange(Subrange *range) {_range = *range;}
 
 signals:
     // used for display, by the RangeMeter widget:
@@ -50,9 +51,5 @@ private:
     FrequencySpectrum   _spectrum;
     Subrange            _range;
 };
-
-// ??? this doesn't compile; but also doesn't seem needed. Dunno why.
-// Perhaps its automatic when from QObject?
-// Q_DECLARE_METATYPE(SublevelNode)
 
 #endif // SUBLEVELNODE_H

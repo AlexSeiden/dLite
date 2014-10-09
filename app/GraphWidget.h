@@ -44,6 +44,8 @@ public slots:
     void frameAll();
     void xAlign();
     void yAlign();
+    void xDistribute();
+    void yDistribute();
     void frameSelection();
     void zoomOut();
     void zoomIn();
@@ -66,6 +68,7 @@ private:
     void    connectUi();
 
     void    align(bool xaxis);
+    void    distribute(bool xaxis);
     void    frameItems(QList<QGraphicsItem*> items);
     QPointF positionNodeItem(NodeItem* ni, QPointF startPos);
 

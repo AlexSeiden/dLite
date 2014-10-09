@@ -152,7 +152,7 @@ protected:
     void getValue(QString paramName, T& value) const
     {
         ParamBase *pb = _paramDict[paramName];
-        Q_ASSERT(pb);
+        Q_ASSERT_X(pb, "No param named ", paramName.toStdString().c_str());
         Param<T>*param = dynamic_cast<Param<T>*>(pb);
         Q_ASSERT(param);
         param->getValue(value);
@@ -162,7 +162,7 @@ protected:
     void setValue(QString paramName, const T value)
     {
         ParamBase *pb = _paramDict[paramName];
-        Q_ASSERT(pb);
+        Q_ASSERT_X(pb, "No param named ", paramName.toStdString().c_str());
         Param<T>*param = dynamic_cast<Param<T>*>(pb);
         Q_ASSERT(param);
         param->setValue(value);

@@ -17,7 +17,7 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     _minimized(false)
 {
     _margins = QMarginsF(9,5,9,5);
-    setFlags(ItemIsSelectable | ItemIsMovable);
+    setFlags(ItemIsSelectable | ItemIsMovable  | ItemSendsScenePositionChanges);
 
     // Name editor
     QLineEdit *nameEdit = new QLineEdit;
@@ -117,11 +117,28 @@ void NodeItem::paint(QPainter *painter,
 
 // ---------------------------
 // Event handling
+#if 0
 void NodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     // Used for updating any attached connectors.
+    qDebug() << "NodeItem mme" << _node->getName();
     emit nodeMovedEventSignal();
-    QGraphicsItem::mouseMoveEvent(event);
+    event->ignore();
+    QGraphicsObject::mouseMoveEvent(event);
+}
+#endif
+
+// The mouseMoveEvent stuff doesn't work correctly when multiple
+// nodeitems are selected--only one of the nodes gets the MME event,
+// and connections to the other nodes are left dangling when they are
+// all moved.
+QVariant    NodeItem::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if (change == ItemScenePositionHasChanged) {
+//        qDebug() << "NodeItem itemchange" << _node->getName();
+        emit nodeMovedEventSignal();
+    }
+    return QGraphicsItem::itemChange(change, value);
 }
 
 #if 0
@@ -165,6 +182,8 @@ void NodeItem::nameEdit(QString newname)
 // ---------------------------
 // Display
 // reposition node item, and signal to connections that we've moved.
+// This is called from routines like align and layout, that reposition
+// a NodeItem programmatically.
 void NodeItem::rePos(const QPointF &pos)
 {
     setPos(pos);

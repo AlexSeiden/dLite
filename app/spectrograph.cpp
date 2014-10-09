@@ -215,10 +215,8 @@ void Spectrograph::mouseReleaseEvent(QMouseEvent *event)
 
     Subrange subr;
     subr.setMinMax(fmin, fmax, amin, amax);
-    subr.setWin(subrect);
 
     setSubrangeWindow(subr);
-    subr.computeWinFromRange(m_lowFreq, m_highFreq);
 
     // Cleanup & redraw.
     m_rubberBand->hide();
@@ -321,7 +319,7 @@ QPair<qreal, qreal> Spectrograph::barRangeLog(int index) const
     return QPair<qreal, qreal>(freq_min, freq_max);
 }
 
-qreal Spectrograph::frac2freq(qreal frac) const
+double Spectrograph::frac2freq(qreal frac) const
 {
     // Note: oddly, it doesn't matter what base you use for the logarhythms
     // TODO precompute these
@@ -334,6 +332,30 @@ qreal Spectrograph::frac2freq(qreal frac) const
 
     return (freq);
 }
+
+double Spectrograph::freq2frac(double freq) const
+{
+    const double log_min = log10(m_lowFreq);
+    const double log_max = log10(m_highFreq);
+    const double log_freq = log10(freq);
+    const double delta_log = log_max - log_min;
+
+    return ((log_freq - log_min)/delta_log);
+}
+
+QRectF Spectrograph::computeWinFromRange(Subrange *subrange)
+{
+    // $$$ Could optimize--this is recomputing more often than needed.
+    // Invert amplitudes, since drawing is y increases downwards.
+    double ampMin = 1.0 - subrange->_ampMin;
+    double ampMax = 1.0 - subrange->_ampMax;
+    double minSubwindowFreq = freq2frac(subrange->_freqMin);
+    double maxSubwindowFreq = freq2frac(subrange->_freqMax);
+
+    _subrangeRect.setCoords(minSubwindowFreq, ampMax, maxSubwindowFreq, ampMin);
+    return _subrangeRect;
+}
+
 
 /*
  * updateBars()
@@ -407,26 +429,6 @@ void Spectrograph::submeterDeselected(SublevelNode *chosen)
     update();  // XXX Can optimize
 }
 
-#if 0
-void Spectrograph::submeterSelectionChanged(SublevelNode *chosen)
-{
-    _selectedSublevelNode = chosen;
-    displayThisSubrange(chosen->getSubrange());
-}
-
-void Spectrograph::displayThisSubrange(Subrange *subrange)
-{
-    if (subrange) {
-        _subrange = *subrange;
-        _showSubrange = true;
-    }
-    else
-        _showSubrange = false;
-
-    update();
-}
-#endif
-
 bool Spectrograph::showSubrange()
 {
     if (_selectedSublevels.size() == 1)
@@ -436,15 +438,17 @@ bool Spectrograph::showSubrange()
 
 QRectF Spectrograph::getSubrangeWindow()
 {
+    // Caclulates the rect that should be drawn for a given range.
     if (_selectedSublevels.size() == 1) {
         QSet<SublevelNode*>::const_iterator i = _selectedSublevels.constBegin();
-        return (*i)->getSubrange()->getWindow();
+        return (computeWinFromRange((*i)->getSubrange()));
     }
     return QRectF();
 }
 
 void Spectrograph::setSubrangeWindow(Subrange &subrange)
 {
+    // Store a newly dragged out range into the subrange struct.
     if (_selectedSublevels.size() == 1) {
         QSet<SublevelNode*>::const_iterator i = _selectedSublevels.constBegin();
         (*i)->setSubrange(&subrange);

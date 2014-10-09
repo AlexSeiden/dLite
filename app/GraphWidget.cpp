@@ -20,6 +20,7 @@
 #include "Cupid.h"
 #include "SegmentController.h"
 #include "Transport.h"
+#include <algorithm>    // For sort
 
 GraphWidget::GraphWidget(QWidget *parent) :
     QWidget(parent)
@@ -103,7 +104,8 @@ void GraphWidget::newCuesheet()
     update();
 }
 
-void GraphWidget::showSegmentController(){
+void GraphWidget::showSegmentController()
+{
     if (! _segmentController) {
         _segmentController = new SegmentController;
         CHECKED_CONNECT(this, SIGNAL(segmentationChanged(SongSegmentation*)),
@@ -357,6 +359,7 @@ void GraphWidget::frameAll()
 }
 
 // Automatically layout all nodes.
+// TODO layout selection
 void GraphWidget::layoutAll()
 {
     // Start with Cues, which will be the root of the dag:
@@ -418,6 +421,74 @@ void GraphWidget::yAlign()
 void GraphWidget::xAlign()
 {
     align(true);
+}
+
+bool compareX(NodeItem *lhs, NodeItem *rhs)
+{
+    return (lhs->pos().x() < rhs->pos().x());
+}
+
+bool compareY(NodeItem *lhs, NodeItem *rhs)
+{
+    return (lhs->pos().y() < rhs->pos().y());
+}
+
+// distribute selected nodes horizontally or vertically.
+void GraphWidget::distribute(bool xaxis)
+{
+    QList<NodeItem*> selection = getCurrentScene()->getSelectedNodeItems();
+//    // Find bbox:
+//    QRectF bbox;
+//    foreach (NodeItem* ni, selection)
+//        bbox = bbox.united(ni->boundingRect());
+
+//    qreal spacing = 0;
+//    if (xaxis)
+//        spacing = bbox.width();
+//    else
+//        spacing = bbox.height();
+//    spacing /= selection.size();
+
+    // Sort nodes in selected axis:
+    if (xaxis)
+        std::sort(selection.begin(), selection.end(), compareX);
+    else
+        std::sort(selection.begin(), selection.end(), compareY);
+
+    // Move each node to the appropriate position
+    QList<NodeItem*>::iterator start = selection.begin();
+    QList<NodeItem*>::iterator finish = selection.end();
+    finish--;
+    qreal minValOnAxis;
+    qreal maxValOnAxis;
+    if (xaxis) {
+        minValOnAxis = (*start)->pos().x();
+        maxValOnAxis = (*finish)->pos().x();
+    } else {
+        minValOnAxis = (*start)->pos().y();
+        maxValOnAxis = (*finish)->pos().y();
+    }
+    qreal spacing = (maxValOnAxis - minValOnAxis)/selection.size();
+    start++;
+
+    for (int i=1; start<finish; ++start, ++i) {
+        QPointF newpos = (*start)->pos();
+        if (xaxis)
+            newpos.setX(minValOnAxis + i*spacing);
+        else
+            newpos.setY(minValOnAxis + i*spacing);
+        (*start)->rePos(newpos);
+    }
+}
+
+void GraphWidget::yDistribute()
+{
+    distribute(false);
+}
+
+void GraphWidget::xDistribute()
+{
+    distribute(true);
 }
 
 void GraphWidget::minimizeSelected() {

@@ -60,7 +60,7 @@ public slots:
     // XXX is this needed?  only for new songs--which should be a separate slot
     void bufferLengthChanged(qint64 length);
 
-    // XXX This is more of a "model" or "controller" issue than a view/widget one.
+    // Style: This is more of a "model" or "controller" issue than a view/widget one.
     void newNodeRequest(QString name);
 
 private slots:
@@ -100,12 +100,15 @@ private:
     QShortcut*              m_layoutAllShortcut;
     QShortcut*              m_xAlignShortcut;
     QShortcut*              m_yAlignShortcut;
+    QShortcut*              m_xDistributeShortcut;
+    QShortcut*              m_yDistributeShortcut;
     QShortcut*              m_zoomOutShortcut;
     QShortcut*              m_zoomInShortcut;
     QShortcut*              m_zoomResetShortcut;
     QShortcut*              m_saveShortcut;
     QShortcut*              m_saveAsShortcut;
     QShortcut*              m_openFileShortcut;
+    QShortcut*              m_openSongShortcut;
     QShortcut*              m_duplicateShortcut;
     QShortcut*              m_groupShortcut;
     QShortcut*              m_ungroupShortcut;

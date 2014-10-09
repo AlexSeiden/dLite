@@ -38,7 +38,8 @@ IP:  multiple tabbed cue sheets
     need individual control over ordering
     rename tabs
     saving of tabs
-    restore with open, Import into current sheet
+    restore with open,
+    Import into current sheet
     save only current tab
     drive via segmentino
 

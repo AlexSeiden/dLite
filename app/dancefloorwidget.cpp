@@ -36,7 +36,6 @@ void Dancefloorwidget::setModel(Dancefloor *model)
     setFixedHeight(_ysize*(_cellsize+_cellspace));
 
     // TODO restore from saved & allowed saved layouts
-    // also move to right side of screen?
     // also, snapping...
     move(1100, 10);
 }
@@ -78,7 +77,6 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
             if (y==0) {
                 painter.save();
                 painter.setPen(GuiSettings::sg_textColor);  // hardw give own guisetting
-//                painter.drawText(cell, Qt::AlignTop|Qt::AlignRight, QString::number(x));
                 painter.drawText(cell, Qt::AlignTop|Qt::AlignLeft, QString::number(x));
                 painter.restore();
             }
@@ -86,12 +84,11 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
             if (x==0) {
                 painter.save();
                 painter.setPen(GuiSettings::sg_textColor);  // hardw give own guisetting
-//                painter.drawText(cell, Qt::AlignBottom|Qt::AlignLeft, QString::number(y));
                 painter.drawText(cell, Qt::AlignTop|Qt::AlignLeft, QString::number(y));
                 painter.restore();
             }
 
-            // GROSS HACK!! Hardwired bars
+            // GROSS HACK!! Hardwired bars showing where the plywood is
             // Vertical bars
             int xstart= (y<9) ? 4 : 6;
             int xend= (y<9) ? 19 : 17;
@@ -177,6 +174,8 @@ QPoint Dancefloorwidget::findPos(QPoint cell)
     return QPoint(x,y);
 }
 
+// -----------------------------------------------------------------------------
+// Mouse Events
 void Dancefloorwidget::mousePressEvent(QMouseEvent *event)
 {
     if (! editingRegion())

@@ -39,8 +39,8 @@ CuesheetView::CuesheetView(QWidget *parent)
     zoomOutIcon->setIconSize(iconSize);
     _zoomSlider = new QSlider;
     _zoomSlider->setMinimum(0);
-    _zoomSlider->setMaximum(500);
-    _zoomSlider->setValue(500);
+    _zoomSlider->setMaximum(700);
+    _zoomSlider->setValue(700);
     _zoomSlider->setTickPosition(QSlider::TicksRight);
 
     _resetButton = new QToolButton;
@@ -92,7 +92,8 @@ void CuesheetView::resetView()
 
 void CuesheetView::fitBbox(const QRectF &bbox)
 {
-    view()->fitInView(bbox, Qt::KeepAspectRatioByExpanding);
+//    view()->fitInView(bbox, Qt::KeepAspectRatioByExpanding);
+    view()->fitInView(bbox, Qt::KeepAspectRatio);
     setSliderFromTransform();
 }
 
@@ -104,12 +105,17 @@ void CuesheetView::setSliderFromTransform()
     // m22 should be the same... could check....
 
     // Compute the slider value from the xform matrix that exists:
-    int slider = 200 * log2(scale) + 500;
+    int slider = 200 * log2(scale) + 700;
 
-    // Set the slider value, but not so much that it zooms in beyond "500",
+//    qDebug() << scale << slider;
+    _zoomSlider->setValue(slider);
+    return;
+
+
+    // Set the slider value, but not so much that it zooms in beyond "700",
     // which is overkill.
-    if (slider<0 || slider>500) {
-        slider = clamp(0,500,slider);
+    if (slider<0 || slider>700) {
+        slider = clamp(0,700,slider);
         _zoomSlider->setValue(slider);
         setupMatrix();
     }
@@ -119,9 +125,10 @@ void CuesheetView::setSliderFromTransform()
 
 void CuesheetView::setupMatrix()
 {
-    qreal scale = qPow(qreal(2), (_zoomSlider->value() - 500) / qreal(200));
+    qreal scale = qPow(2., (_zoomSlider->value() - 700.) / 200.);
     _graphicsView->setTransform(QTransform());
     _graphicsView->scale(scale, scale);
+//    qDebug() << "setting scale" << scale << "from slider" << _zoomSlider->value();
 }
 
 void CuesheetView::zoomIn(int level)
@@ -136,7 +143,7 @@ void CuesheetView::zoomOut(int level)
 
 void CuesheetView::zoomReset()
 {
-    _zoomSlider->setValue(500);
+    _zoomSlider->setValue(700);
 }
 
 #ifndef QT_NO_WHEELEVENT

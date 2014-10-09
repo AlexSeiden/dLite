@@ -33,6 +33,12 @@ SublevelNode::SublevelNode(QObject *parent) :
                     SLOT(submeterDeselected(SublevelNode *)));
 }
 
+SublevelNode::~SublevelNode()
+{
+    // Deselect when deleted
+    emit sublevelDeselected(this);
+}
+
 void SublevelNode::spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum)
 {
     Q_UNUSED(position)

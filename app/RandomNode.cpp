@@ -6,7 +6,6 @@
 
 RandomFloat::RandomFloat()
 {
-    setRandomEngine();
     setName("RandomFloat");
     _type = FLOAT;
 
@@ -15,6 +14,8 @@ RandomFloat::RandomFloat()
     addParam<float>("min", 0.0, false, false);
     addParam<float>("max", 1.0, false, false);
     addParam<bool>("trigger", true);
+
+    setRandomEngine();
 }
 
 void RandomFloat::setRandomEngine()

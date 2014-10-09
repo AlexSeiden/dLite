@@ -53,7 +53,9 @@ signals:
     void        nodeMovedEventSignal();
 
 protected:
-    void        mouseMoveEvent(QGraphicsSceneMouseEvent* event);
+//    void        mouseMoveEvent(QGraphicsSceneMouseEvent* event);
+    QVariant    itemChange(GraphicsItemChange change, const QVariant &value);
+
 //    void        keyPressEvent(QKeyEvent* event);
 
     Node*       _node;

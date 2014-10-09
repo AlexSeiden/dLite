@@ -345,7 +345,8 @@ void MainWidget::connectUi()
 
 void MainWidget::createShortcuts()
 {
-    // Transport shortcuts ----------
+    // ----------------------------------------
+    // Transport shortcuts
     // Toggle audio playback
     m_playPauseShortcut = new QShortcut(Qt::Key_Space, this);
     m_playPauseShortcut->setContext(Qt::ApplicationShortcut);
@@ -355,7 +356,8 @@ void MainWidget::createShortcuts()
     m_rewindShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_rewindShortcut, SIGNAL(activated()), m_engine, SLOT(rewind()));
 
-    // Graph view shortcuts ----------
+    // ----------------------------------------
+    // Graph view shortcuts
     m_frameAllShortcut = new QShortcut(Qt::Key_A, this);
     m_frameAllShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_frameAllShortcut, SIGNAL(activated()), m_graphWidget, SLOT(frameAll()));
@@ -388,6 +390,14 @@ void MainWidget::createShortcuts()
     m_yAlignShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_yAlignShortcut, SIGNAL(activated()), m_graphWidget, SLOT(yAlign()));
 
+    m_xDistributeShortcut = new QShortcut(QKeySequence("Shift+X"), this);
+    m_xDistributeShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_xDistributeShortcut, SIGNAL(activated()), m_graphWidget, SLOT(xDistribute()));
+
+    m_yDistributeShortcut = new QShortcut(QKeySequence("Shift+Y"), this);
+    m_yDistributeShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_yDistributeShortcut, SIGNAL(activated()), m_graphWidget, SLOT(yDistribute()));
+
     m_duplicateShortcut = new QShortcut(Qt::Key_D, this);
     m_duplicateShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_duplicateShortcut, SIGNAL(activated()), m_graphWidget, SLOT(duplicate()));
@@ -408,7 +418,8 @@ void MainWidget::createShortcuts()
     m_newTabShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_newTabShortcut, SIGNAL(activated()), m_graphWidget, SLOT(newCuesheet()));
 
-    // File I/O shortcuts ----------
+    // ----------------------------------------
+    // File I/O shortcuts
     m_saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
     m_saveShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_saveShortcut, SIGNAL(activated()), this, SLOT(save()));
@@ -420,6 +431,10 @@ void MainWidget::createShortcuts()
     m_openFileShortcut = new QShortcut(QKeySequence("Ctrl+O"), this);
     m_openFileShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_openFileShortcut, SIGNAL(activated()), this, SLOT(showOpenDialog()));
+
+    m_openSongShortcut = new QShortcut(QKeySequence("Ctrl+Shift+O"), this);
+    m_openSongShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_openSongShortcut, SIGNAL(activated()), this, SLOT(showLoadSongDialog()));
 }
 
 void MainWidget::updateButtonStates()
