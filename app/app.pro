@@ -43,7 +43,8 @@ SOURCES  += \
     Region.cpp \
     RegionCue.cpp \
     DotCue.cpp \
-    SegmentController.cpp
+    SegmentController.cpp \
+    NodeFactory.cpp
 
 HEADERS  += \
     engine.h \
@@ -72,7 +73,8 @@ HEADERS  += \
     RegionCue.h \
     DotCue.h \
     Remap.h \
-    SegmentController.h
+    SegmentController.h \
+    NodeFactory.h
 
 fftreal_dir = ../3rdparty/fftreal
 

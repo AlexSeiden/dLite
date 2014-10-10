@@ -2,6 +2,7 @@
 #include "DanceFloor.h"
 #include "Cupid.h"
 #include <QPainter>
+#include "NodeFactory.h"
 
 // ------------------------------------------------------------------------------
 // Imager base class

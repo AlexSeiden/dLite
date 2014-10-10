@@ -30,13 +30,14 @@ public:
     explicit GraphWidget(QWidget *parent = 0);
     ~GraphWidget() {}
 
-//    void addTheseNodes(QList<Node*> aBunchOfNodes);
     void writeNodeUiToJSONObj(const Node *node, QJsonObject& json);
     void readNodeUiFromJSONObj(Node* node, const QJsonObject &json);
 
-    QList<Cue*> getCurrentCues();
-    bool        useAllCues();
-    void        selectNodes(QList<Node*>);
+    QList<Cue*>             getCurrentCues();
+    QList<CuesheetScene*>   getCuesheets();
+    CuesheetScene*          newCuesheet(QString name);
+    bool                    useAllCues();
+    void                    selectNodes(QList<Node*>);
 
 public slots:
     void addNode(Node *node, QJsonObject* json = nullptr);
@@ -57,10 +58,12 @@ public slots:
     void ungroup();
     void duplicate();
     void minimizeSelected();
-    void newCuesheet();
+    CuesheetScene *newCuesheet();
     void showSegmentController();
     void newSong(QString filename);
     void setCuesheet(int index);
+    void deleteCuesheet(int index);
+    void deleteEmptyFirstCuesheet();
 
 signals:
     void segmentationChanged(SongSegmentation *);
@@ -73,7 +76,9 @@ private:
     void    frameItems(QList<QGraphicsItem*> items);
     QPointF positionNodeItem(NodeItem* ni, QPointF startPos);
 
+    CuesheetScene*     getCurrentScene(int i);
     CuesheetScene*     getCurrentScene();
+    CuesheetView*      getCurrentView(int i);
     CuesheetView*      getCurrentView();
 
     QToolButton *       _newCueButton;

@@ -1,9 +1,11 @@
-#include "BeatFiles.h"
-#include "Node.h"
-#include "Cupid.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
+
+#include "BeatFiles.h"
+#include "Node.h"
+#include "Cupid.h"
+#include "NodeFactory.h"
 
 // TODO master todo here (because it's the first src file.)
 /*
@@ -85,6 +87,8 @@ Bugs:
     editor widgets should give up focus when enter is hit
     AudioNotify drop
     SublevelNodes don't restore window when re-read from file.
+    Potential UUID collisions; should only store UUIDs during
+        serialization and deserialization
 
 */
 

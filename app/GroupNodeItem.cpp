@@ -68,3 +68,4 @@ void GroupNodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     }
     QGraphicsItemGroup::mouseMoveEvent(event);
 }
+

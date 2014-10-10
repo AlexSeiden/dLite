@@ -1,4 +1,5 @@
 #include "Remap.h"
+#include "NodeFactory.h"
 
 Remap::Remap()
 {

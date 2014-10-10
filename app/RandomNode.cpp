@@ -1,4 +1,5 @@
 #include "RandomNode.h"
+#include "NodeFactory.h"
 #include <QDebug>
 
 // ------------------------------------------------------------------------------

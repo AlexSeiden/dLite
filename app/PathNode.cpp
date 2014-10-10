@@ -1,6 +1,7 @@
 #include "PathNode.h"
 #include "utils.h"
 #include "Cupid.h"
+#include "NodeFactory.h"
 #include <QJsonObject>
 #include <QJsonArray>
 

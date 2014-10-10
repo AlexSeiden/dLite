@@ -1,4 +1,5 @@
 #include "RegionNode.h"
+#include "NodeFactory.h"
 #include "utils.h"
 #include "Cupid.h"
 #include <QJsonObject>

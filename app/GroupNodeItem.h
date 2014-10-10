@@ -20,8 +20,7 @@ protected:
 
 private:
     bool                _minimized;     // TODO
-    QString             _name;
-    QList<NodeItem*>    _members;
+    QString             _name;          // TODO
 };
 
 #endif // GROUPNODEITEM_H

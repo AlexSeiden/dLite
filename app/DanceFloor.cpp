@@ -230,7 +230,7 @@ void Dancefloor::evaluateAllCues() {
         for (Cue *cue : _cues)
             cue->evaluate();
     else {
-        // Only get cues on the active cuesheet
+        // Only use cues on the active cuesheet
         foreach (Cue *cue,
                  Cupid::Singleton()->getGraphWidget()->getCurrentCues())
             cue->evaluate();

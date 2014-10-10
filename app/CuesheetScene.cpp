@@ -266,7 +266,7 @@ QList<NodeItem*> CuesheetScene::getAllCueNodeItems()
     return allCues;
 }
 
-QList<NodeItem*> CuesheetScene::getAllNodeItems()
+QList<NodeItem*> CuesheetScene::getAllNodeItems() const
 {
     QList<QGraphicsItem*>allItems = items();
     QList<NodeItem*>allNodes;
@@ -292,7 +292,7 @@ QList<NodeItem*> CuesheetScene::getSelectedNodeItems()
     return allNodes;
 }
 
-QRectF CuesheetScene::getItemsBBox(QList<QGraphicsItem*> items)
+QRectF CuesheetScene::getItemsBBox(QList<QGraphicsItem*> items) const
 {
     QRectF bbox;
     foreach (QGraphicsItem* item, items) {
@@ -332,4 +332,14 @@ QList<GroupNodeItem*> CuesheetScene::getSelectedGroups()
         }
     }
     return groupItems;
+}
+
+QList<Node*> CuesheetScene::getNodes() const
+{
+    QList<NodeItem *> selection = getAllNodeItems();
+    QList<Node*> out;
+    foreach (NodeItem* item, selection) {
+        out << item->getNode();
+    }
+    return out;
 }

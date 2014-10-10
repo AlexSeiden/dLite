@@ -66,6 +66,7 @@ public slots:
 private slots:
     void showLoadSongDialog();
     void showOpenDialog();
+    void showImportDialog();
     void showSettingsDialog();
     void updateButtonStates();
 
@@ -108,6 +109,7 @@ private:
     QShortcut*              m_saveShortcut;
     QShortcut*              m_saveAsShortcut;
     QShortcut*              m_openFileShortcut;
+    QShortcut*              m_importFileShortcut;
     QShortcut*              m_openSongShortcut;
     QShortcut*              m_duplicateShortcut;
     QShortcut*              m_groupShortcut;

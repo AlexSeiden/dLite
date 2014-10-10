@@ -1,4 +1,5 @@
 #include "ColorNodes.h"
+#include "NodeFactory.h"
 #include "utils.h"
 
 // ------------------------------------------------------------------------------

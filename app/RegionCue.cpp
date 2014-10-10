@@ -1,4 +1,5 @@
 #include "RegionCue.h"
+#include "NodeFactory.h"
 #include "DanceFloor.h"
 
 RegionCue::RegionCue()

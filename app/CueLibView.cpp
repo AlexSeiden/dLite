@@ -1,6 +1,7 @@
 #include <QtWidgets>
 
 #include "CueLibView.h"
+#include "NodeFactory.h"
 #include "utils.h"
 
 // ------------------------------------------------------------------------------

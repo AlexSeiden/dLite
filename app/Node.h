@@ -18,6 +18,7 @@
 // Abstract base class for all Nodes
 
 class NodeFactory;
+class NodeItem;
 
 class Node
 {
@@ -53,8 +54,11 @@ public:
     void                setActive(bool active);
 
     virtual node_t      getType();
-    QList<ParamBase *>  getParams()        {return _paramList;}
-    virtual QString     getClass() const   {return _className;}
+    QList<ParamBase *>  getParams()         {return _paramList;}
+    virtual QString     getClass() const    {return _className;}
+
+    NodeItem*           getNodeItem() const         {return _nodeItem;}
+    void                setNodeItem(NodeItem* ni)   {_nodeItem= ni;}
 
     // Functor that provides closure over instance object,
     // and allows downstream clients to evaluate.
@@ -120,6 +124,7 @@ protected:
     int                   _frameLastEvaluated;
     /*const */QUuid       _uuid;        // Could be const except for need to assign in NodeFactory::instantiateNode when reading from file.
     QString               _className;   // Assigned by NodeFactory
+    NodeItem*             _nodeItem;
 
 
     static QList<Node *>  _allNodes;
@@ -167,63 +172,6 @@ protected:
 
     // This is so instantiateNode can set classname:
     friend class NodeFactory;
-};
-
-//
-// ------------------------------------------------------------------------------
-// NodeFactory
-// Singleton class to list & instantiate all available nodes.
-class NodeFactory
-{
-
-public:
-    NodeFactory();
-    ~NodeFactory();
-
-    typedef  std::function<Node*(void)> NodeInstatiator_t;
-
-    Node*           instatiateNode(QString classname, QUuid uuid=0);
-    void            registerNodetype(QString classname, Node::node_t typeInfo, NodeInstatiator_t instantiatorFunction);
-    const QStringList& getNodesOfType(Node::node_t typeInfo);
-    QList<Node*>    allNodes() const {return Node::allNodes();}
-    void            duplicateNodes(QList<Node *> *dupeThese, QRectF bbox = QRectF());
-
-    static NodeFactory *Singleton();
-
-    // Serialization
-    bool    saveToFile(QString filename);
-    bool    readFromFile(QString filename);
-    Node*   readNodeFromJSONObj(const QJsonObject &json);
-    void    readAllNodes(const QJsonObject &json);
-    void    writeToJSONObj(QJsonObject &json) const;
-
-//signals:
-//    void    selectNodes(QList<Node*>);
-
-private:
-    // Registry
-    std::map<std::string, NodeInstatiator_t>    _registry;
-    QMap<Node::node_t, QStringList>             _registryByType;
-    QMap<QUuid, ParamBase*>                     _registryUUIDtoParam;
-    QMap<ParamBase *, QUuid>                    _connectionsToMake;
-
-    bool            _dirty;     // TODO set this, and maybe move it to static node
-};
-
-
-// ------------------------------------------------------------------------------
-// Registrar
-// Called to add each kind of node to the registry.
-
-template<class T>
-class Registrar {
-public:
-    Registrar(QString className, Node::node_t nodeType) {
-        // register the ctor for a Node subclass, so that
-        // the factory can instatiate them by name.
-        NodeFactory::Singleton()->registerNodetype(className, nodeType,
-                                      [](void) -> Node * { return new T();});
-    }
 };
 
 #endif // NODE_H

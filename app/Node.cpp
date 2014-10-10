@@ -18,7 +18,8 @@ Node::Node() :
     _name(QString()),
     _type(UNDEFINED),
     _frameLastEvaluated(-1),
-    _uuid(QUuid::createUuid())
+    _uuid(QUuid::createUuid()),
+    _nodeItem(nullptr)
 {
     // Style Hmmm, this might be a good place to use a weak ptr.
     _allNodes.append(this);
@@ -49,9 +50,8 @@ void Node::setActive(bool status)
 void Node::cloneHelper(Node& lhs)
 {
     // Things that are simply copied
-    // (this is possibly redundant?  will implicit copy constructor do this?
-    // No, because it doesn't exist and is never called!)
-    // (but these first two are set from the regular constructor.)
+    // (Although these first two are set from the regular ctor,
+    // and shouldn't change.)
     lhs._type       = _type;
     lhs._className  = _className;
 
@@ -70,9 +70,23 @@ void Node::cloneHelper(Node& lhs)
     }
 }
 
+/*
+The beenSelected() and beenDeselected() methods are virtual
+methods that are overridden in nodes like SublevelNode and
+Region, which will put other windows (e.g. the spectrograph
+and Dancefloorwidget, respectively) that they should be
+in their special editing mode.
+*/
 void Node::beenSelected() {}
 void Node::beenDeselected() {}
 
+/*
+loadFile methods are virtual methods that are overridden in
+nodes like BarBeat, etc., which read precomputed data from a
+file on disk.  It's a virtual method of Node so that when the
+song changes, it's easy to just call loadFile() on all nodes
+and the nodes that need to reload will do so.
+*/
 void Node::loadFile() {}
 void Node::loadFile(QString filename) {Q_UNUSED(filename)}
 
@@ -111,10 +125,9 @@ Node::node_t Node::getType()
     return _type;
 }
 
-// evalAllInputs()
-//      Evaluates the providers connected to any input parameters.
 void Node::evalAllInputs()
 {
+    // Evaluates the providers connected to any input parameters.
     foreach (ParamBase *p, getParams()) {
         if (! p->isOutput()) {
             p->eval();
@@ -122,13 +135,12 @@ void Node::evalAllInputs()
     }
 }
 
-// evaluatedThisFrame()
 bool Node::evaluatedThisFrame()
 {
-/*
+    /*
     Predicate that returns true if the node has already been evaluated
     on this frame, and therefore shouldn't be evaluted again.
-*/
+    */
     int frame =  Cupid::getCurrentFrame();
     if (frame == _frameLastEvaluated)
         return true;
@@ -137,12 +149,15 @@ bool Node::evaluatedThisFrame()
     return false;
 }
 
-// ---------------------------
+// ------------------------------------------------------------------------------
 // Serialization
 void Node::readFromJSONObj(const QJsonObject &json)
 {
     setName(json["name"].toString());
-    setActive(json["active"].toBool());
+    // Redundant because active is just another parameter, and is handled as part of
+    // the paramlist.
+//    setActive(json["active"].toBool());
+
 }
 
 void Node::writeToJSONObj(QJsonObject &json) const
@@ -150,7 +165,6 @@ void Node::writeToJSONObj(QJsonObject &json) const
     // ErrorHandling
 
     json["name"] = getName();
-//    json["active"] = isActive();
     // by "classname", I mean the name used as used in the NodeFactory registry.
     json["classname"] = _className;
     json["uuid"] = _uuid.toString();
@@ -177,267 +191,4 @@ ParamBase *Node::getParamByName(QString paramname)
         return _paramDict[paramname];
     return nullptr;
     // ErrorHandling
-}
-
-// ------------------------------------------------------------------------------
-//  NodeFactory
-
-NodeFactory::NodeFactory()  {}
-NodeFactory::~NodeFactory() {}
-
-void NodeFactory::registerNodetype(
-        QString classname,
-        Node::node_t typeInfo,
-        NodeInstatiator_t instantiatorFunction)
-{
-    // Register the ctor for the given classname.
-    _registry[classname.toStdString()] = instantiatorFunction;
-
-    // Add it to a list of nodes in the same type, for use
-    // by the CueLib widget.
-    _registryByType[typeInfo] << classname;
-}
-
-
-// Given the name of a node type, finds its ctor in the registry,
-// and instantiates an instance of that node.
-Node * NodeFactory::instatiateNode(QString classname, QUuid uuid)
-{
-    /* STYLE ? could be: std::shared_ptr<Node> NodeFactory::instatiateNode(QString name) */
-
-    Node *instance = nullptr;
-
-    // find name in the registry and call factory method.
-    NodeInstatiator_t instancer = _registry[classname.toStdString()];
-    if (! instancer)
-        return nullptr;
-        // ErrorHandling
-
-    instance = instancer();
-    // When instatiating from the CueLibrary, the uuid will be null,
-    // which means a new one should be created.
-    // When we're reading in from a file, there will already be a uuid
-    // which connections may refer to, and we need to assign it here.
-    if (! uuid.isNull())
-        instance->_uuid = uuid;  // GROSS this keeps uuid from being const.
-    instance->_className = classname; // GROSS should get classname automatically in ctor
-
-    return instance;
-}
-
-NodeFactory * NodeFactory::Singleton() {
-    // First, the NodeFactory obviously needs to be a singleton, since
-    // we don't want/need a bunch of separate factories or registries!
-    //
-    // We need to implement it this way--rather than just using a single
-    // instance of NodeFactory--
-    // so that we get the right order of initialization, and the Registrar
-    // won't be trying to access an uninitialized factory.
-    static NodeFactory factory;
-    return &factory;
-}
-
-// Return all nodes of a given type.
-const QStringList & NodeFactory::getNodesOfType(Node::node_t typeInfo) {
-    return _registryByType[typeInfo];
-}
-
-void NodeFactory::duplicateNodes(QList<Node*>* dupeThese, QRectF bbox)
-{
-    // Duplicate each node
-    QMap<Node*, Node*> nodeMapping;
-    foreach (Node* orignode, *dupeThese) {
-        Node* newnode = orignode->clone();
-        Cupid::Singleton()->getGraphWidget()->addNode(newnode);
-        nodeMapping[orignode] = newnode;
-    }
-
-    // connections that are internal to the network should be made to
-    // the new nodes.
-    QList<ParamBase*> haveInternalConnections;
-    QList<ParamBase*> haveExternalConnections;
-    foreach (Node* newNode, nodeMapping.values()) {
-        foreach (ParamBase* newParam, newNode->getParams()) {
-            Node* origServer = newParam->getServer();
-            if (! origServer) continue;
-
-            if (dupeThese->contains(origServer)) {
-                haveInternalConnections << newParam;
-                // Rewire a connection within the network so that it stays within the network
-                Node* newServer = nodeMapping[origServer];
-                Q_ASSERT(newServer);
-                ParamBase* oldConnection = newParam->connectedParam();
-                QString name = oldConnection->getName();
-                ParamBase* newConnection = newServer->getParamByName(name);
-                Q_ASSERT(newConnection);
-                newParam->connectTo(newConnection);
-            }
-            else {
-                // Connection has already been made
-                haveExternalConnections << newParam;
-            }
-        }
-    }
-
-    // Add external connection items to graph
-    // (Purely a display operation)
-    foreach (ParamBase* param, haveExternalConnections) {
-        Cupid::Singleton()->getGraphWidget()->addConnection(param->connectedParam(), param);
-    }
-
-    foreach (ParamBase* param, haveInternalConnections) {
-        Cupid::Singleton()->getGraphWidget()->addConnection(param->connectedParam(), param);
-    }
-
-#if 0
-    // TODO Relative positioning.
-    // First, pick a position for the new nodes
-    //to the right of the bbox of the originals:
-
-    if (bbox.isNull()) return;
-
-    QPointF origOrigin = bbox.topLeft();
-    QPointF newOrigin = bbox.topRight() + QPointF(20, 20);
-    foreach (Node* origNode, *dupeThese) {
-        Node* newNode = nodeMapping[origNode];
-        QPointF deltaOrig = origNode->Pos() - origOrigin;  // XXX Need orignodeItem->pos()
-        QPointF newPos = newOrigin + deltaOrig;
-        newNode->setPos(newPos);        // XXX need newNodeItem->setPos
-    }
-#endif
-
-    Cupid::Singleton()->getGraphWidget()->selectNodes(nodeMapping.values());
-}
-
-// -------------------
-// File writing
-
-bool NodeFactory::saveToFile(QString filename)
-{
-    QFile qfile(filename);
-    if (!qfile.open(QIODevice::WriteOnly)) {
-        qWarning("Couldn't open file for saving."); //ErrorHandling
-        return false;
-    }
-
-    QJsonObject sceneObject;
-    // Fill sceneObject with all the scene data.
-    writeToJSONObj(sceneObject);
-
-    QJsonDocument jsonDoc(sceneObject);
-    qfile.write(jsonDoc.toJson());
-    _dirty = false;
-
-    return true;
-}
-
-void NodeFactory::writeToJSONObj(QJsonObject &json) const
-{
-    QJsonArray nodeJsonArray;
-    foreach (const Node *node, allNodes()) {
-         QJsonObject nodeJson;
-         node->writeToJSONObj(nodeJson);
-         nodeJsonArray.append(nodeJson);
-    }
-    json["nodes"] = nodeJsonArray;
-
-     // TODO write:
-     //     audioFilename
-     //     onset, beat, etc., files
-}
-
-// -------------------
-// File reading
-
-bool NodeFactory::readFromFile(QString filename)
-{
-    QFile qfile(filename);
-    if (!qfile.open(QIODevice::ReadOnly)) {
-        qWarning("Couldn't open saved file.");
-        return false;
-    }
-
-    QByteArray fileData = qfile.readAll();
-    QJsonDocument jsonDoc(QJsonDocument::fromJson(fileData));
-
-    _connectionsToMake.clear();
-    readAllNodes(jsonDoc.object());
-
-    return true;
-}
-
-void NodeFactory::readAllNodes(const QJsonObject &json)
-{
-    // TODO something like this:
-    //CueSheet.clear();
-    // or
-    //CueSheet.new();
-    // or maybe Nodefactory::{new,clear}....
-    // Or maybe this should be a switch in the file open dialog?
-
-    QJsonArray nodesArray = json["nodes"].toArray();
-    // Instatiate a node for every node in the json file.
-    // Keep track of any connections that will need to be made in
-    // the _connectionsToMake[] map.
-    for (int i = 0; i < nodesArray.size(); ++i) {
-        // Parse and instatiate each node:
-        QJsonObject nodeObject = nodesArray[i].toObject();
-        Node* newnode = readNodeFromJSONObj(nodeObject);
-
-        // Add to the graph, and restore graph position:
-        Cupid::Singleton()->getGraphWidget()->addNode(newnode, &nodeObject);
-    }
-
-    // Make connections between nodes:
-    foreach (ParamBase* param, _connectionsToMake.keys()) {
-        QUuid serverUuid =  _connectionsToMake[param];
-        ParamBase* server = _registryUUIDtoParam[serverUuid];
-        param->connectTo(server);
-        Cupid::Singleton()->getGraphWidget()->addConnection(server, param);
-    }
-}
-
-Node* NodeFactory::readNodeFromJSONObj(const QJsonObject &json)
-{
-    QString classname   = json["classname"].toString();
-    QUuid uuid          = QUuid(json["uuid"].toString());
-
-    Node* newnode      = Singleton()->instatiateNode(classname, uuid);
-    newnode->readFromJSONObj(json);
-
-    QJsonArray paramsArray = json["paramList"].toArray();
-    for (int i=0; i<paramsArray.size(); ++i) {
-        QJsonObject paramJsonObject = paramsArray[i].toObject();
-        // Params are already instantiated by the node, at least for now.
-        // (This will change if we make nodes like Palette allow dynamically adding
-        // parameters.)
-        // But their values, UUIDs, and connections must be read and assigned appropriately.
-        QString paramname = paramJsonObject["name"].toString();
-
-        // Find a pointer to the named param in this node:
-        ParamBase *param = newnode->getParamByName(paramname);
-
-        if (! param) {
-            // ErrorHandling
-            qDebug() << Q_FUNC_INFO << QString("Node \"%1\" has no parameter \"%2\"").arg(classname, paramname);
-            continue;
-        }
-
-        // Read values, which is specialized by type.
-        param->readFromJSONObj(paramJsonObject);
-
-        // Store UUID in registry
-        _registryUUIDtoParam[param->getUuid()] = param;
-
-        // If param has a connection, deal with that:
-        if (paramJsonObject.contains("connectedTo")) {
-            QUuid connectedUUID = QUuid(paramJsonObject["connectedTo"].toString());
-            // Since connections will be made to parameters that may not have been
-            // instantiated yet, we need to save all these connections, then
-            // make them after everything has been read and instatiated.
-            _connectionsToMake[param] = connectedUUID;
-        }
-    }
-
-    return newnode;
 }

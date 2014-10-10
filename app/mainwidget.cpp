@@ -9,6 +9,7 @@
 #include "GraphWidget.h"
 #include "Node.h"
 #include "Cupid.h"
+#include "NodeFactory.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -195,12 +196,23 @@ void MainWidget::showSaveDialog()
 void MainWidget::showOpenDialog()
 {
     const QString dir = QDir::homePath(); // XXX better default path
-    const QString fileName = QFileDialog::getOpenFileName(this, tr("Open dLite file"), dir, "*.json *.dLite");
+    const QString fileName = QFileDialog::getOpenFileName(this, tr("Open dLite file"), dir, "*.dLite");
     // TODO open multiple files
     if (! fileName.isEmpty() && ! fileName.isNull()) {
         bool result = NodeFactory::Singleton()->readFromFile(fileName);
         if (result)
             _filename = fileName;
+        updateButtonStates();
+    }
+}
+
+void MainWidget::showImportDialog()
+{
+    const QString dir = QDir::homePath(); // XXX better default path
+    const QString fileName = QFileDialog::getOpenFileName(this, tr("Import dLite file"), dir, "*.dLite");
+    // TODO open multiple files
+    if (! fileName.isEmpty() && ! fileName.isNull()) {
+        NodeFactory::Singleton()->readFromFile(fileName, true);
         updateButtonStates();
     }
 }
@@ -431,6 +443,10 @@ void MainWidget::createShortcuts()
     m_openFileShortcut = new QShortcut(QKeySequence("Ctrl+O"), this);
     m_openFileShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_openFileShortcut, SIGNAL(activated()), this, SLOT(showOpenDialog()));
+
+    m_importFileShortcut = new QShortcut(QKeySequence("Ctrl+I"), this);
+    m_importFileShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_importFileShortcut, SIGNAL(activated()), this, SLOT(showImportDialog()));
 
     m_openSongShortcut = new QShortcut(QKeySequence("Ctrl+Shift+O"), this);
     m_openSongShortcut->setContext(Qt::ApplicationShortcut);

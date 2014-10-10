@@ -35,7 +35,7 @@ public:
     ConnectorItem*      getConnectorForClient(const ParamBase* client);
     ConnectorItem*      getConnectorForParam(const ParamBase* param);
     NodeItem*           getNodeItemForNode(const Node *node);
-    QList<NodeItem*>    getAllNodeItems();
+    QList<NodeItem*>    getAllNodeItems() const;
     QList<NodeItem*>    getSelectedNodeItems();
     QList<QGraphicsItem*>    getSelectedGroupableItems();
     QList<GroupNodeItem*>    getSelectedGroups();
@@ -45,7 +45,12 @@ public:
     void                setName(QString name) {_name = name;}
     void                addCue(Cue *cue) {_cues<<cue;}
     QList<Cue*>         getCues() const {return _cues;}
-    QRectF              getItemsBBox(QList<QGraphicsItem*> items);
+    QList<Node*>        getNodes() const;
+    QRectF              getItemsBBox(QList<QGraphicsItem*> items) const;
+
+
+//    void readFromJSONObj(const QJsonObject &json);
+//    void writeToJSONObj(QJsonObject &json) const;
 
 public slots:
     void setConnecting(bool status=true) {_isConnecting = status;}
@@ -70,7 +75,10 @@ private:
     //  socket to connect to.
     bool                _isConnecting;
     QString             _name;
+
+    // GROSS business and view logic getting pretty sloppy here:
     QList<Cue*>         _cues;
+    QList<Node*>        _nodes;
 };
 
 #endif // CUESHEETSCENE_H

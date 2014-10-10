@@ -1,4 +1,5 @@
 #include "SublevelNode.h"
+#include "NodeFactory.h"
 #include "utils.h"
 #include "Cupid.h"
 #include "engine.h"
@@ -35,7 +36,7 @@ SublevelNode::SublevelNode(QObject *parent) :
 
 SublevelNode::~SublevelNode()
 {
-    // Deselect when deleted
+    // Deselect when deleted, otherwise
     emit sublevelDeselected(this);
 }
 

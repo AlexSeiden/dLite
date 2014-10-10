@@ -2,6 +2,7 @@
 #include "DanceFloor.h"
 #include <QDebug>
 #include "Node.h"
+#include "NodeFactory.h"
 
 DotCue::DotCue()
 {

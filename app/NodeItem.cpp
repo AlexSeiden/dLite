@@ -16,6 +16,9 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     _node(node),
     _minimized(false)
 {
+
+    node->setNodeItem(this);
+
     _margins = QMarginsF(9,5,9,5);
     setFlags(ItemIsSelectable | ItemIsMovable  | ItemSendsScenePositionChanges);
 

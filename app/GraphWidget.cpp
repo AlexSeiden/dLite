@@ -1,3 +1,4 @@
+#include <algorithm>    // For sort
 #include "GraphWidget.h"
 #include "NodeItem.h"
 #include "Node.h"
@@ -20,7 +21,7 @@
 #include "Cupid.h"
 #include "SegmentController.h"
 #include "Transport.h"
-#include <algorithm>    // For sort
+#include "NodeFactory.h"
 
 GraphWidget::GraphWidget(QWidget *parent) :
     QWidget(parent)
@@ -87,9 +88,8 @@ void GraphWidget::connectUi()
 
 // ------------------------------------------------------------------------------
 // Cuesheet mgmt
-void GraphWidget::newCuesheet()
+CuesheetScene* GraphWidget::newCuesheet(QString name)
 {
-    int nCuesheets = _tabwidget->count();
     CuesheetView *csv = new CuesheetView(_tabwidget);
     CuesheetScene *css = new CuesheetScene;
 
@@ -97,11 +97,54 @@ void GraphWidget::newCuesheet()
     csv->view()->setScene(css);
 
     CHECKED_CONNECT(css, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));
-    QString name = QString("Cuesheet %1").arg(nCuesheets);
     _tabwidget->addTab(csv, name);
     css->setName(name);
     _tabwidget->setCurrentWidget(csv);
     update();
+    return css;
+}
+
+CuesheetScene* GraphWidget::newCuesheet()
+{
+    int nCuesheets = _tabwidget->count();
+    QString name = QString("Cuesheet %1").arg(nCuesheets);
+    CuesheetScene *css = newCuesheet(name);
+    return css;
+}
+
+
+QList<CuesheetScene*> GraphWidget::getCuesheets()
+{
+    // GROSS oh man really breakin down the view/business wall here
+    QList<CuesheetScene*> out;
+    for (int i=0; i<_tabwidget->count(); ++i) {
+        CuesheetScene* css = getCurrentScene(i);
+        out << css;
+    }
+    return out;
+}
+
+void GraphWidget::deleteCuesheet(int index)
+{
+    QWidget *widget = _tabwidget->widget(index);
+    CuesheetView *csv = getCurrentView(index);
+    CuesheetScene *css = getCurrentScene(index);
+    // If deleting the last widget, first create a new one,
+    // because we have to have at least one widget
+    if (_tabwidget->count() == 1) {
+        newCuesheet();
+    }
+    delete csv;
+    delete css;
+    _tabwidget->removeTab(_tabwidget->indexOf(widget));
+}
+
+void GraphWidget::deleteEmptyFirstCuesheet()
+{
+    CuesheetScene *css = getCurrentScene(0);
+    if (css->items().size() == 0) {
+        deleteCuesheet(0);
+    }
 }
 
 void GraphWidget::showSegmentController()
@@ -124,12 +167,19 @@ void GraphWidget::showSegmentController()
 
 QList<Cue*> GraphWidget::getCurrentCues()
 {
+    // Returns all cues on the current tab
     return getCurrentScene()->getCues();
 }
 
 CuesheetScene* GraphWidget::getCurrentScene()
 {
-    CuesheetView *csv = getCurrentView();
+    return getCurrentScene(_tabwidget->currentIndex());
+}
+
+CuesheetScene* GraphWidget::getCurrentScene(int i)
+{
+    // Returns the cuesheetsceen associated with the current tab.
+    CuesheetView *csv = getCurrentView(i);
     Q_ASSERT(csv->view());
     QGraphicsScene *scn = csv->view()->scene();
     Q_ASSERT(scn);
@@ -140,16 +190,22 @@ CuesheetScene* GraphWidget::getCurrentScene()
 
 CuesheetView* GraphWidget::getCurrentView()
 {
-    QWidget *currentTab = _tabwidget->currentWidget();
+    return getCurrentView(_tabwidget->currentIndex());
+}
+
+CuesheetView* GraphWidget::getCurrentView(int i)
+{
+    QWidget *currentTab = _tabwidget->widget(i);
     Q_ASSERT(currentTab);
     CuesheetView *csv = qobject_cast<CuesheetView*>(currentTab);
     Q_ASSERT(csv);
-//    qDebug() << "CurrentIndex" << _tabwidget->currentIndex();
     return csv;
 }
 
 bool GraphWidget::useAllCues()
 {
+    // When "_useAllCues" is false, only cues on the
+    // current cuesheet are active.
     return _useAllCues->isChecked();
 }
 
@@ -227,7 +283,10 @@ void GraphWidget::addConnection(ParamBase* server, ParamBase* client)
    }
    else {
        // ErrorHandling
-       qDebug() << Q_FUNC_INFO << "Could not connect" ;
+       qDebug() << Q_FUNC_INFO << "Could not connect server "
+                << server->getParentNode()->getName() << server->getName()
+                << "to client"
+                << client->getParentNode()->getName() << client->getName();
    }
 }
 
@@ -269,7 +328,7 @@ void GraphWidget::addNode(Node *node, QJsonObject* json)
 // Serialization
 void GraphWidget::writeNodeUiToJSONObj(const Node* node, QJsonObject& json)
 {
-    NodeItem* ni = getCurrentScene()->getNodeItemForNode(node);
+    NodeItem* ni = node->getNodeItem();
     if (ni)
         ni->writeToJSONObj(json);
     else
@@ -454,7 +513,7 @@ void GraphWidget::distribute(bool xaxis)
 //        spacing = bbox.height();
 //    spacing /= selection.size();
 
-    // Sort nodes in selected axis:
+    // Sort nodesitems in selected axis:
     if (xaxis)
         std::sort(selection.begin(), selection.end(), compareX);
     else
@@ -541,24 +600,17 @@ void GraphWidget::ungroup() {
 void GraphWidget::duplicate() {
     QList<NodeItem *> selection = getCurrentScene()->getSelectedNodeItems();
     // Convert to list of nodes:
-//    QList<Node*>* out = new QList<Node*>;
     QList<Node*> out;
     foreach (NodeItem* item, selection) {
         out << item->getNode();
-//        (*out) << item->getNode();
     }
     NodeFactory::Singleton()->duplicateNodes(&out);
-//    qDebug() << "Nodes Duplicated";
 }
 
 // ------------------------------------------------------------------------------
 // Observer forwarding
 void GraphWidget::newSong(QString filename)
 {
-//    qDebug() << "filename via slot" << filename;
-//    QString audioFilename = Cupid::getAudioFilename();
-//    qDebug() << "filename via cupid" << audioFilename;
-
     Q_UNUSED(filename);
     // remember, filename passed into this is audio file,
     // and node loadFile(QString) methods expect the name of file they
