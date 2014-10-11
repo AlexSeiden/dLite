@@ -10,21 +10,25 @@
 // TODO master todo here (because it's the first src file.)
 /*
 IP: Grouping
+    save & restore
     display names
     rename
-    save & restore
     group-aware duplicate
+
+IP: multiple tabbed cue sheets
+    save only current tab
 
 Node Types:
    color nodes:
         palette  -- improve
         spline
    beats!
-        segmentino
+        other segmenters
         IP: breakdown viewer & editor
         multiply & divide beats (double/half)
         offsets
         bar float output
+   region sequence
    Conversion nodes between float & int
    math nodes
    Paths
@@ -36,15 +40,6 @@ playback controller
     multiple queued songs
     Load dlite file from dir with wave
 
-IP:  multiple tabbed cue sheets
-    need individual control over ordering
-    rename tabs
-    saving of tabs
-    restore with open,
-    Import into current sheet
-    save only current tab
-    drive via segmentino
-
 Export/bake
 
 IP:  more Shape rendering with QPainter
@@ -53,7 +48,6 @@ global hotkeys:
   frame all / frame selected  (Still a little funky)
 
 compmode & decaymode pups on cuewidgets
-
 
 put spectrograph options back in somewhere.
 
@@ -65,15 +59,10 @@ Drawing:
     color-coded paramitems
     color-coded connectors
     param-view transparent bg
-    x,y distribute selected
     arrows on connectors
     be able to scroll even when current scene is entirely visible.
 
 "_dirty" bit
-
-Menus!
-    Windows menu to restore minimized views
-    Save, etc
 
 Cleaning:
     Remnants of original spectrum audio recording stuff in bufferlength and
@@ -83,10 +72,9 @@ Cleaning:
     Get rid of Lightcolor and use QColor
 
 Bugs:
-    moving playhead back in time breaks beat nodes.
+    XXX moving playhead back in time breaks beat nodes. (as well as new song)
     editor widgets should give up focus when enter is hit
     AudioNotify drop
-    SublevelNodes don't restore window when re-read from file.
     Potential UUID collisions; should only store UUIDs during
         serialization and deserialization
 
@@ -294,6 +282,46 @@ void NodeOnset::loadFile(QString filename)
     convertSamplesToMS(_onsets);
 }
 
+
+int findClosestBeatBefore(int thisSample, std::vector<int> beatvec)
+{
+#if 1
+    int i=0;
+    for (i=1; i<beatvec.size(); ++i) {
+        if (beatvec[i]>thisSample)
+            break;
+    }
+    return i-1;
+#else
+    // Use binary search to find the index of the closest beat
+    // before thisSample.  Return -1 if thisSample is before all beats.
+    std::vector<int>::iterator start = beats.begin();
+    std::vector<int>::iterator finish = beats.end();
+    int index = -1;
+    while (start < finish) {
+        if ((*start) < thisSample)
+            break;
+    }
+#endif
+}
+
+bool checkBeatIndex(int index, int lastSample, std::vector<int> beatvec)
+{
+    if (index == -1)
+        return false;
+    if (beatvec[index] >= lastSample)
+        return true;
+    return false;
+}
+
+bool checkBeat(int thisSample, int lastSample, std::vector<int> beatvec)
+{
+    // Check to see if we've passed a beat:
+    // If there is a beat between lastSample and thisSample
+    int index = findClosestBeatBefore(thisSample, beatvec);
+    return checkBeatIndex(index, lastSample, beatvec);
+}
+
 void NodeOnset::operator()()
 {
     // Boilerplate start of operator:
@@ -301,16 +329,9 @@ void NodeOnset::operator()()
         return;
     evalAllInputs();
 
-    // Automatically reset after triggering.
-    bool out = false;
-
-    // XXX this breaks if we move the audio playhead back in time.
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
-    if (mSecs > _nextRefresh) {
-        qDebug() << mSecs << _nextRefresh;
-       out = true;
-       _nextRefresh = _onsets[++_nextIndex];
-    }
+    bool out = checkBeat(mSecs, _lastSample, _onsets);
+    _lastSample = mSecs;
 
     setValue("out", out);
 }
@@ -482,6 +503,7 @@ void NodeBarBeat::loadFile(QString filename)
     }
 
     std::string line;
+    int barNumber = 0;
     while ( getline (filestream,line) ) {
         // Split at comma
         std::istringstream ss(line);
@@ -493,6 +515,10 @@ void NodeBarBeat::loadFile(QString filename)
         getline(ss, token, ',');
         int beatNumber = std::atoi(token.c_str());
         _beatnumber.push_back(beatNumber);
+
+        if (beatNumber == 1)
+            barNumber++;
+        _barnumber.push_back(barNumber);
     }
     filestream.close();
     convertSamplesToMS(_beats);
@@ -507,29 +533,16 @@ void NodeBarBeat::operator()() {
     // Automatically reset after triggering.
     bool barTrigger = false;
     bool beatTrigger = false;
-    int barNumber;
-    int beatNumber;
-    getValue("Bar Number", barNumber);
-    getValue("Beat Number", beatNumber);
 
-    // XXX this breaks if we move the audio playhead back in time.
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
-    if (mSecs > _nextRefresh) {
-        beatTrigger = true;
-        beatNumber = _beatnumber[_nextIndex];
+    int beatIndex = findClosestBeatBefore(mSecs, _beats);
+    beatTrigger = checkBeatIndex(beatIndex, _lastSample, _beats);
+    _lastSample = mSecs;
 
-        if (beatNumber == 1) {
-            barTrigger = true;
-            barNumber++;
-        }
-        _nextRefresh = _beats[++_nextIndex];
-    }
-
-    // Boilerplate end of operator:
     setValue("Bar Trigger", barTrigger);
     setValue("Beat Trigger", beatTrigger);
-    setValue("Bar Number", barNumber);
-    setValue("Beat Number", beatNumber);
+    setValue("Bar Number", _barnumber[beatIndex]);
+    setValue("Beat Number", _beatnumber[beatIndex]);
 }
 
 NodeBarBeat* NodeBarBeat::clone()

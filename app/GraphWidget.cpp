@@ -22,11 +22,19 @@
 #include "SegmentController.h"
 #include "Transport.h"
 #include "NodeFactory.h"
+#include "RenameTabDialog.h"
 
 GraphWidget::GraphWidget(QWidget *parent) :
     QWidget(parent)
 {
     _tabwidget = new QTabWidget(this);
+    _tabwidget->setMovable(true);
+    _tabwidget->setTabShape(QTabWidget::Triangular);
+    _tabwidget->setTabsClosable(true);  // TODO handle event
+    CHECKED_CONNECT(_tabwidget, SIGNAL(tabCloseRequested(int)),
+                    this, SLOT(deleteCuesheet(int)));
+    CHECKED_CONNECT(_tabwidget, SIGNAL(tabBarDoubleClicked(int)),
+                    this, SLOT(showRenameTabDialog(int)));
     newCuesheet();
 //    qDebug() << QStyleFactory::keys();
 //    _tabwidget->setStyle(QStyleFactory::create("Fusion"));
@@ -70,6 +78,8 @@ GraphWidget::GraphWidget(QWidget *parent) :
     setWindowFlags( Qt::Window | Qt::WindowMaximizeButtonHint |
                     Qt::CustomizeWindowHint);
 
+    _renameTabDialog = new RenameTabDialog(this);
+
     // GROSS this doesn't really belong here in GraphWidget
     // GROSS this duplicates code below.
     _segmentController = new SegmentController;
@@ -111,7 +121,6 @@ CuesheetScene* GraphWidget::newCuesheet()
     CuesheetScene *css = newCuesheet(name);
     return css;
 }
-
 
 QList<CuesheetScene*> GraphWidget::getCuesheets()
 {
@@ -163,6 +172,19 @@ void GraphWidget::showSegmentController()
     }
 
     _segGui->show();
+}
+
+void GraphWidget::showRenameTabDialog(int index)
+{
+    _renameTabDialog->setIndex(index);
+    _renameTabDialog->setTabname(_tabwidget->tabText(index));
+    _renameTabDialog->exec();
+    if (_renameTabDialog->result() == QDialog::Accepted) {
+        // Style: kinda mixed up here...CuesheetScene should probably own
+        // the tab name
+        _tabwidget->setTabText(index, _renameTabDialog->tabname());
+        getCurrentScene()->setName(_renameTabDialog->tabname());
+    }
 }
 
 QList<Cue*> GraphWidget::getCurrentCues()

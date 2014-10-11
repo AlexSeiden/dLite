@@ -122,7 +122,7 @@ void Engine::movePlaybackHead(double positionfraction)
 
     // Round off to start of the channel 0.
     byteposition -= byteposition % (m_format.channelCount() * m_format.sampleSize());
-    playPositionChanged(byteposition);
+    emit playPositionChanged(byteposition);
 
     bool result = _qbuf.seek(byteposition);
     Q_ASSERT(result);

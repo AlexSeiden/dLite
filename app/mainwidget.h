@@ -28,6 +28,7 @@ class QPushButton;
 class QSpinBox;
 class QLineEdit;
 class QShortcut;
+class QMenuBar;
 QT_END_NAMESPACE
 
 // Main application widget, responsible for connecting the various UI
@@ -73,6 +74,7 @@ private slots:
 private:
     void createUi();
     void createShortcuts();
+    void createActions();
     void createMenus();
     void connectUi();
     void reset();
@@ -116,6 +118,22 @@ private:
     QShortcut*              m_ungroupShortcut;
     QShortcut*              m_minimizeSelectedShortcut;
     QShortcut*              m_newTabShortcut;
+
+    QMenuBar*               m_menuBar;
+    QMenu*                  m_fileMenu;
+    QMenu*                  m_editMenu;
+    QMenu*                  m_windowMenu;
+    QAction*                m_newAct;
+    QAction*                m_openAct;
+    QAction*                m_saveAct;
+    QAction*                m_saveAsAct;
+    QAction*                m_exitAct;
+    QAction*                m_cutAct;
+    QAction*                m_copyAct;
+    QAction*                m_pasteAct;
+    QAction*                m_showDancefloorwidget;
+    QAction*                m_showCueLibView;
+    QAction*                m_showGraphWidget;
 
 #if 1 // NUKEMEMAYBE
     QLabel*                 m_infoMessage;

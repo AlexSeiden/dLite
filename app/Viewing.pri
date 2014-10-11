@@ -15,7 +15,8 @@ SOURCES += \
     $$PWD/Transport.cpp \
     $$PWD/GuiSettings.cpp \
     $$PWD/ColorChip.cpp \
-    $$PWD/GroupNodeItem.cpp
+    $$PWD/GroupNodeItem.cpp \
+    $$PWD/RenameTabDialog.cpp
 
 HEADERS += \
     mainwidget.h \
@@ -32,4 +33,5 @@ HEADERS += \
     $$PWD/Transport.h \
     $$PWD/GuiSettings.h \
     $$PWD/ColorChip.h \
-    $$PWD/GroupNodeItem.h
+    $$PWD/GroupNodeItem.h \
+    $$PWD/RenameTabDialog.h

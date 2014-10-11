@@ -56,7 +56,8 @@ public:
     void operator() (void);
     virtual NodeOnset* clone();
 
-    // TODO for random access:  int     getNextBeat(int sample);
+    // TODO for random access:
+//     bool     checkBeat(int thisSample, int lastSample);
 
     void    loadFile();
     void    loadFile(QString filename);
@@ -67,6 +68,8 @@ private:
     std::vector<int> _onsets;
     int _nextRefresh;
     int _nextIndex;
+
+    int _lastSample;
 };
 
 // ------------------------------------------------------------------------------
@@ -116,8 +119,11 @@ public:
 private:
     std::vector<int> _beats;
     std::vector<int> _beatnumber;
+    std::vector<int> _barnumber;
     int _nextRefresh;
     int _nextIndex;
+
+    int _lastSample;
 };
 
 // ------------------------------------------------------------------------------

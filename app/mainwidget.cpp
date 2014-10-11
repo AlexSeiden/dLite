@@ -22,6 +22,7 @@
 #include <QTimerEvent>
 #include <QMessageBox>
 #include <QShortCut>
+#include <QMenuBar>
 
 const int NullTimerId = -1;
 
@@ -39,7 +40,7 @@ MainWidget::MainWidget(QWidget *parent)
     ,   m_infoMessage(new QLabel(tr(""), this))
     ,   m_infoMessageTimerId(NullTimerId)
     ,   m_settingsDialog(new SettingsDialog(m_engine->interval(), this))
-    ,   m_dancefloor(new Dancefloor)  // TODO should be allocated in main?
+    ,   m_dancefloor(new Dancefloor)
     ,   m_cueLibView(NULL)
     ,   _filename()
 {
@@ -87,6 +88,8 @@ MainWidget::MainWidget(QWidget *parent)
     updateButtonStates();
 
     createShortcuts();
+    createActions();
+    createMenus();
 }
 
 MainWidget::~MainWidget() { }
@@ -298,6 +301,75 @@ void MainWidget::createUi()
     setLayout(windowLayout);
 }
 
+void MainWidget::createActions()
+{
+#if 0
+    m_newAct = new QAction(tr("New"), this);
+    connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
+#endif
+
+    m_openAct = new QAction(tr("Open..."), this);
+    connect(m_openAct, SIGNAL(triggered()), this, SLOT(showOpenDialog()));
+
+    m_saveAct = new QAction(tr("Save"), this);
+    connect(m_saveAct, SIGNAL(triggered()), this, SLOT(save()));
+
+    m_saveAsAct = new QAction(tr("Save As..."), this);
+    connect(m_saveAsAct, SIGNAL(triggered()), this, SLOT(showSaveDialog()));
+
+    m_showDancefloorwidget = new QAction(tr("Dance Floor"), this);
+    connect(m_showDancefloorwidget, SIGNAL(triggered()), m_dancefloorwidget, SLOT(show()));
+
+    m_showGraphWidget = new QAction(tr("Graph"), this);
+    connect(m_showGraphWidget, SIGNAL(triggered()), m_graphWidget, SLOT(show()));
+
+    m_showCueLibView = new QAction(tr("Node Library"), this);
+    connect(m_showCueLibView, SIGNAL(triggered()), m_cueLibView, SLOT(show()));
+
+
+    m_cutAct = new QAction(tr("Cut"), this);
+    m_cutAct->setShortcuts(QKeySequence::Cut);
+//    connect(m_cutAct, SIGNAL(triggered()), m_graphWidget, SLOT(cut()));
+
+    m_copyAct = new QAction(tr("Copy"), this);
+    m_copyAct->setShortcuts(QKeySequence::Copy);
+//    connect(m_copyAct, SIGNAL(triggered()), m_graphWidget, SLOT(copy()));
+
+    m_pasteAct = new QAction(tr("Paste"), this);
+    m_pasteAct->setShortcuts(QKeySequence::Paste);
+//    connect(m_pasteAct, SIGNAL(triggered()), m_graphWidget, SLOT(paste()));
+
+    m_cutAct->setEnabled(false);
+    m_copyAct->setEnabled(false);
+#if 0
+    connect(textEdit, SIGNAL(copyAvailable(bool)),
+            m_cutAct, SLOT(setEnabled(bool)));
+    connect(textEdit, SIGNAL(copyAvailable(bool)),
+            m_copyAct, SLOT(setEnabled(bool)));
+#endif
+}
+
+void MainWidget::createMenus()
+{
+    // Mac-style main menu bar
+    m_menuBar = new QMenuBar(nullptr);
+    m_fileMenu = m_menuBar->addMenu(tr("File"));
+//    m_fileMenu->addAction(m_newAct);
+    m_fileMenu->addAction(m_openAct);
+    m_fileMenu->addAction(m_saveAct);
+    m_fileMenu->addAction(m_saveAsAct);
+
+    m_editMenu = m_menuBar->addMenu(tr("Edit"));
+    m_editMenu->addAction(m_cutAct);
+    m_editMenu->addAction(m_copyAct);
+    m_editMenu->addAction(m_pasteAct);
+
+    m_windowMenu = m_menuBar->addMenu(tr("Window"));
+    m_windowMenu->addAction(m_showDancefloorwidget);
+    m_windowMenu->addAction(m_showGraphWidget);
+    m_windowMenu->addAction(m_showCueLibView);
+}
+
 void MainWidget::connectUi()
 {
     CHECKED_CONNECT(m_pauseButton, SIGNAL(clicked()),
@@ -359,7 +431,6 @@ void MainWidget::createShortcuts()
 {
     // ----------------------------------------
     // Transport shortcuts
-    // Toggle audio playback
     m_playPauseShortcut = new QShortcut(Qt::Key_Space, this);
     m_playPauseShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_playPauseShortcut, SIGNAL(activated()), m_engine, SLOT(togglePlayback()));

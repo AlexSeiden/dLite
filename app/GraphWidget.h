@@ -15,6 +15,7 @@ class CuesheetView;
 class SegmentController;
 class SegGui;
 class SongSegmentation;
+class RenameTabDialog;
 
 QT_BEGIN_NAMESPACE
 class QTabWidget;
@@ -60,6 +61,7 @@ public slots:
     void minimizeSelected();
     CuesheetScene *newCuesheet();
     void showSegmentController();
+    void showRenameTabDialog(int index);
     void newSong(QString filename);
     void setCuesheet(int index);
     void deleteCuesheet(int index);
@@ -87,6 +89,7 @@ private:
     QTabWidget *        _tabwidget;
     SegmentController * _segmentController;
     SegGui *            _segGui;
+    RenameTabDialog*    _renameTabDialog;
 
 //    CuesheetScene*     _scene;
 //    CuesheetView*      _csview;
