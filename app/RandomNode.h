@@ -51,4 +51,14 @@ private:
     int _counter;
 };
 
+class IntToFloat : public Node
+{
+public:
+    IntToFloat();
+
+    void    operator() ();
+    virtual IntToFloat* clone();
+    void    paramHasBeenEdited();
+};
+
 #endif // RANDOMNODE_H

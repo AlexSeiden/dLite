@@ -14,6 +14,8 @@ SegmentController::SegmentController()
     loadFile();  // ErrorHandling
 }
 
+// Loads file from "Segmentino" output.
+// TODO code duped from BeatFiles.cpp
 void SegmentController::loadFile()
 {
     // Guess filename from audio file:
@@ -40,6 +42,8 @@ void SegmentController::loadFile(QString filename)
     if (! filestream.is_open())
         return; // ErrorHandling
 
+    // ErrorHandling: This assumes the startTimes are strictly increasing and
+    // the durations add up.
     std::string line;
     while ( getline (filestream,line) ) {
         Segment seg;
@@ -75,11 +79,17 @@ void SegmentController::loadFile(QString filename)
         _segmentation._segments << seg;
     }
     filestream.close();
-    _segmentation._segmentIndices = segmentSet.values();
 
+    // Calculate total duration from last segment start & duration
+    _segmentation._duration =   _segmentation._segments.last().startTime +
+                                _segmentation._segments.last().duration;
+
+    // Find all indices used by the segmenter.
+    _segmentation._segmentIndices = segmentSet.values();
     qSort(_segmentation._segmentIndices);
 }
 
+// Given a time, finds the segment inside the song that we are currently in.
 int SegmentController::findSegment(int msecs)
 {
     foreach (Segment seg, _segmentation._segments) {
@@ -97,7 +107,7 @@ int SegmentController::findSegment() {
 }
 
 
-
+// ------------------------------------------------------------------------------
 // Seg controller gui
 
 SegGui::SegGui(SegmentController *segcont, QWidget *parent) :
@@ -113,7 +123,6 @@ SegGui::SegGui(SegmentController *segcont, QWidget *parent) :
 
     QLabel *checkboxlabel = new QLabel;
     checkboxlabel->setText(QString("Use all cues"));
-
 
     foreach (int seg, _sc->_segmentation._segmentIndices) {
         QLabel *lab = new QLabel;
@@ -148,6 +157,7 @@ SegGui::SegGui(SegmentController *segcont, QWidget *parent) :
 
     setWindowTitle(tr("Segments"));
     setWindowFlags(Qt::WindowTitleHint  | Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
+    // this is here because the gui is a QObject and Segmentation controller isn't
     CHECKED_CONNECT(Cupid::Singleton()->getEngine(), SIGNAL(playPositionChanged(qint64)),
                     this, SLOT(whatToActivate()));
 }

@@ -87,6 +87,59 @@ Bugs:
 //      based on that.
 
 // ------------------------------------------------------------------------------
+//  utils
+int findBeatIndexForSample(int thisSample, std::vector<int> beatvec)
+{
+#if 1
+    int i=0;
+    for (i=1; i<beatvec.size(); ++i) {
+        if (beatvec[i]>thisSample)
+            break;
+    }
+    return i-1;
+#else
+    // Use binary search to find the index of the closest beat
+    // before thisSample.  Return -1 if thisSample is before all beats.
+    std::vector<int>::iterator start = beats.begin();
+    std::vector<int>::iterator finish = beats.end();
+    int index = -1;
+    while (start < finish) {
+        if ((*start) < thisSample)
+            break;
+    }
+#endif
+}
+
+int findBeatIndexForSample(int thisSample, std::vector<int> beatvec, int suggestedIndex)
+{
+    if (suggestedIndex < 0)
+        suggestedIndex = 0;
+    if (suggestedIndex > beatvec.size()-2)
+        suggestedIndex = beatvec.size()-2;
+    if (beatvec[suggestedIndex]<thisSample &&
+        beatvec[suggestedIndex+1]>thisSample)
+        return suggestedIndex;
+    return findBeatIndexForSample(thisSample, beatvec);
+}
+
+bool checkBeatIndex(int index, int lastSample, std::vector<int> beatvec)
+{
+    if (index == -1)
+        return false;
+    if (beatvec[index] >= lastSample)
+        return true;
+    return false;
+}
+
+bool checkBeat(int thisSample, int lastSample, std::vector<int> beatvec)
+{
+    // Check to see if we've passed a beat:
+    // If there is a beat between lastSample and thisSample
+    int index = findBeatIndexForSample(thisSample, beatvec);
+    return checkBeatIndex(index, lastSample, beatvec);
+}
+
+// ------------------------------------------------------------------------------
 //  TriggerEvery
 //      Triggers every _interval milliseconds
 
@@ -282,46 +335,6 @@ void NodeOnset::loadFile(QString filename)
     convertSamplesToMS(_onsets);
 }
 
-
-int findClosestBeatBefore(int thisSample, std::vector<int> beatvec)
-{
-#if 1
-    int i=0;
-    for (i=1; i<beatvec.size(); ++i) {
-        if (beatvec[i]>thisSample)
-            break;
-    }
-    return i-1;
-#else
-    // Use binary search to find the index of the closest beat
-    // before thisSample.  Return -1 if thisSample is before all beats.
-    std::vector<int>::iterator start = beats.begin();
-    std::vector<int>::iterator finish = beats.end();
-    int index = -1;
-    while (start < finish) {
-        if ((*start) < thisSample)
-            break;
-    }
-#endif
-}
-
-bool checkBeatIndex(int index, int lastSample, std::vector<int> beatvec)
-{
-    if (index == -1)
-        return false;
-    if (beatvec[index] >= lastSample)
-        return true;
-    return false;
-}
-
-bool checkBeat(int thisSample, int lastSample, std::vector<int> beatvec)
-{
-    // Check to see if we've passed a beat:
-    // If there is a beat between lastSample and thisSample
-    int index = findClosestBeatBefore(thisSample, beatvec);
-    return checkBeatIndex(index, lastSample, beatvec);
-}
-
 void NodeOnset::operator()()
 {
     // Boilerplate start of operator:
@@ -439,8 +452,8 @@ NodeBar* NodeBar::clone()
 }
 
 // ------------------------------------------------------------------------------
-// NodeBar
-//      Loads bar (measure) info from precomputed file.
+// NodeBarBeat
+//      Loads bar (measure) & beat info from precomputed file.
 /*
 BarBeat files look like this:
           15360,3,"3"
@@ -492,7 +505,6 @@ void NodeBarBeat::loadFile(QString filename)
 {
     _beats.clear();
     _beatnumber.clear();
-    _nextIndex = 0;
     _nextRefresh = 0;
 
     std::ifstream filestream;
@@ -535,14 +547,27 @@ void NodeBarBeat::operator()() {
     bool beatTrigger = false;
 
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
-    int beatIndex = findClosestBeatBefore(mSecs, _beats);
-    beatTrigger = checkBeatIndex(beatIndex, _lastSample, _beats);
-    _lastSample = mSecs;
+#if 1
+    int oldbi = _beatIndex;
+    _beatIndex = findBeatIndexForSample(mSecs, _beats, _beatIndex);
+    beatTrigger = checkBeatIndex(_beatIndex, _lastSample, _beats);
 
-    setValue("Bar Trigger", barTrigger);
+//    qDebug() << _lastSample << mSecs << oldbi << _beatIndex << beatTrigger;
+
+    _lastSample = mSecs;
+#else
+    if ((mSecs - _lastSample)> 300) {
+        beatTrigger = true;
+        _lastSample = mSecs;
+    }
+#endif
+
     setValue("Beat Trigger", beatTrigger);
-    setValue("Bar Number", _barnumber[beatIndex]);
-    setValue("Beat Number", _beatnumber[beatIndex]);
+    setValue("Bar Number", _barnumber[_beatIndex]);
+    setValue("Beat Number", _beatnumber[_beatIndex]);
+    if (beatTrigger && _beatnumber[_beatIndex] == 1)
+        barTrigger = true;
+    setValue("Bar Trigger", barTrigger);
 }
 
 NodeBarBeat* NodeBarBeat::clone()

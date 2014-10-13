@@ -10,8 +10,10 @@
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QToolButton>
+#include <QEvent>
 #include "utils.h"
 #include "ColorChip.h"
+#include "MyDoubleSpinBox.h"
 
 // These constants defined for convinience & speed when doing type checks.
 // ??? Are these still needed?  Would it be better just to have use an enum?
@@ -26,21 +28,6 @@ std::function<void()> ParamBase::getProvider()
     // All output values will be updated.
     return [this]() {(*this->_parentNode)();};
 }
-
-#if 0
-void ParamBase::getValueAndConnections(const ParamBase &rhs)
-{
-    this->_connectedParam = rhs._connectedParam;
-}
-#endif
-
-/*
-ParamBase& ParamBase::operator=(const ParamBase& rhs)
-{
-    this->_connectedParam = rhs._connectedParam;
-    return *this;
-}
-*/
 
 // ------------------------------------------------------------------------------
 // isConnectableTo
@@ -354,9 +341,10 @@ QWidget* ParamBase::getEditorWidget(QObject *sendValueChangesHere)
 
 // TODO subclass Spin Boxes
 // and capture editingFinished signal to perform clearFocus()
+
 template <> QWidget* Param<float>::getEditorWidget(QObject* sendValueChangesHere)
 {
-    QDoubleSpinBox *editorWidget = new QDoubleSpinBox;
+    MyDoubleSpinBox *editorWidget = new MyDoubleSpinBox;
     if (_useminmax) {    // TODO finish this
         editorWidget->setRange(_minVal, _maxVal);
         editorWidget->setSingleStep(_stepVal);
@@ -378,12 +366,14 @@ template <> QWidget* Param<float>::getEditorWidget(QObject* sendValueChangesHere
 
     // was trying to get centered widget...
 //    editorWidget->move(0, -editorWidget->rect().bottom());
+    editorWidget->setFocusPolicy(Qt::ClickFocus);
     return editorWidget;
 }
 
 template <> QWidget* Param<int>::getEditorWidget(QObject* sendValueChangesHere)
 {
     QSpinBox *editorWidget = new QSpinBox;
+//    editorWidget->installEventFilter(eventFilter);
     if (_useminmax) {    // TODO finish this
         editorWidget->setRange(_minVal, _maxVal);
         editorWidget->setSingleStep(_stepVal);

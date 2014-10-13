@@ -9,6 +9,9 @@
 class QLineEdit;
 class QSpinBox;
 
+// ------------------------------------------------------------------------------
+// Song segmentation
+//      Encapsulates segmentation data
 struct Segment {
     int startTime;
     int duration;
@@ -21,10 +24,14 @@ public:
     QList<Segment>  _segments;
     // Sorted list of segment indices, with no duplicates.
     QList<int>      _segmentIndices;
+    int             _duration;
 };
 
 Q_DECLARE_METATYPE(SongSegmentation);
 
+// ------------------------------------------------------------------------------
+// Segment Controller
+//      Switches between cues when segments change.
 class SegmentController : QObject
 {
     Q_OBJECT
@@ -36,16 +43,17 @@ public:
     void    loadFile(QString filename);
 
     SongSegmentation _segmentation;
+
 private:
-//    std::vector<std::pair<int, int> > _segments;
-
-
     int findSegment(int msecs);
     int findSegment();
 
     friend class SegGui;
 };
 
+// ------------------------------------------------------------------------------
+// SegGui
+//      Widget that displays segment controller.
 class SegGui : public QWidget
 {
     Q_OBJECT
@@ -59,11 +67,9 @@ signals:
     void setCuesheet(int);
 
 private:
-    SegmentController *_sc;
-    QMap<int, QLineEdit*> _indexToLE;
-    QMap<int, QSpinBox*> _indexToSpinbox;
-
-
+    SegmentController*      _sc;
+    QMap<int, QLineEdit*>   _indexToLE;
+    QMap<int, QSpinBox*>    _indexToSpinbox;
 };
 
 #endif // SEGMENTCONTROLLER_H

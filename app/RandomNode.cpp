@@ -197,6 +197,46 @@ SequenceInt* SequenceInt::clone()
     return lhs;
 }
 
-static Registrar<RandomFloat>   registrar1("RandomFloat", Node::FLOAT);
-static Registrar<RandomInt>     registrar2("RandomInt", Node::INT);
-static Registrar<SequenceInt>   registrar3("SequenceInt", Node::INT);
+// ------------------------------------------------------------------------------
+//  IntToFloat
+//      Converts an int to a float
+
+IntToFloat::IntToFloat()
+{
+    setName(QString("IntToFloat%1").arg(nodeCount()));
+    _type = INT;
+
+    // Declare params.
+    addParam<float>("out", 0., true);
+    addParam<int>("in", 0);
+}
+
+void IntToFloat::paramHasBeenEdited()
+{
+    int in;
+    getValue("in", in);
+}
+
+void IntToFloat::operator()()
+{
+    // Boilerplate start of operator:
+    if (evaluatedThisFrame())
+        return;
+    evalAllInputs();
+
+    int in;
+    getValue("in", in);
+    float out = in;
+    setValue("out", out);
+}
+
+IntToFloat* IntToFloat::clone()
+{
+    IntToFloat* lhs = new IntToFloat;
+    cloneHelper(*lhs);
+    return lhs;
+}
+static Registrar<RandomFloat>   registrar1("RandomFloat",   Node::FLOAT);
+static Registrar<RandomInt>     registrar2("RandomInt",     Node::INT);
+static Registrar<SequenceInt>   registrar3("SequenceInt",   Node::INT);
+static Registrar<IntToFloat>    registrar4("IntToFloat",    Node::FLOAT);

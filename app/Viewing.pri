@@ -16,7 +16,8 @@ SOURCES += \
     $$PWD/GuiSettings.cpp \
     $$PWD/ColorChip.cpp \
     $$PWD/GroupNodeItem.cpp \
-    $$PWD/RenameTabDialog.cpp
+    $$PWD/RenameTabDialog.cpp \
+    $$PWD/MyDoubleSpinBox.cpp
 
 HEADERS += \
     mainwidget.h \
@@ -34,4 +35,5 @@ HEADERS += \
     $$PWD/GuiSettings.h \
     $$PWD/ColorChip.h \
     $$PWD/GroupNodeItem.h \
-    $$PWD/RenameTabDialog.h
+    $$PWD/RenameTabDialog.h \
+    $$PWD/MyDoubleSpinBox.h

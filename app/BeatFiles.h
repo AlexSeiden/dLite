@@ -121,7 +121,7 @@ private:
     std::vector<int> _beatnumber;
     std::vector<int> _barnumber;
     int _nextRefresh;
-    int _nextIndex;
+    int _beatIndex;
 
     int _lastSample;
 };
