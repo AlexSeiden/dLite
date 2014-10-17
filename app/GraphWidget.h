@@ -38,6 +38,7 @@ public:
     QList<CuesheetScene*>   getCuesheets();
     CuesheetScene*          newCuesheet(QString name);
     bool                    useAllCues();
+    bool                    autoSwitchCues();
     void                    selectNodes(QList<Node*>);
 
 public slots:
@@ -66,6 +67,7 @@ public slots:
     void setCuesheet(int index);
     void deleteCuesheet(int index);
     void deleteEmptyFirstCuesheet();
+    int whatToActivate();
 
 signals:
     void segmentationChanged(SongSegmentation *);
@@ -85,14 +87,12 @@ private:
 
     QToolButton *       _newCueButton;
     QCheckBox *         _useAllCues;
+    QCheckBox *         _autoSwitchCues;
     QToolButton *       _segmentButton;
     QTabWidget *        _tabwidget;
     SegmentController * _segmentController;
-    SegGui *            _segGui;
+//    SegGui *            _segGui;
     RenameTabDialog*    _renameTabDialog;
-
-//    CuesheetScene*     _scene;
-//    CuesheetView*      _csview;
 
     // Last selection made--used for updating selections
     QSet<NodeItem*>     _wasSelected;

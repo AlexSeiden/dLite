@@ -63,13 +63,15 @@ bool Engine::loadSong(const QString &fileName)
     qint64 bytesToRead = m_wavFileHandle->size() - m_wavFileHandle->headerLength();
     m_buffer.resize(bytesToRead);
     int bytesRead = m_wavFileHandle->read(m_buffer.data(), bytesToRead);
-    Q_UNUSED(bytesRead);
+//    Q_UNUSED(bytesRead);
     // ErrorHandling
 
     m_wavFileHandle->close();
     _qbuf.setBuffer(&m_buffer);
     _qbuf.open(QIODevice::ReadOnly);
     _qbuf.seek(0);
+//    m_audioOutput->setBufferSize(bytesRead);
+    qDebug() << bytesToRead << bytesRead << _qbuf.size() << m_audioOutput->bufferSize();
     emit bufferLengthChanged(bufferLength());
     emit newSong(fileName);
 
@@ -181,13 +183,15 @@ void Engine::audioNotify()
 
 void Engine::audioStateChanged(QAudio::State state)
 {
-    ENGINE_DEBUG << "Engine::audioStateChanged from " << m_state << " to " << state;
+    qDebug() << "Engine::audioStateChanged from " << m_state << " to " << state;
 
     // Check error
     QAudio::Error error = QAudio::NoError;
     error = m_audioOutput->error();
-    if (error != QAudio::NoError)
-        ENGINE_DEBUG << "Engine::audioStateChanged [0] error " << error ;
+    if (error != QAudio::NoError) {
+        qDebug() << "Engine::audioStateChanged [0] error " << error ;
+        qDebug() << "_qbuf.pos()" << _qbuf.pos();
+    }
 
     if (state == QAudio::IdleState && _qbuf.pos() == _qbuf.size()) {
         // The song is over!
@@ -198,7 +202,7 @@ void Engine::audioStateChanged(QAudio::State state)
             QAudio::Error error = QAudio::NoError;
             error = m_audioOutput->error();
             if (QAudio::NoError != error) {
-                ENGINE_DEBUG << "Engine::audioStateChanged error " << error ;
+                qDebug() << "Engine::audioStateChanged error " << error ;
                 reset();
                 return;
             }
@@ -252,7 +256,8 @@ bool Engine::initialize()
     if (selectFormat()) {
         resetAudioDevices();
         result = true;
-        m_audioOutput = new QAudioOutput(m_audioOutputDevice, m_format, this);
+//        m_audioOutput = new QAudioOutput(m_audioOutputDevice, m_format, this);
+        m_audioOutput = new QAudioOutput(m_format, this);
         m_audioOutput->setNotifyInterval(m_notifyIntervalMs);
     } else {
         if (m_wavFileHandle)

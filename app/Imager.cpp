@@ -116,9 +116,9 @@ Box::Box() :
     addParam<float>("y", 8.);
     addParam<float>("width", 1.0);
     addParam<float>("height", 1.0);
-    addParam<float>("rotation", 0.);
+    ParamBase *rot = addParam<float>("rotation", 0.);
     addParam<bool>("antialiased", false);
-    // TODO _rotation.setRange(true, -10000., 10000., 1.0);
+    rot->setRange(true, -10000., 10000., 1.0);
 }
 
 void Box::draw()

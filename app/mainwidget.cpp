@@ -176,12 +176,13 @@ void MainWidget::bufferLengthChanged(qint64 length)
 void MainWidget::showLoadSongDialog()
 {
     // TODO Load & queue multiple files
-    const QString dir;
+    QString dir = "/Users/alex/Documents/WAVS";
     const QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open WAV file"), dir, "*.wav");
     if (fileNames.count()) {
         reset();
         m_engine->loadSong(fileNames.front()); // TODO open multiple files
         updateButtonStates();
+        m_engine->startPlayback();
     }
 }
 

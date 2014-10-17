@@ -32,7 +32,7 @@ Q_DECLARE_METATYPE(SongSegmentation);
 // ------------------------------------------------------------------------------
 // Segment Controller
 //      Switches between cues when segments change.
-class SegmentController : QObject
+class SegmentController : public QObject
 {
     Q_OBJECT
 
@@ -44,13 +44,13 @@ public:
 
     SongSegmentation _segmentation;
 
-private:
     int findSegment(int msecs);
     int findSegment();
 
-    friend class SegGui;
+//    friend class SegGui;
 };
 
+#if 0
 // ------------------------------------------------------------------------------
 // SegGui
 //      Widget that displays segment controller.
@@ -62,14 +62,16 @@ public:
 
 public slots:
     int whatToActivate();
+    void setNumCues(int nCues);
 
 signals:
     void setCuesheet(int);
 
-private:
+public:  // GROSS !!
     SegmentController*      _sc;
     QMap<int, QLineEdit*>   _indexToLE;
     QMap<int, QSpinBox*>    _indexToSpinbox;
+    int                     _nCues;
 };
-
+#endif
 #endif // SEGMENTCONTROLLER_H

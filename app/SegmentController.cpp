@@ -110,6 +110,7 @@ int SegmentController::findSegment() {
 // ------------------------------------------------------------------------------
 // Seg controller gui
 
+#if 0
 SegGui::SegGui(SegmentController *segcont, QWidget *parent) :
     QWidget(parent),
     _sc(segcont)
@@ -117,18 +118,18 @@ SegGui::SegGui(SegmentController *segcont, QWidget *parent) :
     QGridLayout *grid = new QGridLayout(this);
     QFrame *bigframe = new QFrame;
     QVBoxLayout *vlay = new QVBoxLayout;
-    QCheckBox* useAllCues = new QCheckBox;
-    useAllCues->setEnabled(true);
-    useAllCues->setChecked(true);
+//    QCheckBox* useAllCues = new QCheckBox;
+//    useAllCues->setEnabled(true);
+//    useAllCues->setChecked(true);
 
-    QLabel *checkboxlabel = new QLabel;
-    checkboxlabel->setText(QString("Use all cues"));
+//    QLabel *checkboxlabel = new QLabel;
+//    checkboxlabel->setText(QString("Use all cues"));
 
     foreach (int seg, _sc->_segmentation._segmentIndices) {
         QLabel *lab = new QLabel;
         QString labeltext = QString("Segment #%1").arg(seg);
         lab->setText(labeltext);
-        QLineEdit *le = new QLineEdit(this);
+        QLabel *le = new QLabel(this);
         _indexToLE[seg] = le;
 
         QSpinBox *spinbox = new QSpinBox;
@@ -157,11 +158,10 @@ SegGui::SegGui(SegmentController *segcont, QWidget *parent) :
 
     setWindowTitle(tr("Segments"));
     setWindowFlags(Qt::WindowTitleHint  | Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
-    // this is here because the gui is a QObject and Segmentation controller isn't
+    // GROSS !! this is here because the gui is a QObject and Segmentation controller isn't
     CHECKED_CONNECT(Cupid::Singleton()->getEngine(), SIGNAL(playPositionChanged(qint64)),
                     this, SLOT(whatToActivate()));
 }
-
 int SegGui::whatToActivate()
 {
     int ms = Cupid::getPlaybackPositionUSecs()/1000;
@@ -171,3 +171,19 @@ int SegGui::whatToActivate()
     emit setCuesheet(cuesheetIndex);
     return cuesheetIndex;
 }
+
+void SegGui::setNumCues(int nCues, )
+{
+    if (nCues == 0)
+        _nCues = 1;
+    else
+        _nCues = nCues;
+    int i = 0;
+    foreach (int seg, _sc->_segmentation._segmentIndices) {
+        _indexToSpinbox[seg]->setValue(i%_nCues);
+        _indexToLE[seg]->setText(i%_nCues);
+        i++;
+    }
+    update();
+}
+#endif

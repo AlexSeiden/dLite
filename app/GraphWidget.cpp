@@ -36,10 +36,6 @@ GraphWidget::GraphWidget(QWidget *parent) :
     CHECKED_CONNECT(_tabwidget, SIGNAL(tabBarDoubleClicked(int)),
                     this, SLOT(showRenameTabDialog(int)));
     newCuesheet();
-//    qDebug() << QStyleFactory::keys();
-//    _tabwidget->setStyle(QStyleFactory::create("Fusion"));
-//    this->setStyle(QStyleFactory::create("Fusion"));
-//    _tabwidget->setStyle(QStyleFactory::create("Windows"));
 
     _newCueButton = new QToolButton;
     _newCueButton->setText(tr("+"));
@@ -51,18 +47,23 @@ GraphWidget::GraphWidget(QWidget *parent) :
     _useAllCues->setEnabled(true);
     _useAllCues->setChecked(true);
 
-    _segmentButton = new QToolButton;
-    _segmentButton->setText(tr("S"));
-    _segmentButton->setEnabled(true);
+    _autoSwitchCues = new QCheckBox;
+    _autoSwitchCues->setEnabled(true);
+    _autoSwitchCues->setChecked(true);
+
+//    _segmentButton = new QToolButton;
+//    _segmentButton->setText(tr("S"));
+//    _segmentButton->setEnabled(true);
     _segmentController = nullptr;
-    _segGui = nullptr;
+//    _segGui = nullptr;
 
     QVBoxLayout *vlayout = new QVBoxLayout();
     vlayout->setSpacing(0);
     vlayout->setContentsMargins(0,0,0,0);
     vlayout->addWidget(_newCueButton);
     vlayout->addWidget(_useAllCues);
-    vlayout->addWidget(_segmentButton);
+    vlayout->addWidget(_autoSwitchCues);
+//    vlayout->addWidget(_segmentButton);
     vlayout->addStretch();
 
     QHBoxLayout *layout = new QHBoxLayout(this);
@@ -85,6 +86,8 @@ GraphWidget::GraphWidget(QWidget *parent) :
     _segmentController = new SegmentController;
     CHECKED_CONNECT(this, SIGNAL(segmentationChanged(SongSegmentation*)),
                     Cupid::Singleton()->getTransport(), SLOT(segmentsChanged(SongSegmentation*)));
+    CHECKED_CONNECT(Cupid::Singleton()->getEngine(), SIGNAL(playPositionChanged(qint64)),
+                    this, SLOT(whatToActivate()));
     emit segmentationChanged(&(_segmentController->_segmentation));
 }
 
@@ -93,7 +96,7 @@ void GraphWidget::connectUi()
     CHECKED_CONNECT(Cupid::Singleton()->getEngine(), SIGNAL(newSong(QString)),
                     this, SLOT(newSong(QString)));
     CHECKED_CONNECT(_newCueButton, SIGNAL(clicked()), this, SLOT(newCuesheet()));
-    CHECKED_CONNECT(_segmentButton, SIGNAL(clicked()), this, SLOT(showSegmentController()));
+//    CHECKED_CONNECT(_segmentButton, SIGNAL(clicked()), this, SLOT(showSegmentController()));
 }
 
 // ------------------------------------------------------------------------------
@@ -150,6 +153,9 @@ void GraphWidget::deleteCuesheet(int index)
 
 void GraphWidget::deleteEmptyFirstCuesheet()
 {
+    // This is for when we load dLite a file immediately after opening the app.
+    // There's already a "Cuesheet 0" that doesn't have anything in it.
+    // We delete that sheet.  If there's anything in the sheet, we keep it.
     CuesheetScene *css = getCurrentScene(0);
     if (css->items().size() == 0) {
         deleteCuesheet(0);
@@ -165,13 +171,24 @@ void GraphWidget::showSegmentController()
         emit segmentationChanged(&(_segmentController->_segmentation));
     }
 
-    if (! _segGui) {
-        _segGui = new SegGui(_segmentController);
-        CHECKED_CONNECT(_segGui, SIGNAL(setCuesheet(int)),
-                        this, SLOT(setCuesheet(int)));
-    }
+//    if (! _segGui) {
+//        _segGui = new SegGui(_segmentController);
+//        CHECKED_CONNECT(_segGui, SIGNAL(setCuesheet(int)),
+//                        this, SLOT(setCuesheet(int)));
+//    }
 
-    _segGui->show();
+//    _segGui->show();
+}
+
+int GraphWidget::whatToActivate()
+{
+    int ms = Cupid::getPlaybackPositionUSecs()/1000;
+    int segmentIndex = _segmentController->findSegment(ms);
+//    int cuesheetIndex = _segmentIndexToCuesheetIndex[segmentIndex];
+    int cuesheetIndex = segmentIndex % _tabwidget->count();
+    if (autoSwitchCues())
+        emit setCuesheet(cuesheetIndex);
+    return cuesheetIndex;
 }
 
 void GraphWidget::showRenameTabDialog(int index)
@@ -229,6 +246,11 @@ bool GraphWidget::useAllCues()
     // When "_useAllCues" is false, only cues on the
     // current cuesheet are active.
     return _useAllCues->isChecked();
+}
+
+bool GraphWidget::autoSwitchCues()
+{
+    return _autoSwitchCues->isChecked();
 }
 
 void GraphWidget::setCuesheet(int index)
@@ -644,4 +666,6 @@ void GraphWidget::newSong(QString filename)
 
     if (_segmentController)
         _segmentController->loadFile();
+//    if (_segGui)
+//        _segGui->setNumCues(_tabwidget->count());
 }
