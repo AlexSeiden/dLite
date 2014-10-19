@@ -116,11 +116,14 @@ public:
     void    loadFile();
     void    loadFile(QString filename);
 
+
 private:
+    int     findStartOfBar(int beatindex);
+    int     findStartOfNextBar(int beatindex);
+
     std::vector<int> _beats;
     std::vector<int> _beatnumber;
     std::vector<int> _barnumber;
-    int _nextRefresh;
     int _beatIndex;
 
     int _lastSample;

@@ -16,6 +16,7 @@
 #include <QToolButton>
 #include <QCheckBox>
 #include <QStyleFactory>
+#include <QShortcut>
 #include "GroupNodeItem.h"
 #include "Cue.h"
 #include "Cupid.h"
@@ -89,6 +90,7 @@ GraphWidget::GraphWidget(QWidget *parent) :
     CHECKED_CONNECT(Cupid::Singleton()->getEngine(), SIGNAL(playPositionChanged(qint64)),
                     this, SLOT(whatToActivate()));
     emit segmentationChanged(&(_segmentController->_segmentation));
+    createShortcuts();
 }
 
 void GraphWidget::connectUi()
@@ -668,4 +670,18 @@ void GraphWidget::newSong(QString filename)
         _segmentController->loadFile();
 //    if (_segGui)
 //        _segGui->setNumCues(_tabwidget->count());
+}
+
+#include <QSignalMapper>
+
+void GraphWidget::createShortcuts() {
+    QSignalMapper *sm = new QSignalMapper(this);
+    CHECKED_CONNECT(sm, SIGNAL(mapped(int)),
+                    this, SLOT(setCuesheet(int)));
+    for (int i=0; i<6; ++i) {
+        QShortcut *sc = new QShortcut(QKeySequence(QString::number(i+2)), this);
+        sm->setMapping(sc, i);
+        sc->setContext(Qt::ApplicationShortcut);
+        CHECKED_CONNECT(sc, SIGNAL(activated()), sm, SLOT(map()));
+    }
 }

@@ -118,6 +118,7 @@ private:
     QShortcut*              m_ungroupShortcut;
     QShortcut*              m_minimizeSelectedShortcut;
     QShortcut*              m_newTabShortcut;
+    QList<QShortcut*>       m_cueShortcut;
 
     QMenuBar*               m_menuBar;
     QMenu*                  m_fileMenu;

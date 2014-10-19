@@ -74,6 +74,7 @@ signals:
 
 private:
     void    connectUi();
+    void    createShortcuts();
 
     void    align(bool xaxis);
     void    distribute(bool xaxis);

@@ -56,6 +56,8 @@ public:
 
     // Length of the song in bytes.
     qint64 bufferLength() const;
+    // Length in milliseconds
+    qint64 bufferLengthMS() const;
 
     // Set window function applied to audio data before spectral analysis.
     void setWindowFunction(WindowFunction type);

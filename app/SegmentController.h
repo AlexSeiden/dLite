@@ -21,9 +21,12 @@ struct Segment {
 
 class SongSegmentation {
 public:
+    // Each segment
     QList<Segment>  _segments;
+
     // Sorted list of segment indices, with no duplicates.
     QList<int>      _segmentIndices;
+    int             _nSegments; // size of above, precalced for wikid efficientcy
     int             _duration;
 };
 
@@ -41,6 +44,7 @@ public:
 
     void    loadFile();
     void    loadFile(QString filename);
+    void    loadFileQM(QString filename);
 
     SongSegmentation _segmentation;
 

@@ -485,6 +485,8 @@ NodeBarBeat::NodeBarBeat()
     addParam<bool>("Beat Trigger", true, true);
     addParam<int>("Bar Number", true, true);
     addParam<int>("Beat Number", true, true);
+    addParam<float>("Beat Frac", true, true);
+    addParam<float>("Bar Frac", true, true);
 
     loadFile();  // ErrorHandling
 }
@@ -505,7 +507,6 @@ void NodeBarBeat::loadFile(QString filename)
 {
     _beats.clear();
     _beatnumber.clear();
-    _nextRefresh = 0;
 
     std::ifstream filestream;
     filestream.open(filename.toStdString(), std::ios::in);
@@ -561,6 +562,14 @@ void NodeBarBeat::operator()() {
         _lastSample = mSecs;
     }
 #endif
+    int nextbeat = _beatIndex + 1;
+    float beatFrac = 1.0;
+    if (nextbeat < _beats.size())
+        beatFrac = (float(mSecs) - _beats[_beatIndex])/(float(_beats[nextbeat]) - _beats[_beatIndex]);
+
+    int barStart = findStartOfBar(_beatIndex);
+    int nextBarStart = findStartOfNextBar(_beatIndex);
+    float barFrac = (float(mSecs) - barStart)/(float(nextBarStart) - barStart);
 
     setValue("Beat Trigger", beatTrigger);
     setValue("Bar Number", _barnumber[_beatIndex]);
@@ -568,6 +577,31 @@ void NodeBarBeat::operator()() {
     if (beatTrigger && _beatnumber[_beatIndex] == 1)
         barTrigger = true;
     setValue("Bar Trigger", barTrigger);
+    setValue("Beat Frac", beatFrac);
+    setValue("Bar Frac", barFrac);
+}
+
+int NodeBarBeat::findStartOfBar(int beatindex)
+{
+    int index = beatindex;
+    while (index >=0) {
+       if (_beatnumber[index] == 1)
+            break;
+       index--;
+    }
+    return _beats[index];
+}
+
+int NodeBarBeat::findStartOfNextBar(int beatindex)
+{
+    int barnumber = _barnumber[beatindex];
+    int index = beatindex;
+    while (index < _beats.size()) {
+       if (_barnumber[index] != barnumber)
+            break;
+       index++;
+    }
+    return _beats[index];
 }
 
 NodeBarBeat* NodeBarBeat::clone()

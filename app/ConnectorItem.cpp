@@ -19,7 +19,7 @@ ConnectorItem::ConnectorItem(SocketItem *serverSocket, SocketItem *clientSocket,
     _clientSocket(clientSocket),
     _path(nullptr)
 {
-    setZValue(1000.0);  // TODO make connector z a pref?
+    setZValue(-1000.0);  // TODO make connector z a pref?
     updatePath();
 
     setFlags(ItemIsSelectable);

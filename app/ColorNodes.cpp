@@ -25,8 +25,8 @@ void ColorRamp::operator()()
 
     Lightcolor color0, color1;
     float mix;
-    getValue("color0", color0);
-    getValue("color1", color1);
+    getValue("Color0", color0);
+    getValue("Color1", color1);
     getValue("mix", mix);
 
     Lightcolor part0, part1;

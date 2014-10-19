@@ -9,6 +9,7 @@
 #include <QVBoxLayout>
 #include <QLineEdit>
 
+// TODO get starting values from dancefloor engine etc.
 SettingsDialog::SettingsDialog(int interval,
             QWidget *parent)
     :   QDialog(parent)

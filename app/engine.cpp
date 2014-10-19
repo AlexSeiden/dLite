@@ -80,8 +80,15 @@ bool Engine::loadSong(const QString &fileName)
 
 qint64 Engine::bufferLength() const
 {
+    // Return buffer length in bytes
 //    return m_wavFileHandle ? m_wavFileHandle->size() : -1;
     return _qbuf.buffer().size();
+}
+
+qint64 Engine::bufferLengthMS() const
+{
+    // Return buffer length in ms
+    return audioDuration(m_format, bufferLength());
 }
 
 void Engine::setWindowFunction(WindowFunction type)

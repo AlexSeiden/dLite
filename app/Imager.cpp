@@ -70,20 +70,21 @@ Circle::Circle() :
     // Declare params.
     addParam<float>("x", 10.);
     addParam<float>("y", 8.);
-    addParam<float>("scale", 1.0);
-    // alpha & color???
-
+    addParam<float>("width", 1.0);
+    addParam<float>("height", 1.0);
 }
 
 void Circle::draw()
 {
     Lightcolor color;
-    int x,y;
-    float scale;
+    float x,y;
+    float width;
+    float height;
     getValue("color", color);
     getValue("x", x);
     getValue("y", y);
-    getValue("scale", scale);
+    getValue("width", width);
+    getValue("height", height);
 
     QPainter painter(_image);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -91,7 +92,7 @@ void Circle::draw()
     painter.fillRect(_image->rect(), Qt::black);
     painter.setBrush(QBrush(color.toQColor()));
     QPointF center(x, y);
-    painter.drawEllipse(center, scale, scale);
+    painter.drawEllipse(center, width, height);
 
     painter.end();
 }
