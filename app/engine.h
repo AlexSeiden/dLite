@@ -12,12 +12,12 @@
 #include <QDir>
 #include <QObject>
 #include <QVector>
+#include <QTimer>
 
 class FrequencySpectrum;
 class Dancefloor;
 
 QT_BEGIN_NAMESPACE
-class QAudioInput;
 class QAudioOutput;
 QT_END_NAMESPACE
 
@@ -95,13 +95,14 @@ signals:
 
     // Spectrum has changed.
     // \param position Position of start of window in bytes
-    // \param length   Length of window in bytes
+    // \param length   Length of window in byte
     // \param spectrum Resulting frequency spectrum
     // TODO change this to only pass the spectrum
     void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
 
 private slots:
     void audioNotify();
+    void alternativeNotify();
     void audioStateChanged(QAudio::State state);
     void spectrumChanged(const FrequencySpectrum &spectrum);
 
@@ -141,6 +142,7 @@ private:
 
     qint64              _uSecs;
     QString             m_audiofilename;
+    QTimer              *m_timer;
 };
 
 #endif // ENGINE_H

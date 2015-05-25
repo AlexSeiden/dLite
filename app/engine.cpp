@@ -22,6 +22,7 @@ Engine::Engine(QObject *parent)
     ,   m_spectrumBufferLength(0)
     ,   m_spectrumAnalyser()
     ,   m_notifyIntervalMs(35)
+    ,   m_timer(new QTimer(this))
 {
     qRegisterMetaType<FrequencySpectrum>("FrequencySpectrum");
     qRegisterMetaType<WindowFunction>("WindowFunction");
@@ -29,6 +30,12 @@ Engine::Engine(QObject *parent)
                     SIGNAL(spectrumChanged(FrequencySpectrum)),
                     this,
                     SLOT(spectrumChanged(FrequencySpectrum)));
+
+    m_timer->setInterval(m_notifyIntervalMs);
+    m_timer->setTimerType(Qt::PreciseTimer);
+    m_timer->start();
+    CHECKED_CONNECT(m_timer, SIGNAL(timeout()),
+                    this, SLOT(alternativeNotify()));
 }
 
 Engine::~Engine() { }
@@ -109,8 +116,8 @@ void Engine::startPlayback()
         setPlayPosition(0, true);
         CHECKED_CONNECT(m_audioOutput, SIGNAL(stateChanged(QAudio::State)),
                         this, SLOT(audioStateChanged(QAudio::State)));
-        CHECKED_CONNECT(m_audioOutput, SIGNAL(notify()),
-                        this, SLOT(audioNotify()));
+//        CHECKED_CONNECT(m_audioOutput, SIGNAL(notify()),
+//                        this, SLOT(audioNotify()));
         _qbuf.seek(0);
         m_audioOutput->start(&_qbuf);
     }
@@ -159,33 +166,31 @@ void Engine::togglePlayback()
 
 void Engine::audioNotify()
 {
-    _uSecs = m_audioOutput->processedUSecs();  // NUKEME
-    // Find current playPosition in bytes
-    const qint64 playPosition = _qbuf.pos();
+}
 
-    // Why would we be beyond the bufferLength???
-    setPlayPosition(qMin(bufferLength(), playPosition));  // NUKEME
+void Engine::alternativeNotify()
+{
 
-    // Look backwards from the playPosition when computing the spectrum
-    const qint64 spectrumPosition = playPosition - m_spectrumBufferLength;
+    if (QAudio::ActiveState == m_state) {
+        const qint64 playPosition = _qbuf.pos();
+//        qDebug() << "altnotify" << playPosition;
+        const qint64 spectrumPosition = playPosition - m_spectrumBufferLength;
 
-    const qint64 specWindowStart = qMax(qint64(0), spectrumPosition);
-    const qint64 specWindowEnd   = qMin(_qbuf.size(), spectrumPosition + m_spectrumBufferLength);
+        const qint64 specWindowStart = qMax(qint64(0), spectrumPosition);
+        const qint64 specWindowEnd   = qMin(_qbuf.size(), spectrumPosition + m_spectrumBufferLength);
 
-    calculateSpectrum(specWindowStart, specWindowEnd);
+        calculateSpectrum(specWindowStart, specWindowEnd);
 
+        // ==============================
+        // OKAY!
+        // THIS IS IT!  ARE YOU READY?  It all happens here:
 
-
-
-    // ==============================
-    // OKAY!
-    // THIS IS IT!  ARE YOU READY?  It all happens here:
-
-    _dfModel->evaluate();
-    // TODO move elsewhere?  perhaps it's own timer loop?
-    // Although, it wants to be on a timer synced with audio playback...
-    // TA-DA !
-    // ==============================
+        _dfModel->evaluate();
+        // TODO move elsewhere?  perhaps it's own timer loop?
+        // Although, it wants to be on a timer synced with audio playback...
+        // TA-DA !
+        // ==============================
+    }
 }
 
 void Engine::audioStateChanged(QAudio::State state)
@@ -263,19 +268,18 @@ bool Engine::initialize()
     if (selectFormat()) {
         resetAudioDevices();
         result = true;
-//        m_audioOutput = new QAudioOutput(m_audioOutputDevice, m_format, this);
         m_audioOutput = new QAudioOutput(m_format, this);
-        m_audioOutput->setNotifyInterval(m_notifyIntervalMs);
+//        m_audioOutput->setNotifyInterval(m_notifyIntervalMs);
     } else {
         if (m_wavFileHandle)
             emit errorMessage(tr("Audio format not supported"), formatToString(m_format));
     }
 
-    // (notify Interval may not be the same as set, if it's not supportable by device)
-    if (m_notifyIntervalMs != m_audioOutput->notifyInterval()) {
-        qDebug() << "Engine::initialize" << "requested notify interval" << m_notifyIntervalMs;
-        qDebug() << "                  " << "actual    notify interval" << m_audioOutput->notifyInterval();
-    }
+//    // (notify Interval may not be the same as set, if it's not supportable by device)
+//    if (m_notifyIntervalMs != m_audioOutput->notifyInterval()) {
+//        qDebug() << "Engine::initialize" << "requested notify interval" << m_notifyIntervalMs;
+//        qDebug() << "                  " << "actual    notify interval" << m_audioOutput->notifyInterval();
+//    }
 
     ENGINE_DEBUG << "Engine::initialize" << "format" << m_format;
 

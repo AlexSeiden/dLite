@@ -33,6 +33,8 @@ Node Types:
    math nodes
    Paths
 
+Fader
+
 Compositing modes
 Firing decay modes
 
@@ -51,8 +53,13 @@ compmode & decaymode pups on cuewidgets
 
 put spectrograph options back in somewhere.
 
+switch between 10 different tabs via control keys
+
 Drawing:
     LOD
+        Turn off level meters when small
+        longer tangents when small
+    drop shadow
     nicer active-mode control widget
     Grid BG option in graph view
     nicer colors
