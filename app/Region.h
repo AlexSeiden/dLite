@@ -21,6 +21,8 @@ public:
     QList<QPoint> getCells() {return _cells;}       // GROSS
 
 private:
+    // Stores a list of all points (in Dancefloor cell space)
+    // in the region.
     QList<QPoint> _cells;
 };
 

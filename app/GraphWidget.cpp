@@ -46,10 +46,12 @@ GraphWidget::GraphWidget(QWidget *parent) :
     // e.g. compmodes, etc.
     _useAllCues = new QCheckBox;
     _useAllCues->setEnabled(true);
+    _useAllCues->setToolTip("Use All Cues");
     _useAllCues->setChecked(true);
 
     _autoSwitchCues = new QCheckBox;
     _autoSwitchCues->setEnabled(true);
+    _autoSwitchCues->setToolTip("Auto Switch Cues");
     _autoSwitchCues->setChecked(true);
 
 //    _segmentButton = new QToolButton;
@@ -257,7 +259,8 @@ bool GraphWidget::autoSwitchCues()
 
 void GraphWidget::setCuesheet(int index)
 {
-    _tabwidget->setCurrentIndex(index);
+    if (index < _tabwidget->count())
+        _tabwidget->setCurrentIndex(index);
 }
 
 void GraphWidget::selectionChanged()
@@ -674,14 +677,19 @@ void GraphWidget::newSong(QString filename)
 
 #include <QSignalMapper>
 
+// Create shortcuts for switching between tabs
 void GraphWidget::createShortcuts() {
     QSignalMapper *sm = new QSignalMapper(this);
     CHECKED_CONNECT(sm, SIGNAL(mapped(int)),
                     this, SLOT(setCuesheet(int)));
-    for (int i=0; i<6; ++i) {
-        QShortcut *sc = new QShortcut(QKeySequence(QString::number(i+2)), this);
+    for (int i=0; i<8; ++i) {
+        QShortcut *sc = new QShortcut(QKeySequence(QString::number(i+1)), this);
         sm->setMapping(sc, i);
         sc->setContext(Qt::ApplicationShortcut);
         CHECKED_CONNECT(sc, SIGNAL(activated()), sm, SLOT(map()));
     }
+    QShortcut *sc = new QShortcut(QKeySequence(QString::number(0)), this);
+    sm->setMapping(sc, 9);
+    sc->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(sc, SIGNAL(activated()), sm, SLOT(map()));
 }

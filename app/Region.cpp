@@ -2,18 +2,20 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-Region::Region()
-{
-}
+Region::Region() { }
 
+// Returns true if the Region contains point p, expressed in
+// cell coordinates
 bool Region::hasCell(QPoint p)
 {
     return _cells.contains(p);
 }
 
+// Sets the status of point p
 void Region::setCell(QPoint p, bool status)
 {
-    // $$$ inefficient!!
+    // $$$ inefficient, although really not that bad because _cells is
+    // a QList<QPoint>.  Could easily  be made QSet<> TODO
     _cells.removeAll(p);
     if (status)
         _cells.append(p);

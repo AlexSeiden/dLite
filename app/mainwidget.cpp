@@ -458,7 +458,7 @@ void MainWidget::createShortcuts()
     m_zoomInShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_zoomInShortcut, SIGNAL(activated()), m_graphWidget, SLOT(zoomIn()));
 
-    m_zoomResetShortcut = new QShortcut(Qt::Key_1, this);
+    m_zoomResetShortcut = new QShortcut(Qt::Key_BracketLeft, this);
     m_zoomResetShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_zoomResetShortcut, SIGNAL(activated()), m_graphWidget, SLOT(zoomReset()));
 

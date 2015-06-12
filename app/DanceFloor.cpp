@@ -119,6 +119,9 @@ void Dancefloor::printLayout()
 // Access
 bool Dancefloor::hasPixel(int x, int y)
 {
+    if (x < 0 || y < 0 || x >= _xsize || y >= _ysize)
+        return false;
+
     int index = _getIndex(x,y);
     if (_lights[index]._lightID == 0)
         return false;
@@ -132,6 +135,7 @@ int Dancefloor::_getIndex(int x, int y)
     if (!(x >= 0 && x < _xsize && y >= 0 && y < _ysize)) {
         qDebug() << "BOUNDS ERROR: " <<x <<y;
         qDebug() << "MAX SIZE    : " <<_xsize <<_ysize;
+        return 0;
     }
     Q_ASSERT(x >= 0 && x < _xsize && y >= 0 && y < _ysize);
     return _xsize*y + x;
