@@ -9,3 +9,6 @@ FORMS +=
 HEADERS += 
 
 SOURCES +=
+
+OTHER_FILES += \
+    $$PWD/app/dLite.qss

@@ -9,7 +9,7 @@ CONFIG  += c++11
 SUBDIRS += 3rdparty/fftreal
 SUBDIRS += app
 
-TARGET = spectrum
+TARGET = dLite
 
 
 # mostly for std::function

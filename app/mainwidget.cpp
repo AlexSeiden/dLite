@@ -10,6 +10,7 @@
 #include "Node.h"
 #include "Cupid.h"
 #include "NodeFactory.h"
+#include "GuiSettings.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -49,6 +50,10 @@ MainWidget::MainWidget(QWidget *parent)
     Cupid::Singleton()->setDancefloor(m_dancefloor);
     Cupid::Singleton()->setSpectrograph(m_spectrograph);
     Cupid::Singleton()->setTransport(m_transport);
+
+//    guisettings = new GuiSettings();
+
+    this->loadStyleSheet();
 
     // numBands, lowfreq, hifreq.
     // TODO move somewhere else....
@@ -168,6 +173,14 @@ void MainWidget::bufferLengthChanged(qint64 length)
     m_transport->bufferLengthChanged(length);
 }
 
+void MainWidget::loadStyleSheet()
+{
+    guisettings = new GuiSettings();
+    QFile file(":dLite.qss");
+    file.open(QFile::ReadOnly);
+    QString styleSheet = QString::fromLatin1(file.readAll());
+    qApp->setStyleSheet(styleSheet);
+}
 
 //-----------------------------------------------------------------------------
 // Private slots

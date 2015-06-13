@@ -16,7 +16,6 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     _node(node),
     _minimized(false)
 {
-
     node->setNodeItem(this);
 
     _margins = QMarginsF(9,5,9,5);
@@ -149,24 +148,6 @@ QVariant    NodeItem::itemChange(GraphicsItemChange change, const QVariant &valu
     return QGraphicsItem::itemChange(change, value);
 }
 
-#if 0
-void NodeItem::keyPressEvent(QKeyEvent *event)
-{
-    // XXX  this isn't working
-//    qDebug() << "keypress " << event->key();
-    switch (event->key()) {
-    case Qt::Key_Delete:
-        delete this->_node;
-        this->scene()->removeItem(this);
-        deleteLater();
-        update();
-        break;
-    default:
-        QGraphicsItem::keyPressEvent(event);
-    }
-}
-#endif
-
 // Forward selection to node, in case there's anything special to do
 // (e.g. Sublevel nodes need to interact with the spectrograph;
 //  path nodes will interact with the floor display.)
@@ -189,7 +170,7 @@ void NodeItem::nameEdit(QString newname)
 
 // ---------------------------
 // Display
-// reposition node item, and signal to connections that we've moved.
+// Reposition the node item, and signal to connections that we've moved.
 // This is called from routines like align and layout, that reposition
 // a NodeItem programmatically.
 void NodeItem::rePos(const QPointF &pos)
@@ -297,6 +278,7 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
 {
     int yOffset = GuiSettings::paramHeight/2;
 
+    this->setObjectName(tr("ack"));
     // Build socket items
     _socket = new SocketItem(param, this);
     if (param->isOutput())
@@ -333,18 +315,53 @@ QRectF ParamItem::boundingRect() const
     return QRectF(-5, -5, GuiSettings::nodeWidth+9, GuiSettings::paramHeight+9);
 }
 
+
+QColor ParamItem::get_bgcolor() const
+{
+ return m_color;
+}
+
+void ParamItem::set_bgcolor( QColor c )
+{
+ qDebug() << "setbgcolor" << c;
+ m_color = c;
+}
+
+
 void ParamItem::paint(QPainter *painter,
            const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     painter->save();
-    Q_UNUSED(option);
     Q_UNUSED(widget);
+    Q_UNUSED(option);
+    static bool printed = false;
 
     // Set box for this param
+#if 0
     if (_param->isOutput())
         painter->setBrush(GuiSettings::outputParamFillColor);
     else
         painter->setBrush(GuiSettings::paramFillColor);
+#else
+    if (_param->isOutput())
+        painter->setBrush(GuiSettings::outputParamFillColor);
+    else
+        painter->setBrush(guisettings->m_PIbgcolor);
+
+    if (printed == false) {
+        printed = true;
+        QObject *object = guisettings;
+        const QMetaObject *metaobject = object->metaObject();
+        int count = metaobject->propertyCount();
+        for (int i=0; i<count; ++i) {
+            QMetaProperty metaproperty = metaobject->property(i);
+            const char *name = metaproperty.name();
+            QVariant value = object->property(name);
+            qDebug() << name << value;
+        }
+    }
+
+#endif
     QRect rr(0,0,GuiSettings::nodeWidth,GuiSettings::paramHeight);
 
     // Draw rectangle

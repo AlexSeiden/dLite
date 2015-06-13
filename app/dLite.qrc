@@ -6,5 +6,6 @@
         <file>images/whip_disconnected.png</file>
         <file>images/zoomout.png</file>
         <file>images/zoomin.png</file>
+        <file>dLite.qss</file>
     </qresource>
 </RCC>

@@ -1,7 +1,7 @@
 #ifndef GUISETTINGS_H
 #define GUISETTINGS_H
 
-#include <QObject>
+#include <QWidget>
 #include <QColor>
 
 QT_BEGIN_NAMESPACE
@@ -12,11 +12,13 @@ QT_END_NAMESPACE
 
 // Singleton class to maintain color values for the UI.
 // Derived from QObject so we can used signals & slots
-class GuiSettings : public QObject
+class GuiSettings : public QWidget
 {
     Q_OBJECT
+    Q_PROPERTY(QColor PIbgcolor MEMBER m_PIbgcolor)
+
 public:
-    explicit GuiSettings(QObject *parent = 0);
+    explicit GuiSettings(QWidget *parent = 0);
     // Graph widget
     static QColor   nodeNameColor;
     static QFont    nodeNameFont;
@@ -87,6 +89,8 @@ public:
     static QColor  trans_currentSegmentColor;
     static QFont   trans_segmentFont;
 
+    // Stylesheet
+    QColor m_PIbgcolor;
 
 
 
@@ -94,6 +98,7 @@ public:
     // QColor colorForType(ParamBase *param);
 };
 
+extern GuiSettings *guisettings;
 
 // Free function prototypes
 

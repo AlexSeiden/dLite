@@ -73,9 +73,12 @@ QColor  GuiSettings::trans_playheadColor   = QColor(255,255,255);
 int     GuiSettings::trans_playheadWidth   = 2;
 
 
-GuiSettings::GuiSettings(QObject *parent) :
-    QObject(parent)
+GuiSettings *guisettings;
+
+GuiSettings::GuiSettings(QWidget *parent) :
+    QWidget(parent)
 {
+    this->setObjectName(QString("gsets"));
 }
 
 void    GuiSettings::editGuiColorsDialog(QObject *parent)
@@ -93,3 +96,4 @@ void setButtonColor(QToolButton *colorButton, const QColor &col){
         colorButton->setStyleSheet(qss);
     }
 }
+

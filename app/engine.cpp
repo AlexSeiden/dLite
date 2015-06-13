@@ -116,6 +116,7 @@ void Engine::startPlayback()
         setPlayPosition(0, true);
         CHECKED_CONNECT(m_audioOutput, SIGNAL(stateChanged(QAudio::State)),
                         this, SLOT(audioStateChanged(QAudio::State)));
+//      There seems to be a bug that causes audioNotify signals get dropped.
 //        CHECKED_CONNECT(m_audioOutput, SIGNAL(notify()),
 //                        this, SLOT(audioNotify()));
         _qbuf.seek(0);

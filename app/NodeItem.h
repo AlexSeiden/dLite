@@ -21,6 +21,10 @@ class ConnectionItem;
 class NodeItem : public QGraphicsObject
 {
     Q_OBJECT
+//    Q_PROPERTY(QColor color MEMBER m_color)
+//    Q_PROPERTY(QColor background-color MEMBER m_background-color)
+//    Q_PROPERTY(QFont font MEMBER m_font)
+
 public:
     explicit NodeItem(Node* node, QGraphicsItem* parent = 0);
     ~NodeItem();
@@ -67,6 +71,9 @@ protected:
 class ParamItem : public QGraphicsObject
 {
     Q_OBJECT
+    //Q_PROPERTY(QColor bgcolor MEMBER m_color NOTIFY bgColorChanged DESIGNABLE true)
+    Q_PROPERTY(QColor bgcolor READ get_bgcolor WRITE set_bgcolor DESIGNABLE true)
+
 public:
     explicit        ParamItem(ParamBase* param, QGraphicsObject* parent);
 
@@ -76,6 +83,11 @@ public:
     void            setSocket(SocketItem* sock) {_socket = sock;}
     SocketItem*     getSocket()                 {return _socket;}
     ParamBase*      getParam()                  {return _param;}
+
+    QColor          get_bgcolor() const;
+    void          set_bgcolor(QColor c);
+signals:
+    void bgColorChanged();
 
 public slots:
     // It would be nice to template these, but that won't work with QObject
@@ -89,6 +101,7 @@ public slots:
 private:
     ParamBase*      _param;
     SocketItem*     _socket;
+    QColor          m_color;
 };
 
 

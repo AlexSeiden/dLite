@@ -26,6 +26,7 @@ QRectF GroupNodeItem::boundingRect() const
 void GroupNodeItem::paint(QPainter *painter,
            const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(widget)
     painter->save();
     painter->setBrush(QBrush(QColor(200,200,200,100))); // HARDW
     QPen selectedPen;

@@ -7,6 +7,7 @@
 #include <QIntValidator>
 #include <QSpinBox>
 #include <QRubberBand>
+#include <QApplication>
 
 class Engine;
 class FrequencySpectrum;
@@ -54,6 +55,7 @@ public slots:
 
     void save();
     void showSaveDialog();
+    void loadStyleSheet();
 
     // XXX is this still needed?
     void audioPositionChanged(qint64 position);

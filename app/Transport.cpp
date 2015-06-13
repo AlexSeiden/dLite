@@ -22,7 +22,6 @@ Transport::~Transport() { }
 
 void Transport::reset()
 {
-    // XXX when would we really want to call this?
     m_bufferLength = 0;
     m_playPosition = 0;
     _totalDuration = 0;
