@@ -27,7 +27,7 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
     proxy->setWidget(nameEdit);
     proxy->setPos(GuiSettings::socketWidth + GuiSettings::paramTextOffset, 5);  // Hardw
-    proxy->resize(GuiSettings::nodeWidth*.75, GuiSettings::paramHeight* .75);  // Hardw
+    proxy->resize(guisettings->m_NNWidth*.75, guisettings->m_PIheight* .75);  // Hardw
     CHECKED_CONNECT(nameEdit, SIGNAL(textChanged(QString)), this, SLOT(nameEdit(QString)));
 
     // Minimize checkbox
@@ -35,7 +35,7 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     cb->setChecked(_minimized);
     QGraphicsProxyWidget *cbproxy = new QGraphicsProxyWidget(this);
     cbproxy->setWidget(cb);
-    qreal extra = GuiSettings::paramHeight - cbproxy->rect().height();
+    qreal extra = guisettings->m_PIheight - cbproxy->rect().height();
     int yshift =  extra/2;
     cbproxy->setPos(GuiSettings::socketWidth/2, yshift);  // Hardw
     CHECKED_CONNECT(cb, SIGNAL(stateChanged(int)), this, SLOT(minimize(int)));
@@ -43,7 +43,7 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     // Make a ParamItem for every param in the node:
     int y = 0;
     for (ParamBase *param : node->getParams()) {
-        y+=GuiSettings::paramHeight;
+        y+=guisettings->m_PIheight;
         ParamItem *parItem = new ParamItem(param, this);
         parItem->setPos(0,y);
     }
@@ -75,8 +75,8 @@ QRectF NodeItem::boundingRect() const
         nRows = 1;
     else
         nRows = _node->getParams().size() + 1;
-    QRectF bbox =  QRectF(0,0,GuiSettings::nodeWidth,
-                          GuiSettings::paramHeight*nRows);
+    QRectF bbox =  QRectF(0,0,guisettings->m_NNWidth,
+                          guisettings->m_PIheight*nRows);
     return bbox.marginsAdded(_margins);
 }
 
@@ -90,7 +90,7 @@ void NodeItem::paint(QPainter *painter,
 
     //painter->setBrush(dragOver ? color.light(130) : GuiColors::nodeBGColor);
     // TODO hover highlighting
-    painter->setBrush(GuiSettings::nodeBGColor); // TODO color by type
+    painter->setBrush(guisettings->m_NNBGColor);
 
     QBrush b = painter->brush();
     QPen p = painter->pen();
@@ -98,7 +98,7 @@ void NodeItem::paint(QPainter *painter,
     // Draw rectangle of entire node:
     QRectF bigrect = boundingRect();
     bigrect = bigrect.marginsRemoved(_margins);
-    painter->setBrush(GuiSettings::nodeNameColor);
+    painter->setBrush(guisettings->m_NNBGColor);
     painter->drawRect(bigrect);
     painter->setBrush(b);
 
@@ -109,8 +109,8 @@ void NodeItem::paint(QPainter *painter,
 
         // Make penWidth constant in screen space
         const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
-        const qreal penWidth = qreal(GuiSettings::selectedNodePenWidth) / lod;
-        QPen selectedPen = QPen(GuiSettings::selectedNodePenColor);
+        const qreal penWidth = qreal(guisettings->m_NNselectedWidth) / lod;
+        QPen selectedPen = QPen(guisettings->m_NNselectedColor);
         selectedPen.setWidth(penWidth);
         painter->setPen(selectedPen);
 
@@ -188,7 +188,7 @@ void NodeItem::avoidCollisions()
    foreach (QGraphicsItem *item, colliders) {
        NodeItem *ni = dynamic_cast<NodeItem *>(item);
        if (ni) {
-           moveBy(GuiSettings::nodeSpacing, 0);
+           moveBy(guisettings->m_NNSpacing, 0);
            avoidCollisions();
            break;
        }
@@ -276,14 +276,14 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
     QGraphicsObject(parent),
     _param(param)
 {
-    int yOffset = GuiSettings::paramHeight/2;
+    int yOffset = guisettings->m_PIheight/2;
 
     this->setObjectName(tr("ack"));
     // Build socket items
     _socket = new SocketItem(param, this);
     if (param->isOutput())
         // Output items get their socket on the right side
-        _socket->setPos(GuiSettings::nodeWidth - GuiSettings::socketWidth, yOffset);
+        _socket->setPos(guisettings->m_NNWidth - GuiSettings::socketWidth, yOffset);
     else {
         // Input items get their socket on the left side, and get an editor
         // proxyWidget too.
@@ -296,7 +296,7 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
         // it's a child of an object in the scene.
         QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
         proxy->setWidget(paramEditorWidget);
-        qreal extra = GuiSettings::paramHeight - proxy->rect().height();
+        qreal extra = guisettings->m_PIheight - proxy->rect().height();
         int yshift =  extra/2;
         int xshift = GuiSettings::socketWidth + GuiSettings::paramTextOffset + GuiSettings::paramEditorOffset;
         proxy->setPos(xshift, yshift);
@@ -312,19 +312,7 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
 
 QRectF ParamItem::boundingRect() const
 {
-    return QRectF(-5, -5, GuiSettings::nodeWidth+9, GuiSettings::paramHeight+9);
-}
-
-
-QColor ParamItem::get_bgcolor() const
-{
- return m_color;
-}
-
-void ParamItem::set_bgcolor( QColor c )
-{
- qDebug() << "setbgcolor" << c;
- m_color = c;
+    return QRectF(-5, -5, guisettings->m_NNWidth+9, guisettings->m_PIheight+9);
 }
 
 
@@ -334,44 +322,22 @@ void ParamItem::paint(QPainter *painter,
     painter->save();
     Q_UNUSED(widget);
     Q_UNUSED(option);
-    static bool printed = false;
 
     // Set box for this param
-#if 0
     if (_param->isOutput())
-        painter->setBrush(GuiSettings::outputParamFillColor);
-    else
-        painter->setBrush(GuiSettings::paramFillColor);
-#else
-    if (_param->isOutput())
-        painter->setBrush(GuiSettings::outputParamFillColor);
+        painter->setBrush(guisettings->m_PIoutputbgcolor);
     else
         painter->setBrush(guisettings->m_PIbgcolor);
 
-    if (printed == false) {
-        printed = true;
-        QObject *object = guisettings;
-        const QMetaObject *metaobject = object->metaObject();
-        int count = metaobject->propertyCount();
-        for (int i=0; i<count; ++i) {
-            QMetaProperty metaproperty = metaobject->property(i);
-            const char *name = metaproperty.name();
-            QVariant value = object->property(name);
-            qDebug() << name << value;
-        }
-    }
-
-#endif
-    QRect rr(0,0,GuiSettings::nodeWidth,GuiSettings::paramHeight);
+    QRect rr(0,0,guisettings->m_NNWidth,guisettings->m_PIheight);
 
     // Draw rectangle
     painter->setPen(Qt::black);
     painter->drawRoundedRect(rr, 10, 10);
 
     // Draw name
-    painter->setPen(GuiSettings::paramTextColor);
     rr.translate(GuiSettings::socketWidth + GuiSettings::paramTextOffset, 0);
-    painter->setFont(GuiSettings::paramTextFont);
+    painter->setFont(guisettings->m_PIfont);
     painter->drawText(rr,Qt::AlignLeft | Qt::AlignVCenter, _param->getName());
     painter->restore();
 }
@@ -489,6 +455,6 @@ QPointF SocketItem::socketPos()
 //    qDebug() << "no, invisible";
     QPointF nodePos = parentItem()->parentItem()->scenePos();
     QPointF out = scenePos();
-    out.setY(nodePos.y() + GuiSettings::paramHeight/2);
+    out.setY(nodePos.y() + guisettings->m_PIheight/2);
     return out;
 }

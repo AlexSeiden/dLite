@@ -176,10 +176,15 @@ void MainWidget::bufferLengthChanged(qint64 length)
 void MainWidget::loadStyleSheet()
 {
     guisettings = new GuiSettings();
-    QFile file(":dLite.qss");
+//    QFile file(":dLite.qss");
+    QFile file("/Users/alex/src/dLite/app/dLite.qss");
     file.open(QFile::ReadOnly);
     QString styleSheet = QString::fromLatin1(file.readAll());
+    qDebug() << "reload styles";
+    qDebug() << styleSheet;
     qApp->setStyleSheet(styleSheet);
+    this->repaint();
+    qApp->processEvents();
 }
 
 //-----------------------------------------------------------------------------
@@ -514,6 +519,12 @@ void MainWidget::createShortcuts()
     m_newTabShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_T), this);
     m_newTabShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_newTabShortcut, SIGNAL(activated()), m_graphWidget, SLOT(newCuesheet()));
+
+    // ----------------------------------------
+    // GUI shortcuts
+    m_reloadStylesShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this);
+    m_reloadStylesShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_reloadStylesShortcut, SIGNAL(activated()), this, SLOT(loadStyleSheet()));
 
     // ----------------------------------------
     // File I/O shortcuts

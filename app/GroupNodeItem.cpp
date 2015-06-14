@@ -35,12 +35,12 @@ void GroupNodeItem::paint(QPainter *painter,
         // Draw bright red rect around selected node.
         // Make penWidth constant in screen space
         const qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
-        const qreal penWidth = qreal(GuiSettings::selectedNodePenWidth) / lod;
-        selectedPen = QPen(GuiSettings::selectedNodePenColor);
+        const qreal penWidth = qreal(guisettings->m_NNselectedWidth) / lod;
+        selectedPen = QPen(guisettings->m_NNselectedColor);
         selectedPen.setWidth(penWidth);
     } else {
         selectedPen = QPen(Qt::black);                          // HARDW
-        selectedPen.setWidth(GuiSettings::selectedNodePenWidth);
+        selectedPen.setWidth(guisettings->m_NNselectedWidth);
     }
     painter->setPen(selectedPen);
     QRectF bbox = QGraphicsItemGroup::boundingRect();

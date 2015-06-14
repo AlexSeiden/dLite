@@ -1,101 +1,22 @@
 /* dLite Qt stylesheet */
 
-NodeItem {
-    color: rgb(55,55,255);
-    font: Helvetica 14px rgb(255,255,255);
-    background-color:  rgb(120,100,60);
-}
-
-QLineEdit {
-    background-color:  rgb(255,255,60);
-}
-
-ParamItem {
-    qproperty-bgcolor: rgb(20, 50, 255);
-    bgcolor: rgb(20, 50, 255);
-}
-
-*#ack {
-    qproperty-bgcolor: rgb(20, 50, 255);
-    bgcolor: rgb(20, 50, 255);
-}
 
 GuiSettings {
+    qproperty-NNBGColor: rgb(55,55,255);
+    qproperty-NNNameFont: Helvetica 14px rgb(55,55,255);
+    qproperty-NNborderRadius: 4;
+    qproperty-NNselectedColor: rgb(255,100,100);
+    qproperty-NNselectedWidth: 2;
+    qproperty-NNWidth: 200;
+    qproperty-NNSpacing: 30;
+
     qproperty-PIbgcolor: rgb(20, 50, 55);
+    qproperty-PIoutputbgcolor: rgb(200, 50, 55);
+    qproperty-PIheight: 30;
+    qproperty-PIfont: Helvetica 14px rgb(255,255,255);
+
 }
 
-/*
-*#gsets {
-    qproperty-PIbgcolor: rgb(200, 50, 255);
+CuesheetView QGraphicsView {
+    background-color: rgb(40, 40, 40);
 }
-*/
-
-/*
-// GraphWidget & related classes (CuesheetView, NodeItem, SocketItem, ParamItem, ConnectorItem)
-color:  GuiSettings::socketFillColor      = rgb(255,20,80);
-color:  GuiSettings::socketOutlineColor   = rgb(255,255,255);
-color:  GuiSettings::paramTextColor       = rgb(255,255,255);
-color:  GuiSettings::paramFillColor       = rgb(120,100,60);
-QFont   GuiSettings::paramTextFont        = QFont("Helvetica", 14);
-color:  GuiSettings::outputParamFillColor = rgb(100,100,100);
-int     GuiSettings::nodeWidth            = 230;                // Width of the entire node
-int     GuiSettings::nodeSpacing          = 30;                 // Space between nodes
-int     GuiSettings::socketWidth          = 16;                 // Width of the socket connector rectangle
-int     GuiSettings::paramHeight          = 30;                 // Height of each param
-int     GuiSettings::paramTextOffset      = 15;
-int     GuiSettings::paramEditorOffset    = 80;
-color:  GuiSettings::selectedNodePenColor = rgb(255,100,100);
-int     GuiSettings::selectedNodePenWidth = 2;
-QPen    GuiSettings::socketOutlinePen     = QPen(GuiSettings::socketOutlineColor, 2, Qt::SolidLine);
-color:  GuiSettings::connectorColor       = rgb(20,20,80);
-color:  GuiSettings::connectorCenterColor = rgb(80,80,80);
-QPen    GuiSettings::connectorPen         = QPen(GuiSettings::connectorColor, 2, Qt::SolidLine);
-QPen    GuiSettings::connectorPenSelected = QPen(GuiSettings::selectedNodePenColor, 4, Qt::SolidLine);
-QBrush  GuiSettings::connectorBrush       = QBrush(GuiSettings::connectorCenterColor);
-int     GuiSettings::connectorEndSize     = 5;
-int     GuiSettings::zoomIconSize         = 16;
-int     GuiSettings::colorChipSize        = 16;
-
-// Dancefloorwidget
-color:  GuiSettings::df_bgColor           = rgb(30,30,80);
-color:  GuiSettings::df_panelSepColor     = rgb(255,255,200);
-color:  GuiSettings::df_cellSepColor      = rgb(100,100,100);
-color:  GuiSettings::df_noCellColor       = rgb(60,60,60);
-color:  GuiSettings::df_woodColor         = rgb(130,123,112);
-int     GuiSettings::df_cellsize          = 20;
-int     GuiSettings::df_cellspace         = 4;
-
-// Spectrograph
-color:  GuiSettings::sg_barColor          = rgb(51, 204, 102);
-color:  GuiSettings::sg_lineColor         = GuiSettings::sg_barColor.lighter();
-color:  GuiSettings::sg_clipColor         = rgb(255, 255, 0);
-color:  GuiSettings::sg_gridColor         = GuiSettings::sg_barColor.darker();
-color:  GuiSettings::sg_bg                = rgb(0,0,0);
-color:  GuiSettings::sg_textColor         = rgb(230,230,255);
-color:  GuiSettings::sg_sublevelRegion    = rgb(20,20,255);
-int     GuiSettings::sg_sublevelPenwidth  = 2;
-int     GuiSettings::sg_textHeight        = 20;
-int     GuiSettings::sg_textOffset        = GuiSettings::sg_textHeight/4;
-QFont   GuiSettings::sg_HzFont            = QFont("Helvetica", 10);
-
-color:  GuiSettings::sl_bgColor           = rgb(0,0,0);
-color:  GuiSettings::sl_barColor          = GuiSettings::sg_barColor;
-color:  GuiSettings::sl_squareColor       = rgb(0,0,255);
-color:  GuiSettings::sl_selectedColor     = GuiSettings::sg_sublevelRegion;
-color:  GuiSettings::sl_dragTarget        = rgb(255,20,20);
-int     GuiSettings::sl_barHeight         = 25;
-
-color:  GuiSettings::trans_bgColor        = rgb(24,24,22);
-color:  GuiSettings::trans_barColor       = rgb(38,50,95);
-int     GuiSettings::trans_barHeight      = 25;
-color:  GuiSettings::trans_segmentColor   = rgb(226,222,170);
-color:  GuiSettings::trans_currentSegmentColor   = rgb(255,200,20);
-//QFont   GuiSettings::trans_segmentFont    = QFont("Source Code Pro", 9, 99);
-//QFont   GuiSettings::trans_segmentFont    = QFont("Avenir Heavy Oblique", 9, 50);
-QFont   GuiSettings::trans_segmentFont    = QFont("Futura", 8, 70, true);
-color:  GuiSettings::trans_segmentTextColor   = rgb(0,0,0);
-color:  GuiSettings::trans_playheadColor   = rgb(255,255,255);
-int     GuiSettings::trans_playheadWidth   = 2;
-
-
-*/

@@ -72,7 +72,7 @@ class ParamItem : public QGraphicsObject
 {
     Q_OBJECT
     //Q_PROPERTY(QColor bgcolor MEMBER m_color NOTIFY bgColorChanged DESIGNABLE true)
-    Q_PROPERTY(QColor bgcolor READ get_bgcolor WRITE set_bgcolor DESIGNABLE true)
+//    Q_PROPERTY(QColor bgcolor READ get_bgcolor WRITE set_bgcolor DESIGNABLE true)
 
 public:
     explicit        ParamItem(ParamBase* param, QGraphicsObject* parent);
@@ -83,11 +83,6 @@ public:
     void            setSocket(SocketItem* sock) {_socket = sock;}
     SocketItem*     getSocket()                 {return _socket;}
     ParamBase*      getParam()                  {return _param;}
-
-    QColor          get_bgcolor() const;
-    void          set_bgcolor(QColor c);
-signals:
-    void bgColorChanged();
 
 public slots:
     // It would be nice to template these, but that won't work with QObject

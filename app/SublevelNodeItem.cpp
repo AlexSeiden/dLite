@@ -13,7 +13,7 @@ SublevelNodeItem::SublevelNodeItem(Node *node, QGraphicsItem *parent) :
     CHECKED_CONNECT(_sln, SIGNAL(levelChanged(qreal)), _slm, SLOT(levelChanged(qreal)));
     QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
     proxy->setWidget(_slm);
-    proxy->setPos(0, (_node->getParams().size()+1)*GuiSettings::paramHeight);
+    proxy->setPos(0, (_node->getParams().size()+1)*guisettings->m_PIheight);
 }
 
 QRectF SublevelNodeItem::boundingRect() const
@@ -22,9 +22,9 @@ QRectF SublevelNodeItem::boundingRect() const
     int nRows = _node->getParams().size() + 1;
     QRectF bbox;
     if (isMinimized())
-        bbox =  QRectF(0,0,GuiSettings::nodeWidth, GuiSettings::paramHeight);
+        bbox =  QRectF(0,0,guisettings->m_NNWidth, guisettings->m_PIheight);
     else
-        bbox =  QRectF(0,0,GuiSettings::nodeWidth, GuiSettings::paramHeight*nRows + GuiSettings::sl_barHeight);
+        bbox =  QRectF(0,0,guisettings->m_NNWidth, guisettings->m_PIheight*nRows + GuiSettings::sl_barHeight);
     return bbox.marginsAdded(_margins);
 }
 
@@ -45,7 +45,7 @@ RangeMeter::RangeMeter(QWidget *parent)
       _level(0.0)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    setFixedSize(GuiSettings::nodeWidth, GuiSettings::sl_barHeight);
+    setFixedSize(guisettings->m_NNWidth, GuiSettings::sl_barHeight);
 }
 
 RangeMeter::~RangeMeter() {  }

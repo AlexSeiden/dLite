@@ -15,27 +15,51 @@ QT_END_NAMESPACE
 class GuiSettings : public QWidget
 {
     Q_OBJECT
-    Q_PROPERTY(QColor PIbgcolor MEMBER m_PIbgcolor)
+    // Node properties
+    Q_PROPERTY(QColor    NNNameColor        MEMBER m_NNNameColor)
+    Q_PROPERTY(QFont     NNNameFont         MEMBER m_NNNameFont)
+    Q_PROPERTY(QColor    NNBGColor          MEMBER m_NNBGColor)
+    Q_PROPERTY(QColor    NNTextColor        MEMBER m_NNTextColor)
+    Q_PROPERTY(QColor    NNselectedColor    MEMBER m_NNselectedColor)
+    Q_PROPERTY(int       NNselectedWidth    MEMBER m_NNselectedWidth)
+    Q_PROPERTY(int       NNWidth            MEMBER m_NNWidth)
+    Q_PROPERTY(int       NNSpacing          MEMBER m_NNSpacing)
+    Q_PROPERTY(int       NNborderRadius     MEMBER m_NNborderRadius)
+
+    // ParamItem properties
+    Q_PROPERTY(QColor    PIbgcolor          MEMBER m_PIbgcolor)
+    Q_PROPERTY(QColor    PIoutputbgcolor    MEMBER m_PIoutputbgcolor)
+    Q_PROPERTY(int       PIheight           MEMBER m_PIheight)
+    Q_PROPERTY(QFont     PIfont             MEMBER m_PIfont)
 
 public:
+    // Stylesheet
+    QColor    m_NNNameColor;
+    QFont     m_NNNameFont ;
+    QColor    m_NNBGColor  ;
+    int       m_NNWidth    ;
+    int       m_NNSpacing  ;
+    int       m_NNselectedWidth;
+    QColor    m_NNselectedColor;
+    QColor    m_NNTextColor;
+    int       m_NNborderRadius;
+
+    QColor    m_PIbgcolor;
+    QColor    m_PIoutputbgcolor;
+    int       m_PIheight;
+    QFont     m_PIfont ;
+
+
     explicit GuiSettings(QWidget *parent = 0);
     // Graph widget
-    static QColor   nodeNameColor;
-    static QFont    nodeNameFont;
-    static QColor   nodeBGColor;
-    static QColor   nodeTextColor;
-    static int      nodeWidth;
-    static int      nodeSpacing;
     static QColor   selectedNodePenColor;
     static int      selectedNodePenWidth;
     static QColor   socketFillColor;
     static QColor   socketOutlineColor;
-    static QColor   paramFillColor;
     static QColor   outputParamFillColor;
     static QColor   paramTextColor;
     static QFont    paramTextFont;
     static int      socketWidth;
-    static int      paramHeight;
     static int      paramTextOffset;
     static int      paramEditorOffset;
     static QPen     socketOutlinePen;
@@ -88,10 +112,6 @@ public:
     static QColor  trans_segmentTextColor;
     static QColor  trans_currentSegmentColor;
     static QFont   trans_segmentFont;
-
-    // Stylesheet
-    QColor m_PIbgcolor;
-
 
 
     void    editGuiColorsDialog(QObject *parent = 0);

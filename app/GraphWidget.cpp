@@ -480,7 +480,7 @@ void GraphWidget::layoutAll()
     QPointF nextPos = QPointF(2000., -1000.);
     foreach (NodeItem*ni, allCues) {
         QPointF finalPos = positionNodeItem(ni, nextPos);
-        nextPos += QPointF(0, ni->boundingRect().height() + GuiSettings::nodeSpacing);
+        nextPos += QPointF(0, ni->boundingRect().height() + guisettings->m_NNSpacing);
         nextPos.setY(qMax(nextPos.y(), finalPos.y()));
     }
 
@@ -492,11 +492,11 @@ QPointF GraphWidget::positionNodeItem(NodeItem* ni, QPointF startPos)
 {
     ni->rePos(startPos);
     // Move to the left
-    QPointF nextPos = startPos - QPointF(GuiSettings::nodeWidth + GuiSettings::nodeSpacing/2, 0);
+    QPointF nextPos = startPos - QPointF(guisettings->m_NNWidth + guisettings->m_NNSpacing/2, 0);
 
     foreach (NodeItem* upstreamItem, ni->getUpstreamNodeItems()) {
         QPointF finalPos = positionNodeItem(upstreamItem, nextPos);
-        nextPos += QPointF(0, upstreamItem->boundingRect().height() + GuiSettings::nodeSpacing);
+        nextPos += QPointF(0, upstreamItem->boundingRect().height() + guisettings->m_NNSpacing);
         nextPos.setY(qMax(nextPos.y(), finalPos.y()));
     }
     return nextPos;

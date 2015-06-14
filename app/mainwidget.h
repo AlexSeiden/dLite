@@ -55,7 +55,6 @@ public slots:
 
     void save();
     void showSaveDialog();
-    void loadStyleSheet();
 
     // XXX is this still needed?
     void audioPositionChanged(qint64 position);
@@ -72,6 +71,7 @@ private slots:
     void showImportDialog();
     void showSettingsDialog();
     void updateButtonStates();
+    void loadStyleSheet();
 
 private:
     void createUi();
@@ -120,6 +120,7 @@ private:
     QShortcut*              m_ungroupShortcut;
     QShortcut*              m_minimizeSelectedShortcut;
     QShortcut*              m_newTabShortcut;
+    QShortcut*              m_reloadStylesShortcut;
     QList<QShortcut*>       m_cueShortcut;
 
     QMenuBar*               m_menuBar;
