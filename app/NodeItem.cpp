@@ -26,7 +26,7 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     nameEdit->setText(_node->getName());
     QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
     proxy->setWidget(nameEdit);
-    proxy->setPos(GuiSettings::socketWidth + GuiSettings::paramTextOffset, 5);  // Hardw
+    proxy->setPos(guisettings->m_socketWidth + guisettings->paramTextOffset, 5);  // Hardw
     proxy->resize(guisettings->m_NNWidth*.75, guisettings->m_PIheight* .75);  // Hardw
     CHECKED_CONNECT(nameEdit, SIGNAL(textChanged(QString)), this, SLOT(nameEdit(QString)));
 
@@ -37,7 +37,7 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     cbproxy->setWidget(cb);
     qreal extra = guisettings->m_PIheight - cbproxy->rect().height();
     int yshift =  extra/2;
-    cbproxy->setPos(GuiSettings::socketWidth/2, yshift);  // Hardw
+    cbproxy->setPos(guisettings->m_socketWidth/2, yshift);  // Hardw
     CHECKED_CONNECT(cb, SIGNAL(stateChanged(int)), this, SLOT(minimize(int)));
 
     // Make a ParamItem for every param in the node:
@@ -75,8 +75,8 @@ QRectF NodeItem::boundingRect() const
         nRows = 1;
     else
         nRows = _node->getParams().size() + 1;
-    QRectF bbox =  QRectF(0,0,guisettings->m_NNWidth,
-                          guisettings->m_PIheight*nRows);
+    QRectF bbox =  QRectF(0,0,guisettings->m_NNWidth + 2, // TODO replace 2 with shadow size
+                          guisettings->m_PIheight*nRows + 2);
     return bbox.marginsAdded(_margins);
 }
 
@@ -98,8 +98,16 @@ void NodeItem::paint(QPainter *painter,
     // Draw rectangle of entire node:
     QRectF bigrect = boundingRect();
     bigrect = bigrect.marginsRemoved(_margins);
+
+    //Draw dropshadow first
+    QRectF shadowrect = bigrect;
+    // TODO make properties
+    shadowrect.moveTopLeft(QPointF(2.,2.));
+    painter->setBrush(QColor(0,0,0));
+    painter->drawRoundedRect(shadowrect, guisettings->m_NNborderRadius, guisettings->m_NNborderRadius);
+
     painter->setBrush(guisettings->m_NNBGColor);
-    painter->drawRect(bigrect);
+    painter->drawRoundedRect(bigrect, guisettings->m_NNborderRadius, guisettings->m_NNborderRadius);
     painter->setBrush(b);
 
     if (isSelected()) {
@@ -115,7 +123,8 @@ void NodeItem::paint(QPainter *painter,
         painter->setPen(selectedPen);
 
         QRectF biggerRect = bigrect.marginsAdded(QMarginsF(2,2,2,2));
-        painter->drawRect(biggerRect);
+        int b = guisettings->m_NNselectedBorderRadius;
+        painter->drawRoundedRect(biggerRect, b, b);
         painter->restore();
     }
 
@@ -283,11 +292,11 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
     _socket = new SocketItem(param, this);
     if (param->isOutput())
         // Output items get their socket on the right side
-        _socket->setPos(guisettings->m_NNWidth - GuiSettings::socketWidth, yOffset);
+        _socket->setPos(guisettings->m_NNWidth - guisettings->m_socketWidth, yOffset);
     else {
         // Input items get their socket on the left side, and get an editor
         // proxyWidget too.
-        _socket->setPos(GuiSettings::socketWidth,yOffset);
+        _socket->setPos(guisettings->m_socketWidth,yOffset);
 
         // Display an editor widget for the parameter value.
         QWidget* paramEditorWidget = param->getEditorWidget(this);
@@ -298,7 +307,7 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
         proxy->setWidget(paramEditorWidget);
         qreal extra = guisettings->m_PIheight - proxy->rect().height();
         int yshift =  extra/2;
-        int xshift = GuiSettings::socketWidth + GuiSettings::paramTextOffset + GuiSettings::paramEditorOffset;
+        int xshift = guisettings->m_socketWidth + guisettings->paramTextOffset + guisettings->paramEditorOffset;
         proxy->setPos(xshift, yshift);
 
 #if 0
@@ -333,12 +342,20 @@ void ParamItem::paint(QPainter *painter,
 
     // Draw rectangle
     painter->setPen(Qt::black);
-    painter->drawRoundedRect(rr, 10, 10);
+    painter->drawRoundedRect(rr, 0, 0);
 
     // Draw name
-    rr.translate(GuiSettings::socketWidth + GuiSettings::paramTextOffset, 0);
+    painter->setPen(guisettings->m_PIfontcolor);
     painter->setFont(guisettings->m_PIfont);
-    painter->drawText(rr,Qt::AlignLeft | Qt::AlignVCenter, _param->getName());
+    int offset = guisettings->m_socketWidth + guisettings->paramTextOffset;
+
+    if (_param->isOutput()) {
+        rr.setRight(rr.right() - offset);
+        painter->drawText(rr,Qt::AlignRight | Qt::AlignVCenter, _param->getName());
+    } else {
+        rr.setLeft(rr.left() + offset);
+        painter->drawText(rr,Qt::AlignLeft | Qt::AlignVCenter, _param->getName());
+    }
     painter->restore();
 }
 
@@ -414,8 +431,8 @@ SocketItem::SocketItem(ParamBase *param, QGraphicsObject *parent) :
 { }
 
 QRectF SocketItem::boundingRect() const {
-    QRectF out = QRectF(-GuiSettings::socketWidth/2, -GuiSettings::socketWidth/2,
-                         GuiSettings::socketWidth,  GuiSettings::socketWidth);
+    QRectF out = QRectF(-guisettings->m_socketWidth/2, -guisettings->m_socketWidth/2,
+                         guisettings->m_socketWidth,  guisettings->m_socketWidth);
     out.adjust(-2,-2,2,2);
     return out;
 }
@@ -428,11 +445,11 @@ void SocketItem::paint(QPainter *painter,
     Q_UNUSED(widget);
 
     // Draw connector socket
-    painter->setBrush(GuiSettings::socketFillColor);
-    painter->setPen(GuiSettings::socketOutlinePen);
-//    painter->drawEllipse(0, 0, GuiSettings::socketWidth, GuiSettings::socketWidth);
-    painter->drawRect(-GuiSettings::socketWidth/2, -GuiSettings::socketWidth/2,
-                      GuiSettings::socketWidth, GuiSettings::socketWidth);
+    painter->setBrush(guisettings->m_socketFillColor);
+    painter->setPen(guisettings->socketOutlinePen);
+//    painter->drawEllipse(0, 0, guisettings->m_socketWidth, guisettings->m_socketWidth);
+    painter->drawRect(-guisettings->m_socketWidth/2, -guisettings->m_socketWidth/2,
+                      guisettings->m_socketWidth, guisettings->m_socketWidth);
 
     painter->restore();
 }

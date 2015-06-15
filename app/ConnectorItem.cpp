@@ -19,7 +19,7 @@ ConnectorItem::ConnectorItem(SocketItem *serverSocket, SocketItem *clientSocket,
     _clientSocket(clientSocket),
     _path(nullptr)
 {
-    setZValue(-1000.0);  // TODO make connector z a pref?
+    setZValue(1000.0);  // TODO make connector z a pref?
     updatePath();
 
     setFlags(ItemIsSelectable);
@@ -74,7 +74,7 @@ QRectF ConnectorItem::boundingRect() const
     QRectF bbox(QPointF(left,top),QPointF(right, bottom));
 
 //    qDebug() << pos() << nStart << nEnd << bbox;
-    qreal extra = GuiSettings::connectorEndSize + 5;
+    qreal extra = guisettings->connectorEndSize + 5;
     bbox.adjust(-extra, -extra, extra, extra);
     return bbox;
 }
@@ -107,18 +107,18 @@ void ConnectorItem::paint(QPainter *painter,
     Q_UNUSED(widget);
 
     painter->save();
-    if (isSelected())
-        painter->setPen(GuiSettings::connectorPenSelected);
-    else
-        painter->setPen(GuiSettings::connectorPen);
     painter->setBrush(Qt::NoBrush);
-    if (_path)
-        painter->drawPath(*_path);
+    if (isSelected())
+        painter->setPen(guisettings->connectorPenSelected);
+    else
+        painter->setPen(guisettings->connectorPen);
+
+    painter->drawPath(*_path);
 
     // TODO set ellipse pen brush & size
-    painter->setBrush(GuiSettings::connectorBrush);
-    painter->drawEllipse(_pStart, GuiSettings::connectorEndSize, GuiSettings::connectorEndSize);
-    painter->drawEllipse(_pEnd,   GuiSettings::connectorEndSize, GuiSettings::connectorEndSize);
+    painter->setBrush(guisettings->connectorBrush);
+    painter->drawEllipse(_pStart, guisettings->connectorEndSize, guisettings->connectorEndSize);
+    painter->drawEllipse(_pEnd,   guisettings->connectorEndSize, guisettings->connectorEndSize);
 
     painter->restore();
 }

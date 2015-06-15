@@ -16,8 +16,8 @@ Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
     _rubberBand(nullptr),
     _dragged(false)
 {
-    _cellsize = GuiSettings::df_cellsize;
-    _cellspace = GuiSettings::df_cellspace;
+    _cellsize = guisettings->df_cellsize;
+    _cellspace = guisettings->df_cellspace;
 
     setWindowTitle(tr("dLite floor"));
 //    setWindowFlags(Qt::Tool | Qt::WindowTitleHint  |
@@ -51,10 +51,10 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
     Q_UNUSED(event)
 
     QPainter painter(this);
-    painter.fillRect(rect(), GuiSettings::df_bgColor);
+    painter.fillRect(rect(), guisettings->df_bgColor);
 
     // Draw the outline
-    QPen cellPen(GuiSettings::df_cellSepColor);
+    QPen cellPen(guisettings->df_cellSepColor);
     painter.setPen(cellPen);
     painter.setFont(GuiSettings::sg_HzFont);    // hardw give own guisetting
 
@@ -71,7 +71,7 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
                     painter.fillRect(cell, _dfModel->getQColor(x,y));
             }
             else
-                painter.fillRect(cell, GuiSettings::df_noCellColor);
+                painter.fillRect(cell, guisettings->df_noCellColor);
             painter.drawRect(cell);
 
             if (y==0) {
@@ -98,7 +98,7 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
                     wood.setRight(cell.right()+_cellspace);
                     wood.setTop(cell.top()-_cellspace+2);
                     wood.setBottom(cell.bottom()+_cellspace-1);
-                    painter.fillRect(wood,GuiSettings::df_woodColor);
+                    painter.fillRect(wood,guisettings->df_woodColor);
             }
             // Horizontal bars
             xstart= (y<10) ? 5 : 7;
@@ -109,7 +109,7 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
                     wood.setRight(cell.right()+_cellspace);
                     wood.setTop(cell.top()-_cellspace+1);
                     wood.setBottom(cell.top()-1);
-                    painter.fillRect(wood,GuiSettings::df_woodColor);
+                    painter.fillRect(wood,guisettings->df_woodColor);
             }
         }
     }

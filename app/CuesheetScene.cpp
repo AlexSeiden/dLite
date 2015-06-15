@@ -139,7 +139,8 @@ void CuesheetScene::startLine(QGraphicsSceneMouseEvent *mouseEvent, SocketItem *
     _startSocket = srcItem;
     _startPoint = mouseEvent->scenePos();
     _line = new QGraphicsLineItem(QLineF(_startPoint, _startPoint));
-    _line->setPen(QPen(GuiSettings::connectorColor, 2));
+    // TODO width property
+    _line->setPen(QPen(guisettings->connectorColor, 2));
     addItem(_line);
 }
 

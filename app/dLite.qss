@@ -2,18 +2,52 @@
 
 
 GuiSettings {
-    qproperty-NNBGColor: rgb(55,55,255);
-    qproperty-NNNameFont: Helvetica 14px rgb(55,55,255);
-    qproperty-NNborderRadius: 4;
+    qproperty-NNBGColor: rgb(150,150,255);
+    qproperty-NNNameFont: "Helvetica Light,  -1,14,  0,25,  0,0,0,0,0";
+    qproperty-NNborderRadius: 8;
     qproperty-NNselectedColor: rgb(255,100,100);
     qproperty-NNselectedWidth: 2;
+    qproperty-NNselectedBorderRadius: 4;
     qproperty-NNWidth: 200;
     qproperty-NNSpacing: 30;
 
-    qproperty-PIbgcolor: rgb(20, 50, 55);
-    qproperty-PIoutputbgcolor: rgb(200, 50, 55);
+    qproperty-PIbgcolor: rgb(50, 50, 55);
+    qproperty-PIoutputbgcolor: rgb(100,100,100);
     qproperty-PIheight: 30;
-    qproperty-PIfont: Helvetica 14px rgb(255,255,255);
+
+    /*
+    Doc on fonts:
+    qproperty-myFont: "serif,-1,14,5,0,0,0,0,0,0";
+    Where parameters are:
+                font family, pointSizeF, pixelSize,
+                QFont::StyleHint, QFont::Weight,
+                QFont::Style, underline, strikeOut, fixedPitch, rawMode
+    */
+    qproperty-PIfont: "Helvetica Light,  -1,14,  0,25,  0,0,0,0,0";
+    qproperty-PIfontcolor:          rgb(255,255,255);
+    qproperty-paramTextOffset:          15;
+    qproperty-paramEditorOffset:            80;
+
+
+    qproperty-socketFillColor:          rgb(255,20,80);
+    qproperty-socketOutlineColor:       rgb(255,255,255);
+    qproperty-socketWidth:              16;
+    qproperty-zoomIconSize:         16;
+
+    /* This is the color of the ellipses at the end of the connector which you don't see right now */
+    qproperty-connectorCenterColor:     rgb(2, 230, 255);
+    qproperty-connectorEndSize:     5;
+
+    qproperty-connectorColor:           rgb(255,186,2);
+
+    /*  Dancefloorwidget */
+    qproperty-df_bgColor           : rgb(30,30,80);
+    qproperty-df_panelSepColor     : rgb(255,255,200);
+    qproperty-df_cellSepColor      : rgb(100,100,100);
+    qproperty-df_noCellColor       : rgb(60,60,60);
+    qproperty-df_woodColor         : rgb(130,123,112);
+    qproperty-df_cellsize          : 20;
+    qproperty-df_cellspace         : 4;
 
 }
 

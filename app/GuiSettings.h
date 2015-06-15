@@ -3,10 +3,10 @@
 
 #include <QWidget>
 #include <QColor>
+#include <QPen>
 
 QT_BEGIN_NAMESPACE
 class QToolButton;
-class QPen;
 QT_END_NAMESPACE
 
 
@@ -25,15 +25,37 @@ class GuiSettings : public QWidget
     Q_PROPERTY(int       NNWidth            MEMBER m_NNWidth)
     Q_PROPERTY(int       NNSpacing          MEMBER m_NNSpacing)
     Q_PROPERTY(int       NNborderRadius     MEMBER m_NNborderRadius)
+    Q_PROPERTY(int       NNselectedBorderRadius     MEMBER m_NNselectedBorderRadius)
 
     // ParamItem properties
     Q_PROPERTY(QColor    PIbgcolor          MEMBER m_PIbgcolor)
     Q_PROPERTY(QColor    PIoutputbgcolor    MEMBER m_PIoutputbgcolor)
     Q_PROPERTY(int       PIheight           MEMBER m_PIheight)
     Q_PROPERTY(QFont     PIfont             MEMBER m_PIfont)
+    Q_PROPERTY(QColor    PIfontcolor        MEMBER m_PIfontcolor)
+    Q_PROPERTY(int      paramTextOffset     MEMBER paramTextOffset)
+    Q_PROPERTY(int      paramEditorOffset   MEMBER paramEditorOffset)
+
+    Q_PROPERTY(QColor   socketFillColor     MEMBER m_socketFillColor)
+    Q_PROPERTY(QColor   socketOutlineColor  MEMBER socketOutlineColor )
+    Q_PROPERTY(int      socketWidth         MEMBER m_socketWidth)
+    Q_PROPERTY(QColor   connectorColor      MEMBER connectorColor)
+    Q_PROPERTY(QColor   connectorCenterColor    MEMBER connectorCenterColor)
+    Q_PROPERTY(int      connectorEndSize    MEMBER connectorEndSize)
+    Q_PROPERTY(int      zoomIconSize        MEMBER zoomIconSize)
+
+    // Dance floor widget
+    Q_PROPERTY(QColor  df_cellSepColor      MEMBER df_cellSepColor)
+    Q_PROPERTY(QColor  df_bgColor           MEMBER df_bgColor)
+    Q_PROPERTY(QColor  df_panelSepColor     MEMBER df_panelSepColor)
+    Q_PROPERTY(QColor  df_noCellColor       MEMBER df_noCellColor)
+    Q_PROPERTY(QColor  df_woodColor         MEMBER df_woodColor)
+    Q_PROPERTY(int     df_cellsize          MEMBER df_cellsize)
+    Q_PROPERTY(int     df_cellspace         MEMBER df_cellspace)
 
 public:
     // Stylesheet
+    // NodeItem
     QColor    m_NNNameColor;
     QFont     m_NNNameFont ;
     QColor    m_NNBGColor  ;
@@ -43,43 +65,43 @@ public:
     QColor    m_NNselectedColor;
     QColor    m_NNTextColor;
     int       m_NNborderRadius;
+    int       m_NNselectedBorderRadius;
 
+    // ParamItem
     QColor    m_PIbgcolor;
     QColor    m_PIoutputbgcolor;
     int       m_PIheight;
     QFont     m_PIfont ;
+    QColor    m_PIfontcolor;
 
-
-    explicit GuiSettings(QWidget *parent = 0);
-    // Graph widget
-    static QColor   selectedNodePenColor;
-    static int      selectedNodePenWidth;
-    static QColor   socketFillColor;
-    static QColor   socketOutlineColor;
-    static QColor   outputParamFillColor;
-    static QColor   paramTextColor;
-    static QFont    paramTextFont;
-    static int      socketWidth;
-    static int      paramTextOffset;
-    static int      paramEditorOffset;
-    static QPen     socketOutlinePen;
-    static QColor   connectorColor;
-    static QColor   connectorCenterColor;
-    static QPen     connectorPen;
-    static QPen     connectorPenSelected;
-    static QBrush   connectorBrush;
-    static int      connectorEndSize;
-    static int      zoomIconSize;
-    static int      colorChipSize;
+    QColor   m_socketFillColor;
+    QColor   socketOutlineColor ;
+    QColor   outputParamFillColor ;
+    int      m_socketWidth;
+    int      paramTextOffset;
+    int      paramEditorOffset;
+    QColor   connectorColor;
+    QColor   connectorCenterColor;
+    int      connectorEndSize;
+    int      zoomIconSize;
+    int      colorChipSize;
+    // Derived
+    QPen     socketOutlinePen;
+    QPen     connectorPen;
+    QPen     connectorPenSelected;
+    QBrush   connectorBrush;
 
     // Dance floor widget
-    static QColor  df_cellSepColor;
-    static QColor  df_bgColor;
-    static QColor  df_panelSepColor;
-    static QColor  df_noCellColor;
-    static QColor  df_woodColor;
-    static int     df_cellsize;
-    static int     df_cellspace;
+    QColor  df_cellSepColor;
+    QColor  df_bgColor;
+    QColor  df_panelSepColor;
+    QColor  df_noCellColor;
+    QColor  df_woodColor;
+    int     df_cellsize;
+    int     df_cellspace;
+    
+
+    explicit GuiSettings(QWidget *parent = 0);
 
     // Spectrograph widget
     static QColor  sg_barColor;
