@@ -91,13 +91,16 @@ void ConnectorItem::updatePath()
     _pStart = _serverSocket->socketPos();
     _pEnd   = _clientSocket->socketPos();
 
+    qreal deltaX = fabs(_pEnd.x() - _pStart.x());
+    qreal tangent = .5 * deltaX; //hardw
+
     prepareGeometryChange();
     if (_path)
         delete _path;
 
     _path = new QPainterPath();
     _path->moveTo(_pStart);
-    _path->cubicTo(_pStart+QPointF(100.,0.), _pEnd+QPointF(-100.,0.), _pEnd);
+    _path->cubicTo(_pStart+QPointF(tangent,0.), _pEnd+QPointF(-tangent,0.), _pEnd);
 }
 
 void ConnectorItem::paint(QPainter *painter,

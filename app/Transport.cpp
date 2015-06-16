@@ -34,7 +34,7 @@ void Transport::paintEvent(QPaintEvent * event)
     Q_UNUSED(event);
 
     QPainter painter(this);
-    painter.fillRect(rect(), GuiSettings::trans_bgColor);
+    painter.fillRect(rect(), guisettings->trans_bgColor);
 
     if (! m_bufferLength) return;
 
@@ -43,7 +43,7 @@ void Transport::paintEvent(QPaintEvent * event)
     const qreal play = qreal(m_playPosition) / m_bufferLength;
     bar.setLeft(rect().left() + play * rect().width());
     bar.setRight(rect().left());
-    painter.fillRect(bar, GuiSettings::trans_barColor);
+    painter.fillRect(bar, guisettings->trans_barColor);
 
     if (_segmentation) {
         const int segheight = (rect().height()-2)/_segmentation->_segmentIndices.count();
@@ -52,17 +52,17 @@ void Transport::paintEvent(QPaintEvent * event)
             int x = float(seg.startTime)*rect().width()/_totalDuration;
             int y = seg.segmentIndex*segheight+1;
             QRect segrect(x,y, segwidth, segheight);
-            painter.fillRect(segrect, GuiSettings::trans_segmentColor);
-            painter.setFont(GuiSettings::trans_segmentFont);
-            painter.setPen(GuiSettings::trans_segmentTextColor);
+            painter.fillRect(segrect, guisettings->trans_segmentColor);
+            painter.setFont(guisettings->trans_segmentFont);
+            painter.setPen(guisettings->trans_segmentTextColor);
             segrect.setBottom(segrect.bottom()+2);
             painter.drawText(segrect, Qt::AlignBottom|Qt::AlignHCenter, seg.segmentVariant);
         }
     }
 
     // Play head
-    QRect playHead(bar.left(), 0, GuiSettings::trans_playheadWidth, rect().height());
-    painter.fillRect(playHead, GuiSettings::trans_playheadColor);
+    QRect playHead(bar.left(), 0, guisettings->trans_playheadWidth, rect().height());
+    painter.fillRect(playHead, guisettings->trans_playheadColor);
 
 }
 

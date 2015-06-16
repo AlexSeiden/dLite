@@ -7,5 +7,13 @@
         <file>images/zoomout.png</file>
         <file>images/zoomin.png</file>
         <file>dLite.qss</file>
+        <file>images/arrow-down.png</file>
+        <file>images/arrow-down@2x.png</file>
+        <file>images/arrow-left.png</file>
+        <file>images/arrow-left@2x.png</file>
+        <file>images/arrow-right.png</file>
+        <file>images/arrow-right@2x.png</file>
+        <file>images/arrow-up.png</file>
+        <file>images/arrow-up@2x.png</file>
     </qresource>
 </RCC>

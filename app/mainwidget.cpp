@@ -181,15 +181,18 @@ void MainWidget::loadStyleSheet()
     QFile file("/Users/alex/src/dLite/app/dLite.qss");
     file.open(QFile::ReadOnly);
     QString styleSheet = QString::fromLatin1(file.readAll());
-    qDebug() << "reload styles";
+//    qDebug() << "reload styles";
     qApp->setStyleSheet(styleSheet);
     // Need to run process events here so that custom properties will get updated.
     qApp->processEvents(QEventLoop::AllEvents, 1000);
+
     // Derived
     guisettings->socketOutlinePen     = QPen(guisettings->socketOutlineColor, 2, Qt::SolidLine);
     guisettings->connectorPen         = QPen(QBrush(guisettings->connectorColor), 2.0, Qt::SolidLine);
     guisettings->connectorPenSelected = QPen(QColor(200,40,40), 4, Qt::SolidLine);
     guisettings->connectorBrush       = QBrush(guisettings->connectorCenterColor);
+
+//    guisettings->m_PIfont.setWeight(QFont::Light);
 
     this->repaint();
     qApp->processEvents();

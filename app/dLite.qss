@@ -13,7 +13,7 @@ GuiSettings {
 
     qproperty-PIbgcolor: rgb(50, 50, 55);
     qproperty-PIoutputbgcolor: rgb(100,100,100);
-    qproperty-PIheight: 30;
+    qproperty-PIheight: 26;
 
     /*
     Doc on fonts:
@@ -23,20 +23,24 @@ GuiSettings {
                 QFont::StyleHint, QFont::Weight,
                 QFont::Style, underline, strikeOut, fixedPitch, rawMode
     */
-    qproperty-PIfont: "Helvetica Light,  -1,14,  0,25,  0,0,0,0,0";
-    qproperty-PIfontcolor:          rgb(255,255,255);
+    /*qproperty-PIfont: "Helvetica Light,  -1,14,  0,25,  0,0,0,0,0"; */
+    /* qproperty-PIfont    :               "Futura, -1,13,  0,0,  0,0,0,0,0"; */
+    qproperty-PIfont    :               "Futura, -1,12,  0,0,  0,0,0,0,0";
+    qproperty-PIfontcolor:              rgb(255,255,255);
     qproperty-paramTextOffset:          15;
-    qproperty-paramEditorOffset:            80;
-
+    qproperty-paramEditorOffset:        80;
+    qproperty-paramBorderRadius         0px;
+    qproperty-paramBorderWidth          0px;
+    qproperty-paramBorderColor          black;
 
     qproperty-socketFillColor:          rgb(255,20,80);
     qproperty-socketOutlineColor:       rgb(255,255,255);
     qproperty-socketWidth:              16;
-    qproperty-zoomIconSize:         16;
+    qproperty-zoomIconSize:             16;
 
     /* This is the color of the ellipses at the end of the connector which you don't see right now */
     qproperty-connectorCenterColor:     rgb(2, 230, 255);
-    qproperty-connectorEndSize:     5;
+    qproperty-connectorEndSize:         5;
 
     qproperty-connectorColor:           rgb(255,186,2);
 
@@ -49,8 +53,67 @@ GuiSettings {
     qproperty-df_cellsize          : 20;
     qproperty-df_cellspace         : 4;
 
+    qproperty-sg_barColor          : rgb(51, 204, 102);
+    qproperty-sg_lineColor         : rgb(75, 150, 150);
+    qproperty-sg_clipColor         : rgb(255, 255, 0);
+    qproperty-sg_gridColor         : rgb(22, 100, 50);
+    qproperty-sg_bg                : rgb(0,0,0);
+    qproperty-sg_textColor         : rgb(230,230,255);
+    qproperty-sg_sublevelRegion    : rgb(20,20,255);
+    qproperty-sg_sublevelPenwidth  : 2;
+    qproperty-sg_textHeight        : 20;
+    qproperty-sg_textOffset        : 5;
+    qproperty-sg_HzFont            : "Helvetica Light,  -1,10,  0,25,  0,0,0,0,0";
+
+    
+    qproperty-sl_bgColor           : rgb(0,0,0);
+    qproperty-sl_barColor          : rgb(51, 204, 102);
+    qproperty-sl_squareColor       : rgb(0,0,255);
+    qproperty-sl_selectedColor     : rgb(20,20,255);
+    qproperty-sl_dragTarget        : rgb(255,20,20);
+    qproperty-sl_barHeight         : 25;
+
+    qproperty-trans_bgColor        : rgb(24,24,22);
+    qproperty-trans_barColor       : rgb(38,50,95);
+    qproperty-trans_barHeight      : 25;
+    qproperty-trans_segmentColor   : rgb(226,222,170);
+    qproperty-trans_currentSegmentColor   : rgb(255,200,20);
+    qproperty-trans_segmentFont    : "Futura,  8,-1,  0,70,  1,0,0,0,0";
+    qproperty-trans_segmentTextColor: rgb(0,0,0);
+    qproperty-trans_playheadColor   : rgb(255,255,255);
+    qproperty-trans_playheadWidth   : 2;
 }
 
+/* ------------------------------------------------------------------------------ */
 CuesheetView QGraphicsView {
     background-color: rgb(40, 40, 40);
+}
+
+/* ------------------------------------------------------------------------------ */
+QLineEdit {
+    border: 1px solid gray;
+    padding: 2 0px;
+    margin: 0px;
+    background: rgb(200,200,200);
+    selection-background-color: rgb(20,20,20);
+    max-height: 16px;
+}
+
+/* ------------------------------------------------------------------------------ */
+QCheckBox {
+    padding: 0px;
+    margin: 0px;
+    spacing: 0px;
+}
+
+/* ------------------------------------------------------------------------------ */
+QSpinBox, QDoubleSpinBox {
+    max-height: 14px;
+    font-size: 10px;
+    margin: 0px;
+    spacing: 0px;
+    padding-left: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-right: 15px;
 }

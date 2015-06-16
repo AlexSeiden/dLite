@@ -58,12 +58,12 @@ void Spectrograph::paintEvent(QPaintEvent *event)
     Q_UNUSED(event)
 
     QPainter painter(this);
-    painter.fillRect(rect(), GuiSettings::sg_bg);
+    painter.fillRect(rect(), guisettings->sg_bg);
 
     const int numBars = m_bars.count();
 
     // Draw the outline
-    QPen gridPen(GuiSettings::sg_gridColor);
+    QPen gridPen(guisettings->sg_gridColor);
     painter.setPen(gridPen);
     painter.drawLine(rect().topLeft(), rect().topRight());
     painter.drawLine(rect().topRight(), rect().bottomRight());
@@ -103,9 +103,9 @@ void Spectrograph::paintEvent(QPaintEvent *event)
         painter.drawLine(line);
     }
 
-    QColor lineColor = GuiSettings::sg_lineColor;
+    QColor lineColor = guisettings->sg_lineColor;
     lineColor.setAlphaF(0.75);
-    QColor clipColor = GuiSettings::sg_clipColor;
+    QColor clipColor = guisettings->sg_clipColor;
     clipColor.setAlphaF(0.75);
 
     // Draw the bars
@@ -118,7 +118,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
         bar.setTop(rect().top() + gapWidth + (1.0 - value) * barHeight);
         bar.setBottom(rect().bottom() - gapWidth);
 
-        QColor color = GuiSettings::sg_barColor;
+        QColor color = guisettings->sg_barColor;
         if (m_bars[i].clipped)
             color = clipColor;
 
@@ -126,13 +126,13 @@ void Spectrograph::paintEvent(QPaintEvent *event)
     }
 
     // Label each bar with its frequency in Hz:
-    painter.setPen(GuiSettings::sg_textColor);
+    painter.setPen(guisettings->sg_textColor);
     for (int i=0; i<numBars; ++i) {
         QRect textrect = rect();
         textrect.setLeft(rect().left() + leftPaddingWidth/2 + (i * (gapWidth + barWidth)));
         textrect.setWidth(barWidth+gapWidth);
-        textrect.setBottom(rect().bottom() - GuiSettings::sg_textOffset);
-        textrect.setTop(rect().bottom() - GuiSettings::sg_textOffset - GuiSettings::sg_textHeight);
+        textrect.setBottom(rect().bottom() - guisettings->sg_textOffset);
+        textrect.setTop(rect().bottom() - guisettings->sg_textOffset - guisettings->sg_textHeight);
 
         QPair<qreal, qreal> freqrange = barRange(i, true);
         int centerfreq = (freqrange.first + freqrange.second)/2.0;
@@ -141,7 +141,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
             hz = QString::number(centerfreq);
         else
             hz = QString("%1K").arg(qreal(centerfreq)/1000,0,'f',1);
-        painter.setFont(GuiSettings::sg_HzFont);
+        painter.setFont(guisettings->sg_HzFont);
         painter.drawText(textrect, Qt::AlignBottom|Qt::AlignHCenter, hz);
     }
 
@@ -154,8 +154,8 @@ void Spectrograph::paintEvent(QPaintEvent *event)
         subwin.setLeft  (rect().width()  * subrangewindow.left());
         subwin.setRight (rect().width()  * subrangewindow.right());
 
-        QPen pen(GuiSettings::sg_sublevelRegion);
-        pen.setWidth(GuiSettings::sg_sublevelPenwidth);
+        QPen pen(guisettings->sg_sublevelRegion);
+        pen.setWidth(guisettings->sg_sublevelPenwidth);
         painter.setPen(pen);
 
         painter.drawRect(subwin);

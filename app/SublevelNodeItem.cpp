@@ -24,7 +24,7 @@ QRectF SublevelNodeItem::boundingRect() const
     if (isMinimized())
         bbox =  QRectF(0,0,guisettings->m_NNWidth, guisettings->m_PIheight);
     else
-        bbox =  QRectF(0,0,guisettings->m_NNWidth, guisettings->m_PIheight*nRows + GuiSettings::sl_barHeight);
+        bbox =  QRectF(0,0,guisettings->m_NNWidth, guisettings->m_PIheight*nRows + guisettings->sl_barHeight);
     return bbox.marginsAdded(_margins);
 }
 
@@ -45,7 +45,7 @@ RangeMeter::RangeMeter(QWidget *parent)
       _level(0.0)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    setFixedSize(guisettings->m_NNWidth, GuiSettings::sl_barHeight);
+    setFixedSize(guisettings->m_NNWidth, guisettings->sl_barHeight);
 }
 
 RangeMeter::~RangeMeter() {  }
@@ -55,12 +55,12 @@ void RangeMeter::paintEvent(QPaintEvent *event)
     Q_UNUSED(event)
 
     QPainter painter(this);
-    painter.fillRect(rect(), GuiSettings::sl_bgColor);
+    painter.fillRect(rect(), guisettings->sl_bgColor);
 
     // Draw bar
     QRect bar = rect();
     bar.setRight(rect().left() +  _level * rect().width());
-    painter.fillRect(bar, GuiSettings::sl_barColor);
+    painter.fillRect(bar, guisettings->sl_barColor);
 
     // Draw pulsar
     QRect squareRect = rect();

@@ -56,7 +56,7 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
     // Draw the outline
     QPen cellPen(guisettings->df_cellSepColor);
     painter.setPen(cellPen);
-    painter.setFont(GuiSettings::sg_HzFont);    // hardw give own guisetting
+    painter.setFont(guisettings->sg_HzFont);    // hardw give own guisetting
 
     QRect cell(0,0, _cellsize, _cellsize);
     for (int y=0; y<_ysize; ++y) {
@@ -76,14 +76,14 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
 
             if (y==0) {
                 painter.save();
-                painter.setPen(GuiSettings::sg_textColor);  // hardw give own guisetting
+                painter.setPen(guisettings->sg_textColor);  // hardw give own guisetting
                 painter.drawText(cell, Qt::AlignTop|Qt::AlignLeft, QString::number(x));
                 painter.restore();
             }
 
             if (x==0) {
                 painter.save();
-                painter.setPen(GuiSettings::sg_textColor);  // hardw give own guisetting
+                painter.setPen(guisettings->sg_textColor);  // hardw give own guisetting
                 painter.drawText(cell, Qt::AlignTop|Qt::AlignLeft, QString::number(y));
                 painter.restore();
             }

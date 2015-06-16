@@ -26,8 +26,8 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     nameEdit->setText(_node->getName());
     QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
     proxy->setWidget(nameEdit);
-    proxy->setPos(guisettings->m_socketWidth + guisettings->paramTextOffset, 5);  // Hardw
-    proxy->resize(guisettings->m_NNWidth*.75, guisettings->m_PIheight* .75);  // Hardw
+    proxy->setPos(guisettings->m_socketWidth + guisettings->paramTextOffset, 2);  // Hardw
+    proxy->resize(guisettings->m_NNWidth*.75, (guisettings->m_PIheight -2)* .75);  // Hardw
     CHECKED_CONNECT(nameEdit, SIGNAL(textChanged(QString)), this, SLOT(nameEdit(QString)));
 
     // Minimize checkbox
@@ -338,11 +338,11 @@ void ParamItem::paint(QPainter *painter,
     else
         painter->setBrush(guisettings->m_PIbgcolor);
 
-    QRect rr(0,0,guisettings->m_NNWidth,guisettings->m_PIheight);
+    QRect rr(2,0,guisettings->m_NNWidth-4,guisettings->m_PIheight); //hardw
 
     // Draw rectangle
-    painter->setPen(Qt::black);
-    painter->drawRoundedRect(rr, 0, 0);
+    painter->setPen(QPen(guisettings->paramBorderColor, guisettings->paramBorderWidth));
+    painter->drawRoundedRect(rr, guisettings->paramBorderRadius, guisettings->paramBorderRadius);
 
     // Draw name
     painter->setPen(guisettings->m_PIfontcolor);
