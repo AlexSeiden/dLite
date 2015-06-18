@@ -44,6 +44,23 @@ public:
     static QString  getAudioFilename()
                         {return Singleton()->_engine->getAudioFilename();}
 
+signals:
+    // Forward to engine (via mainwidget for now TODO)
+    void togglePlayback();
+    void rewind();
+    void suspend();
+    void startPlayback();
+
+    // Forward to MainWindow
+    void showLoadSongDialog();
+    void showSaveDialog();
+    void showOpenDialog();
+    void showSettingsDialog();
+    void showImportDialog();
+
+    // Forward to TransportControl
+    void updateButtonStates();
+
 private:
     // Display widgets
     QObject*                _spectrograph;

@@ -13,7 +13,7 @@ Transport::Transport(QWidget *parent)
     ,   _segmentation(nullptr)
 {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    setMinimumHeight(30);
+    setMinimumSize(300,30);
     _playIcon = style()->standardIcon(QStyle::SP_MediaPlay);
     _pauseIcon = style()->standardIcon(QStyle::SP_MediaPause);
 }

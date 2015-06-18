@@ -1,25 +1,8 @@
 #include "GuiSettings.h"
 #include <QToolButton>
 #include <QPen>
-#if 0
-QColor  GuiSettings::sl_bgColor           = QColor(0,0,0);
-QColor  GuiSettings::sl_barColor          = QColor(51, 204, 102);
-QColor  GuiSettings::sl_squareColor       = QColor(0,0,255);
-QColor  GuiSettings::sl_selectedColor     =  QColor(20,20,255);
-QColor  GuiSettings::sl_dragTarget        = QColor(255,20,20);
-int     GuiSettings::sl_barHeight         = 25;
-
-QColor  GuiSettings::trans_bgColor        = QColor(24,24,22);
-QColor  GuiSettings::trans_barColor       = QColor(38,50,95);
-int     GuiSettings::trans_barHeight      = 25;
-QColor  GuiSettings::trans_segmentColor   = QColor(226,222,170);
-QColor  GuiSettings::trans_currentSegmentColor   = QColor(255,200,20);
-QFont   GuiSettings::trans_segmentFont    = QFont("Futura", 8, 70, true);
-QColor  GuiSettings::trans_segmentTextColor   = QColor(0,0,0);
-QColor  GuiSettings::trans_playheadColor   = QColor(255,255,255);
-int     GuiSettings::trans_playheadWidth   = 2;
-#endif
-
+#include <QFile>
+#include <QApplication>
 
 GuiSettings *guisettings;
 
@@ -28,12 +11,6 @@ GuiSettings::GuiSettings(QWidget *parent) :
 {
     // XXX dunno why this crashes
 //    this->setObjectName(QString("guisettings"));
-}
-
-void    GuiSettings::editGuiColorsDialog(QObject *parent)
-{
-    Q_UNUSED(parent);
-    //LATER void    GuiColors::editGuiColorsDialog()
 }
 
 // Utility function
@@ -46,3 +23,24 @@ void setButtonColor(QToolButton *colorButton, const QColor &col){
     }
 }
 
+void GuiSettings::loadStyleSheet()
+{
+//    guisettings = new GuiSettings();
+//    QFile file(":dLite.qss");
+    QFile file("/Users/alex/src/dLite/app/dLite.qss");
+    file.open(QFile::ReadOnly);
+    QString styleSheet = QString::fromLatin1(file.readAll());
+    qApp->setStyleSheet(styleSheet);
+
+    // Need to run process events here so that custom properties will get updated.
+    qApp->processEvents(QEventLoop::AllEvents, 1000);
+
+    // Derived
+    guisettings->socketOutlinePen     = QPen(guisettings->socketOutlineColor, 2, Qt::SolidLine);
+    guisettings->connectorPen         = QPen(QBrush(guisettings->connectorColor), 2.0, Qt::SolidLine);
+    guisettings->connectorPenSelected = QPen(QColor(200,40,40), 4, Qt::SolidLine);
+    guisettings->connectorBrush       = QBrush(guisettings->connectorCenterColor);
+
+    this->repaint();
+    qApp->processEvents();
+}

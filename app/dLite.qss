@@ -25,11 +25,11 @@ GuiSettings {
     */
     /*qproperty-PIfont: "Helvetica Light,  -1,14,  0,25,  0,0,0,0,0"; */
     /* qproperty-PIfont    :               "Futura, -1,13,  0,0,  0,0,0,0,0"; */
-    qproperty-PIfont    :               "Futura, -1,12,  0,0,  0,0,0,0,0";
+    qproperty-PIfont    :               "Futura, -1,10,  0,0,  0,0,0,0,0";
     qproperty-PIfontcolor:              rgb(255,255,255);
     qproperty-paramTextOffset:          15;
     qproperty-paramEditorOffset:        80;
-    qproperty-paramBorderRadius         0px;
+    qproperty-paramBorderRadius         1px;
     qproperty-paramBorderWidth          0px;
     qproperty-paramBorderColor          black;
 
@@ -83,6 +83,11 @@ GuiSettings {
     qproperty-trans_playheadColor   : rgb(255,255,255);
     qproperty-trans_playheadWidth   : 2;
 }
+
+TransportControl {
+    background-color: rgb(40,40,150);
+}
+
 
 /* ------------------------------------------------------------------------------ */
 CuesheetView QGraphicsView {

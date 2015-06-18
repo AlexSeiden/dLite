@@ -8,13 +8,15 @@
 
 Spectrograph::Spectrograph(QWidget *parent)
     :   QWidget(parent)
-    ,   m_lowFreq(10.0)
-    ,   m_highFreq(1000.0)
+    ,   m_lowFreq(20.0)
+    ,   m_highFreq(10000.0)
     ,   m_printspectrum(false)
     ,   m_dragStart(QPoint(0,0))
     ,   m_rubberBand(NULL)
 {
-    setMinimumHeight(100);
+    setMinimumHeight(300);
+    setMinimumWidth(400);
+    setNumBars(20);
 }
 
 Spectrograph::~Spectrograph() { }

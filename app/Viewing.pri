@@ -17,7 +17,9 @@ SOURCES += \
     $$PWD/ColorChip.cpp \
     $$PWD/GroupNodeItem.cpp \
     $$PWD/RenameTabDialog.cpp \
-    $$PWD/MyDoubleSpinBox.cpp
+    $$PWD/MyDoubleSpinBox.cpp \
+    $$PWD/TransportControl.cpp \
+    $$PWD/ModalDialogs.cpp
 
 HEADERS += \
     mainwidget.h \
@@ -36,4 +38,6 @@ HEADERS += \
     $$PWD/ColorChip.h \
     $$PWD/GroupNodeItem.h \
     $$PWD/RenameTabDialog.h \
-    $$PWD/MyDoubleSpinBox.h
+    $$PWD/MyDoubleSpinBox.h \
+    $$PWD/TransportControl.h \
+    $$PWD/ModalDialogs.h

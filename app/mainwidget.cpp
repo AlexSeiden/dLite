@@ -1,16 +1,4 @@
-#include "engine.h"
 #include "mainwidget.h"
-#include "Transport.h"
-#include "settingsdialog.h"
-#include "spectrograph.h"
-#include "utils.h"
-#include "dancefloorwidget.h"
-#include "CueLibView.h"
-#include "GraphWidget.h"
-#include "Node.h"
-#include "Cupid.h"
-#include "NodeFactory.h"
-#include "GuiSettings.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -25,44 +13,29 @@
 #include <QShortCut>
 #include <QMenuBar>
 
-const int NullTimerId = -1;
-
 MainWidget::MainWidget(QWidget *parent)
-    :   QWidget(parent)
+    :   QMainWindow(parent)
     ,   m_engine(new Engine(this))
     ,   m_transport(new Transport(this))
     ,   m_spectrograph(new Spectrograph(this))
-    ,   m_fileButton(new QPushButton(this))
-    ,   m_saveButton(new QPushButton(this))
-    ,   m_openButton(new QPushButton(this))
-    ,   m_pauseButton(new QPushButton(this))
-    ,   m_playButton(new QPushButton(this))
-    ,   m_settingsButton(new QPushButton(this))
-    ,   m_infoMessage(new QLabel(tr(""), this))
-    ,   m_infoMessageTimerId(NullTimerId)
     ,   m_settingsDialog(new SettingsDialog(m_engine->interval(), this))
     ,   m_dancefloor(new Dancefloor)
     ,   m_cueLibView(NULL)
-    ,   _filename()
+    ,   m_filename()
 {
     // GROSS  These are essentially globals:
     Cupid::Singleton()->setEngine(m_engine);
     Cupid::Singleton()->setDancefloor(m_dancefloor);
     Cupid::Singleton()->setSpectrograph(m_spectrograph);
     Cupid::Singleton()->setTransport(m_transport);
-
-//    guisettings = new GuiSettings();
-
-    this->loadStyleSheet();
-
-    // numBands, lowfreq, hifreq.
-    // TODO move somewhere else....
-    m_spectrograph->setParams(20, 20., 10000.);
+    guisettings = new GuiSettings();
+    guisettings->loadStyleSheet();
 
     createUi();
 
-    setMinimumSize(500, 400);
-    resize(600, 450);
+    // These cause problems with the dock widgets
+//    setMinimumSize(500, 400);
+//    resize(600, 450);
     move(5,10);  // TODO restore from last saved
 
     // TODO move to settings/prefs  & allow setting this
@@ -74,9 +47,8 @@ MainWidget::MainWidget(QWidget *parent)
     m_dancefloorwidget = new Dancefloorwidget();
     m_dancefloorwidget->setModel(m_dancefloor);
     m_dancefloor->setView(m_dancefloorwidget);  // GROSS
-    m_dancefloorwidget->show();
+    setCentralWidget(m_dancefloorwidget);
     Cupid::Singleton()->setDancefloorwidget(m_dancefloorwidget);
-
 
     m_cueLibView = new CueLibView(NULL);
     m_cueLibView->show();
@@ -88,9 +60,8 @@ MainWidget::MainWidget(QWidget *parent)
     connectUi();
 
     // TODO default to last played.
-    //m_engine->loadFile(QString("/Users/alex/Documents/lights/Jam On It/Jam On It.wav"));
     m_engine->loadSong(QString("/Users/alex/Documents/WAVS/Awesome/Awesome.wav"));
-    updateButtonStates();
+    emit updateButtonStates();
 
     createShortcuts();
     createActions();
@@ -101,234 +72,34 @@ MainWidget::~MainWidget() { }
 
 
 //-----------------------------------------------------------------------------
-// Public slots
-//-----------------------------------------------------------------------------
-
-void MainWidget::stateChanged(QAudio::State state)
-{
-    updateButtonStates();
-
-    if (QAudio::ActiveState != state && QAudio::SuspendedState != state) {
-        m_spectrograph->reset();
-    }
-}
-
-// TODO decouple position & spectrum change
-// They are artificially coupled in engine.cpp
-void MainWidget::spectrumChanged(qint64 position, qint64 length,
-                                 const FrequencySpectrum &spectrum)
-{
-    Q_UNUSED(position)
-    Q_UNUSED(length)
-    // ??? Why is this a function call, instead of a signal?
-    m_spectrograph->spectrumChanged(spectrum);
-}
-
-void MainWidget::save()
-{
-    if (_filename.isEmpty() || _filename.isNull())
-        showSaveDialog();
-    else
-        NodeFactory::Singleton()->saveToFile(_filename);
-}
-
-#if 0 // NUKEMEMAYBE
-void MainWidget::infoMessage(const QString &message, int timeoutMs)
-{
-    m_infoMessage->setText(message);
-
-    if (NullTimerId != m_infoMessageTimerId) {
-        killTimer(m_infoMessageTimerId);
-        m_infoMessageTimerId = NullTimerId;
-    }
-
-    if (NullMessageTimeout != timeoutMs)
-        m_infoMessageTimerId = startTimer(timeoutMs);
-}
-
-void MainWidget::errorMessage(const QString &heading, const QString &detail)
-{
-    QMessageBox::warning(this, heading, detail, QMessageBox::Close);
-}
-#endif
-
-
-void MainWidget::timerEvent(QTimerEvent *event)
-{
-    Q_ASSERT(event->timerId() == m_infoMessageTimerId);
-    Q_UNUSED(event) // suppress warnings in release builds
-    killTimer(m_infoMessageTimerId);
-    m_infoMessageTimerId = NullTimerId;
-    m_infoMessage->setText("");
-}
-
-void MainWidget::audioPositionChanged(qint64 position)
-{
-    Q_UNUSED(position)
-    // WTF why isn't this used?  Can we nuke it?
-}
-
-void MainWidget::bufferLengthChanged(qint64 length)
-{
-    m_transport->bufferLengthChanged(length);
-}
-
-// TODO move to GuiSettings
-void MainWidget::loadStyleSheet()
-{
-    guisettings = new GuiSettings();
-//    QFile file(":dLite.qss");
-    QFile file("/Users/alex/src/dLite/app/dLite.qss");
-    file.open(QFile::ReadOnly);
-    QString styleSheet = QString::fromLatin1(file.readAll());
-//    qDebug() << "reload styles";
-    qApp->setStyleSheet(styleSheet);
-    // Need to run process events here so that custom properties will get updated.
-    qApp->processEvents(QEventLoop::AllEvents, 1000);
-
-    // Derived
-    guisettings->socketOutlinePen     = QPen(guisettings->socketOutlineColor, 2, Qt::SolidLine);
-    guisettings->connectorPen         = QPen(QBrush(guisettings->connectorColor), 2.0, Qt::SolidLine);
-    guisettings->connectorPenSelected = QPen(QColor(200,40,40), 4, Qt::SolidLine);
-    guisettings->connectorBrush       = QBrush(guisettings->connectorCenterColor);
-
-//    guisettings->m_PIfont.setWeight(QFont::Light);
-
-    this->repaint();
-    qApp->processEvents();
-}
-
-//-----------------------------------------------------------------------------
-// Private slots
-//-----------------------------------------------------------------------------
-
-void MainWidget::showLoadSongDialog()
-{
-    // TODO Load & queue multiple files
-    QString dir = "/Users/alex/Documents/WAVS";
-    const QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open WAV file"), dir, "*.wav");
-    if (fileNames.count()) {
-        reset();
-        m_engine->loadSong(fileNames.front()); // TODO open multiple files
-        updateButtonStates();
-        m_engine->startPlayback();
-    }
-}
-
-void MainWidget::showSaveDialog()
-{
-    const QString dir = QDir::homePath(); // XXX better default path
-    _filename = QFileDialog::getSaveFileName(this, tr("Save file"), dir);
-    if (! _filename.isEmpty()) {
-        if (! _filename.endsWith(".dlite"))
-            _filename.append(".dlite");
-        NodeFactory::Singleton()->saveToFile(_filename);
-    }
-}
-
-void MainWidget::showOpenDialog()
-{
-    const QString dir = QDir::homePath(); // XXX better default path
-    const QString fileName = QFileDialog::getOpenFileName(this, tr("Open dLite file"), dir, "*.dLite");
-    // TODO open multiple files
-    if (! fileName.isEmpty() && ! fileName.isNull()) {
-        bool result = NodeFactory::Singleton()->readFromFile(fileName);
-        if (result)
-            _filename = fileName;
-        updateButtonStates();
-    }
-}
-
-void MainWidget::showImportDialog()
-{
-    const QString dir = QDir::homePath(); // XXX better default path
-    const QString fileName = QFileDialog::getOpenFileName(this, tr("Import dLite file"), dir, "*.dLite");
-    // TODO open multiple files
-    if (! fileName.isEmpty() && ! fileName.isNull()) {
-        NodeFactory::Singleton()->readFromFile(fileName, true);
-        updateButtonStates();
-    }
-}
-
-void MainWidget::showSettingsDialog()
-{
-    m_settingsDialog->exec();
-    if (m_settingsDialog->result() == QDialog::Accepted) {
-        m_engine->setWindowFunction(m_settingsDialog->windowFunction());
-        m_engine->setUpdateInterval(m_settingsDialog->interval());
-        m_dancefloor->setHardwareStatus(m_settingsDialog->useHardware());
-    }
-}
-
-//-----------------------------------------------------------------------------
 // Private functions
 //-----------------------------------------------------------------------------
 
 void MainWidget::createUi()
 {
-    setWindowTitle(tr("Spectrum Analyser"));
+    setWindowTitle(tr("dLite"));
 
-    QVBoxLayout *windowLayout = new QVBoxLayout(this);
+    m_transportControl = new TransportControl(this);
+    addToolBar(Qt::BottomToolBarArea, m_transportControl);
 
-    m_infoMessage->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    m_infoMessage->setAlignment(Qt::AlignHCenter);
+#if 1
+    QToolBar *transport_tb = addToolBar(tr("Transport"));
+    QAction *transport_act = transport_tb->addWidget(m_transport);
+    transport_act->setVisible(true);
 
-    windowLayout->addWidget(m_transport);
+
+#else
+    QDockWidget *transport_dw = new QDockWidget(this);
+    transport_dw->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
+    transport_dw->setWidget(m_transport);
+    addDockWidget(Qt::TopDockWidgetArea, transport_dw);
+#endif
 
     // Spectrograph
-    QScopedPointer<QHBoxLayout> analysisLayout(new QHBoxLayout);
-    analysisLayout->addWidget(m_spectrograph);
-    windowLayout->addLayout(analysisLayout.data());
-    analysisLayout.take();
-
-    // Button panel
-    const QSize buttonSize(30, 30);
-
-    m_fileButton->setText(tr("Song..."));
-
-    m_pauseIcon = style()->standardIcon(QStyle::SP_MediaPause);
-    m_pauseButton->setIcon(m_pauseIcon);
-    m_pauseButton->setEnabled(false);
-    m_pauseButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    m_pauseButton->setMinimumSize(buttonSize);
-
-    m_playIcon = style()->standardIcon(QStyle::SP_MediaPlay);
-    m_playButton->setIcon(m_playIcon);
-    m_playButton->setEnabled(false);
-    m_playButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    m_playButton->setMinimumSize(buttonSize);
-
-    m_settingsIcon = QIcon(":/images/settings.png");
-    m_settingsButton->setIcon(m_settingsIcon);
-    m_settingsButton->setEnabled(true);
-    m_settingsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    m_settingsButton->setMinimumSize(buttonSize);
-
-    m_saveButton->setText(tr("Save..."));
-    m_openButton->setText(tr("Open..."));
-
-
-    QScopedPointer<QHBoxLayout> buttonPanelLayout(new QHBoxLayout);
-    buttonPanelLayout->addStretch();
-    buttonPanelLayout->addWidget(m_fileButton);
-    buttonPanelLayout->addWidget(m_pauseButton);
-    buttonPanelLayout->addWidget(m_playButton);
-    buttonPanelLayout->addWidget(m_settingsButton);
-    buttonPanelLayout->addWidget(m_openButton);
-    buttonPanelLayout->addWidget(m_saveButton);
-
-    QWidget *buttonPanel = new QWidget(this);
-    buttonPanel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    buttonPanel->setLayout(buttonPanelLayout.data());
-    buttonPanelLayout.take(); // ownership transferred to buttonPanel
-
-    QScopedPointer<QHBoxLayout> bottomPaneLayout(new QHBoxLayout);
-    bottomPaneLayout->addWidget(buttonPanel);
-    windowLayout->addLayout(bottomPaneLayout.data());
-    bottomPaneLayout.take(); // ownership transferred to windowLayout
-
-    // Apply layout
-    setLayout(windowLayout);
+    QScopedPointer<QDockWidget> spectrograph_dw(new QDockWidget(tr("Spectrograph"), this));
+    spectrograph_dw->setWidget(m_spectrograph);
+    spectrograph_dw->setFloating(true);
+    spectrograph_dw.take();
 }
 
 void MainWidget::createActions()
@@ -402,24 +173,6 @@ void MainWidget::createMenus()
 
 void MainWidget::connectUi()
 {
-    CHECKED_CONNECT(m_pauseButton, SIGNAL(clicked()),
-            m_engine, SLOT(suspend()));
-
-    CHECKED_CONNECT(m_playButton, SIGNAL(clicked()),
-            m_engine, SLOT(startPlayback()));
-
-    CHECKED_CONNECT(m_fileButton, SIGNAL(clicked()),
-            this, SLOT(showLoadSongDialog()));
-
-    CHECKED_CONNECT(m_saveButton, SIGNAL(clicked()),
-            this, SLOT(showSaveDialog()));
-
-    CHECKED_CONNECT(m_openButton, SIGNAL(clicked()),
-            this, SLOT(showOpenDialog()));
-
-    CHECKED_CONNECT(m_settingsButton, SIGNAL(clicked()),
-            this, SLOT(showSettingsDialog()));
-
     CHECKED_CONNECT(m_engine, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(stateChanged(QAudio::State)));
 
@@ -440,35 +193,12 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_transport, SIGNAL(movePlaybackHead(double)),
             m_engine, SLOT(movePlaybackHead(double)));
 
-#if 0 // NUKEMEMAYBE
-    // Info & error messages--now obsolete?
-    CHECKED_CONNECT(m_engine, SIGNAL(infoMessage(QString, int)),
-            this, SLOT(infoMessage(QString, int)));
-
-    CHECKED_CONNECT(m_engine, SIGNAL(errorMessage(QString, QString)),
-            this, SLOT(errorMessage(QString, QString)));
-
-    CHECKED_CONNECT(m_spectrograph, SIGNAL(infoMessage(QString, int)),
-            this, SLOT(infoMessage(QString, int)));
-#endif
-
-
     CHECKED_CONNECT(m_cueLibView, SIGNAL(newNodeRequest(QString)),
                     this, SLOT(newNodeRequest(QString)));
 }
 
 void MainWidget::createShortcuts()
 {
-    // ----------------------------------------
-    // Transport shortcuts
-    m_playPauseShortcut = new QShortcut(Qt::Key_Space, this);
-    m_playPauseShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_playPauseShortcut, SIGNAL(activated()), m_engine, SLOT(togglePlayback()));
-
-    m_rewindShortcut = new QShortcut(QKeySequence("Ctrl+0"), this);
-    m_rewindShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_rewindShortcut, SIGNAL(activated()), m_engine, SLOT(rewind()));
-
     // ----------------------------------------
     // Graph view shortcuts
     m_frameAllShortcut = new QShortcut(Qt::Key_A, this);
@@ -535,10 +265,11 @@ void MainWidget::createShortcuts()
     // GUI shortcuts
     m_reloadStylesShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this);
     m_reloadStylesShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_reloadStylesShortcut, SIGNAL(activated()), this, SLOT(loadStyleSheet()));
+    CHECKED_CONNECT(m_reloadStylesShortcut, SIGNAL(activated()), guisettings, SLOT(loadStyleSheet()));
 
     // ----------------------------------------
     // File I/O shortcuts
+#if 0
     m_saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
     m_saveShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_saveShortcut, SIGNAL(activated()), this, SLOT(save()));
@@ -558,17 +289,31 @@ void MainWidget::createShortcuts()
     m_openSongShortcut = new QShortcut(QKeySequence("Ctrl+Shift+O"), this);
     m_openSongShortcut->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(m_openSongShortcut, SIGNAL(activated()), this, SLOT(showLoadSongDialog()));
-}
+#endif
 
-void MainWidget::updateButtonStates()
-{
-    const bool pauseEnabled = (QAudio::ActiveState == m_engine->state() ||
-                               QAudio::IdleState == m_engine->state());
-    m_pauseButton->setEnabled(pauseEnabled);
+    CHECKED_CONNECT(Cupid::Singleton(), SIGNAL(showLoadSongDialog()),
+                    this, SLOT(showLoadSongDialog()));
+    CHECKED_CONNECT(Cupid::Singleton(), SIGNAL(showSaveDialog()),
+                    this, SLOT(showSaveDialog()));
+    CHECKED_CONNECT(Cupid::Singleton(), SIGNAL(showOpenDialog()),
+                    this, SLOT(showOpenDialog()));
+    CHECKED_CONNECT(Cupid::Singleton(), SIGNAL(showImportDialog()),
+                    this, SLOT(showImportDialog()));
+    CHECKED_CONNECT(Cupid::Singleton(), SIGNAL(showSettingsDialog()),
+                    this, SLOT(showSettingsDialog()));
 
-    const bool playEnabled = ( (QAudio::ActiveState != m_engine->state() &&
-                                QAudio::IdleState != m_engine->state()));
-    m_playButton->setEnabled(playEnabled);
+    // Fowarding from Cupid to engine...
+    CHECKED_CONNECT(Cupid::Singleton(), SIGNAL(togglePlayback()),
+                    m_engine, SLOT(togglePlayback()));
+    CHECKED_CONNECT(Cupid::Singleton(), SIGNAL(rewind()),
+                    m_engine, SLOT(rewind()));
+    CHECKED_CONNECT(Cupid::Singleton(), SIGNAL(suspend()),
+                    m_engine, SLOT(suspend()));
+    CHECKED_CONNECT(Cupid::Singleton(), SIGNAL(startPlayback()),
+                    m_engine, SLOT(startPlayback()));
+
+    CHECKED_CONNECT(this, SIGNAL(updateButtonStates()),
+                Cupid::Singleton(), SIGNAL(updateButtonStates()));
 }
 
 void MainWidget::reset()
@@ -577,6 +322,53 @@ void MainWidget::reset()
     m_spectrograph->reset();
     m_transport->reset();
 }
+
+//-----------------------------------------------------------------------------
+// Public slots
+//-----------------------------------------------------------------------------
+
+void MainWidget::stateChanged(QAudio::State state)
+{
+    emit updateButtonStates();
+
+    if (QAudio::ActiveState != state && QAudio::SuspendedState != state) {
+        m_spectrograph->reset();
+    }
+}
+
+// TODO decouple position & spectrum change
+// They are artificially coupled in engine.cpp
+void MainWidget::spectrumChanged(qint64 position, qint64 length,
+                                 const FrequencySpectrum &spectrum)
+{
+    Q_UNUSED(position)
+    Q_UNUSED(length)
+    // ??? Why is this a function call, instead of a signal?
+    m_spectrograph->spectrumChanged(spectrum);
+}
+
+void MainWidget::save()
+{
+    if (m_filename.isEmpty() || m_filename.isNull())
+        showSaveDialog();
+    else
+        NodeFactory::Singleton()->saveToFile(m_filename);
+}
+
+void MainWidget::audioPositionChanged(qint64 position)
+{
+    Q_UNUSED(position)
+    // WTF why isn't this used?  Can we nuke it?
+}
+
+void MainWidget::bufferLengthChanged(qint64 length)
+{
+    m_transport->bufferLengthChanged(length);
+}
+
+//-----------------------------------------------------------------------------
+// Private slots
+//-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 // New node slots

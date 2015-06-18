@@ -90,6 +90,8 @@ class GuiSettings : public QWidget
 
 
 public:
+    explicit GuiSettings(QWidget *parent = 0);
+
     // Stylesheet
     // NodeItem
     QColor    m_NNNameColor;
@@ -124,6 +126,7 @@ public:
     int      connectorEndSize;
     int      zoomIconSize;
     int      colorChipSize;
+
     // Derived
     QPen     socketOutlinePen;
     QPen     connectorPen;
@@ -152,8 +155,6 @@ public:
     int     sg_textOffset;
     QFont   sg_HzFont;
 
-    explicit GuiSettings(QWidget *parent = 0);
-
     // Sublevel meter
     QColor  sl_bgColor;
     QColor  sl_barColor;
@@ -173,9 +174,10 @@ public:
     QColor  trans_currentSegmentColor;
     QFont   trans_segmentFont;
 
-
-    void    editGuiColorsDialog(QObject *parent = 0);
     // QColor colorForType(ParamBase *param);
+
+public slots:
+    void loadStyleSheet();
 };
 
 extern GuiSettings *guisettings;
