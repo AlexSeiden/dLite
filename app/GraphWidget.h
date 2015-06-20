@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QList>
 #include <QSet>
+#include <QShortcut>
 
 #include "Param.h"
 
@@ -74,6 +75,7 @@ signals:
 
 private:
     void    connectUi();
+    void    createAppShortcuts();
     void    createShortcuts();
 
     void    align(bool xaxis);
@@ -86,13 +88,28 @@ private:
     CuesheetView*      getCurrentView(int i);
     CuesheetView*      getCurrentView();
 
+    QShortcut*          m_frameAllShortcut;
+    QShortcut*          m_frameSelectedShortcut;
+    QShortcut*          m_layoutAllShortcut;
+    QShortcut*          m_xAlignShortcut;
+    QShortcut*          m_yAlignShortcut;
+    QShortcut*          m_xDistributeShortcut;
+    QShortcut*          m_yDistributeShortcut;
+    QShortcut*          m_zoomOutShortcut;
+    QShortcut*          m_zoomInShortcut;
+    QShortcut*          m_zoomResetShortcut;
+    QShortcut*          m_duplicateShortcut;
+    QShortcut*          m_groupShortcut;
+    QShortcut*          m_ungroupShortcut;
+    QShortcut*          m_minimizeSelectedShortcut;
+    QShortcut*          m_newTabShortcut;
+
     QToolButton *       _newCueButton;
     QCheckBox *         _useAllCues;
     QCheckBox *         _autoSwitchCues;
     QToolButton *       _segmentButton;
     QTabWidget *        _tabwidget;
     SegmentController * _segmentController;
-//    SegGui *            _segGui;
     RenameTabDialog*    _renameTabDialog;
 
     // Last selection made--used for updating selections

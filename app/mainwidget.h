@@ -23,7 +23,6 @@
 #include "Node.h"
 #include "Cupid.h"
 #include "GuiSettings.h"
-#include "TransportControl.h"
 
 class FrequencySpectrum;
 class Transport;
@@ -57,9 +56,6 @@ public slots:
                          const FrequencySpectrum &spectrum);
     void save();
 
-    // XXX is this still needed?
-    void audioPositionChanged(qint64 position);
-
     // XXX is this needed?  only for new songs--which should be a separate slot
     void bufferLengthChanged(qint64 length);
 
@@ -71,15 +67,12 @@ public slots:
     void showOpenDialog();
     void showImportDialog();
     void showSettingsDialog();
-
-signals:
-    void updateButtonStates();
+    void updateMenuStates();
 
 private:
     void createUi();
     void createShortcuts();
     void createActions();
-    void createMenus();
     void connectUi();
     void reset();
 
@@ -87,50 +80,41 @@ private:
     Engine*                 m_engine;
 
     Transport*              m_transport;
-    TransportControl*       m_transportControl;
     Spectrograph*           m_spectrograph;
 
-    QShortcut*              m_frameAllShortcut;
-    QShortcut*              m_frameSelectedShortcut;
-    QShortcut*              m_layoutAllShortcut;
-    QShortcut*              m_xAlignShortcut;
-    QShortcut*              m_yAlignShortcut;
-    QShortcut*              m_xDistributeShortcut;
-    QShortcut*              m_yDistributeShortcut;
-    QShortcut*              m_zoomOutShortcut;
-    QShortcut*              m_zoomInShortcut;
-    QShortcut*              m_zoomResetShortcut;
-    QShortcut*              m_saveShortcut;
-    QShortcut*              m_saveAsShortcut;
-    QShortcut*              m_openFileShortcut;
     QShortcut*              m_importFileShortcut;
     QShortcut*              m_openSongShortcut;
-    QShortcut*              m_duplicateShortcut;
-    QShortcut*              m_groupShortcut;
-    QShortcut*              m_ungroupShortcut;
-    QShortcut*              m_minimizeSelectedShortcut;
-    QShortcut*              m_newTabShortcut;
     QShortcut*              m_reloadStylesShortcut;
-    QList<QShortcut*>       m_cueShortcut;
 
+    // Menu items
     QMenuBar*               m_menuBar;
+
     QMenu*                  m_fileMenu;
-    QMenu*                  m_editMenu;
-    QMenu*                  m_windowMenu;
-    QAction*                m_newAct;
     QAction*                m_openAct;
+    QAction*                m_openSongAct;
+    QAction*                m_importFileAct;
     QAction*                m_saveAct;
     QAction*                m_saveAsAct;
-    QAction*                m_exitAct;
+
+    QMenu*                  m_editMenu;
     QAction*                m_cutAct;
     QAction*                m_copyAct;
     QAction*                m_pasteAct;
+    QAction*                m_settingsAct;
+
+    QMenu*                  m_controlMenu;
+    QAction*                m_playAct;
+    QAction*                m_pauseAct;
+    QAction*                m_playPauseAct;
+    QAction*                m_rewindAct;
+
+    QMenu*                  m_windowMenu;
     QAction*                m_showDancefloorwidget;
     QAction*                m_showCueLibView;
     QAction*                m_showGraphWidget;
 
+    // Dialogs
     SettingsDialog*         m_settingsDialog;
-
     Dancefloor *            m_dancefloor;
     Dancefloorwidget *      m_dancefloorwidget;
     CueLibView *            m_cueLibView;

@@ -41,3 +41,6 @@ HEADERS += \
     $$PWD/MyDoubleSpinBox.h \
     $$PWD/TransportControl.h \
     $$PWD/ModalDialogs.h
+
+FORMS += \
+    $$PWD/mainwindow.ui

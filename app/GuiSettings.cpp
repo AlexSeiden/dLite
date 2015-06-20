@@ -11,6 +11,7 @@ GuiSettings::GuiSettings(QWidget *parent) :
 {
     // XXX dunno why this crashes
 //    this->setObjectName(QString("guisettings"));
+//    loadStyleSheet();
 }
 
 // Utility function
@@ -25,8 +26,6 @@ void setButtonColor(QToolButton *colorButton, const QColor &col){
 
 void GuiSettings::loadStyleSheet()
 {
-//    guisettings = new GuiSettings();
-//    QFile file(":dLite.qss");
     QFile file("/Users/alex/src/dLite/app/dLite.qss");
     file.open(QFile::ReadOnly);
     QString styleSheet = QString::fromLatin1(file.readAll());
@@ -40,6 +39,7 @@ void GuiSettings::loadStyleSheet()
     guisettings->connectorPen         = QPen(QBrush(guisettings->connectorColor), 2.0, Qt::SolidLine);
     guisettings->connectorPenSelected = QPen(QColor(200,40,40), 4, Qt::SolidLine);
     guisettings->connectorBrush       = QBrush(guisettings->connectorCenterColor);
+    guisettings->m_PIfont.setLetterSpacing(QFont::PercentageSpacing, guisettings->m_PIletterspacing);
 
     this->repaint();
     qApp->processEvents();

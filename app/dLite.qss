@@ -23,10 +23,11 @@ GuiSettings {
                 QFont::StyleHint, QFont::Weight,
                 QFont::Style, underline, strikeOut, fixedPitch, rawMode
     */
-    /*qproperty-PIfont: "Helvetica Light,  -1,14,  0,25,  0,0,0,0,0"; */
-    /* qproperty-PIfont    :               "Futura, -1,13,  0,0,  0,0,0,0,0"; */
-    qproperty-PIfont    :               "Futura, -1,10,  0,0,  0,0,0,0,0";
+    qproperty-PIfont    :               "Helvetica Neue, -1,10,  0,25,  0,0,0,20,0";
     qproperty-PIfontcolor:              rgb(255,255,255);
+    /* AFTER HERE */
+    qproperty-PIletterspacing:          150;
+    /* BEFORE HERE */
     qproperty-paramTextOffset:          15;
     qproperty-paramEditorOffset:        80;
     qproperty-paramBorderRadius         1px;
@@ -65,7 +66,7 @@ GuiSettings {
     qproperty-sg_textOffset        : 5;
     qproperty-sg_HzFont            : "Helvetica Light,  -1,10,  0,25,  0,0,0,0,0";
 
-    
+
     qproperty-sl_bgColor           : rgb(0,0,0);
     qproperty-sl_barColor          : rgb(51, 204, 102);
     qproperty-sl_squareColor       : rgb(0,0,255);
@@ -84,10 +85,6 @@ GuiSettings {
     qproperty-trans_playheadWidth   : 2;
 }
 
-TransportControl {
-    background-color: rgb(40,40,150);
-}
-
 
 /* ------------------------------------------------------------------------------ */
 CuesheetView QGraphicsView {
@@ -97,11 +94,14 @@ CuesheetView QGraphicsView {
 /* ------------------------------------------------------------------------------ */
 QLineEdit {
     border: 1px solid gray;
-    padding: 2 0px;
-    margin: 0px;
-    background: rgb(200,200,200);
+    padding: 2px 0px;
+    margin-bottom: 0px;
+    margin-top: 3px;
+    background: rgba(200,200,200, 128);
     selection-background-color: rgb(20,20,20);
-    max-height: 16px;
+    max-height: 12px;
+    font-family: Courier;
+    font-size: 12px;
 }
 
 /* ------------------------------------------------------------------------------ */
@@ -119,6 +119,71 @@ QSpinBox, QDoubleSpinBox {
     spacing: 0px;
     padding-left: 0px;
     padding-top: 0px;
-    padding-bottom: 0px;
+    padding-bottom: 1px;
     padding-right: 15px;
+    border: 1px solid black;
+}
+
+/* ------------------------------------------------------------------------------ */
+QTabWidget::pane { /* The tab widget frame */
+    border: 1px solid grey;
+}
+
+QTabWidget::tab-bar {
+    left: 5px; /* move to the right by 5px */
+}
+
+QTabBar {
+    font-family: Futura;
+    font-style: italic;
+    font-size: 10px;
+}
+/* Style the tab using the tab sub-control. Note that
+    it reads QTabBar _not_ QTabWidget */
+QTabBar::tab {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
+                                stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
+    border: 2px solid #C4C4C3;
+    border-bottom-color: #C2C7CB; /* same as the pane color */
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    min-width: 8ex;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 4px;
+    padding-right: 2px;
+    spacing: 4px;
+    margin-right: 8px;
+}
+
+QTabBar::tab:selected, QTabBar::tab:hover {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #fafafa, stop: 0.4 #f4f4f4,
+                                stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
+}
+
+QTabBar::tab:selected {
+    border-color: green;
+    border-bottom: 1px;
+    margin-bottom: -2px;
+}
+
+QTabBar::tab:!selected {
+    margin-top: 4px; /* make non-selected tabs look smaller */
+}
+
+/* make use of negative margins for overlapping tabs */
+QTabBar::tab:selected {
+    /* expand/overlap to the left and right by 4px */
+    margin-left: -4px;
+    margin-right: -4px;
+}
+
+QTabBar::tab:first:selected {
+    margin-left: 0; /* the first selected tab has nothing to overlap with on the left */
+}
+
+QTabBar::tab:last:selected {
+    margin-right: 0; /* the last selected tab has nothing to overlap with on the right */
 }

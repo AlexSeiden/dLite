@@ -6,6 +6,7 @@
 #include "CuesheetView.h"
 #include "GuiSettings.h"
 #include "utils.h"
+
 #include <QHBoxLayout>
 #include <QGraphicsObject>
 #include <QGraphicsProxyWidget>
@@ -17,6 +18,7 @@
 #include <QCheckBox>
 #include <QStyleFactory>
 #include <QShortcut>
+
 #include "GroupNodeItem.h"
 #include "Cue.h"
 #include "Cupid.h"
@@ -103,6 +105,73 @@ void GraphWidget::connectUi()
 //    CHECKED_CONNECT(_segmentButton, SIGNAL(clicked()), this, SLOT(showSegmentController()));
 }
 
+
+void GraphWidget::createAppShortcuts()
+{
+    // ----------------------------------------
+    // Graph view shortcuts
+    // TODO move these to graph view!
+    m_frameAllShortcut = new QShortcut(Qt::Key_A, this);
+    m_frameAllShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_frameAllShortcut, SIGNAL(activated()), this, SLOT(frameAll()));
+
+    m_frameSelectedShortcut = new QShortcut(Qt::Key_F, this);
+    m_frameSelectedShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_frameSelectedShortcut, SIGNAL(activated()), this, SLOT(frameSelection()));
+
+    m_zoomOutShortcut = new QShortcut(Qt::Key_Minus, this);
+    m_zoomOutShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_zoomOutShortcut, SIGNAL(activated()), this, SLOT(zoomOut()));
+
+    m_zoomInShortcut = new QShortcut(Qt::Key_Equal, this);
+    m_zoomInShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_zoomInShortcut, SIGNAL(activated()), this, SLOT(zoomIn()));
+
+    m_zoomResetShortcut = new QShortcut(Qt::Key_BracketLeft, this);
+    m_zoomResetShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_zoomResetShortcut, SIGNAL(activated()), this, SLOT(zoomReset()));
+
+    m_layoutAllShortcut = new QShortcut(Qt::Key_L, this);
+    m_layoutAllShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_layoutAllShortcut, SIGNAL(activated()), this, SLOT(layoutAll()));
+
+    m_xAlignShortcut = new QShortcut(Qt::Key_X, this);
+    m_xAlignShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_xAlignShortcut, SIGNAL(activated()), this, SLOT(xAlign()));
+
+    m_yAlignShortcut = new QShortcut(Qt::Key_Y, this);
+    m_yAlignShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_yAlignShortcut, SIGNAL(activated()), this, SLOT(yAlign()));
+
+    m_xDistributeShortcut = new QShortcut(QKeySequence("Shift+X"), this);
+    m_xDistributeShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_xDistributeShortcut, SIGNAL(activated()), this, SLOT(xDistribute()));
+
+    m_yDistributeShortcut = new QShortcut(QKeySequence("Shift+Y"), this);
+    m_yDistributeShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_yDistributeShortcut, SIGNAL(activated()), this, SLOT(yDistribute()));
+
+    m_duplicateShortcut = new QShortcut(Qt::Key_D, this);
+    m_duplicateShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_duplicateShortcut, SIGNAL(activated()), this, SLOT(duplicate()));
+
+    m_groupShortcut = new QShortcut(Qt::Key_G, this);
+    m_groupShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_groupShortcut, SIGNAL(activated()), this, SLOT(group()));
+
+    m_ungroupShortcut = new QShortcut(Qt::Key_U, this);
+    m_ungroupShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_ungroupShortcut, SIGNAL(activated()), this, SLOT(ungroup()));
+
+    m_minimizeSelectedShortcut = new QShortcut(Qt::Key_M, this);
+    m_minimizeSelectedShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_minimizeSelectedShortcut, SIGNAL(activated()), this, SLOT(minimizeSelected()));
+
+    m_newTabShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_T), this);
+    m_newTabShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_newTabShortcut, SIGNAL(activated()), this, SLOT(newCuesheet()));
+}
+
 // ------------------------------------------------------------------------------
 // Cuesheet mgmt
 CuesheetScene* GraphWidget::newCuesheet(QString name)
@@ -174,14 +243,6 @@ void GraphWidget::showSegmentController()
                         Cupid::Singleton()->getTransport(), SLOT(segmentsChanged(SongSegmentation*)));
         emit segmentationChanged(&(_segmentController->_segmentation));
     }
-
-//    if (! _segGui) {
-//        _segGui = new SegGui(_segmentController);
-//        CHECKED_CONNECT(_segGui, SIGNAL(setCuesheet(int)),
-//                        this, SLOT(setCuesheet(int)));
-//    }
-
-//    _segGui->show();
 }
 
 int GraphWidget::whatToActivate()
@@ -296,31 +357,6 @@ void GraphWidget::selectNodes(QList<Node *>nodes)
 {
     getCurrentScene()->selectTheseNodes(nodes);
 }
-
-#if 0
-// Not used with current reading-from-file paradigm
-void GraphWidget::addTheseNodes(QList<Node*> aBunchOfNodes)
-{
-    // Adds a list of nodes & their connections to the scene.
-    // Right now this isn't used; the file read stuff calls
-    // addNode & addConnection directly so that NodeItem positions
-    // can be restored.
-
-    // First add all the nodes...
-    foreach (Node *node, aBunchOfNodes)
-        addNode(node);
-
-    // ...then make all the connections.  Because you can't make the connections before
-    // the nodes are instanced!
-    foreach (Node *node, aBunchOfNodes) {
-        foreach (ParamBase *param, node->getParams()) {
-            if (param->connectedParam()) {
-                addConnection(param->connectedParam(), param);
-            }
-        }
-    }
-}
-#endif
 
 void GraphWidget::addConnection(ParamBase* server, ParamBase* client)
 {
@@ -550,18 +586,6 @@ bool compareY(NodeItem *lhs, NodeItem *rhs)
 void GraphWidget::distribute(bool xaxis)
 {
     QList<NodeItem*> selection = getCurrentScene()->getSelectedNodeItems();
-//    // Find bbox:
-//    QRectF bbox;
-//    foreach (NodeItem* ni, selection)
-//        bbox = bbox.united(ni->boundingRect());
-
-//    qreal spacing = 0;
-//    if (xaxis)
-//        spacing = bbox.width();
-//    else
-//        spacing = bbox.height();
-//    spacing /= selection.size();
-
     // Sort nodesitems in selected axis:
     if (xaxis)
         std::sort(selection.begin(), selection.end(), compareX);

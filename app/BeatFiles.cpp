@@ -32,6 +32,12 @@ Node Types:
    Conversion nodes between float & int
    math nodes
    Paths
+    Use openGL for shading
+    Comp nodes
+    perlin noise
+    particle systems
+
+Mixer style fading
 
 Fader
 
@@ -53,8 +59,6 @@ compmode & decaymode pups on cuewidgets
 
 put spectrograph options back in somewhere.
 
-switch between 10 different tabs via control keys
-
 Drawing:
     LOD
         Turn off level meters when small
@@ -68,6 +72,8 @@ Drawing:
     param-view transparent bg
     arrows on connectors
     be able to scroll even when current scene is entirely visible.
+
+
 
 "_dirty" bit
 

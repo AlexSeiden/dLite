@@ -10,7 +10,8 @@ void MainWidget::showLoadSongDialog()
     if (fileNames.count()) {
         reset();
         m_engine->loadSong(fileNames.front()); // TODO open multiple files
-        emit updateButtonStates();
+//        emit updateButtonStates();
+        updateMenuStates();
         m_engine->startPlayback();
     }
 }
@@ -35,7 +36,8 @@ void MainWidget::showOpenDialog()
         bool result = NodeFactory::Singleton()->readFromFile(fileName);
         if (result)
             m_filename = fileName;
-        emit updateButtonStates();
+//        emit updateButtonStates();
+        updateMenuStates();
     }
 }
 
@@ -46,7 +48,8 @@ void MainWidget::showImportDialog()
     // TODO open multiple files
     if (! fileName.isEmpty() && ! fileName.isNull()) {
         NodeFactory::Singleton()->readFromFile(fileName, true);
-        emit updateButtonStates();
+//        emit updateButtonStates();
+        updateMenuStates();
     }
 }
 

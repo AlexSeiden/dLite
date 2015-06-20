@@ -150,7 +150,6 @@ bool NodeFactory::saveToFile(QString filename)
 
     QJsonObject sceneObject;
     // Fill sceneObject with all the scene data.
-//    writeNodesToJSONObj(sceneObject, allNodes());
     writeCuesheetsToJSONObj(sceneObject);
 
     QJsonDocument jsonDoc(sceneObject);

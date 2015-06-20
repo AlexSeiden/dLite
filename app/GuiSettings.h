@@ -33,6 +33,7 @@ class GuiSettings : public QWidget
     Q_PROPERTY(int       PIheight           MEMBER m_PIheight)
     Q_PROPERTY(QFont     PIfont             MEMBER m_PIfont)
     Q_PROPERTY(QColor    PIfontcolor        MEMBER m_PIfontcolor)
+    Q_PROPERTY(qreal     PIletterspacing    MEMBER m_PIletterspacing)
     Q_PROPERTY(int       paramTextOffset    MEMBER paramTextOffset)
     Q_PROPERTY(int       paramEditorOffset  MEMBER paramEditorOffset)
     Q_PROPERTY(int       paramBorderRadius  MEMBER paramBorderRadius)
@@ -110,6 +111,7 @@ public:
     QColor    m_PIoutputbgcolor;
     int       m_PIheight;
     QFont     m_PIfont ;
+    qreal     m_PIletterspacing ;
     QColor    m_PIfontcolor;
     int      paramTextOffset;
     int      paramEditorOffset;

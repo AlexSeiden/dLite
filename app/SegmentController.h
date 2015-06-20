@@ -54,28 +54,4 @@ public:
 //    friend class SegGui;
 };
 
-#if 0
-// ------------------------------------------------------------------------------
-// SegGui
-//      Widget that displays segment controller.
-class SegGui : public QWidget
-{
-    Q_OBJECT
-public:
-    SegGui(SegmentController *segcont, QWidget *parent = 0);
-
-public slots:
-    int whatToActivate();
-    void setNumCues(int nCues);
-
-signals:
-    void setCuesheet(int);
-
-public:  // GROSS !!
-    SegmentController*      _sc;
-    QMap<int, QLineEdit*>   _indexToLE;
-    QMap<int, QSpinBox*>    _indexToSpinbox;
-    int                     _nCues;
-};
-#endif
 #endif // SEGMENTCONTROLLER_H
