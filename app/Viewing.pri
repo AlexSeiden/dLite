@@ -37,8 +37,7 @@ HEADERS += \
     $$PWD/ColorChip.h \
     $$PWD/GroupNodeItem.h \
     $$PWD/RenameTabDialog.h \
-    $$PWD/MyDoubleSpinBox.h \
-    $$PWD/ModalDialogs.h
+    $$PWD/MyDoubleSpinBox.h
 
 FORMS += \
     $$PWD/mainwindow.ui
