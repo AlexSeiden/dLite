@@ -18,7 +18,6 @@ SOURCES += \
     $$PWD/GroupNodeItem.cpp \
     $$PWD/RenameTabDialog.cpp \
     $$PWD/MyDoubleSpinBox.cpp \
-    $$PWD/TransportControl.cpp \
     $$PWD/ModalDialogs.cpp
 
 HEADERS += \
@@ -39,7 +38,6 @@ HEADERS += \
     $$PWD/GroupNodeItem.h \
     $$PWD/RenameTabDialog.h \
     $$PWD/MyDoubleSpinBox.h \
-    $$PWD/TransportControl.h \
     $$PWD/ModalDialogs.h
 
 FORMS += \
