@@ -74,7 +74,7 @@ QRectF ConnectorItem::boundingRect() const
     QRectF bbox(QPointF(left,top),QPointF(right, bottom));
 
 //    qDebug() << pos() << nStart << nEnd << bbox;
-    qreal extra = guisettings->connectorEndSize + 5;
+    qreal extra = guisettings->m_connectorEndSize + 5;
     bbox.adjust(-extra, -extra, extra, extra);
     return bbox;
 }
@@ -112,16 +112,16 @@ void ConnectorItem::paint(QPainter *painter,
     painter->save();
     painter->setBrush(Qt::NoBrush);
     if (isSelected())
-        painter->setPen(guisettings->connectorPenSelected);
+        painter->setPen(guisettings->m_connectorPenSelected);
     else
-        painter->setPen(guisettings->connectorPen);
+        painter->setPen(guisettings->m_connectorPen);
 
     painter->drawPath(*_path);
 
     // TODO set ellipse pen brush & size
-    painter->setBrush(guisettings->connectorBrush);
-    painter->drawEllipse(_pStart, guisettings->connectorEndSize, guisettings->connectorEndSize);
-    painter->drawEllipse(_pEnd,   guisettings->connectorEndSize, guisettings->connectorEndSize);
+    painter->setBrush(guisettings->m_connectorBrush);
+    painter->drawEllipse(_pStart, guisettings->m_connectorEndSize, guisettings->m_connectorEndSize);
+    painter->drawEllipse(_pEnd,   guisettings->m_connectorEndSize, guisettings->m_connectorEndSize);
 
     painter->restore();
 }

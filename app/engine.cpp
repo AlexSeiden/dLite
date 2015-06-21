@@ -1,7 +1,3 @@
-#include "engine.h"
-#include "utils.h"
-#include "DanceFloor.h"
-
 #include <math.h>
 
 #include <QAudioOutput>
@@ -11,6 +7,10 @@
 #include <QMetaObject>
 #include <QSet>
 #include <QThread>
+
+#include "engine.h"
+#include "utils.h"
+#include "DanceFloor.h"
 
 Engine::Engine(QObject *parent)
     :   QObject(parent)
@@ -35,7 +35,7 @@ Engine::Engine(QObject *parent)
     m_timer->setTimerType(Qt::PreciseTimer);
     m_timer->start();
     CHECKED_CONNECT(m_timer, SIGNAL(timeout()),
-                    this, SLOT(alternativeNotify()));
+                    this, SLOT(timerNotify()));
 }
 
 Engine::~Engine() { }
@@ -74,11 +74,11 @@ bool Engine::loadSong(const QString &fileName)
     // ErrorHandling
 
     m_wavFileHandle->close();
-    _qbuf.setBuffer(&m_buffer);
-    _qbuf.open(QIODevice::ReadOnly);
-    _qbuf.seek(0);
+    m_qbuf.setBuffer(&m_buffer);
+    m_qbuf.open(QIODevice::ReadOnly);
+    m_qbuf.seek(0);
 //    m_audioOutput->setBufferSize(bytesRead);
-    qDebug() << bytesToRead << bytesRead << _qbuf.size() << m_audioOutput->bufferSize();
+    qDebug() << bytesToRead << bytesRead << m_qbuf.size() << m_audioOutput->bufferSize();
     emit bufferLengthChanged(bufferLength());
     emit newSong(fileName);
 
@@ -89,7 +89,7 @@ qint64 Engine::bufferLength() const
 {
     // Return buffer length in bytes
 //    return m_wavFileHandle ? m_wavFileHandle->size() : -1;
-    return _qbuf.buffer().size();
+    return m_qbuf.buffer().size();
 }
 
 qint64 Engine::bufferLengthMS() const
@@ -119,8 +119,8 @@ void Engine::startPlayback()
 //      There seems to be a bug that causes audioNotify signals get dropped.
 //        CHECKED_CONNECT(m_audioOutput, SIGNAL(notify()),
 //                        this, SLOT(audioNotify()));
-        _qbuf.seek(0);
-        m_audioOutput->start(&_qbuf);
+        m_qbuf.seek(0);
+        m_audioOutput->start(&m_qbuf);
     }
 }
 
@@ -141,7 +141,7 @@ void Engine::movePlaybackHead(double positionfraction)
     byteposition -= byteposition % (m_format.channelCount() * m_format.sampleSize());
     emit playPositionChanged(byteposition);
 
-    bool result = _qbuf.seek(byteposition);
+    bool result = m_qbuf.seek(byteposition);
     Q_ASSERT(result);
 }
 
@@ -165,20 +165,14 @@ void Engine::togglePlayback()
 //-----------------------------------------------------------------------------
 // Private slots
 
-void Engine::audioNotify()
+void Engine::timerNotify()
 {
-}
-
-void Engine::alternativeNotify()
-{
-
     if (QAudio::ActiveState == m_state) {
-        const qint64 playPosition = _qbuf.pos();
-//        qDebug() << "altnotify" << playPosition;
+        const qint64 playPosition = m_qbuf.pos();
         const qint64 spectrumPosition = playPosition - m_spectrumBufferLength;
 
         const qint64 specWindowStart = qMax(qint64(0), spectrumPosition);
-        const qint64 specWindowEnd   = qMin(_qbuf.size(), spectrumPosition + m_spectrumBufferLength);
+        const qint64 specWindowEnd   = qMin(m_qbuf.size(), spectrumPosition + m_spectrumBufferLength);
 
         calculateSpectrum(specWindowStart, specWindowEnd);
 
@@ -186,7 +180,8 @@ void Engine::alternativeNotify()
         // OKAY!
         // THIS IS IT!  ARE YOU READY?  It all happens here:
 
-        _dfModel->evaluate();
+        m_dfModel->evaluate();
+
         // TODO move elsewhere?  perhaps it's own timer loop?
         // Although, it wants to be on a timer synced with audio playback...
         // TA-DA !
@@ -203,10 +198,10 @@ void Engine::audioStateChanged(QAudio::State state)
     error = m_audioOutput->error();
     if (error != QAudio::NoError) {
         qDebug() << "Engine::audioStateChanged [0] error " << error ;
-        qDebug() << "_qbuf.pos()" << _qbuf.pos();
+        qDebug() << "_qbuf.pos()" << m_qbuf.pos();
     }
 
-    if (state == QAudio::IdleState && _qbuf.pos() == _qbuf.size()) {
+    if (state == QAudio::IdleState && m_qbuf.pos() == m_qbuf.size()) {
         // The song is over!
         stopPlayback();
     } else {
@@ -255,8 +250,8 @@ void Engine::reset()
     delete m_wavFileHandle;
     m_wavFileHandle = 0;
     m_buffer.clear();
-    if (_qbuf.isOpen())
-        _qbuf.close();
+    if (m_qbuf.isOpen())
+        m_qbuf.close();
     resetAudioDevices();
 }
 
@@ -383,6 +378,6 @@ void Engine::setUpdateInterval(int val)
 // return time in microseconds
 qint64 Engine::getCurrentTime() const
 {
-    qint64 positionInBytes = _qbuf.pos();
+    qint64 positionInBytes = m_qbuf.pos();
     return audioDuration(m_format, positionInBytes);
 }

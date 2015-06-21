@@ -7,54 +7,54 @@ TransportControl::TransportControl(QWidget *parent) :
     QToolBar(parent)
 {
     setWindowTitle("Transport Control");
-    loadsongAction = new QAction(tr("Open..."), this);
-    loadsongAction->setIcon(QIcon(":/images/settings.png"));
-    loadsongAction->setShortcut(QKeySequence("Ctrl+Shift+O"));
-    loadsongAction->setShortcutContext(Qt::ApplicationShortcut);
-    loadsongAction->setStatusTip(tr("Load song..."));
-    addAction(loadsongAction);
-    CHECKED_CONNECT(loadsongAction, SIGNAL(triggered()),
+    m_loadsongAction = new QAction(tr("Open..."), this);
+    m_loadsongAction->setIcon(QIcon(":/images/settings.png"));
+    m_loadsongAction->setShortcut(QKeySequence("Ctrl+Shift+O"));
+    m_loadsongAction->setShortcutContext(Qt::ApplicationShortcut);
+    m_loadsongAction->setStatusTip(tr("Load song..."));
+    addAction(m_loadsongAction);
+    CHECKED_CONNECT(m_loadsongAction, SIGNAL(triggered()),
                     Cupid::Singleton(), SIGNAL(showLoadSongDialog()));
 
-    pauseAction = new QAction(tr("Pause"), this);
-    pauseAction->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
-    pauseAction->setStatusTip(tr("Pause"));
-    addAction(pauseAction);
-    CHECKED_CONNECT(pauseAction, SIGNAL(triggered()),
+    m_pauseAction = new QAction(tr("Pause"), this);
+    m_pauseAction->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+    m_pauseAction->setStatusTip(tr("Pause"));
+    addAction(m_pauseAction);
+    CHECKED_CONNECT(m_pauseAction, SIGNAL(triggered()),
                     Cupid::Singleton(), SIGNAL(suspend()));
 
-    playAction = new QAction(tr("Play"), this);
-    playAction->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-    playAction->setStatusTip(tr("Play"));
-    addAction(playAction);
-    CHECKED_CONNECT(playAction, SIGNAL(triggered()),
+    m_playAction = new QAction(tr("Play"), this);
+    m_playAction->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    m_playAction->setStatusTip(tr("Play"));
+    addAction(m_playAction);
+    CHECKED_CONNECT(m_playAction, SIGNAL(triggered()),
                     Cupid::Singleton(), SIGNAL(startPlayback()));
-    playAction->setEnabled(false);
+    m_playAction->setEnabled(false);
 
-    settingsAction = new QAction(tr("Settings..."), this);
-    settingsAction->setIcon(QIcon(":/images/settings.png"));
-    settingsAction->setStatusTip(tr("Settings..."));
-    addAction(settingsAction);
-    CHECKED_CONNECT(settingsAction, SIGNAL(triggered()),
+    m_settingsAction = new QAction(tr("Settings..."), this);
+    m_settingsAction->setIcon(QIcon(":/images/settings.png"));
+    m_settingsAction->setStatusTip(tr("Settings..."));
+    addAction(m_settingsAction);
+    CHECKED_CONNECT(m_settingsAction, SIGNAL(triggered()),
                     Cupid::Singleton(), SIGNAL(showSettingsDialog()));
 
-    saveAction = new QAction(tr("Save..."), this);
-    saveAction->setIcon(QIcon(":/images/settings.png"));
-    saveAction->setShortcut(QKeySequence("Ctrl+S"));
-    saveAction->setShortcutContext(Qt::ApplicationShortcut);
-    saveAction->setStatusTip(tr("Save..."));
-    addAction(saveAction);
-    CHECKED_CONNECT(saveAction, SIGNAL(triggered()),
+    m_saveAction = new QAction(tr("Save..."), this);
+    m_saveAction->setIcon(QIcon(":/images/settings.png"));
+    m_saveAction->setShortcut(QKeySequence("Ctrl+S"));
+    m_saveAction->setShortcutContext(Qt::ApplicationShortcut);
+    m_saveAction->setStatusTip(tr("Save..."));
+    addAction(m_saveAction);
+    CHECKED_CONNECT(m_saveAction, SIGNAL(triggered()),
                     Cupid::Singleton(), SIGNAL(showSaveDialog()));
 
 
-    openAction = new QAction(tr("Open dLite file..."), this);
-    openAction->setIcon(QIcon(":/images/settings.png"));
-    openAction->setShortcut(QKeySequence("Ctrl+O"));
-    openAction->setShortcutContext(Qt::ApplicationShortcut);
-    openAction->setStatusTip(tr("Open dLite file..."));
-    addAction(openAction);
-    CHECKED_CONNECT(openAction, SIGNAL(triggered()),
+    m_openAction = new QAction(tr("Open dLite file..."), this);
+    m_openAction->setIcon(QIcon(":/images/settings.png"));
+    m_openAction->setShortcut(QKeySequence("Ctrl+O"));
+    m_openAction->setShortcutContext(Qt::ApplicationShortcut);
+    m_openAction->setStatusTip(tr("Open dLite file..."));
+    addAction(m_openAction);
+    CHECKED_CONNECT(m_openAction, SIGNAL(triggered()),
                     Cupid::Singleton(), SIGNAL(showOpenDialog()));
 
     // ----------------------------------------
@@ -78,10 +78,10 @@ void TransportControl::updateButtonStates()
 {
     const bool pauseEnabled = (QAudio::ActiveState == Cupid::Singleton()->getEngine()->state() ||
                                QAudio::IdleState == Cupid::Singleton()->getEngine()->state());
-    pauseAction->setEnabled(pauseEnabled);
+    m_pauseAction->setEnabled(pauseEnabled);
 
     const bool playEnabled = ( (QAudio::ActiveState != Cupid::Singleton()->getEngine()->state() &&
                                 QAudio::IdleState != Cupid::Singleton()->getEngine()->state()));
-    playAction->setEnabled(playEnabled);
+    m_playAction->setEnabled(playEnabled);
 }
 

@@ -1,21 +1,19 @@
-#include "Transport.h"
-#include "GuiSettings.h"
 #include <QPainter>
-#include <QStyle>
 #include <QMouseEvent>
 #include <QDebug>
-#include "Cupid.h"
+
+#include "utils.h"
+#include "Transport.h"
+#include "GuiSettings.h"
 
 Transport::Transport(QWidget *parent)
     :   QWidget(parent)
     ,   m_bufferLength(0)
     ,   m_playPosition(0)
-    ,   _segmentation(nullptr)
+    ,   m_segmentation(nullptr)
 {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     setMinimumSize(300,30);
-    _playIcon = style()->standardIcon(QStyle::SP_MediaPlay);
-    _pauseIcon = style()->standardIcon(QStyle::SP_MediaPause);
 }
 
 Transport::~Transport() { }
@@ -24,7 +22,7 @@ void Transport::reset()
 {
     m_bufferLength = 0;
     m_playPosition = 0;
-    _totalDuration = 0;
+    m_totalDuration = 0;
 
     update();
 }
@@ -45,11 +43,11 @@ void Transport::paintEvent(QPaintEvent * event)
     bar.setRight(rect().left());
     painter.fillRect(bar, guisettings->trans_barColor);
 
-    if (_segmentation) {
-        const int segheight = (rect().height()-2)/_segmentation->_segmentIndices.count();
-        foreach (Segment seg, _segmentation->_segments) {
-            int segwidth = rect().width()*seg.duration/_totalDuration;
-            int x = float(seg.startTime)*rect().width()/_totalDuration;
+    if (m_segmentation) {
+        const int segheight = (rect().height()-2)/m_segmentation->_segmentIndices.count();
+        foreach (Segment seg, m_segmentation->_segments) {
+            int segwidth = rect().width()*seg.duration/m_totalDuration;
+            int x = float(seg.startTime)*rect().width()/m_totalDuration;
             int y = seg.segmentIndex*segheight+1;
             QRect segrect(x,y, segwidth, segheight);
             painter.fillRect(segrect, guisettings->trans_segmentColor);
@@ -69,7 +67,7 @@ void Transport::paintEvent(QPaintEvent * event)
 void Transport::bufferLengthChanged(qint64 bufferSize)
 {
     m_bufferLength = bufferSize;
-    _totalDuration = bytes2ms(bufferSize);
+    m_totalDuration = bytes2ms(bufferSize);
     m_playPosition = 0;
     repaint();
 }
@@ -86,13 +84,14 @@ void Transport::playPositionChanged(qint64 playPosition)
 
 void Transport::segmentsChanged(SongSegmentation *segmentation)
 {
-    _segmentation = segmentation;
+    m_segmentation = segmentation;
 }
 
 // ------------------------------------------------------------------------------
 // Mouse event
 //      Move playhead to mouse click point
-//      XXX most of the "beat" nodes get confused by this.
+//      XXX most of the "beat" nodes assume time is going to be increasing
+//      without jumps forward or back.
 void Transport::mousePressEvent(QMouseEvent *event)
 {
     int xpos = event->pos().x();

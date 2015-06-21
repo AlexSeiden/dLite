@@ -84,8 +84,8 @@ private:
     QPoint				m_dragStart;
     QRubberBand*		m_rubberBand;
 
-    QSet<SublevelNode*> _selectedSublevels;
-    QRectF              _subrangeRect;
+    QSet<SublevelNode*> m_selectedSublevels;
+    QRectF              m_subrangeRect;
 
 };
 

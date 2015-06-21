@@ -104,16 +104,16 @@ private:
     QShortcut*          m_minimizeSelectedShortcut;
     QShortcut*          m_newTabShortcut;
 
-    QToolButton *       _newCueButton;
-    QCheckBox *         _useAllCues;
-    QCheckBox *         _autoSwitchCues;
-    QToolButton *       _segmentButton;
-    QTabWidget *        _tabwidget;
-    SegmentController * _segmentController;
-    RenameTabDialog*    _renameTabDialog;
+    QToolButton *       m_newCueButton;
+    QCheckBox *         m_useAllCues;
+    QCheckBox *         m_autoSwitchCues;
+    QToolButton *       m_segmentButton;
+    QTabWidget *        m_tabwidget;
+    SegmentController * m_segmentController;
+    RenameTabDialog*    m_renameTabDialog;
 
     // Last selection made--used for updating selections
-    QSet<NodeItem*>     _wasSelected;
+    QSet<NodeItem*>     m_wasSelected;
 
 
 protected:

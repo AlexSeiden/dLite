@@ -25,7 +25,7 @@ public:
     void setHasLights(int x, int y, bool status);
 
     void paintEvent(QPaintEvent *event);
-    // We'll need these when implementing path & region selection
+    // We need these when implementing path & region selection
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -43,19 +43,19 @@ private:
     QPoint  findCell(QPoint p);
     QPoint  findPos(QPoint cell);
 
-    Dancefloor* _dfModel;
-    int         _xsize;
-    int         _ysize;
-    int         _cellsize;
-    int         _cellspace;
+    Dancefloor* m_dfModel;
+    int         m_xsize;
+    int         m_ysize;
+    int         m_cellsize;
+    int         m_cellspace;
 
-    QSet<RegionNode*>       _selectedRegionNodes;
-    PixelQueryDelegate_t    _regionQuery;
-    PixelEditDelegate_t     _regionEdit;
-    QRubberBand*		    _rubberBand;
-    QPoint                  _dragStart;
-    QPoint                  _dragCellStart;
-    bool                    _dragged;
+    QSet<RegionNode*>       m_selectedRegionNodes;
+    PixelQueryDelegate_t    m_regionQuery;
+    PixelEditDelegate_t     m_regionEdit;
+    QRubberBand*		    m_rubberBand;
+    QPoint                  m_dragStart;
+    QPoint                  m_dragCellStart;
+    bool                    m_dragged;
 
 #ifdef INLINE
     int _getIndex(int x, int y) {return xsize*y + x;}

@@ -61,7 +61,7 @@ public:
 
     // Set window function applied to audio data before spectral analysis.
     void setWindowFunction(WindowFunction type);
-    void setDancefloormodel(Dancefloor *df) {_dfModel = df;}
+    void setDancefloormodel(Dancefloor *df) {m_dfModel = df;}
 
 public slots:
     void startPlayback();
@@ -84,7 +84,7 @@ signals:
     void formatChanged(const QAudioFormat &format);
 
     // Length of buffer has changed.
-    // \param duration Duration in microseconds
+    // duration is in microseconds.
     void bufferLengthChanged(qint64 duration);
 
     void newSong(QString songfile);
@@ -94,15 +94,14 @@ signals:
     void playPositionChanged(qint64 position);
 
     // Spectrum has changed.
-    // \param position Position of start of window in bytes
-    // \param length   Length of window in byte
-    // \param spectrum Resulting frequency spectrum
+    // position Position of start of window in bytes
+    // length   Length of window in byte
+    // spectrum Resulting frequency spectrum
     // TODO change this to only pass the spectrum
     void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
 
 private slots:
-    void audioNotify();
-    void alternativeNotify();
+    void timerNotify();
     void audioStateChanged(QAudio::State state);
     void spectrumChanged(const FrequencySpectrum &spectrum);
 
@@ -128,7 +127,7 @@ private:
     qint64              m_playPosition;
 
     QByteArray          m_buffer;
-    QBuffer             _qbuf;  // TODO better name for qbuf
+    QBuffer             m_qbuf;  // TODO better name for qbuf
 
     int                 m_spectrumBufferLength;	// in bytes
     QByteArray          m_spectrumBuffer;
@@ -138,11 +137,10 @@ private:
     int    				m_notifyIntervalMs;
 
     //  Style : dfModel only needed to call evaluate.  Perhaps should use signals?
-    Dancefloor          *_dfModel;
+    Dancefloor*         m_dfModel;
 
-    qint64              _uSecs;
     QString             m_audiofilename;
-    QTimer              *m_timer;
+    QTimer*             m_timer;
 };
 
 #endif // ENGINE_H

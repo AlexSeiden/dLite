@@ -26,7 +26,7 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     nameEdit->setText(_node->getName());
     QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
     proxy->setWidget(nameEdit);
-    proxy->setPos(guisettings->m_socketWidth + guisettings->paramTextOffset, 2);  // Hardw
+    proxy->setPos(guisettings->m_socketWidth + guisettings->m_paramTextOffset, 2);  // Hardw
     proxy->resize(guisettings->m_NNWidth*.75, (guisettings->m_PIheight -2)* .75);  // Hardw
     CHECKED_CONNECT(nameEdit, SIGNAL(textChanged(QString)), this, SLOT(nameEdit(QString)));
 
@@ -307,7 +307,7 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
         proxy->setWidget(paramEditorWidget);
         qreal extra = guisettings->m_PIheight - proxy->rect().height();
         int yshift =  extra/2;
-        int xshift = guisettings->m_socketWidth + guisettings->paramTextOffset + guisettings->paramEditorOffset;
+        int xshift = guisettings->m_socketWidth + guisettings->m_paramTextOffset + guisettings->m_paramEditorOffset;
         proxy->setPos(xshift, yshift);
 
 #if 0
@@ -341,13 +341,13 @@ void ParamItem::paint(QPainter *painter,
     QRect rr(2,0,guisettings->m_NNWidth-4,guisettings->m_PIheight); //hardw
 
     // Draw rectangle
-    painter->setPen(QPen(guisettings->paramBorderColor, guisettings->paramBorderWidth));
-    painter->drawRoundedRect(rr, guisettings->paramBorderRadius, guisettings->paramBorderRadius);
+    painter->setPen(QPen(guisettings->m_paramBorderColor, guisettings->m_paramBorderWidth));
+    painter->drawRoundedRect(rr, guisettings->m_paramBorderRadius, guisettings->m_paramBorderRadius);
 
     // Draw name
     painter->setPen(guisettings->m_PIfontcolor);
     painter->setFont(guisettings->m_PIfont);
-    int offset = guisettings->m_socketWidth + guisettings->paramTextOffset;
+    int offset = guisettings->m_socketWidth + guisettings->m_paramTextOffset;
 
     if (_param->isOutput()) {
         rr.setRight(rr.right() - offset);
@@ -446,7 +446,7 @@ void SocketItem::paint(QPainter *painter,
 
     // Draw connector socket
     painter->setBrush(guisettings->m_socketFillColor);
-    painter->setPen(guisettings->socketOutlinePen);
+    painter->setPen(guisettings->m_socketOutlinePen);
 //    painter->drawEllipse(0, 0, guisettings->m_socketWidth, guisettings->m_socketWidth);
     painter->drawRect(-guisettings->m_socketWidth/2, -guisettings->m_socketWidth/2,
                       guisettings->m_socketWidth, guisettings->m_socketWidth);

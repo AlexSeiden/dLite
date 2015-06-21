@@ -354,8 +354,8 @@ QRectF Spectrograph::computeWinFromRange(Subrange *subrange)
     double minSubwindowFreq = freq2frac(subrange->_freqMin);
     double maxSubwindowFreq = freq2frac(subrange->_freqMax);
 
-    _subrangeRect.setCoords(minSubwindowFreq, ampMax, maxSubwindowFreq, ampMin);
-    return _subrangeRect;
+    m_subrangeRect.setCoords(minSubwindowFreq, ampMax, maxSubwindowFreq, ampMin);
+    return m_subrangeRect;
 }
 
 
@@ -421,19 +421,19 @@ void Spectrograph::printSpectrum() {
 
 void Spectrograph::submeterSelected(SublevelNode *chosen)
 {
-    _selectedSublevels.insert(chosen);
+    m_selectedSublevels.insert(chosen);
     update();  // XXX Can optimize
 }
 
 void Spectrograph::submeterDeselected(SublevelNode *chosen)
 {
-    _selectedSublevels.remove(chosen);
+    m_selectedSublevels.remove(chosen);
     update();  // XXX Can optimize
 }
 
 bool Spectrograph::showSubrange()
 {
-    if (_selectedSublevels.size() == 1)
+    if (m_selectedSublevels.size() == 1)
         return true;
     return false;
 }
@@ -441,8 +441,8 @@ bool Spectrograph::showSubrange()
 QRectF Spectrograph::getSubrangeWindow()
 {
     // Caclulates the rect that should be drawn for a given range.
-    if (_selectedSublevels.size() == 1) {
-        QSet<SublevelNode*>::const_iterator i = _selectedSublevels.constBegin();
+    if (m_selectedSublevels.size() == 1) {
+        QSet<SublevelNode*>::const_iterator i = m_selectedSublevels.constBegin();
         return (computeWinFromRange((*i)->getSubrange()));
     }
     return QRectF();
@@ -451,8 +451,8 @@ QRectF Spectrograph::getSubrangeWindow()
 void Spectrograph::setSubrangeWindow(Subrange &subrange)
 {
     // Store a newly dragged out range into the subrange struct.
-    if (_selectedSublevels.size() == 1) {
-        QSet<SublevelNode*>::const_iterator i = _selectedSublevels.constBegin();
+    if (m_selectedSublevels.size() == 1) {
+        QSet<SublevelNode*>::const_iterator i = m_selectedSublevels.constBegin();
         (*i)->setSubrange(&subrange);
     }
 }

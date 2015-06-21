@@ -11,13 +11,13 @@
 
 Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
     QWidget(parent),
-    _regionQuery(nullptr),
-    _regionEdit(nullptr),
-    _rubberBand(nullptr),
-    _dragged(false)
+    m_regionQuery(nullptr),
+    m_regionEdit(nullptr),
+    m_rubberBand(nullptr),
+    m_dragged(false)
 {
-    _cellsize = guisettings->df_cellsize;
-    _cellspace = guisettings->df_cellspace;
+    m_cellsize = guisettings->df_cellsize;
+    m_cellspace = guisettings->df_cellspace;
 
     setWindowTitle(tr("dLite floor"));
 //    setWindowFlags(Qt::Tool | Qt::WindowTitleHint  |
@@ -29,11 +29,11 @@ Dancefloorwidget::~Dancefloorwidget() { }
 
 void Dancefloorwidget::setModel(Dancefloor *model)
 {
-    _dfModel = model;
-    _xsize = model->getXsize();
-    _ysize = model->getYsize();
-    setFixedWidth(_xsize*(_cellsize+_cellspace));
-    setFixedHeight(_ysize*(_cellsize+_cellspace));
+    m_dfModel = model;
+    m_xsize = model->getXsize();
+    m_ysize = model->getYsize();
+    setFixedWidth(m_xsize*(m_cellsize+m_cellspace));
+    setFixedHeight(m_ysize*(m_cellsize+m_cellspace));
 
     // TODO restore from saved & allowed saved layouts
     // also, snapping...
@@ -41,7 +41,7 @@ void Dancefloorwidget::setModel(Dancefloor *model)
 }
 
 bool Dancefloorwidget::cellHasLights(int x, int y) {
-    return _dfModel->hasPixel(x,y);
+    return m_dfModel->hasPixel(x,y);
 }
 
 // -----------------------------------------------------------------------------
@@ -58,17 +58,17 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
     painter.setPen(cellPen);
     painter.setFont(guisettings->sg_HzFont);    // hardw give own guisetting
 
-    QRect cell(0,0, _cellsize, _cellsize);
-    for (int y=0; y<_ysize; ++y) {
-        for (int x=0; x<_xsize; ++x) {
-            cell.moveLeft(_cellspace/2 + x*(_cellsize+_cellspace));
-            cell.moveTop(_cellspace/2 + y*(_cellsize+_cellspace));
+    QRect cell(0,0, m_cellsize, m_cellsize);
+    for (int y=0; y<m_ysize; ++y) {
+        for (int x=0; x<m_xsize; ++x) {
+            cell.moveLeft(m_cellspace/2 + x*(m_cellsize+m_cellspace));
+            cell.moveTop(m_cellspace/2 + y*(m_cellsize+m_cellspace));
 
             if (cellHasLights(x,y)) {
-                if (_regionQuery)
-                    painter.fillRect(cell, _regionQuery(QPoint(x,y)));
+                if (m_regionQuery)
+                    painter.fillRect(cell, m_regionQuery(QPoint(x,y)));
                 else
-                    painter.fillRect(cell, _dfModel->getQColor(x,y));
+                    painter.fillRect(cell, m_dfModel->getQColor(x,y));
             }
             else
                 painter.fillRect(cell, guisettings->df_noCellColor);
@@ -95,9 +95,9 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
             if ((x>xstart) && (x<xend) && (y>2) && (y<17) && (x%2==1)) {
                     QRect wood = cell;
                     wood.setLeft(cell.right()+2);
-                    wood.setRight(cell.right()+_cellspace);
-                    wood.setTop(cell.top()-_cellspace+2);
-                    wood.setBottom(cell.bottom()+_cellspace-1);
+                    wood.setRight(cell.right()+m_cellspace);
+                    wood.setTop(cell.top()-m_cellspace+2);
+                    wood.setBottom(cell.bottom()+m_cellspace-1);
                     painter.fillRect(wood,guisettings->df_woodColor);
             }
             // Horizontal bars
@@ -105,9 +105,9 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
             xend= (y<10) ? 18 : 16;
             if ((x>xstart) && (x<xend) && (y>2) && (y<18) && (y%2==1)) {
                     QRect wood = cell;
-                    wood.setLeft(cell.left()-_cellspace+1);
-                    wood.setRight(cell.right()+_cellspace);
-                    wood.setTop(cell.top()-_cellspace+1);
+                    wood.setLeft(cell.left()-m_cellspace+1);
+                    wood.setRight(cell.right()+m_cellspace);
+                    wood.setTop(cell.top()-m_cellspace+1);
                     wood.setBottom(cell.top()-1);
                     painter.fillRect(wood,guisettings->df_woodColor);
             }
@@ -118,9 +118,9 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
 #ifndef INLINE
 int Dancefloorwidget::_getIndex(int x, int y)
 {
-    Q_ASSERT(x >= 0 && x < _xsize && y >= 0 && y < _ysize);
+    Q_ASSERT(x >= 0 && x < m_xsize && y >= 0 && y < m_ysize);
     // XXX could clamp
-    return _xsize*y + x;
+    return m_xsize*y + x;
 }
 #endif
 
@@ -128,49 +128,49 @@ int Dancefloorwidget::_getIndex(int x, int y)
 // Region editing
 void Dancefloorwidget::setRegionEdit()
 {
-    if (_selectedRegionNodes.size() == 1) {
-        QSet<RegionNode*>::const_iterator i = _selectedRegionNodes.constBegin();
-        _regionQuery = (*i)->getQueryDelegate();
-        _regionEdit  = (*i)->getEditDelegate();
+    if (m_selectedRegionNodes.size() == 1) {
+        QSet<RegionNode*>::const_iterator i = m_selectedRegionNodes.constBegin();
+        m_regionQuery = (*i)->getQueryDelegate();
+        m_regionEdit  = (*i)->getEditDelegate();
     }
     else {
-        _regionQuery = nullptr;
-        _regionEdit  = nullptr;
+        m_regionQuery = nullptr;
+        m_regionEdit  = nullptr;
     }
 }
 
 void Dancefloorwidget::regionSelected(RegionNode *chosen)
 {
-    _selectedRegionNodes.insert(chosen);
+    m_selectedRegionNodes.insert(chosen);
     setRegionEdit();
     update();  // XXX Can optimize
 }
 
 void Dancefloorwidget::regionDeselected(RegionNode *chosen)
 {
-    _selectedRegionNodes.remove(chosen);
+    m_selectedRegionNodes.remove(chosen);
     setRegionEdit();
     update();  // XXX Can optimize
 }
 
 bool Dancefloorwidget::editingRegion()
 {
-    return (_regionEdit && _regionQuery);
+    return (m_regionEdit && m_regionQuery);
 }
 
 // Find which cell was clicked, given a point in the widget
 QPoint Dancefloorwidget::findCell(QPoint p)
 {
-    int xCell = p.x()/(_cellsize+_cellspace);
-    int yCell = p.y()/(_cellsize+_cellspace);
+    int xCell = p.x()/(m_cellsize+m_cellspace);
+    int yCell = p.y()/(m_cellsize+m_cellspace);
     return QPoint(xCell,yCell);
 }
 
 // Find the point in the widget, given the cell that was clicked.
 QPoint Dancefloorwidget::findPos(QPoint cell)
 {
-    int x = cell.x()*(_cellsize+_cellspace);
-    int y = cell.y()*(_cellsize+_cellspace);
+    int x = cell.x()*(m_cellsize+m_cellspace);
+    int y = cell.y()*(m_cellsize+m_cellspace);
     return QPoint(x,y);
 }
 
@@ -181,11 +181,11 @@ void Dancefloorwidget::mousePressEvent(QMouseEvent *event)
     if (! editingRegion())
         return;
 
-    _dragStart = event->pos();
+    m_dragStart = event->pos();
     QPoint cell = findCell(event->pos());
-    _dragCellStart = cell;
+    m_dragCellStart = cell;
 
-    _dragged = false;
+    m_dragged = false;
 }
 
 void Dancefloorwidget::mouseMoveEvent(QMouseEvent *event)
@@ -194,30 +194,30 @@ void Dancefloorwidget::mouseMoveEvent(QMouseEvent *event)
         return;
 
     // Minimum distance for "drag"
-    QPoint diff = event->pos() - _dragStart;
+    QPoint diff = event->pos() - m_dragStart;
     if (diff.manhattanLength() < 5)
         return;
 
-    _dragged = true;
-    if (!_rubberBand)
-        _rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
-    _rubberBand->setGeometry(QRect(_dragStart, event->pos()).normalized());
-    _rubberBand->show();
+    m_dragged = true;
+    if (!m_rubberBand)
+        m_rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
+    m_rubberBand->setGeometry(QRect(m_dragStart, event->pos()).normalized());
+    m_rubberBand->show();
 
     QPoint currentCell = findCell(event->pos());
 
     // Fill all cells between drag start cell & current cell
-    int xstart = qMin(_dragCellStart.x(), currentCell.x());
-    int xend   = qMax(_dragCellStart.x(), currentCell.x());
-    int ystart = qMin(_dragCellStart.y(), currentCell.y());
-    int yend   = qMax(_dragCellStart.y(), currentCell.y());
+    int xstart = qMin(m_dragCellStart.x(), currentCell.x());
+    int xend   = qMax(m_dragCellStart.x(), currentCell.x());
+    int ystart = qMin(m_dragCellStart.y(), currentCell.y());
+    int yend   = qMax(m_dragCellStart.y(), currentCell.y());
     for (int y=ystart; y<=yend; ++y)
         for (int x=xstart; x<=xend; ++x) {
             QPoint cell = QPoint(x,y);
             if (event->modifiers() == Qt::ControlModifier)
-                _regionEdit(cell, false);
+                m_regionEdit(cell, false);
             else
-                _regionEdit(cell, true);
+                m_regionEdit(cell, true);
         }
 
     int right = xend+1;
@@ -234,18 +234,18 @@ void Dancefloorwidget::mouseReleaseEvent(QMouseEvent *event)
         return;
 
     // If we didn't drag, treat as a click
-    if (! _dragged) {
+    if (! m_dragged) {
         if (event->modifiers() == Qt::ControlModifier)
-            _regionEdit(_dragCellStart, false);
+            m_regionEdit(m_dragCellStart, false);
         else
-            _regionEdit(_dragCellStart, true);
+            m_regionEdit(m_dragCellStart, true);
     }
     // reset for next time
-    _dragged = false;
+    m_dragged = false;
 
     // Cleanup & redraw.
-    if (_rubberBand)
-        _rubberBand->hide();
+    if (m_rubberBand)
+        m_rubberBand->hide();
     update();
 }
 

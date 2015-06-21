@@ -2,12 +2,7 @@
 #define TRANSPORT_H
 
 #include <QWidget>
-#include <QIcon>
 #include "SegmentController.h"
-
-QT_BEGIN_NAMESPACE
-class QPushButton;
-QT_END_NAMESPACE
 
 class Transport : public QWidget
 {
@@ -29,14 +24,10 @@ signals:
     void movePlaybackHead(double pos);
 
 private:
-    qint64 m_bufferLength;
-    qint64 m_playPosition;
-
-    QPushButton*            _playPauseButton;
-    QIcon                   _pauseIcon;
-    QIcon                   _playIcon;
-    SongSegmentation*       _segmentation;
-    int                     _totalDuration;
+    qint64                  m_bufferLength;
+    qint64                  m_playPosition;
+    SongSegmentation*       m_segmentation;
+    int                     m_totalDuration;
 };
 
 #endif // TRANSPORT_H

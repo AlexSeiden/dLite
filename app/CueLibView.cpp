@@ -18,7 +18,7 @@ CueLibView::CueLibView(QWidget *parent) :
 
 void CueLibView::createUi()
 {
-    _signalMapper = new QSignalMapper(this);
+    m_signalMapper = new QSignalMapper(this);
 
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->setMargin(2);
@@ -37,7 +37,7 @@ void CueLibView::createUi()
     setWindowTitle(tr("Cue Library"));
     setWindowFlags( Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
 
-    CHECKED_CONNECT(_signalMapper, SIGNAL(mapped(QString)),
+    CHECKED_CONNECT(m_signalMapper, SIGNAL(mapped(QString)),
                     this, SIGNAL(newNodeRequest(QString)));
     // GROSS The newNodeRequest signal from here is monitored by mainwidget,
     // which does the instantiation, partly by calling back here,
@@ -66,10 +66,10 @@ QGroupBox *CueLibView::createGroup(QString typeName, Node::node_t nodeType)
 // Convienence function
 void CueLibView::addButtonToUi(QLayout *layout, QString buttonName) {
     QPushButton *butt = new QPushButton(buttonName);
-    buttons.push_back(butt);
+    m_buttons.push_back(butt);
     layout->addWidget(butt);
-    _signalMapper->setMapping(butt, buttonName);
-    CHECKED_CONNECT(butt, SIGNAL(clicked()), _signalMapper, SLOT(map()));
+    m_signalMapper->setMapping(butt, buttonName);
+    CHECKED_CONNECT(butt, SIGNAL(clicked()), m_signalMapper, SLOT(map()));
 }
 
 void CueLibView::showAndRaise()

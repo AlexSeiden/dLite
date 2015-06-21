@@ -22,12 +22,12 @@ public slots:
 private:
     void connectUi();
 
-    QAction *loadsongAction;
-    QAction *pauseAction;
-    QAction *playAction;
-    QAction *settingsAction;
-    QAction *saveAction;
-    QAction *openAction;
+    QAction *m_loadsongAction;
+    QAction *m_pauseAction;
+    QAction *m_playAction;
+    QAction *m_settingsAction;
+    QAction *m_saveAction;
+    QAction *m_openAction;
 
     QIcon                   m_pauseIcon;
     QIcon                   m_playIcon;

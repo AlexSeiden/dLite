@@ -22,7 +22,7 @@ CuesheetView::CuesheetView(QWidget *parent)
     _graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
 //    int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
-    QSize iconSize(guisettings->zoomIconSize, guisettings->zoomIconSize);
+    QSize iconSize(guisettings->m_zoomIconSize, guisettings->m_zoomIconSize);
 
     // Create zoom slider
     QToolButton *zoomInIcon = new QToolButton;

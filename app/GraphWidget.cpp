@@ -30,51 +30,51 @@
 GraphWidget::GraphWidget(QWidget *parent) :
     QWidget(parent)
 {
-    _tabwidget = new QTabWidget(this);
-    _tabwidget->setMovable(true);
-    _tabwidget->setTabShape(QTabWidget::Triangular);
-    _tabwidget->setTabsClosable(true);  // TODO handle event
-    CHECKED_CONNECT(_tabwidget, SIGNAL(tabCloseRequested(int)),
+    m_tabwidget = new QTabWidget(this);
+    m_tabwidget->setMovable(true);
+    m_tabwidget->setTabShape(QTabWidget::Triangular);
+    m_tabwidget->setTabsClosable(true);  // TODO handle event
+    CHECKED_CONNECT(m_tabwidget, SIGNAL(tabCloseRequested(int)),
                     this, SLOT(deleteCuesheet(int)));
-    CHECKED_CONNECT(_tabwidget, SIGNAL(tabBarDoubleClicked(int)),
+    CHECKED_CONNECT(m_tabwidget, SIGNAL(tabBarDoubleClicked(int)),
                     this, SLOT(showRenameTabDialog(int)));
     newCuesheet();
 
-    _newCueButton = new QToolButton;
-    _newCueButton->setText(tr("+"));
-    _newCueButton->setEnabled(true);
+    m_newCueButton = new QToolButton;
+    m_newCueButton->setText(tr("+"));
+    m_newCueButton->setEnabled(true);
 
     // TODO lots more
     // e.g. compmodes, etc.
-    _useAllCues = new QCheckBox;
-    _useAllCues->setEnabled(true);
-    _useAllCues->setToolTip("Use All Cues");
-    _useAllCues->setChecked(true);
+    m_useAllCues = new QCheckBox;
+    m_useAllCues->setEnabled(true);
+    m_useAllCues->setToolTip("Use All Cues");
+    m_useAllCues->setChecked(true);
 
-    _autoSwitchCues = new QCheckBox;
-    _autoSwitchCues->setEnabled(true);
-    _autoSwitchCues->setToolTip("Auto Switch Cues");
-    _autoSwitchCues->setChecked(true);
+    m_autoSwitchCues = new QCheckBox;
+    m_autoSwitchCues->setEnabled(true);
+    m_autoSwitchCues->setToolTip("Auto Switch Cues");
+    m_autoSwitchCues->setChecked(true);
 
 //    _segmentButton = new QToolButton;
 //    _segmentButton->setText(tr("S"));
 //    _segmentButton->setEnabled(true);
-    _segmentController = nullptr;
+    m_segmentController = nullptr;
 //    _segGui = nullptr;
 
     QVBoxLayout *vlayout = new QVBoxLayout();
     vlayout->setSpacing(0);
     vlayout->setContentsMargins(0,0,0,0);
-    vlayout->addWidget(_newCueButton);
-    vlayout->addWidget(_useAllCues);
-    vlayout->addWidget(_autoSwitchCues);
+    vlayout->addWidget(m_newCueButton);
+    vlayout->addWidget(m_useAllCues);
+    vlayout->addWidget(m_autoSwitchCues);
 //    vlayout->addWidget(_segmentButton);
     vlayout->addStretch();
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
-    layout->addWidget(_tabwidget);
+    layout->addWidget(m_tabwidget);
     layout->addLayout(vlayout);
     setLayout(layout);
 
@@ -84,16 +84,16 @@ GraphWidget::GraphWidget(QWidget *parent) :
     setWindowFlags( Qt::Window | Qt::WindowMaximizeButtonHint |
                     Qt::CustomizeWindowHint);
 
-    _renameTabDialog = new RenameTabDialog(this);
+    m_renameTabDialog = new RenameTabDialog(this);
 
     // GROSS this doesn't really belong here in GraphWidget
     // GROSS this duplicates code below.
-    _segmentController = new SegmentController;
+    m_segmentController = new SegmentController;
     CHECKED_CONNECT(this, SIGNAL(segmentationChanged(SongSegmentation*)),
                     Cupid::Singleton()->getTransport(), SLOT(segmentsChanged(SongSegmentation*)));
     CHECKED_CONNECT(Cupid::Singleton()->getEngine(), SIGNAL(playPositionChanged(qint64)),
                     this, SLOT(whatToActivate()));
-    emit segmentationChanged(&(_segmentController->_segmentation));
+    emit segmentationChanged(&(m_segmentController->_segmentation));
     createShortcuts();
 }
 
@@ -101,10 +101,9 @@ void GraphWidget::connectUi()
 {
     CHECKED_CONNECT(Cupid::Singleton()->getEngine(), SIGNAL(newSong(QString)),
                     this, SLOT(newSong(QString)));
-    CHECKED_CONNECT(_newCueButton, SIGNAL(clicked()), this, SLOT(newCuesheet()));
+    CHECKED_CONNECT(m_newCueButton, SIGNAL(clicked()), this, SLOT(newCuesheet()));
 //    CHECKED_CONNECT(_segmentButton, SIGNAL(clicked()), this, SLOT(showSegmentController()));
 }
-
 
 void GraphWidget::createAppShortcuts()
 {
@@ -176,23 +175,23 @@ void GraphWidget::createAppShortcuts()
 // Cuesheet mgmt
 CuesheetScene* GraphWidget::newCuesheet(QString name)
 {
-    CuesheetView *csv = new CuesheetView(_tabwidget);
+    CuesheetView *csv = new CuesheetView(m_tabwidget);
     CuesheetScene *css = new CuesheetScene;
 
     css->setSceneRect(QRectF());
     csv->view()->setScene(css);
 
     CHECKED_CONNECT(css, SIGNAL(selectionChanged()), this, SLOT(selectionChanged()));
-    _tabwidget->addTab(csv, name);
+    m_tabwidget->addTab(csv, name);
     css->setName(name);
-    _tabwidget->setCurrentWidget(csv);
+    m_tabwidget->setCurrentWidget(csv);
     update();
     return css;
 }
 
 CuesheetScene* GraphWidget::newCuesheet()
 {
-    int nCuesheets = _tabwidget->count();
+    int nCuesheets = m_tabwidget->count();
     QString name = QString("Cuesheet %1").arg(nCuesheets);
     CuesheetScene *css = newCuesheet(name);
     return css;
@@ -202,7 +201,7 @@ QList<CuesheetScene*> GraphWidget::getCuesheets()
 {
     // GROSS oh man really breakin down the view/business wall here
     QList<CuesheetScene*> out;
-    for (int i=0; i<_tabwidget->count(); ++i) {
+    for (int i=0; i<m_tabwidget->count(); ++i) {
         CuesheetScene* css = getCurrentScene(i);
         out << css;
     }
@@ -211,17 +210,17 @@ QList<CuesheetScene*> GraphWidget::getCuesheets()
 
 void GraphWidget::deleteCuesheet(int index)
 {
-    QWidget *widget = _tabwidget->widget(index);
+    QWidget *widget = m_tabwidget->widget(index);
     CuesheetView *csv = getCurrentView(index);
     CuesheetScene *css = getCurrentScene(index);
     // If deleting the last widget, first create a new one,
     // because we have to have at least one widget
-    if (_tabwidget->count() == 1) {
+    if (m_tabwidget->count() == 1) {
         newCuesheet();
     }
     delete csv;
     delete css;
-    _tabwidget->removeTab(_tabwidget->indexOf(widget));
+    m_tabwidget->removeTab(m_tabwidget->indexOf(widget));
 }
 
 void GraphWidget::deleteEmptyFirstCuesheet()
@@ -237,20 +236,20 @@ void GraphWidget::deleteEmptyFirstCuesheet()
 
 void GraphWidget::showSegmentController()
 {
-    if (! _segmentController) {
-        _segmentController = new SegmentController;
+    if (! m_segmentController) {
+        m_segmentController = new SegmentController;
         CHECKED_CONNECT(this, SIGNAL(segmentationChanged(SongSegmentation*)),
                         Cupid::Singleton()->getTransport(), SLOT(segmentsChanged(SongSegmentation*)));
-        emit segmentationChanged(&(_segmentController->_segmentation));
+        emit segmentationChanged(&(m_segmentController->_segmentation));
     }
 }
 
 int GraphWidget::whatToActivate()
 {
     int ms = Cupid::getPlaybackPositionUSecs()/1000;
-    int segmentIndex = _segmentController->findSegment(ms);
+    int segmentIndex = m_segmentController->findSegment(ms);
 //    int cuesheetIndex = _segmentIndexToCuesheetIndex[segmentIndex];
-    int cuesheetIndex = segmentIndex % _tabwidget->count();
+    int cuesheetIndex = segmentIndex % m_tabwidget->count();
     if (autoSwitchCues())
         emit setCuesheet(cuesheetIndex);
     return cuesheetIndex;
@@ -258,14 +257,14 @@ int GraphWidget::whatToActivate()
 
 void GraphWidget::showRenameTabDialog(int index)
 {
-    _renameTabDialog->setIndex(index);
-    _renameTabDialog->setTabname(_tabwidget->tabText(index));
-    _renameTabDialog->exec();
-    if (_renameTabDialog->result() == QDialog::Accepted) {
+    m_renameTabDialog->setIndex(index);
+    m_renameTabDialog->setTabname(m_tabwidget->tabText(index));
+    m_renameTabDialog->exec();
+    if (m_renameTabDialog->result() == QDialog::Accepted) {
         // Style: kinda mixed up here...CuesheetScene should probably own
         // the tab name
-        _tabwidget->setTabText(index, _renameTabDialog->tabname());
-        getCurrentScene()->setName(_renameTabDialog->tabname());
+        m_tabwidget->setTabText(index, m_renameTabDialog->tabname());
+        getCurrentScene()->setName(m_renameTabDialog->tabname());
     }
 }
 
@@ -277,7 +276,7 @@ QList<Cue*> GraphWidget::getCurrentCues()
 
 CuesheetScene* GraphWidget::getCurrentScene()
 {
-    return getCurrentScene(_tabwidget->currentIndex());
+    return getCurrentScene(m_tabwidget->currentIndex());
 }
 
 CuesheetScene* GraphWidget::getCurrentScene(int i)
@@ -294,12 +293,12 @@ CuesheetScene* GraphWidget::getCurrentScene(int i)
 
 CuesheetView* GraphWidget::getCurrentView()
 {
-    return getCurrentView(_tabwidget->currentIndex());
+    return getCurrentView(m_tabwidget->currentIndex());
 }
 
 CuesheetView* GraphWidget::getCurrentView(int i)
 {
-    QWidget *currentTab = _tabwidget->widget(i);
+    QWidget *currentTab = m_tabwidget->widget(i);
     Q_ASSERT(currentTab);
     CuesheetView *csv = qobject_cast<CuesheetView*>(currentTab);
     Q_ASSERT(csv);
@@ -310,18 +309,18 @@ bool GraphWidget::useAllCues()
 {
     // When "_useAllCues" is false, only cues on the
     // current cuesheet are active.
-    return _useAllCues->isChecked();
+    return m_useAllCues->isChecked();
 }
 
 bool GraphWidget::autoSwitchCues()
 {
-    return _autoSwitchCues->isChecked();
+    return m_autoSwitchCues->isChecked();
 }
 
 void GraphWidget::setCuesheet(int index)
 {
-    if (index < _tabwidget->count())
-        _tabwidget->setCurrentIndex(index);
+    if (index < m_tabwidget->count())
+        m_tabwidget->setCurrentIndex(index);
 }
 
 void GraphWidget::selectionChanged()
@@ -339,8 +338,8 @@ void GraphWidget::selectionChanged()
         if (nodeItem)
             newSelection.insert(nodeItem);
     }
-    QSet<NodeItem*> itemsDeselected = _wasSelected - newSelection;
-    QSet<NodeItem*> itemsNewlySelected = newSelection - _wasSelected;
+    QSet<NodeItem*> itemsDeselected = m_wasSelected - newSelection;
+    QSet<NodeItem*> itemsNewlySelected = newSelection - m_wasSelected;
 
     foreach (NodeItem* item, itemsDeselected)
         item->beenDeselected();
@@ -350,7 +349,7 @@ void GraphWidget::selectionChanged()
 
     // TODO if no SublevelNode selected, setSubrange = NULL
 
-    _wasSelected = newSelection;
+    m_wasSelected = newSelection;
 }
 
 void GraphWidget::selectNodes(QList<Node *>nodes)
@@ -693,8 +692,8 @@ void GraphWidget::newSong(QString filename)
     foreach (Node* node, Node::allNodes())
         node->loadFile();
 
-    if (_segmentController)
-        _segmentController->loadFile();
+    if (m_segmentController)
+        m_segmentController->loadFile();
 //    if (_segGui)
 //        _segGui->setNumCues(_tabwidget->count());
 }

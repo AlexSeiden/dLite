@@ -11,7 +11,7 @@ GuiSettings::GuiSettings(QWidget *parent) :
 {
     // XXX dunno why this crashes
 //    this->setObjectName(QString("guisettings"));
-//    loadStyleSheet();
+//    loadStyleSheet()
 }
 
 // Utility function
@@ -35,10 +35,10 @@ void GuiSettings::loadStyleSheet()
     qApp->processEvents(QEventLoop::AllEvents, 1000);
 
     // Derived
-    guisettings->socketOutlinePen     = QPen(guisettings->socketOutlineColor, 2, Qt::SolidLine);
-    guisettings->connectorPen         = QPen(QBrush(guisettings->connectorColor), 2.0, Qt::SolidLine);
-    guisettings->connectorPenSelected = QPen(QColor(200,40,40), 4, Qt::SolidLine);
-    guisettings->connectorBrush       = QBrush(guisettings->connectorCenterColor);
+    guisettings->m_socketOutlinePen     = QPen(guisettings->m_socketOutlineColor, 2, Qt::SolidLine);
+    guisettings->m_connectorPen         = QPen(QBrush(guisettings->m_connectorColor), 2.0, Qt::SolidLine);
+    guisettings->m_connectorPenSelected = QPen(QColor(200,40,40), 4, Qt::SolidLine);
+    guisettings->m_connectorBrush       = QBrush(guisettings->m_connectorCenterColor);
     guisettings->m_PIfont.setLetterSpacing(QFont::PercentageSpacing, guisettings->m_PIletterspacing);
 
     this->repaint();

@@ -28,12 +28,11 @@ signals:
 private:
     void    createUi();
 
-    QGroupBox   *createGroup(QString typeName, Node::node_t nodeType);
-    void    addButtonToUi(QLayout *layout, QString buttonName);
+    QGroupBox*  createGroup(QString typeName, Node::node_t nodeType);
+    void        addButtonToUi(QLayout *layout, QString buttonName);
 
-    QList<QPushButton *> buttons;
-
-    QSignalMapper *_signalMapper;
+    QList<QPushButton *>    m_buttons;
+    QSignalMapper*          m_signalMapper;
 };
 
 #endif // CUELIBVIEW_H
