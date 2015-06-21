@@ -2,14 +2,13 @@
 #define MAINWIDGET_H
 
 #include <QAudio>
-#include <QIcon>
 #include <QWidget>
-#include <QIntValidator>
-#include <QSpinBox>
-#include <QRubberBand>
 #include <QApplication>
 #include <QMainWindow>
 #include <QDockWidget>
+#include <QMenu>
+#include <QMenuBar>
+#include <QAction>
 
 #include "engine.h"
 #include "NodeFactory.h"
@@ -27,18 +26,6 @@
 class FrequencySpectrum;
 class Transport;
 class Dancefloor;
-
-QT_BEGIN_NAMESPACE
-class QAction;
-class QAudioFormat;
-class QLabel;
-class QMenu;
-class QPushButton;
-class QSpinBox;
-class QLineEdit;
-class QShortcut;
-class QMenuBar;
-QT_END_NAMESPACE
 
 // Main application widget, responsible for connecting the various UI
 // elements to the Engine.
@@ -71,20 +58,14 @@ public slots:
 
 private:
     void createUi();
-    void createShortcuts();
-    void createActions();
+    void createMenus();
     void connectUi();
     void reset();
 
 private:
     Engine*                 m_engine;
-
     Transport*              m_transport;
     Spectrograph*           m_spectrograph;
-
-    QShortcut*              m_importFileShortcut;
-    QShortcut*              m_openSongShortcut;
-    QShortcut*              m_reloadStylesShortcut;
 
     // Menu items
     QMenuBar*               m_menuBar;
@@ -95,6 +76,7 @@ private:
     QAction*                m_importFileAct;
     QAction*                m_saveAct;
     QAction*                m_saveAsAct;
+    QAction*                m_reloadStylesAct;
 
     QMenu*                  m_editMenu;
     QAction*                m_cutAct;

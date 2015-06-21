@@ -23,11 +23,9 @@ GuiSettings {
                 QFont::StyleHint, QFont::Weight,
                 QFont::Style, underline, strikeOut, fixedPitch, rawMode
     */
-    qproperty-PIfont    :               "Helvetica Neue, -1,10,  0,25,  0,0,0,20,0";
+    qproperty-PIfont    :               "Helvetica Neue, -1,10,  0,0,  0,0,0,20,0";
     qproperty-PIfontcolor:              rgb(255,255,255);
-    /* AFTER HERE */
-    qproperty-PIletterspacing:          150;
-    /* BEFORE HERE */
+    qproperty-PIletterspacing:          140;
     qproperty-paramTextOffset:          15;
     qproperty-paramEditorOffset:        80;
     qproperty-paramBorderRadius         1px;

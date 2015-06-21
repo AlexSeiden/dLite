@@ -71,3 +71,9 @@ void CueLibView::addButtonToUi(QLayout *layout, QString buttonName) {
     _signalMapper->setMapping(butt, buttonName);
     CHECKED_CONNECT(butt, SIGNAL(clicked()), _signalMapper, SLOT(map()));
 }
+
+void CueLibView::showAndRaise()
+{
+    show();
+    raise();
+}

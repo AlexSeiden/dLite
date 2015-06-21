@@ -1,18 +1,5 @@
 #include "mainwidget.h"
 
-#include <QLabel>
-#include <QPushButton>
-#include <QLineEdit>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QStyle>
-#include <QMenu>
-#include <QFileDialog>
-#include <QTimerEvent>
-#include <QMessageBox>
-#include <QShortCut>
-#include <QMenuBar>
-
 MainWidget::MainWidget(QWidget *parent)
     :   QMainWindow(parent)
     ,   m_engine(new Engine(this))
@@ -31,38 +18,12 @@ MainWidget::MainWidget(QWidget *parent)
     Cupid::Singleton()->setSpectrograph(m_spectrograph);
     Cupid::Singleton()->setTransport(m_transport);
     createUi();
-
-    // These cause problems with the dock widgets
-//    setMinimumSize(500, 400);
-//    resize(600, 450);
-    move(5,10);  // TODO restore from last saved
-
-    // TODO move to settings/prefs  & allow setting this
-    std::string layoutfile = std::string("/Users/alex/src/floorit/layout.csv");
-    m_dancefloor->ImportLayout(layoutfile);
-    Cue::setDancefloor(m_dancefloor);
-    m_engine->setDancefloormodel(m_dancefloor);
-
-    m_dancefloorwidget = new Dancefloorwidget();
-    m_dancefloorwidget->setModel(m_dancefloor);
-    m_dancefloor->setView(m_dancefloorwidget);  // GROSS
-    setCentralWidget(m_dancefloorwidget);
-    Cupid::Singleton()->setDancefloorwidget(m_dancefloorwidget);
-
-    m_cueLibView = new CueLibView(NULL);
-    m_cueLibView->show();
-
-    m_graphWidget = new GraphWidget(NULL);
-    m_graphWidget->show();
-    Cupid::Singleton()->setGraphWidget(m_graphWidget);
-
     connectUi();
 
     // TODO default to last played.
     m_engine->loadSong(QString("/Users/alex/Documents/WAVS/Awesome/Awesome.wav"));
 
-    createShortcuts();
-    createActions();
+    createMenus();
     updateMenuStates();
 }
 
@@ -77,6 +38,31 @@ void MainWidget::createUi()
 {
     setWindowTitle(tr("dLite"));
 
+    // These cause problems with the dock widgets
+//    setMinimumSize(500, 400);
+//    resize(600, 450);
+//    move(5,10);  // TODO restore from last saved
+
+    // TODO move to settings/prefs  & allow setting this
+    std::string layoutfile = std::string("/Users/alex/src/floorit/layout.csv");
+    m_dancefloor->ImportLayout(layoutfile);
+    Cue::setDancefloor(m_dancefloor);
+    m_engine->setDancefloormodel(m_dancefloor);
+
+    m_dancefloorwidget = new Dancefloorwidget();
+    m_dancefloorwidget->setModel(m_dancefloor);
+    m_dancefloor->setView(m_dancefloorwidget);  // GROSS
+    Cupid::Singleton()->setDancefloorwidget(m_dancefloorwidget);
+    m_dancefloorwidget->show();
+
+    m_cueLibView = new CueLibView(NULL);
+    m_cueLibView->show();
+
+    m_graphWidget = new GraphWidget(NULL);
+    m_graphWidget->show();
+    Cupid::Singleton()->setGraphWidget(m_graphWidget);
+    setCentralWidget(m_graphWidget);
+
     // Spectrograph
     QScopedPointer<QDockWidget> spectrograph_dw(new QDockWidget(tr("Spectrograph"), this));
     spectrograph_dw->setWidget(m_spectrograph);
@@ -84,7 +70,7 @@ void MainWidget::createUi()
     spectrograph_dw.take();
 }
 
-void MainWidget::createActions()
+void MainWidget::createMenus()
 {
     // Mac-style main menu bar
     m_menuBar = new QMenuBar(nullptr);
@@ -121,6 +107,13 @@ void MainWidget::createActions()
     m_saveAsAct->setShortcutContext(Qt::ApplicationShortcut);
     m_fileMenu->addAction(m_saveAsAct);
     CHECKED_CONNECT(m_saveAsAct, SIGNAL(triggered()), this, SLOT(showSaveDialog()));
+
+    // GUI shortcuts
+    m_reloadStylesAct = new QAction(tr("Reload styles"), this);
+    m_reloadStylesAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
+    m_reloadStylesAct->setShortcutContext(Qt::ApplicationShortcut);
+    m_fileMenu->addAction(m_reloadStylesAct);
+    CHECKED_CONNECT(m_reloadStylesAct, SIGNAL(triggered()), guisettings, SLOT(loadStyleSheet()));
 
     // Edit Actions
     m_editMenu = m_menuBar->addMenu(tr("Edit"));
@@ -172,21 +165,21 @@ void MainWidget::createActions()
     m_controlMenu->addAction(m_rewindAct);
     CHECKED_CONNECT(m_rewindAct, SIGNAL(triggered()), m_engine, SLOT(rewind()));
 
+    // ----------------------------------------
     // Window actions
     m_windowMenu = m_menuBar->addMenu(tr("Window"));
 
     m_showDancefloorwidget = new QAction(tr("Dance Floor"), this);
     m_windowMenu->addAction(m_showDancefloorwidget);
-    CHECKED_CONNECT(m_showDancefloorwidget, SIGNAL(triggered()), m_dancefloorwidget, SLOT(show()));
+    CHECKED_CONNECT(m_showDancefloorwidget, SIGNAL(triggered()), m_dancefloorwidget, SLOT(showAndRaise()));
+
+    m_showCueLibView = new QAction(tr("Node Library"), this);
+    m_windowMenu->addAction(m_showCueLibView);
+    CHECKED_CONNECT(m_showCueLibView, SIGNAL(triggered()), m_cueLibView, SLOT(showAndRaise()));
 
     m_showGraphWidget = new QAction(tr("Graph"), this);
     m_windowMenu->addAction(m_showGraphWidget);
     CHECKED_CONNECT(m_showGraphWidget, SIGNAL(triggered()), m_graphWidget, SLOT(show()));
-
-    m_showCueLibView = new QAction(tr("Node Library"), this);
-    m_windowMenu->addAction(m_showCueLibView);
-    CHECKED_CONNECT(m_showCueLibView, SIGNAL(triggered()), m_cueLibView, SLOT(show()));
-
 
     // TODO get cut & paste working
 #if 0
@@ -212,25 +205,16 @@ void MainWidget::connectUi()
 
     // Should these go through cupid? TODO
     CHECKED_CONNECT(m_engine, SIGNAL(playPositionChanged(qint64)),
-            m_transport, SLOT(playPositionChanged(qint64)));
+                    m_transport, SLOT(playPositionChanged(qint64)));
 
     CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
-            this, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
+                    this, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
 
     CHECKED_CONNECT(m_transport, SIGNAL(movePlaybackHead(double)),
-            m_engine, SLOT(movePlaybackHead(double)));
+                    m_engine, SLOT(movePlaybackHead(double)));
 
     CHECKED_CONNECT(m_cueLibView, SIGNAL(newNodeRequest(QString)),
                     this, SLOT(newNodeRequest(QString)));
-}
-
-void MainWidget::createShortcuts()
-{
-    // ----------------------------------------
-    // GUI shortcuts
-    m_reloadStylesShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this);
-    m_reloadStylesShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_reloadStylesShortcut, SIGNAL(activated()), guisettings, SLOT(loadStyleSheet()));
 }
 
 void MainWidget::updateMenuStates()

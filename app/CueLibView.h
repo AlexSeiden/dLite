@@ -19,6 +19,9 @@ class CueLibView : public QWidget
 public:
     CueLibView(QWidget *parent = 0);
 
+public slots:
+    void    showAndRaise();
+
 signals:
     void    newNodeRequest(QString name);
 

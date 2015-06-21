@@ -248,3 +248,11 @@ void Dancefloorwidget::mouseReleaseEvent(QMouseEvent *event)
         _rubberBand->hide();
     update();
 }
+
+// -----------------------------------------------------------------------------
+// Public slots
+void Dancefloorwidget::showAndRaise()
+{
+    show();
+    raise();
+}

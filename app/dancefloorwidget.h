@@ -30,12 +30,12 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
-
     void setRegionEdit();
 
 public slots:
     void regionSelected(RegionNode *chosen);
     void regionDeselected(RegionNode *chosen);
+    void showAndRaise();
 
 private:
     bool    cellHasLights(int x, int y);
