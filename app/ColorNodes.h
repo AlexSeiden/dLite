@@ -1,7 +1,7 @@
 #ifndef COLORNODES_H
 #define COLORNODES_H
-#include "Node.h"
 #include <random>
+#include "Node.h"
 
 class ColorRamp : public Node
 {
@@ -26,9 +26,9 @@ public:
 private:
     void  setRandomEngine();
     std::mt19937 *_randGenerator;
-    std::uniform_real_distribution<float> *_distHue;
-    std::uniform_real_distribution<float> *_distSat;
-    std::uniform_real_distribution<float> *_distVal;
+    std::uniform_real_distribution<float> *m_distHue;
+    std::uniform_real_distribution<float> *m_distSat;
+    std::uniform_real_distribution<float> *m_distVal;
 };
 
 

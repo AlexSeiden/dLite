@@ -16,10 +16,10 @@ public:
     virtual TriggerEvery* clone();
 
 private:
-    void    reset() {setValue("out", false); _nextRefresh=-1;}
+    void    reset() {setValue("out", false); m_nextRefresh=-1;}
 
-    // Internal timekeepers, in milliseconds
-    int     _nextRefresh;
+    // Internal timekeeper, in milliseconds
+    int     m_nextRefresh;
 };
 
 
@@ -33,12 +33,12 @@ public:
     virtual Multiply* clone();
 
 private:
-    void    reset() {setValue("out", false); _nextRefresh=-1;}
+    void    reset() {setValue("out", false); m_nextRefresh=-1;}
 
     // Internal timekeepers, in milliseconds
-    int     _nextRefresh;
-    int     _lastInputBeat;
-    int     _delta;
+    int     m_nextRefresh;
+    int     m_lastInputBeat;
+    int     m_delta;
 };
 
 
@@ -64,12 +64,12 @@ public:
 
     // May want to define a "file" param for input file.
     // Could be auto-filled to look in standard locations.
-private:
-    std::vector<int> _onsets;
-    int _nextRefresh;
-    int _nextIndex;
 
-    int _lastSample;
+private:
+    std::vector<int>    m_onsets;
+    int                 m_nextRefresh;
+    int                 m_nextIndex;
+    int                 m_lastSample;
 };
 
 // ------------------------------------------------------------------------------
@@ -92,9 +92,9 @@ public:
     void    loadFile(QString filename);
 
 private:
-    std::vector<int> _bars;
-    int _nextRefresh;
-    int _nextIndex;
+    std::vector<int>    m_bars;
+    int                 m_nextRefresh;
+    int                 m_nextIndex;
 };
 
 // ------------------------------------------------------------------------------
@@ -121,12 +121,12 @@ private:
     int     findStartOfBar(int beatindex);
     int     findStartOfNextBar(int beatindex);
 
-    std::vector<int> _beats;
-    std::vector<int> _beatnumber;
-    std::vector<int> _barnumber;
-    int _beatIndex;
+    std::vector<int>    m_beats;
+    std::vector<int>    m_beatnumber;
+    std::vector<int>    m_barnumber;
+    int                 m_beatIndex;
 
-    int _lastSample;
+    int                 m_lastSample;
 };
 
 // ------------------------------------------------------------------------------

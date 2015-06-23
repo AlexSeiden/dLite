@@ -2,11 +2,8 @@
 #define RENAMETABDIALOG_H
 
 #include <QDialog>
-
-QT_BEGIN_NAMESPACE
-class QLineEdit;
-class QLabel;
-QT_END_NAMESPACE
+#include <QLineEdit>
+#include <QLabel>
 
 class RenameTabDialog : public QDialog
 {
@@ -14,7 +11,7 @@ class RenameTabDialog : public QDialog
 public:
     explicit RenameTabDialog(QWidget *parent = 0);
 
-    QString tabname() const     { return _tabName;}
+    QString tabname() const     { return m_tabName;}
     void setTabname(QString n);
     void setIndex(int i);
 
@@ -22,10 +19,10 @@ private slots:
     void nameChanged(const QString text);
 
 private:
-    QLineEdit*              _tabNameEditWidget;
-    QString                 _tabName;
-    QLabel*                 _titleLabel;
-    int                     _index;
+    QLineEdit*              m_tabNameEditWidget;
+    QString                 m_tabName;
+    QLabel*                 m_titleLabel;
+    int                     m_index;
 };
 
 #endif // RENAMETABDIALOG_H

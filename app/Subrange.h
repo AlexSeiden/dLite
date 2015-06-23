@@ -15,18 +15,18 @@ public:
     ~Subrange();
 
     void    setMinMax(float fmin, float fmax, float amin, float amax) {
-        _freqMin = fmin;
-        _freqMax = fmax;
-        _ampMin = amin;
-        _ampMax = amax;
+        m_freqMin = fmin;
+        m_freqMax = fmax;
+        m_ampMin  = amin;
+        m_ampMax  = amax;
     }
 
     double  amplitudeWithinWindow(double amp);
     bool    isFrequencyWithinWindow(double freq);
 
 protected:
-    float _freqMin, _freqMax;
-    float _ampMin, _ampMax;
+    float m_freqMin, m_freqMax;
+    float m_ampMin,  m_ampMax;
 
     friend class SublevelNode;
     friend class Spectrograph;

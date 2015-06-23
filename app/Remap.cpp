@@ -4,7 +4,7 @@
 Remap::Remap()
 {
     setName("Remap");
-    _type = FLOAT;
+    m_type = FLOAT;
 
     // Declare params.
     addParam<float>("out", 0.0, true);

@@ -22,12 +22,12 @@ struct Segment {
 class SongSegmentation {
 public:
     // Each segment
-    QList<Segment>  _segments;
+    QList<Segment>  m_segments;
 
     // Sorted list of segment indices, with no duplicates.
-    QList<int>      _segmentIndices;
-    int             _nSegments; // size of above, precalced for wikid efficientcy
-    int             _duration;
+    QList<int>      m_segmentIndices;
+    int             m_nSegments; // size of above, precalced for wikid efficientcy
+    int             m_duration;
 };
 
 Q_DECLARE_METATYPE(SongSegmentation);

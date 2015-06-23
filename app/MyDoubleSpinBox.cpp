@@ -15,7 +15,6 @@ bool MyDoubleSpinBox::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::Wheel) {
         return true;
     } else {
-        // standard event processing
         return QObject::eventFilter(obj, event);
     }
 }

@@ -5,7 +5,7 @@
 RegionCue::RegionCue()
 {
     setName(QString("RegionCue"));
-    _type = CUE;
+    m_type = CUE;
 
     // Declare params.
     addParam<Lightcolor>("color", Lightcolor(255,255,255));
@@ -40,11 +40,11 @@ void RegionCue::evaluate()
     // "Fire" the light with the correct parameters
     foreach (QPoint p, region.getCells()) {
         Firing *firing = new Firing;
-        firing->_color = color*alpha;
-        firing->_alpha = alpha;
-        firing->setDecayMode(_decayMode);
-        firing->setCompMode(_compMode);
-        _dfModel->fireLight(p.x(), p.y(), firing);
+        firing->m_color = color*alpha;
+        firing->m_alpha = alpha;
+        firing->setDecayMode(m_decayMode);
+        firing->setCompMode(m_compMode);
+        m_dfModel->fireLight(p.x(), p.y(), firing);
     }
 }
 

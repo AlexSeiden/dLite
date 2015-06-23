@@ -1,9 +1,8 @@
-#include "RenameTabDialog.h"
-#include <QLineEdit>
-#include <QBoxLayout>
-#include <QLabel>
 #include <QDialogButtonBox>
 #include <QPushButton>
+#include <QBoxLayout>
+
+#include "RenameTabDialog.h"
 #include "utils.h"
 
 RenameTabDialog::RenameTabDialog(QWidget *parent) :
@@ -11,19 +10,19 @@ RenameTabDialog::RenameTabDialog(QWidget *parent) :
 {
     QVBoxLayout *dialogLayout = new QVBoxLayout(this);
 
-    _titleLabel = new QLabel(QString("Change name of cuesheet"), this);
-    dialogLayout->addWidget(_titleLabel);
+    m_titleLabel = new QLabel(QString("Change name of cuesheet"), this);
+    dialogLayout->addWidget(m_titleLabel);
 
-    _tabNameEditWidget = new QLineEdit(this);
-    _tabNameEditWidget->setText("");
+    m_tabNameEditWidget = new QLineEdit(this);
+    m_tabNameEditWidget->setText("");
     QScopedPointer<QHBoxLayout> editLayout (new QHBoxLayout);
     QLabel *editLabel = new QLabel(tr("New name:"), this);
     editLayout->addWidget(editLabel);
-    editLayout->addWidget(_tabNameEditWidget);
+    editLayout->addWidget(m_tabNameEditWidget);
     dialogLayout->addLayout(editLayout.data());
     editLayout.take(); // ownership transferred to dialogLayout
 
-    CHECKED_CONNECT(_tabNameEditWidget, SIGNAL(textChanged(QString)),
+    CHECKED_CONNECT(m_tabNameEditWidget, SIGNAL(textChanged(QString)),
                     this, SLOT(nameChanged(QString)));
 
     // Add standard OK/Cancel buttons to layout
@@ -31,7 +30,6 @@ RenameTabDialog::RenameTabDialog(QWidget *parent) :
     buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     dialogLayout->addWidget(buttonBox);
 
-    // Connect OK/Cancel
     CHECKED_CONNECT(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()),
                     this, SLOT(accept()));
     CHECKED_CONNECT(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()),
@@ -42,18 +40,18 @@ RenameTabDialog::RenameTabDialog(QWidget *parent) :
 
 void RenameTabDialog::setTabname(const QString name)
 {
-    _tabName = name;
-    _tabNameEditWidget->setText(name);
-    _tabNameEditWidget->selectAll();
+    m_tabName = name;
+    m_tabNameEditWidget->setText(name);
+    m_tabNameEditWidget->selectAll();
 }
 
 void RenameTabDialog::setIndex(int index)
 {
-    _index = index;
-    _titleLabel->setText(QString("Change name of cuesheet #%1").arg(_index));
+    m_index = index;
+    m_titleLabel->setText(QString("Change name of cuesheet #%1").arg(m_index));
 }
 
 void RenameTabDialog::nameChanged(const QString text)
 {
-    _tabName = text;
+    m_tabName = text;
 }

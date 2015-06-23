@@ -1,36 +1,39 @@
+// Code for interfacing with the Color Kinetics hardware.
+
 #include <stdio.h>
 #include <iostream>
-#include "Device.h"
 #include <QDebug>
+#include "Device.h"
 
 using namespace std;
 
 
 Device::Device(bool status) :
-    _isActive(status)
+    m_isActive(status)
 {
     // Init _dmx buffers to header, plus zeros.
-    memset(this->dmx0, 0, DMX_LEN);
-    memset(this->dmx1, 0, DMX_LEN);
-    memcpy(this->dmx0, this->header, sizeof(this->header));
-    memcpy(this->dmx1, this->header, sizeof(this->header));
+    memset(this->m_dmx0, 0, DMX_LEN);
+    memset(this->m_dmx1, 0, DMX_LEN);
+    memcpy(this->m_dmx0, this->COLOR_KINETICS_HEADER,
+           sizeof(this->COLOR_KINETICS_HEADER));
+    memcpy(this->m_dmx1, this->COLOR_KINETICS_HEADER,
+           sizeof(this->COLOR_KINETICS_HEADER));
 
-    if (_isActive)
+    if (m_isActive)
         this->connect();
 }
 
 Device::~Device() { }
 
-
-//  Set the value of a single light to rgb.
+//  Set the rgb value on a individual light.
 void
 Device::setlight(int controllerIndex, int lightIndex, unsigned char *rgb) {
     unsigned char *p;
     if (controllerIndex == 0)
-        p = this->dmx0;
+        p = this->m_dmx0;
     else
-        p = this->dmx1;
-    p += sizeof(this->header);
+        p = this->m_dmx1;
+    p += sizeof(this->COLOR_KINETICS_HEADER);
 
     p[lightIndex*3]   = rgb[0];
     p[lightIndex*3+1] = rgb[1];
@@ -51,8 +54,8 @@ bool Device::connect() {
     //      socktyp is 2 SOCK_DGRAM
     //      protos are 6 and 17 -- IPPROTO_TCP and IPPROTO_UDP
 
-    this->sockfd = socket(PF_INET, SOCK_DGRAM, 0);
-    if (this->sockfd == -1) {
+    this->m_sockfd = socket(PF_INET, SOCK_DGRAM, 0);
+    if (this->m_sockfd == -1) {
         // ErrorHandling
         std::cerr << "WARNING socket error: " << errno
                   << " \t" << strerror(errno) << std::endl;
@@ -60,24 +63,24 @@ bool Device::connect() {
         return false;
     }
 
-    addr0.sin_family = AF_INET;
-    addr0.sin_port = htons(this->IPPort);
-    int result = inet_pton(AF_INET, "10.0.1.21", &addr0.sin_addr);
+    m_addr0.sin_family = AF_INET;
+    m_addr0.sin_port = htons(this->IP_PORT);
+    int result = inet_pton(AF_INET, "10.0.1.21", &m_addr0.sin_addr);
     if (result != 1) {
         // ErrorHandling
-        std::cerr << "WARNING addr0 inet_pton result:" << result << "\terror: " << errno
-                  << " \t" << strerror(errno) << std::endl;
+        std::cerr << "WARNING addr0 inet_pton result:" << result  << "\terror: "
+                  << errno << " \t" << strerror(errno) << std::endl;
         std::cerr.flush();
         return false;
     }
 
-    addr1.sin_family = AF_INET;
-    addr1.sin_port = htons(this->IPPort);
-    result = inet_pton(AF_INET, "10.0.1.22", &addr1.sin_addr);
+    m_addr1.sin_family = AF_INET;
+    m_addr1.sin_port = htons(this->IP_PORT);
+    result = inet_pton(AF_INET, "10.0.1.22", &m_addr1.sin_addr);
     if (result != 1) {
         // ErrorHandling
-        std::cerr << "WARNING addr1 inet_pton result:" << result << "\terror: " << errno
-                  << " \t" << strerror(errno) << std::endl;
+        std::cerr << "WARNING addr1 inet_pton result:" << result << "\terror: "
+                  << errno << " \t" << strerror(errno) << std::endl;
         std::cerr.flush();
         return false;
     }
@@ -87,21 +90,21 @@ bool Device::connect() {
 
 void Device::turnOff()
 {
-    if (! _isActive)
+    if (! m_isActive)
         return;
 
     //  TODO close port
-    _isActive = false;
+    m_isActive = false;
     return;
 }
 
 
 void Device::turnOn()
 {
-    if (_isActive)
+    if (m_isActive)
         return;
 
-    _isActive = connect();
+    m_isActive = connect();
     return;
 }
 
@@ -116,30 +119,30 @@ void Device::setActive(bool status)
 
 void
 Device::send() {
-    if (! _isActive)
+    if (! m_isActive)
         return;
 
     //TODO test to see if we're sending too often
 
     ssize_t bytes_sent;
-    // ErrorHandling handle undersends
-    bytes_sent = sendto(this->sockfd, this->dmx0, DMX_LEN, 0,
-                        (struct sockaddr*)&this->addr0, sizeof(this->addr0));
+    // ErrorHandling: Handle undersends
+    bytes_sent = sendto(this->m_sockfd, this->m_dmx0, DMX_LEN, 0,
+                        (struct sockaddr*)&this->m_addr0, sizeof(this->m_addr0));
     if (bytes_sent != DMX_LEN) {
         std::cerr << "WARNING addr0 bytes_sent: " << bytes_sent;
         std::cerr << "\t errno " << errno << " \t" << strerror(errno) << std::endl;
     }
 
 
-    bytes_sent = sendto(this->sockfd, this->dmx1, DMX_LEN, 0,
-                        (struct sockaddr*)&this->addr1, sizeof(this->addr1));
+    bytes_sent = sendto(this->m_sockfd, this->m_dmx1, DMX_LEN, 0,
+                        (struct sockaddr*)&this->m_addr1, sizeof(this->m_addr1));
     if (bytes_sent != DMX_LEN) {
         std::cerr << "WARNING addr1 bytes_sent: " << bytes_sent;
         std::cerr << "\t errno " << errno << " \t" << strerror(errno) << std::endl;
     }
 }
 
-unsigned char Device::header[21] = {
+unsigned char Device::COLOR_KINETICS_HEADER[21] = {
         0x04, 0x01, 0xdc, 0x4a,
         0x01, 0x00, 0x01, 0x01,
         0x00, 0x00, 0x00, 0x00,

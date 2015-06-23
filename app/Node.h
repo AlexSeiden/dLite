@@ -1,6 +1,5 @@
 #ifndef NODE_H
 #define NODE_H
-#include "Param.h"
 #include <QList>
 #include <QString>
 #include <QStringList>
@@ -12,6 +11,7 @@
 #include <QDebug>
 #include <QRectF>
 
+#include "Param.h"
 
 // ------------------------------------------------------------------------------
 // Node
@@ -47,18 +47,18 @@ public:
 
     virtual Node*       clone() = 0;
 
-    const QString &     getName() const {return _name;}
-    void                setName(const QString name) {_name = name;}
+    const QString &     getName() const {return m_name;}
+    void                setName(const QString name) {m_name = name;}
 
     bool                isActive() const;
     void                setActive(bool active);
 
     virtual node_t      getType();
-    QList<ParamBase *>  getParams()         {return _paramList;}
-    virtual QString     getClass() const    {return _className;}
+    QList<ParamBase *>  getParams()         {return m_paramList;}
+    virtual QString     getClass() const    {return m_className;}
 
-    NodeItem*           getNodeItem() const         {return _nodeItem;}
-    void                setNodeItem(NodeItem* ni)   {_nodeItem= ni;}
+    NodeItem*           getNodeItem() const         {return m_nodeItem;}
+    void                setNodeItem(NodeItem* ni)   {m_nodeItem= ni;}
 
     // Functor that provides closure over instance object,
     // and allows downstream clients to evaluate.
@@ -80,9 +80,9 @@ private:
     virtual void doEvalOperation() = 0;
 #endif
 
-    static int nodeCount() {return _allNodes.size();}
-    static bool nameIsUnique(QString name);
-    static QString uniqueName(QString name);
+    static int          nodeCount() {return m_allNodes.size();}
+    static bool         nameIsUnique(QString name);
+    static QString      uniqueName(QString name);
 
     // Called by editor widgets when a parameter has been changed.
     // Most nodes don't need this--only onces like RandomInt where
@@ -106,32 +106,32 @@ private:
     virtual bool        evaluatedThisFrame();
 
     // Serialization
-    virtual void readFromJSONObj(const QJsonObject &json);
-    virtual void writeToJSONObj(QJsonObject &json) const;
-    static QList<Node*>    allNodes() {return _allNodes;}
+    virtual void        readFromJSONObj(const QJsonObject &json);
+    virtual void        writeToJSONObj(QJsonObject &json) const;
+    static QList<Node*> allNodes() {return m_allNodes;}
 
 protected:
     ParamBase *         getParamByName(QString paramname);
-
     void                evalAllInputs();
-
     void                cloneHelper(Node &lhs);
 
-    QString               _name;
-    QList<ParamBase *>    _paramList;
-    QMap<QString, ParamBase*> _paramDict;
-    node_t                _type;
-    int                   _frameLastEvaluated;
-    /*const */QUuid       _uuid;        // Could be const except for need to assign in NodeFactory::instantiateNode when reading from file.
-    QString               _className;   // Assigned by NodeFactory
-    NodeItem*             _nodeItem;
+    QString               m_name;
+    QList<ParamBase *>    m_paramList;
+    QMap<QString, ParamBase*> m_paramDict;
+    node_t                m_type;
+    int                   m_frameLastEvaluated;
+    /*const */QUuid       m_uuid;        // Could be const except for need to assign in NodeFactory::instantiateNode when reading from file.
+    QString               m_className;   // Assigned by NodeFactory
+    NodeItem*             m_nodeItem;
 
 
-    static QList<Node *>  _allNodes;
+    static QList<Node *>  m_allNodes;
 
-    // New style params
     template <typename T>
-    Param<T> *addParam(QString name, const T& defValue=T(0), bool output=false, bool connectable=true)
+    Param<T> *addParam(QString name,
+                       const T& defValue=T(0),
+                       bool output=false,
+                       bool connectable=true)
     {
         Param<T>* param = new Param<T>;
         param->setName(name);
@@ -140,12 +140,13 @@ protected:
         param->setValue(defValue);
 
         param->setParentNode(this);
-        _paramList << param;
-        if (_paramDict.contains(name)) {
+        m_paramList << param;
+        if (m_paramDict.contains(name)) {
             //ErrorHandling
-            qDebug() << Q_FUNC_INFO << QString("adding parameter \"%1\" to node \"%2\" more than once").arg(name, _name);
+            qDebug() << Q_FUNC_INFO
+                     << QString("adding parameter \"%1\" to node \"%2\" more than once").arg(name, m_name);
         }
-        _paramDict[name] = param;
+        m_paramDict[name] = param;
 
         return(param);
     }
@@ -153,7 +154,7 @@ protected:
     template <typename T>
     void getValue(QString paramName, T& value) const
     {
-        ParamBase *pb = _paramDict[paramName];
+        ParamBase *pb = m_paramDict[paramName];
         Q_ASSERT_X(pb, "No param named ", paramName.toStdString().c_str());
         Param<T>*param = dynamic_cast<Param<T>*>(pb);
         Q_ASSERT(param);
@@ -163,7 +164,7 @@ protected:
     template <typename T>
     void setValue(QString paramName, const T value)
     {
-        ParamBase *pb = _paramDict[paramName];
+        ParamBase *pb = m_paramDict[paramName];
         Q_ASSERT_X(pb, "No param named ", paramName.toStdString().c_str());
         Param<T>*param = dynamic_cast<Param<T>*>(pb);
         Q_ASSERT(param);

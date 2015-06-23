@@ -9,8 +9,8 @@
 class Cue;
 class Firing;
 
-enum compMode_t {SET, ADD, OVER, UNDER};
-enum decayMode_t {IMMEDIATE, EXPONENTIAL, FOREVER};
+enum compMode_t     {SET, ADD, OVER, UNDER};
+enum decayMode_t    {IMMEDIATE, EXPONENTIAL, FOREVER};
 
 // -----------------------------------------------------------------------------
 // Lightcolor
@@ -29,9 +29,9 @@ public:
     Lightcolor(const QRgb &qrgb);
     Lightcolor(const Lightcolor &rhs);
 
-    int getRed() const    {return m_r;}
-    int getGreen() const  {return m_g;}
-    int getBlue() const   {return m_b;}
+    int getRed()    const  {return m_r;}
+    int getGreen()  const  {return m_g;}
+    int getBlue()   const  {return m_b;}
 
     Lightcolor  & operator=(const Lightcolor &rhs);
 
@@ -65,11 +65,11 @@ class Light
 public:
     Light();
 
-    int                 _controllerIndex;
-    int                 _lightIndex;
-    int                 _lightID;
-    Lightcolor          _value;
-    std::vector <Firing *>   _firings;
+    int                 m_controllerIndex;
+    int                 m_lightIndex;
+    int                 m_lightID;
+    Lightcolor          m_value;
+    std::vector <Firing *>   m_firings;
 };
 
 #endif // LIGHTCOLOR_H

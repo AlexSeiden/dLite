@@ -6,9 +6,9 @@
 
 DotCue::DotCue()
 {
-    int numCues = _dfModel->getNumCues();
+    int numCues = m_dfModel->getNumCues();
     setName(QString("BoxCue%1").arg(numCues));
-    _type = CUE;
+    m_type = CUE;
 
     // Declare params.
     addParam<int>("x", 10);
@@ -49,11 +49,11 @@ void DotCue::evaluate()
 
     // "Fire" the light with the correct parameters
     Firing *firing = new Firing;
-    firing->_color = color;
-    firing->_alpha = alpha;
-    firing->setDecayMode(_decayMode);
-    firing->setCompMode(_compMode);
-    _dfModel->fireLight(x, y, firing);
+    firing->m_color = color;
+    firing->m_alpha = alpha;
+    firing->setDecayMode(m_decayMode);
+    firing->setCompMode(m_compMode);
+    m_dfModel->fireLight(x, y, firing);
 }
 
 

@@ -35,7 +35,7 @@ signals:
     void regionNodeDeselected(RegionNode *me);
 
 private:
-    Region* _regionP;
+    Region* m_regionP;
 
     bool hasCell(QPoint p);
     void setCell(QPoint p, bool status);

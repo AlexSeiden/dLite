@@ -1,13 +1,13 @@
 #ifndef SPECTROGRAPH_H
 #define SPECTROGRAPH_H
 
-#include "frequencyspectrum.h"
-#include "Subrange.h"
-#include "SublevelNode.h"
-
 #include <QWidget>
 #include <QRubberBand>
 #include <QSet>
+
+#include "frequencyspectrum.h"
+#include "Subrange.h"
+#include "SublevelNode.h"
 
 // Widget which displays a spectrograph showing the frequency spectrum
 // of the window of audio samples most recently analyzed by the Engine.
@@ -19,46 +19,42 @@ public:
     explicit Spectrograph(QWidget *parent = 0);
     ~Spectrograph();
 
-    void setParams(int numBars, qreal lowFreq, qreal highFreq);
+    void    setParams(int numBars, qreal lowFreq, qreal highFreq);
 
-    void paintEvent(QPaintEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+    void    paintEvent(QPaintEvent *event);
+    void    mousePressEvent(QMouseEvent *event);
+    void    mouseMoveEvent(QMouseEvent *event);
+    void    mouseReleaseEvent(QMouseEvent *event);
 
-    int numBars() { return m_bars.count(); }
-    qreal freqLo() { return m_lowFreq; }
-    qreal freqHi() { return m_highFreq; }
+    int     numBars() { return m_bars.count(); }
+    qreal   freqLo() { return m_lowFreq; }
+    qreal   freqHi() { return m_highFreq; }
 
 signals:
-    void infoMessage(const QString &message, int intervalMs);
+    void    infoMessage(const QString &message, int intervalMs);
 
 public slots:
-    void reset();
-    void spectrumChanged(const FrequencySpectrum &spectrum);
-    void setNumBars(int numBars);
-    void setFreqLo(int val);
-    void setFreqHi(int val);
-    void printSpectrum();
-    void submeterSelected(SublevelNode *chosen);
-    void submeterDeselected(SublevelNode *chosen);
+    void    reset();
+    void    spectrumChanged(const FrequencySpectrum &spectrum);
+    void    setNumBars(int numBars);
+    void    setFreqLo(int val);
+    void    setFreqHi(int val);
+    void    printSpectrum();
+    void    submeterSelected(SublevelNode *chosen);
+    void    submeterDeselected(SublevelNode *chosen);
 
 private:
-    int barIndex(qreal frequency) const;
-    int barIndex(qreal frequency, bool logspace) const;
-    int barIndexLog(qreal frequency) const;
-    QPair<qreal, qreal> barRange(int barIndex) const;
-    QPair<qreal, qreal> barRange(int barIndex, bool logspace) const;
+    int     barIndexLog(qreal frequency) const;
     QPair<qreal, qreal> barRangeLog(int barIndex) const;
-    void updateBars();
-    bool showSubrange();
-    QRectF getSubrangeWindow();
-    void setSubrangeWindow(Subrange &subr);
+    void    updateBars();
+    bool    showSubrange();
+    QRectF  getSubrangeWindow();
+    void    setSubrangeWindow(Subrange &subr);
 
 protected:
-    double frac2freq(qreal frac) const;
-    double freq2frac(qreal freq) const;
-    QRectF computeWinFromRange(Subrange *subrange);
+    double  frac2freq(qreal frac) const;
+    double  freq2frac(qreal freq) const;
+    QRectF  computeWinFromRange(Subrange *subrange);
 
 private:
     struct Bar {

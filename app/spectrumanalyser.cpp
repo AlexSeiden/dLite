@@ -1,22 +1,21 @@
-
-#include "spectrumanalyser.h"
-#include "utils.h"
-#include "fftreal_wrapper.h"
-
 #include <qmath.h>
 #include <qmetatype.h>
 #include <QAudioFormat>
 #include <QThread>
 
+#include "spectrumanalyser.h"
+#include "utils.h"
+#include "fftreal_wrapper.h"
+
 SpectrumAnalyserThread::SpectrumAnalyserThread(QObject *parent)
     :   QObject(parent)
     ,   m_fft(new FFTRealWrapper)
-    ,   m_numSamples(SpectrumLengthSamples)
+    ,   m_numSamples(SPECTRUM_LENGTH_SAMPLES)
     ,   m_windowFunction(DefaultWindowFunction)
-    ,   m_window(SpectrumLengthSamples, 0.0)
-    ,   m_input(SpectrumLengthSamples, 0.0)
-    ,   m_output(SpectrumLengthSamples, 0.0)
-    ,   m_spectrum(SpectrumLengthSamples) // This allocates ~2x more samples than needed
+    ,   m_window(SPECTRUM_LENGTH_SAMPLES, 0.0)
+    ,   m_input(SPECTRUM_LENGTH_SAMPLES, 0.0)
+    ,   m_output(SPECTRUM_LENGTH_SAMPLES, 0.0)
+    ,   m_spectrum(SPECTRUM_LENGTH_SAMPLES)
 #ifdef SPECTRUM_ANALYSER_SEPARATE_THREAD
     ,   m_thread(new QThread(this))
 #endif
@@ -66,8 +65,8 @@ void SpectrumAnalyserThread::calculateWindow()
 }
 
 void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
-                                                int inputFrequency,	// Samples rate of audio data
-                                                int bytesPerSample)
+                                               int inputFrequency,	// Samples rate of audio data
+                                               int bytesPerSample)
 {
     Q_ASSERT(buffer.size() == m_numSamples * bytesPerSample);
 
@@ -92,7 +91,7 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
     // Analyze output to obtain amplitude for each frequency
     for (int i=2; i<=m_numSamples/2; ++i) {
         // Calculate frequency of this complex sample
-        m_spectrum[i].frequency = qreal(i * inputFrequency) / (m_numSamples);
+        m_spectrum[i].m_frequency = qreal(i * inputFrequency) / (m_numSamples);
 
         const qreal real = m_output[i];
         qreal imag = 0.0;
@@ -101,16 +100,16 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
 
         const qreal magnitude = sqrt(real*real + imag*imag);
         // TODO Note that this is log here, but linear in the level meter
-        qreal amplitude = SpectrumAnalyserMultiplier * log(magnitude);
+        qreal amplitude = SPECTRUM_ANALYSER_MULTIPLIER * log(magnitude);
         // log(magnitude) can be < 0.
         // XXX so why are we clamping amplitude to 0??
 
         // Bound amplitude to [0.0, 1.0]
-        m_spectrum[i].clipped = (amplitude > 1.0);
+        m_spectrum[i].m_clipped = (amplitude > 1.0);
         amplitude = qMax(qreal(0.0), amplitude);
 
         amplitude = qMin(qreal(1.0), amplitude);
-        m_spectrum[i].amplitude = amplitude;
+        m_spectrum[i].m_amplitude = amplitude;
 
     }
 
@@ -131,10 +130,7 @@ SpectrumAnalyser::SpectrumAnalyser(QObject *parent)
                     this, SLOT(calculationComplete(FrequencySpectrum)));
 }
 
-SpectrumAnalyser::~SpectrumAnalyser()
-{
-
-}
+SpectrumAnalyser::~SpectrumAnalyser() {  }
 
 //-----------------------------------------------------------------------------
 // Public functions
@@ -165,9 +161,9 @@ void SpectrumAnalyser::calculate(const QByteArray &buffer,
 
         m_state = Busy;
 
-        // Invoke SpectrumAnalyserThread::calculateSpectrum using QMetaObject.  If
-        // m_thread is in a different thread from the current thread, the
-        // calculation will be done in the child thread.
+        // Invoke SpectrumAnalyserThread::calculateSpectrum using QMetaObject.
+        // If m_thread is in a different thread from the current thread,
+        // the calculation will be done in the child thread.
         // Once the calculation is finished, a calculationChanged signal will be
         // emitted by m_thread.
         const bool b = QMetaObject::invokeMethod(m_thread, "calculateSpectrum",
@@ -201,7 +197,6 @@ void SpectrumAnalyser::calculationComplete(const FrequencySpectrum &spectrum)
     Q_ASSERT(Idle != m_state);
     if (Busy == m_state) {
         emit spectrumChanged(spectrum);
-        emit dogsFuckedPope(12);
     }
     m_state = Idle;
 }

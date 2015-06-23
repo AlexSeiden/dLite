@@ -4,14 +4,13 @@
 #include "Cupid.h"
 #include "engine.h"
 
-// Sublevel node is unusual, since its Parameters are really the subrange
-// it operates on.  As such, it doesn't have "Params" like most other nodes
-// do.
+// Sublevel node is unusual, since its Parameters are really the subrange it
+// operates on.  As such, it doesn't have "Params" like most other nodes do.
 SublevelNode::SublevelNode(QObject *parent) :
     QObject(parent)
 {
     setName(QString("Spectral Range%1").arg(nodeCount()));
-    _type = FLOAT;
+    m_type = FLOAT;
 
     addParam<float>("out", 0.0, true);
 
@@ -22,7 +21,7 @@ SublevelNode::SublevelNode(QObject *parent) :
                     SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
 
     // Update the spectrograph with selections, so that
-    // it can display selected window, as well as send changes
+    // it can display selected window, and send changes
     // back to this node.
     CHECKED_CONNECT(this,
                     SIGNAL(sublevelSelected(SublevelNode*)),
@@ -45,7 +44,7 @@ void SublevelNode::spectrumChanged(qint64 position, qint64 length, const Frequen
     Q_UNUSED(position)
     Q_UNUSED(length)
 
-    _spectrum = spectrum;
+    m_spectrum = spectrum;
     if (isActive()) {
         calculateLevel();
         // levelChanged signal is connected to the appropriate slot
@@ -59,8 +58,8 @@ void SublevelNode::spectrumChanged(qint64 position, qint64 length, const Frequen
 void SublevelNode::calculateLevel()
 {
     // loop over all frequencies in the spectrum, and set the value
-    FrequencySpectrum::const_iterator i = _spectrum.begin();
-    const FrequencySpectrum::const_iterator end = _spectrum.end();
+    FrequencySpectrum::const_iterator i = m_spectrum.begin();
+    const FrequencySpectrum::const_iterator end = m_spectrum.end();
     int index = 0;
 
     float value = 0;
@@ -71,11 +70,11 @@ void SublevelNode::calculateLevel()
         const FrequencySpectrum::Element e = *i;
 
         // TODO could optimize by skipping straight to start frequency
-        if (_range.isFrequencyWithinWindow(e.frequency)) {
+        if (m_range.isFrequencyWithinWindow(e.m_frequency)) {
             // amplitude window
-            value += _range.amplitudeWithinWindow(e.amplitude);
+            value += m_range.amplitudeWithinWindow(e.m_amplitude);
             nsamples++;
-            clipped |= e.clipped;
+            clipped |= e.m_clipped;
         }
     }
 
@@ -124,24 +123,25 @@ void SublevelNode::beenDeselected()
     emit sublevelDeselected(this);
 }
 
+// Serialization
 void SublevelNode::writeToJSONObj(QJsonObject &json) const
 {
     // Override for serialization
     Node::writeToJSONObj(json);
-    json["freqMin"] = _range._freqMin;
-    json["freqMax"] = _range._freqMax;
-    json["ampMin"] = _range._ampMin;
-    json["ampMax"] = _range._ampMax;
+    json["freqMin"] = m_range.m_freqMin;
+    json["freqMax"] = m_range.m_freqMax;
+    json["ampMin"] = m_range.m_ampMin;
+    json["ampMax"] = m_range.m_ampMax;
 }
 
 void SublevelNode::readFromJSONObj(const QJsonObject &json)
 {
     // Override for serialization
     Node::readFromJSONObj(json);
-    _range._freqMin = json["freqMin"].toDouble();
-    _range._freqMax = json["freqMax"].toDouble();
-    _range._ampMin = json["ampMin"].toDouble();
-    _range._ampMax = json["ampMax"].toDouble();
+    m_range.m_freqMin = json["freqMin"].toDouble();
+    m_range.m_freqMax = json["freqMax"].toDouble();
+    m_range.m_ampMin = json["ampMin"].toDouble();
+    m_range.m_ampMax = json["ampMax"].toDouble();
 }
 
 

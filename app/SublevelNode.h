@@ -27,14 +27,14 @@ public:
     void beenSelected();
     void beenDeselected();
 
-    Subrange *getSubrange() {return &_range;}
+    Subrange *getSubrange() {return &m_range;}
     virtual void readFromJSONObj(const QJsonObject &json);
     virtual void writeToJSONObj(QJsonObject &json) const;
 
 
 public slots:
     void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
-    void setSubrange(Subrange *range) {_range = *range;}
+    void setSubrange(Subrange *range) {m_range = *range;}
 
 signals:
     // used for display, by the RangeMeter widget:
@@ -48,8 +48,8 @@ private:
     void calculateLevel();
 
     // Calculated by engine
-    FrequencySpectrum   _spectrum;
-    Subrange            _range;
+    FrequencySpectrum   m_spectrum;
+    Subrange            m_range;
 };
 
 #endif // SUBLEVELNODE_H

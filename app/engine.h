@@ -1,10 +1,6 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include "spectrum.h"
-#include "spectrumanalyser.h"
-#include "wavfile.h"
-
 #include <QAudioDeviceInfo>
 #include <QAudioFormat>
 #include <QBuffer>
@@ -13,6 +9,10 @@
 #include <QObject>
 #include <QVector>
 #include <QTimer>
+
+#include "spectrum.h"
+#include "spectrumanalyser.h"
+#include "wavfile.h"
 
 class FrequencySpectrum;
 class Dancefloor;
@@ -40,8 +40,8 @@ public:
     QAudio::State state() const { return m_state; }
     int interval() {return m_notifyIntervalMs;}
 
-    // return Current audio format
-    // note May be QAudioFormat() if engine is not initialized
+    // Return current audio format
+    // Note: May be invalid object if engine is not initialized
     const QAudioFormat& format() const { return m_format; }
 
     // Stop playback and reset to ground state.
@@ -50,14 +50,11 @@ public:
     // Load data from WAV file
     bool loadSong(const QString &fileName);
 
-    // Playback position in microseconds.
-    qint64 getCurrentTime() const;
+    qint64 getCurrentTime() const;  // Playback position in microseconds.
     QString getAudioFilename() const {return m_audiofilename;}
 
-    // Length of the song in bytes.
-    qint64 bufferLength() const;
-    // Length in milliseconds
-    qint64 bufferLengthMS() const;
+    qint64 bufferLength() const;    // Length of the song in bytes.
+    qint64 bufferLengthMS() const;  // Length in milliseconds
 
     // Set window function applied to audio data before spectral analysis.
     void setWindowFunction(WindowFunction type);
@@ -94,9 +91,9 @@ signals:
     void playPositionChanged(qint64 position);
 
     // Spectrum has changed.
-    // position Position of start of window in bytes
-    // length   Length of window in byte
-    // spectrum Resulting frequency spectrum
+    //  position Position of start of window in bytes
+    //  length   Length of window in byte
+    //  spectrum Resulting frequency spectrum
     // TODO change this to only pass the spectrum
     void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
 

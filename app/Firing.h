@@ -13,7 +13,8 @@ class Firing
 {
 public:
     Firing();
-    Firing(Lightcolor color, double alpha, compMode_t compmode, decayfunc_t decayfunc, Cue *cue=nullptr);
+    Firing(Lightcolor color, double alpha, compMode_t compmode,
+           decayfunc_t decayfunc, Cue *cue=nullptr);
 
     bool        evaluate();
 
@@ -21,16 +22,15 @@ public:
     Lightcolor  compAdd(const Lightcolor &lightcolor);
     Lightcolor  compSet(const Lightcolor &lightcolor);
 
-    void        setCompMode(compMode_t cm) {_compMode = cm;}
-//    void        setDecayMode(decayfunc_t dfunk) {_decayfunction = dfunk;}
+    void        setCompMode(compMode_t cm) {m_compMode = cm;}
     void        setDecayMode(decayMode_t dmode);
 
-    Lightcolor  _color;
-    float       _alpha;
-    compMode_t  _compMode;
-    decayfunc_t _decayfunction;
-    Cue         *_cue; // mainly used when the same cue wants to replace
-                      // a firing in the buffer, rather than add to it.
+    Lightcolor  m_color;
+    float       m_alpha;
+    compMode_t  m_compMode;
+    decayfunc_t m_decayfunction;
+    Cue *       m_cue;      // mainly used when the same cue wants to replace
+                            // a firing in the buffer, rather than add to it.
 };
 
 

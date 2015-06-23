@@ -1,4 +1,3 @@
-
 #ifndef WAVFILE_H
 #define WAVFILE_H
 
@@ -12,16 +11,16 @@ public:
     WavFile(QObject *parent = 0);
 
     using QFile::open;
-    bool open(const QString &fileName);
+    bool                open(const QString &fileName);
     const QAudioFormat &fileFormat() const;
-    qint64 headerLength() const;
+    qint64              headerLength() const;
 
 private:
-    bool readHeader();
+    bool                readHeader();
 
 private:
-    QAudioFormat m_fileFormat;
-    qint64 m_headerLength;
+    QAudioFormat        m_fileFormat;
+    qint64              m_headerLength;
 };
 
 #endif // WAVFILE_H

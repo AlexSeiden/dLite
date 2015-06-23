@@ -19,11 +19,11 @@ void NodeFactory::registerNodetype(
         NodeInstatiator_t instantiatorFunction)
 {
     // Register the ctor for the given classname.
-    _registry[classname.toStdString()] = instantiatorFunction;
+    m_registry[classname.toStdString()] = instantiatorFunction;
 
     // Add it to a list of nodes in the same type, for use
     // by the CueLib widget.
-    _registryByType[typeInfo] << classname;
+    m_registryByType[typeInfo] << classname;
 }
 
 
@@ -36,7 +36,7 @@ Node * NodeFactory::instatiateNode(QString classname, QUuid uuid)
     Node *instance = nullptr;
 
     // find name in the registry and call factory method.
-    NodeInstatiator_t instancer = _registry[classname.toStdString()];
+    NodeInstatiator_t instancer = m_registry[classname.toStdString()];
     if (! instancer)
         return nullptr;
         // ErrorHandling
@@ -47,8 +47,8 @@ Node * NodeFactory::instatiateNode(QString classname, QUuid uuid)
     // When we're reading in from a file, there will already be a uuid
     // which connections may refer to, and we need to assign it here.
     if (! uuid.isNull())
-        instance->_uuid = uuid;  // GROSS this keeps uuid from being const.
-    instance->_className = classname; // GROSS should get classname automatically in ctor
+        instance->m_uuid = uuid;  // GROSS this keeps uuid from being const.
+    instance->m_className = classname; // GROSS should get classname automatically in ctor
 
     return instance;
 }
@@ -67,7 +67,7 @@ NodeFactory * NodeFactory::Singleton() {
 
 // Return all nodes of a given type.
 const QStringList & NodeFactory::getNodesOfType(Node::node_t typeInfo) {
-    return _registryByType[typeInfo];
+    return m_registryByType[typeInfo];
 }
 
 void NodeFactory::duplicateNodes(QList<Node*>* dupeThese, QRectF bbox)
@@ -154,7 +154,7 @@ bool NodeFactory::saveToFile(QString filename)
 
     QJsonDocument jsonDoc(sceneObject);
     qfile.write(jsonDoc.toJson());
-    _dirty = false;
+    m_dirty = false;
 
     return true;
 }
@@ -231,9 +231,9 @@ void NodeFactory::readCuesheets(const QJsonObject &json, bool ignoreCuesheets)
 
 void NodeFactory::readAllNodes(const QJsonObject &json)
 {
-    _connectionsToMake.clear();
-    _groupsToMake.clear();
-    _uuidToParam.clear();
+    m_connectionsToMake.clear();
+    m_groupsToMake.clear();
+    m_uuidToParam.clear();
 
     QJsonArray nodesArray = json["nodes"].toArray();
     // Instatiate a node for every node in the json file.
@@ -249,9 +249,9 @@ void NodeFactory::readAllNodes(const QJsonObject &json)
     }
 
     // Make connections between nodes:
-    foreach (ParamBase* param, _connectionsToMake.keys()) {
-        QUuid serverUuid =  _connectionsToMake[param];
-        ParamBase* server = _uuidToParam[serverUuid];
+    foreach (ParamBase* param, m_connectionsToMake.keys()) {
+        QUuid serverUuid =  m_connectionsToMake[param];
+        ParamBase* server = m_uuidToParam[serverUuid];
         param->connectTo(server);
         Cupid::Singleton()->getGraphWidget()->addConnection(server, param);
     }
@@ -286,7 +286,7 @@ Node* NodeFactory::readNodeFromJSONObj(const QJsonObject &json)
         // Store UUID in registry, so later when we're hooking things up,
         // we can connect a reference to a UUid to the parameter that's been
         // instatiated for it.
-        _uuidToParam[param->getUuid()] = param;
+        m_uuidToParam[param->getUuid()] = param;
 
         // If param has a connection, deal with that:
         if (paramJsonObject.contains("connectedTo")) {
@@ -294,7 +294,7 @@ Node* NodeFactory::readNodeFromJSONObj(const QJsonObject &json)
             // Since connections will be made to parameters that may not have been
             // instantiated yet, we need to save all these connections, then
             // make them after everything has been read and instatiated.
-            _connectionsToMake[param] = connectedUUID;
+            m_connectionsToMake[param] = connectedUUID;
         }
     }
 

@@ -8,18 +8,16 @@
 // Imager base class
 Imager::Imager()
 {
-    _type = CUE;
+    m_type = CUE;
     addParam<float>("alpha", 1.0);
     addParam<Lightcolor>("color", Lightcolor(255,255,255));
 
     int xsize = Cupid::Singleton()->getDancefloor()->getXsize();
     int ysize = Cupid::Singleton()->getDancefloor()->getYsize();
-    _image = new QImage(xsize, ysize, QImage::Format_ARGB32_Premultiplied);
+    m_image = new QImage(xsize, ysize, QImage::Format_ARGB32_Premultiplied);
 }
 
-void Imager::draw()
-{
-}
+void Imager::draw() { }
 
 void Imager::operator()() {
     evaluate();
@@ -43,20 +41,20 @@ void Imager::evaluate()
 
 void Imager::fire()
 {
-    for (int y=0; y<_image->height(); ++y)
-        for (int x=0; x<_image->width(); ++x) {
+    for (int y=0; y<m_image->height(); ++y)
+        for (int x=0; x<m_image->width(); ++x) {
             // TODO XXX $$$ this is super-inefficient
             Firing *firing = new Firing;
-            Lightcolor color(_image->pixel(x,y));
+            Lightcolor color(m_image->pixel(x,y));
             float alpha;
             getValue("alpha", alpha);
             color *= alpha;
 
-            firing->_color = color;
-            firing->_alpha = alpha;
-            firing->setDecayMode(_decayMode);           // TODO
-            firing->setCompMode(_compMode);             // TODO
-            _dfModel->fireLight(x, y, firing);
+            firing->m_color = color;
+            firing->m_alpha = alpha;
+            firing->setDecayMode(m_decayMode);           // TODO
+            firing->setCompMode(m_compMode);             // TODO
+            m_dfModel->fireLight(x, y, firing);
         }
 }
 
@@ -86,10 +84,10 @@ void Circle::draw()
     getValue("width", width);
     getValue("height", height);
 
-    QPainter painter(_image);
+    QPainter painter(m_image);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    painter.fillRect(_image->rect(), Qt::black);
+    painter.fillRect(m_image->rect(), Qt::black);
     painter.setBrush(QBrush(color.toQColor()));
     QPointF center(x, y);
     painter.drawEllipse(center, width, height);
@@ -137,10 +135,10 @@ void Box::draw()
     getValue("rotation", rotation);
     getValue("antialiased", antialiased);
 
-    QPainter painter(_image);
+    QPainter painter(m_image);
     painter.setRenderHint(QPainter::Antialiasing, antialiased);
 
-    painter.fillRect(_image->rect(), Qt::black);
+    painter.fillRect(m_image->rect(), Qt::black);
     painter.setBrush(QBrush(color.toQColor()));
 
     QPointF topLeft(x, y);
@@ -160,6 +158,6 @@ Box* Box::clone()
     cloneHelper(*lhs);
     return lhs;
 }
-//static Registrar<Imager>     registrar0("Imager", Node::CUE);
+
 static Registrar<Circle>     registrar1("Circle", Node::CUE);
 static Registrar<Box>        registrar2("Box", Node::CUE);

@@ -31,11 +31,10 @@ signals:
     void pathNodeSelected(PathNode *me);
 
 private:
-    Param<int>        _x;       // Output
-    Param<int>        _y;       // Output
+    Param<int>      m_x;       // Output
+    Param<int>      m_y;       // Output
 
-    QList<Position> _positions;
-
+    QList<Position> m_positions;
 };
 
 #endif // PATHNODE_H

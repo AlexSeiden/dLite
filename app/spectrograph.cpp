@@ -1,10 +1,12 @@
-#include "spectrograph.h"
-#include "GuiSettings.h"
+#include <math.h>
+
 #include <QDebug>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QTimerEvent>
-#include <math.h>
+
+#include "spectrograph.h"
+#include "GuiSettings.h"
 
 Spectrograph::Spectrograph(QWidget *parent)
     :   QWidget(parent)
@@ -136,7 +138,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
         textrect.setBottom(rect().bottom() - guisettings->sg_textOffset);
         textrect.setTop(rect().bottom() - guisettings->sg_textOffset - guisettings->sg_textHeight);
 
-        QPair<qreal, qreal> freqrange = barRange(i, true);
+        QPair<qreal, qreal> freqrange = barRangeLog(i);
         int centerfreq = (freqrange.first + freqrange.second)/2.0;
         QString hz;
         if (centerfreq<1000)
@@ -241,31 +243,8 @@ void Spectrograph::spectrumChanged(const FrequencySpectrum &spectrum)
 
 // -----------------------------------------------------------------------------
 // Math & shit
-/*
- * Given a frequency, returns the bar that covers it.
- */
-int Spectrograph::barIndex(qreal frequency, bool logspace) const
-{
-    if (logspace)
-        return barIndexLog(frequency);
-    else
-        return barIndex(frequency);
-}
 
-int Spectrograph::barIndex(qreal frequency) const
-{
-    Q_ASSERT(frequency >= m_lowFreq && frequency < m_highFreq);
-    const qreal bandWidth = (m_highFreq - m_lowFreq) / m_bars.count();
-    const int index = (frequency - m_lowFreq) / bandWidth;
-    if (index <0 || index >= m_bars.count())
-        Q_ASSERT(false);
-    return index;
-}
-
-/*
- * Given a frequency, returns the bar that covers it.
- * IN LOG SPACE
- */
+// Given a frequency, returns the bar that covers it.
 int Spectrograph::barIndexLog(qreal frequency) const
 {
     Q_ASSERT(frequency >= m_lowFreq && frequency < m_highFreq);
@@ -286,24 +265,7 @@ int Spectrograph::barIndexLog(qreal frequency) const
     return index;
 }
 
-/*
- * Give the index of a bar, returns the range of frequencies it covers.
- */
-QPair<qreal, qreal> Spectrograph::barRange(int index, bool logspace) const
-{
-    if (logspace)
-        return barRangeLog(index);
-    else
-        return barRange(index);
-}
-
-QPair<qreal, qreal> Spectrograph::barRange(int index) const
-{
-    Q_ASSERT(index >= 0 && index < m_bars.count());
-    const qreal bandWidth = (m_highFreq - m_lowFreq) / m_bars.count();
-    return QPair<qreal, qreal>(index * bandWidth + m_lowFreq, (index+1) * bandWidth+m_lowFreq);
-}
-
+// Given the index of a bar, returns the range of frequencies it covers.
 QPair<qreal, qreal> Spectrograph::barRangeLog(int index) const
 {
     Q_ASSERT(index >= 0 && index < m_bars.count());
@@ -349,10 +311,10 @@ QRectF Spectrograph::computeWinFromRange(Subrange *subrange)
 {
     // $$$ Could optimize--this is recomputing more often than needed.
     // Invert amplitudes, since drawing is y increases downwards.
-    double ampMin = 1.0 - subrange->_ampMin;
-    double ampMax = 1.0 - subrange->_ampMax;
-    double minSubwindowFreq = freq2frac(subrange->_freqMin);
-    double maxSubwindowFreq = freq2frac(subrange->_freqMax);
+    double ampMin = 1.0 - subrange->m_ampMin;
+    double ampMax = 1.0 - subrange->m_ampMax;
+    double minSubwindowFreq = freq2frac(subrange->m_freqMin);
+    double maxSubwindowFreq = freq2frac(subrange->m_freqMax);
 
     m_subrangeRect.setCoords(minSubwindowFreq, ampMax, maxSubwindowFreq, ampMin);
     return m_subrangeRect;
@@ -381,14 +343,14 @@ void Spectrograph::updateBars()
     for ( ; i != end; ++i, ++index) {
         const FrequencySpectrum::Element e = *i;
         if (m_printspectrum) {
-            qDebug() << "sample" << index << e.frequency << e.amplitude;
+            qDebug() << "sample" << index << e.m_frequency << e.m_amplitude;
         }
-        if (e.frequency >= m_lowFreq && e.frequency < m_highFreq) {
-            barindex = barIndex(e.frequency, true);
+        if (e.m_frequency >= m_lowFreq && e.m_frequency < m_highFreq) {
+            barindex = barIndexLog(e.m_frequency);
             Bar &bar = m_bars[barindex];
-            bar.value += e.amplitude;
+            bar.value += e.m_amplitude;
             bar.nsamples++;
-            bar.clipped |= e.clipped;
+            bar.clipped |= e.m_clipped;
         }
 
     }

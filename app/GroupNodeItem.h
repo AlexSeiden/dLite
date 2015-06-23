@@ -12,15 +12,15 @@ public:
 
     QRectF  boundingRect() const;
     void    paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
-    QString             getName()                   {return _name;}
-    void                setName(QString name)       {_name = name;}
+    QString             getName()                   {return m_name;}
+    void                setName(QString name)       {m_name = name;}
 
 protected:
     void        mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 
 private:
-    bool                _minimized;     // TODO
-    QString             _name;          // TODO
+    bool                m_minimized;     // TODO
+    QString             m_name;          // TODO
 };
 
 #endif // GROUPNODEITEM_H

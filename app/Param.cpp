@@ -1,10 +1,11 @@
+#include <QDebug>
+#include <QJsonObject>
+#include <QJsonArray>
+
 #include "Param.h"
 #include "lightcolor.h"
 #include "Region.h"
-#include <QDebug>
 #include "Node.h"
-#include <QJsonObject>
-#include <QJsonArray>
 
 // These view things are for the editor widget callback at the bottom
 #include <QSpinBox>
@@ -26,7 +27,7 @@ std::function<void()> ParamBase::getProvider()
 {
     // The Node implements operator() to create closure/functor.
     // All output values will be updated.
-    return [this]() {(*this->_parentNode)();};
+    return [this]() {(*this->m_parentNode)();};
 }
 
 // ------------------------------------------------------------------------------
@@ -69,7 +70,7 @@ void ParamBase::connectTo(ParamBase *server)
     // been verified as being compatable:  i.e., server is an output,
     // client is an input; they have the same type; etc.
 
-    this->_connectedParam = server;
+    this->m_connectedParam = server;
 
     // GROSS -- There's got to be a better way to do this.
     {
@@ -124,8 +125,8 @@ void ParamBase::connectTo(ParamBase *server)
     qDebug() << "serverType  " << typeid(*server).name() << endl;
 
     qDebug() << "as per _type:";
-    qDebug() << "thisType    " << this->_type.name();
-    qDebug() << "serverType  " << server->_type.name() << endl;
+    qDebug() << "thisType    " << this->m_type.name();
+    qDebug() << "serverType  " << server->m_type.name() << endl;
 
     qDebug() << "as per getType:";
     qDebug() << "thisType    " << this->getType().name();
@@ -136,14 +137,14 @@ void ParamBase::connectTo(ParamBase *server)
 // XXX  GROSS -- There's got to be a better way to do this.
 void ParamBase::copyValueAndConnection(ParamBase *rhs)
 {
-    _connectedParam = rhs->_connectedParam;
-    _provider = rhs->_provider;
+    m_connectedParam = rhs->m_connectedParam;
+    m_provider = rhs->m_provider;
 
     {
     Param<int> *s = dynamic_cast<Param<int> *>(rhs);
     Param<int> *c = dynamic_cast<Param<int> *>(this);
     if (s && c) {
-        c->_value = s->_value;
+        c->m_value = s->m_value;
         return;
     }
     }
@@ -152,7 +153,7 @@ void ParamBase::copyValueAndConnection(ParamBase *rhs)
     Param<float> *s = dynamic_cast<Param<float> *>(rhs);
     Param<float> *c = dynamic_cast<Param<float> *>(this);
     if (s && c) {
-        c->_value = s->_value;
+        c->m_value = s->m_value;
         return;
     }
     }
@@ -161,7 +162,7 @@ void ParamBase::copyValueAndConnection(ParamBase *rhs)
     Param<Lightcolor> *s = dynamic_cast<Param<Lightcolor> *>(rhs);
     Param<Lightcolor> *c = dynamic_cast<Param<Lightcolor> *>(this);
     if (s && c) {
-        c->_value = s->_value;
+        c->m_value = s->m_value;
         return;
     }
     }
@@ -170,7 +171,7 @@ void ParamBase::copyValueAndConnection(ParamBase *rhs)
     Param<bool> *s = dynamic_cast<Param<bool> *>(rhs);
     Param<bool> *c = dynamic_cast<Param<bool> *>(this);
     if (s && c) {
-        c->_value = s->_value;
+        c->m_value = s->m_value;
         return;
     }
     }
@@ -180,7 +181,7 @@ void ParamBase::copyValueAndConnection(ParamBase *rhs)
     Param<Region> *c = dynamic_cast<Param<Region> *>(this);
     if (s && c) {
         // XXX this probably isn't correct
-        c->_value = s->_value;
+        c->m_value = s->m_value;
         return;
     }
     }
@@ -196,8 +197,8 @@ void ParamBase::copyValueAndConnection(ParamBase *rhs)
     qDebug() << "rhsType  " << typeid(*rhs).name() << endl;
 
     qDebug() << "as per _type:";
-    qDebug() << "thisType    " << this->_type.name();
-    qDebug() << "rhsType  " << rhs->_type.name() << endl;
+    qDebug() << "thisType    " << this->m_type.name();
+    qDebug() << "rhsType  " << rhs->m_type.name() << endl;
 
     qDebug() << "as per getType:";
     qDebug() << "thisType    " << this->getType().name();
@@ -209,9 +210,9 @@ void ParamBase::copyValueAndConnection(ParamBase *rhs)
 //      Sets min and max range used by numeric params.
 void ParamBase::setRange(bool userange, double min, double max, double step)
 {
-    _useminmax = userange;
-    _minVal = min;
-    _maxVal = max;
+    m_useminmax = userange;
+    m_minVal = min;
+    m_maxVal = max;
     _stepVal = step;
 }
 
@@ -222,10 +223,10 @@ void ParamBase::setRange(bool userange, double min, double max, double step)
 // Writing (base class)
 void ParamBase::writeToJSONObj(QJsonObject &json) const
 {
-    json["name"] = _name;
-    json["uuid"] = _uuid.toString();
-    if (_connectedParam)
-        json["connectedTo"] = _connectedParam->_uuid.toString();
+    json["name"] = m_name;
+    json["uuid"] = m_uuid.toString();
+    if (m_connectedParam)
+        json["connectedTo"] = m_connectedParam->m_uuid.toString();
 #if 0
     // These shouldn't change for a given parameter, and so for now
     // we don't output them.
@@ -243,9 +244,9 @@ template <> void Param<Lightcolor>::writeToJSONObj(QJsonObject &json) const
     if (isOutput())
         return;
 
-    json["red"] = _value.getRed();
-    json["green"] = _value.getGreen();
-    json["blue"] = _value.getBlue();
+    json["red"] = m_value.getRed();
+    json["green"] = m_value.getGreen();
+    json["blue"] = m_value.getBlue();
 }
 
 template <> void Param<float>::writeToJSONObj(QJsonObject &json) const
@@ -253,7 +254,7 @@ template <> void Param<float>::writeToJSONObj(QJsonObject &json) const
     ParamBase::writeToJSONObj(json);
     if (isOutput())
         return;
-    json["value"] = _value;
+    json["value"] = m_value;
 }
 
 template <> void Param<bool>::writeToJSONObj(QJsonObject &json) const
@@ -261,7 +262,7 @@ template <> void Param<bool>::writeToJSONObj(QJsonObject &json) const
     ParamBase::writeToJSONObj(json);
     if (isOutput())
         return;
-    json["value"] = _value;
+    json["value"] = m_value;
 }
 
 template <> void Param<int>::writeToJSONObj(QJsonObject &json) const
@@ -269,7 +270,7 @@ template <> void Param<int>::writeToJSONObj(QJsonObject &json) const
     ParamBase::writeToJSONObj(json);
     if (isOutput())
         return;
-    json["value"] = _value;
+    json["value"] = m_value;
 }
 
 template <> void Param<Region>::writeToJSONObj(QJsonObject &json) const
@@ -283,7 +284,7 @@ template <> void Param<Region>::writeToJSONObj(QJsonObject &json) const
 void ParamBase::readFromJSONObj(const QJsonObject &json)
 {
     // ErrorHandling
-    _uuid = QUuid(json["uuid"].toString());
+    m_uuid = QUuid(json["uuid"].toString());
 }
 
 // Reading (template specializations)
@@ -316,7 +317,7 @@ template <> void Param<Lightcolor>::readFromJSONObj(const QJsonObject &json)
     ParamBase::readFromJSONObj(json);
     if (isOutput())
         return;
-    _value = Lightcolor(json["red"].toInt(), json["green"].toInt(), json["blue"].toInt());
+    m_value = Lightcolor(json["red"].toInt(), json["green"].toInt(), json["blue"].toInt());
 }
 
 
@@ -345,8 +346,8 @@ QWidget* ParamBase::getEditorWidget(QObject *sendValueChangesHere)
 template <> QWidget* Param<float>::getEditorWidget(QObject* sendValueChangesHere)
 {
     MyDoubleSpinBox *editorWidget = new MyDoubleSpinBox;
-    if (_useminmax) {    // TODO finish this
-        editorWidget->setRange(_minVal, _maxVal);
+    if (m_useminmax) {    // TODO finish this
+        editorWidget->setRange(m_minVal, m_maxVal);
         editorWidget->setSingleStep(_stepVal);
     }
     editorWidget->setButtonSymbols(QAbstractSpinBox::NoButtons);
@@ -374,8 +375,8 @@ template <> QWidget* Param<int>::getEditorWidget(QObject* sendValueChangesHere)
 {
     QSpinBox *editorWidget = new QSpinBox;
 //    editorWidget->installEventFilter(eventFilter);
-    if (_useminmax) {    // TODO finish this
-        editorWidget->setRange(_minVal, _maxVal);
+    if (m_useminmax) {    // TODO finish this
+        editorWidget->setRange(m_minVal, m_maxVal);
         editorWidget->setSingleStep(_stepVal);
     }
 //    editorWidget->setButtonSymbols(QAbstractSpinBox::NoButtons);

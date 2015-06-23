@@ -11,17 +11,17 @@ PathNode::PathNode(QObject *parent) :
     QObject(parent)
 {
     setName(QString("Path %1").arg(nodeCount()));
-    _type = POSITION;
+    m_type = POSITION;
 
-    _x.setName("x out");
-    _x.setConnectable(true);
-    _x.setOutput(true);
+    m_x.setName("x out");
+    m_x.setConnectable(true);
+    m_x.setOutput(true);
 
-    _y.setName("y out");
-    _y.setConnectable(true);
-    _y.setOutput(true);
+    m_y.setName("y out");
+    m_y.setConnectable(true);
+    m_y.setOutput(true);
 
-    _paramList << &_x << &_y;
+    m_paramList << &m_x << &m_y;
 }
 
 void PathNode::operator()()
@@ -30,8 +30,8 @@ void PathNode::operator()()
         return;
     // Don't need to evalAllInputs() here because we know there are none!
 
-    _x._qvOutput = _x._value;
-    _y._qvOutput = _y._value;
+    m_x._qvOutput = m_x.m_value;
+    m_y._qvOutput = m_y.m_value;
 }
 
 PathNode* PathNode::clone()
@@ -69,7 +69,7 @@ void PathNode::writeToJSONObj(QJsonObject &json) const
 
     // Override for serialization
     QJsonArray pathJsonArray;
-    foreach (const Position pos, _positions) {
+    foreach (const Position pos, m_positions) {
          QJsonObject posJ;
          posJ["x"] = pos.x;
          posJ["y"] = pos.y;
@@ -88,7 +88,7 @@ void PathNode::readFromJSONObj(const QJsonObject &json)
         Position pos;
         pos.x = posJsonObject["x"].toInt();
         pos.y = posJsonObject["y"].toInt();
-        _positions.push_back(pos);      // (Hopefully) this uses copy to push onto QList of positons.
+        m_positions.push_back(pos);      // (Hopefully) this uses copy to push onto QList of positons.
     }
 }
 

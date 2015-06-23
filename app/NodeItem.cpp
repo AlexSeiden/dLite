@@ -1,29 +1,30 @@
-#include "NodeItem.h"
-#include "CuesheetScene.h"
-#include "GuiSettings.h"
-#include "utils.h"
+// Classes for drawing the graph view representation of all the nodes.
+
 #include <QtWidgets>
 #include <QPainterPath>
 #include <QGraphicsProxyWidget>
 #include "ConnectorItem.h"
+#include "NodeItem.h"
+#include "CuesheetScene.h"
+#include "GuiSettings.h"
+#include "utils.h"
 
-// Classes for drawing the graph view representation of all the nodes.
 
 //-----------------------------------------------------------------------------
 // NodeItem
 NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     QGraphicsObject(parent),
-    _node(node),
-    _minimized(false)
+    m_node(node),
+    m_minimized(false)
 {
     node->setNodeItem(this);
 
-    _margins = QMarginsF(9,5,9,5);
+    m_margins = QMarginsF(9,5,9,5);
     setFlags(ItemIsSelectable | ItemIsMovable  | ItemSendsScenePositionChanges);
 
     // Name editor
     QLineEdit *nameEdit = new QLineEdit;
-    nameEdit->setText(_node->getName());
+    nameEdit->setText(m_node->getName());
     QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
     proxy->setWidget(nameEdit);
     proxy->setPos(guisettings->m_socketWidth + guisettings->m_paramTextOffset, 2);  // Hardw
@@ -32,7 +33,7 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
 
     // Minimize checkbox
     QCheckBox *cb = new QCheckBox;
-    cb->setChecked(_minimized);
+    cb->setChecked(m_minimized);
     QGraphicsProxyWidget *cbproxy = new QGraphicsProxyWidget(this);
     cbproxy->setWidget(cb);
     qreal extra = guisettings->m_PIheight - cbproxy->rect().height();
@@ -65,23 +66,24 @@ NodeItem::~NodeItem()
     }
 
     scene()->removeItem(this);
-    delete _node;
+    delete m_node;
 }
 
 QRectF NodeItem::boundingRect() const
 {
     int nRows;
-    if (_minimized)
+    if (m_minimized)
         nRows = 1;
     else
-        nRows = _node->getParams().size() + 1;
+        nRows = m_node->getParams().size() + 1;
     QRectF bbox =  QRectF(0,0,guisettings->m_NNWidth + 2, // TODO replace 2 with shadow size
                           guisettings->m_PIheight*nRows + 2);
-    return bbox.marginsAdded(_margins);
+    return bbox.marginsAdded(m_margins);
 }
 
 void NodeItem::paint(QPainter *painter,
-           const QStyleOptionGraphicsItem *option, QWidget *widget)
+                     const QStyleOptionGraphicsItem *option,
+                     QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
@@ -97,7 +99,7 @@ void NodeItem::paint(QPainter *painter,
 
     // Draw rectangle of entire node:
     QRectF bigrect = boundingRect();
-    bigrect = bigrect.marginsRemoved(_margins);
+    bigrect = bigrect.marginsRemoved(m_margins);
 
     //Draw dropshadow first
     QRectF shadowrect = bigrect;
@@ -131,23 +133,8 @@ void NodeItem::paint(QPainter *painter,
     painter->restore();
 }
 
-// ---------------------------
 // Event handling
-#if 0
-void NodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-    // Used for updating any attached connectors.
-    qDebug() << "NodeItem mme" << _node->getName();
-    emit nodeMovedEventSignal();
-    event->ignore();
-    QGraphicsObject::mouseMoveEvent(event);
-}
-#endif
-
-// The mouseMoveEvent stuff doesn't work correctly when multiple
-// nodeitems are selected--only one of the nodes gets the MME event,
-// and connections to the other nodes are left dangling when they are
-// all moved.
+//
 QVariant    NodeItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if (change == ItemScenePositionHasChanged) {
@@ -162,23 +149,23 @@ QVariant    NodeItem::itemChange(GraphicsItemChange change, const QVariant &valu
 //  path nodes will interact with the floor display.)
 void NodeItem::beenSelected()
 {
-    _node->beenSelected();
+    m_node->beenSelected();
 }
 
 void NodeItem::beenDeselected()
 {
-    _node->beenDeselected();
+    m_node->beenDeselected();
 }
 
 void NodeItem::nameEdit(QString newname)
 {
     // Since Nodes are not QObjects, we can't send a signal to them directly,
     // so we need the NodeItem to have the edit slot.
-    _node->setName(newname);
+    m_node->setName(newname);
 }
 
-// ---------------------------
 // Display
+//
 // Reposition the node item, and signal to connections that we've moved.
 // This is called from routines like align and layout, that reposition
 // a NodeItem programmatically.
@@ -189,8 +176,7 @@ void NodeItem::rePos(const QPointF &pos)
     emit nodeMovedEventSignal();
 }
 
-// Find an empty space in the graph to display a new node:
-void NodeItem::avoidCollisions()
+void NodeItem::findEmptySpaceInGraph()
 {
    QList<QGraphicsItem *>colliders = collidingItems(Qt::IntersectsItemBoundingRect);
 
@@ -198,7 +184,7 @@ void NodeItem::avoidCollisions()
        NodeItem *ni = dynamic_cast<NodeItem *>(item);
        if (ni) {
            moveBy(guisettings->m_NNSpacing, 0);
-           avoidCollisions();
+           findEmptySpaceInGraph();
            break;
        }
    }
@@ -206,11 +192,11 @@ void NodeItem::avoidCollisions()
 
 void NodeItem::minimize(int status)
 {
-    _minimized = status;
+    m_minimized = status;
     QList<ParamItem*> kiddos = getChildParamItems();
     // TODO Hide all paramitems:
     foreach (ParamItem *pi, kiddos) {
-        if (_minimized)
+        if (m_minimized)
             pi->hide();
         else
             pi->show();
@@ -219,14 +205,14 @@ void NodeItem::minimize(int status)
     update();
 }
 
-// ---------------------------
 // Utility
+//
 
-// Another $$$ routine that probably isn't a big deal.
 QList<NodeItem*> NodeItem::getUpstreamNodeItems()
 {
+    // This could be optimized, but really isn't a big deal.
     QList<NodeItem*> upstream;
-    for (ParamBase *param : _node->getParams()) {
+    for (ParamBase *param : m_node->getParams()) {
         ParamBase *cnctParam = param->connectedParam();
         if (cnctParam) {
             Node *cnctNode = cnctParam->getParentNode();
@@ -251,8 +237,8 @@ QList<ParamItem*> NodeItem::getChildParamItems()
     return out;
 }
 
-// ---------------------------
 // Serialization
+//
 void NodeItem::readFromJSONObj(const QJsonObject &json)
 {
     // ErrorHandling
@@ -275,28 +261,29 @@ void NodeItem::writeToJSONObj(QJsonObject &json) const
     QJsonObject jsonUiSettings;
     jsonUiSettings["xPos"] = x();
     jsonUiSettings["yPos"] = y();
-    jsonUiSettings["minimized"] = _minimized;
+    jsonUiSettings["minimized"] = m_minimized;
     json["uisettings"] = jsonUiSettings;
 }
+
 
 //-----------------------------------------------------------------------------
 // ParamItem
 ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
     QGraphicsObject(parent),
-    _param(param)
+    m_param(param)
 {
     int yOffset = guisettings->m_PIheight/2;
 
     this->setObjectName(tr("ack"));
     // Build socket items
-    _socket = new SocketItem(param, this);
+    m_socket = new SocketItem(param, this);
     if (param->isOutput())
         // Output items get their socket on the right side
-        _socket->setPos(guisettings->m_NNWidth - guisettings->m_socketWidth, yOffset);
+        m_socket->setPos(guisettings->m_NNWidth - guisettings->m_socketWidth, yOffset);
     else {
         // Input items get their socket on the left side, and get an editor
         // proxyWidget too.
-        _socket->setPos(guisettings->m_socketWidth,yOffset);
+        m_socket->setPos(guisettings->m_socketWidth,yOffset);
 
         // Display an editor widget for the parameter value.
         QWidget* paramEditorWidget = param->getEditorWidget(this);
@@ -326,14 +313,15 @@ QRectF ParamItem::boundingRect() const
 
 
 void ParamItem::paint(QPainter *painter,
-           const QStyleOptionGraphicsItem *option, QWidget *widget)
+                      const QStyleOptionGraphicsItem *option,
+                      QWidget *widget)
 {
     painter->save();
     Q_UNUSED(widget);
     Q_UNUSED(option);
 
     // Set box for this param
-    if (_param->isOutput())
+    if (m_param->isOutput())
         painter->setBrush(guisettings->m_PIoutputbgcolor);
     else
         painter->setBrush(guisettings->m_PIbgcolor);
@@ -349,37 +337,36 @@ void ParamItem::paint(QPainter *painter,
     painter->setFont(guisettings->m_PIfont);
     int offset = guisettings->m_socketWidth + guisettings->m_paramTextOffset;
 
-    if (_param->isOutput()) {
+    if (m_param->isOutput()) {
         rr.setRight(rr.right() - offset);
-        painter->drawText(rr,Qt::AlignRight | Qt::AlignVCenter, _param->getName());
+        painter->drawText(rr,Qt::AlignRight | Qt::AlignVCenter, m_param->getName());
     } else {
         rr.setLeft(rr.left() + offset);
-        painter->drawText(rr,Qt::AlignLeft | Qt::AlignVCenter, _param->getName());
+        painter->drawText(rr,Qt::AlignLeft | Qt::AlignVCenter, m_param->getName());
     }
     painter->restore();
 }
 
-// ---------------------------
 // setValue callbacks
 //      It would be nice to template these, but that won't work with QObject
 //      derived classes and the Qt moc.  Fortunately, it's not a lot of stuff.
 //
 void ParamItem::setValue(double val) {
-    Param<float> *p = dynamic_cast<Param<float> *>(this->_param);
+    Param<float> *p = dynamic_cast<Param<float> *>(this->m_param);
     Q_ASSERT(p);
     p->setValue(val);
     p->getParentNode()->paramHasBeenEdited();
 }
 
 void ParamItem::setValue(int val) {
-    Param<int> *p = dynamic_cast<Param<int> *>(this->_param);
+    Param<int> *p = dynamic_cast<Param<int> *>(this->m_param);
     Q_ASSERT(p);
     p->setValue(val);
     p->getParentNode()->paramHasBeenEdited();
 }
 
 void ParamItem::setValue(Lightcolor val) {
-    Param<Lightcolor> *p = dynamic_cast<Param<Lightcolor> *>(this->_param);
+    Param<Lightcolor> *p = dynamic_cast<Param<Lightcolor> *>(this->m_param);
     Q_ASSERT(p);
     p->setValue(val);
     p->getParentNode()->paramHasBeenEdited();
@@ -388,7 +375,7 @@ void ParamItem::setValue(Lightcolor val) {
 // For use with QLineEdit
 void ParamItem::textChanged(QString text)
 {
-    Param<int> *pi = dynamic_cast<Param<int> *>(this->_param);
+    Param<int> *pi = dynamic_cast<Param<int> *>(this->m_param);
     if (pi) {
         int val = text.toInt();
         pi->setValue(val);
@@ -396,7 +383,7 @@ void ParamItem::textChanged(QString text)
         return;
     }
 
-    Param<float> *pf = dynamic_cast<Param<float> *>(this->_param);
+    Param<float> *pf = dynamic_cast<Param<float> *>(this->m_param);
     if (pf) {
         float val = text.toFloat();
         pf->setValue(val);
@@ -412,7 +399,7 @@ void ParamItem::textChanged(QString text)
 // rather than simply "setValue(bool val)", because Qt checkboxes return
 // ints--Checked, unchecked, and "Partially Checked" when in a hierarchy.
 void ParamItem::setBoolValue(int val) {
-    Param<bool> *p = dynamic_cast<Param<bool> *>(this->_param);
+    Param<bool> *p = dynamic_cast<Param<bool> *>(this->m_param);
     Q_ASSERT(p);
     if (val == 0)
         p->setValue(false);
@@ -422,12 +409,13 @@ void ParamItem::setBoolValue(int val) {
     p->getParentNode()->paramHasBeenEdited();
 }
 
+
 //-----------------------------------------------------------------------------
 // SocketItem
 
 SocketItem::SocketItem(ParamBase *param, QGraphicsObject *parent) :
     QGraphicsObject(parent),
-    _param(param)
+    m_param(param)
 { }
 
 QRectF SocketItem::boundingRect() const {
@@ -438,7 +426,8 @@ QRectF SocketItem::boundingRect() const {
 }
 
 void SocketItem::paint(QPainter *painter,
-           const QStyleOptionGraphicsItem *option, QWidget *widget)
+                       const QStyleOptionGraphicsItem *option,
+                       QWidget *widget)
 {
     painter->save();
     Q_UNUSED(option);

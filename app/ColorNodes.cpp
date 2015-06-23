@@ -8,7 +8,7 @@
 ColorRamp::ColorRamp() 
 {
     setName("ColorRamp");
-    _type = COLOR;
+    m_type = COLOR;
 
     addParam<Lightcolor>("out", 0.0, true);
     addParam<Lightcolor>("Color0", 0.0);
@@ -51,7 +51,7 @@ ColorRamp* ColorRamp::clone()
 BriteColor::BriteColor()
 {
     setName("BriteColor");
-    _type = COLOR;
+    m_type = COLOR;
 
     addParam<Lightcolor>("out", 0.0, true);
     addParam<float>("hue min", 0.0, false, false);
@@ -80,9 +80,9 @@ void BriteColor::setRandomEngine()
     getValue("sat max", smax);
     getValue("value min", vmin);
     getValue("value max", vmax);
-    _distHue = new std::uniform_real_distribution<float>(hmin, hmax);
-    _distSat = new std::uniform_real_distribution<float>(smin, smax);
-    _distVal = new std::uniform_real_distribution<float>(vmin, vmax);
+    m_distHue = new std::uniform_real_distribution<float>(hmin, hmax);
+    m_distSat = new std::uniform_real_distribution<float>(smin, smax);
+    m_distVal = new std::uniform_real_distribution<float>(vmin, vmax);
 }
 
 // This is called whenever a parameter gets edited, so
@@ -107,9 +107,9 @@ void BriteColor::operator()()
 
     if (trigger) {
         QColor out;
-        double sat = (*_distSat)(*_randGenerator);
-        double hue = (*_distHue)(*_randGenerator);
-        double val = (*_distVal)(*_randGenerator);
+        double sat = (*m_distSat)(*_randGenerator);
+        double hue = (*m_distHue)(*_randGenerator);
+        double val = (*m_distVal)(*_randGenerator);
 #if 0
         // shouldn't be needed since the rand generators shouldn't be returning
         // values outside this range
@@ -141,7 +141,7 @@ BriteColor* BriteColor::clone()
 Palette::Palette()
 {
     setName("Palette");
-    _type = COLOR;
+    m_type = COLOR;
 
     addParam<Lightcolor>("out", 0.0, true);
     addParam<int>("selector");

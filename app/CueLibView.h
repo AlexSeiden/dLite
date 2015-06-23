@@ -20,13 +20,13 @@ public:
     CueLibView(QWidget *parent = 0);
 
 public slots:
-    void    showAndRaise();
+    void        showAndRaise();
 
 signals:
-    void    newNodeRequest(QString name);
+    void        newNodeRequest(QString name);
 
 private:
-    void    createUi();
+    void        createUi();
 
     QGroupBox*  createGroup(QString typeName, Node::node_t nodeType);
     void        addButtonToUi(QLayout *layout, QString buttonName);

@@ -15,12 +15,14 @@ public:
     typedef  std::function<Node*(void)> NodeInstatiator_t;
 
     Node*           instatiateNode(QString classname, QUuid uuid=0);
-    void            registerNodetype(QString classname, Node::node_t typeInfo, NodeInstatiator_t instantiatorFunction);
+    void            registerNodetype(QString classname,
+                                     Node::node_t typeInfo,
+                                     NodeInstatiator_t instantiatorFunction);
     const QStringList& getNodesOfType(Node::node_t typeInfo);
     QList<Node*>    allNodes() const {return Node::allNodes();}
     void            duplicateNodes(QList<Node *> *dupeThese, QRectF bbox = QRectF());
 
-    static NodeFactory *Singleton();
+    static NodeFactory* Singleton();
 
     // Serialization
     bool    saveToFile(QString filename);
@@ -33,15 +35,15 @@ public:
 
 private:
     // Registry
-    std::map<std::string, NodeInstatiator_t>    _registry;
-    QMap<Node::node_t, QStringList>             _registryByType;
+    std::map<std::string, NodeInstatiator_t>    m_registry;
+    QMap<Node::node_t, QStringList>             m_registryByType;
 
     // Used when reading from a file
-    QMap<QUuid, ParamBase*>                     _uuidToParam;
-    QMap<ParamBase *, QUuid>                    _connectionsToMake;
-    QMap<QUuid, QUuid>                          _groupsToMake;
+    QMap<QUuid, ParamBase*>                     m_uuidToParam;
+    QMap<ParamBase *, QUuid>                    m_connectionsToMake;
+    QMap<QUuid, QUuid>                          m_groupsToMake;
 
-    bool            _dirty;     // TODO set this, and maybe move it to static node
+    bool            m_dirty;     // TODO set this, and maybe move it to static node
 };
 
 

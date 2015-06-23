@@ -41,10 +41,10 @@ public:
     QList<GroupNodeItem*>    getSelectedGroups();
     QList<NodeItem*>    getAllCueNodeItems();
     void                selectTheseNodes(QList<Node*> selection);
-    QString             getName() const {return _name;}
-    void                setName(QString name) {_name = name;}
-    void                addCue(Cue *cue) {_cues<<cue;}
-    QList<Cue*>         getCues() const {return _cues;}
+    QString             getName() const {return m_name;}
+    void                setName(QString name) {m_name = name;}
+    void                addCue(Cue *cue) {m_cues<<cue;}
+    QList<Cue*>         getCues() const {return m_cues;}
     QList<Node*>        getNodes() const;
     QRectF              getItemsBBox(QList<QGraphicsItem*> items) const;
 
@@ -53,8 +53,8 @@ public:
 //    void writeToJSONObj(QJsonObject &json) const;
 
 public slots:
-    void setConnecting(bool status=true) {_isConnecting = status;}
-    void setStartPoint(QPointF startPoint) {_startPoint = startPoint;}
+    void setConnecting(bool status=true) {m_isConnecting = status;}
+    void setStartPoint(QPointF startPoint) {m_startPoint = startPoint;}
     void startLine(QGraphicsSceneMouseEvent *mouseEvent, SocketItem *srcItem);
     void connectSockets(SocketItem *server, SocketItem *client);
 
@@ -66,19 +66,19 @@ protected:
 private:
     QGraphicsItem *findFirstReleventItem(QList<QGraphicsItem *> &endItems);
 
-    SocketItem *        _startSocket;
-    QPointF             _startPoint;
-    QGraphicsLineItem * _line;
+    SocketItem *        m_startSocket;
+    QPointF             m_startPoint;
+    QGraphicsLineItem * m_line;
     //  This is set to true while we are in the process of attempting to
     //  to drag a connection between two nodes.  That is, the user has clicked
     //  on a socket, but hasn't yet finished the action by clicking on another
     //  socket to connect to.
-    bool                _isConnecting;
-    QString             _name;
+    bool                m_isConnecting;
+    QString             m_name;
 
     // GROSS business and view logic getting pretty sloppy here:
-    QList<Cue*>         _cues;
-    QList<Node*>        _nodes;
+    QList<Cue*>         m_cues;
+    QList<Node*>        m_nodes;
 };
 
 #endif // CUESHEETSCENE_H

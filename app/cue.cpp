@@ -6,22 +6,22 @@
 //  Cue
 //  Abstract base class
 
-Dancefloor *Cue::_dfModel = nullptr;
+Dancefloor *Cue::m_dfModel = nullptr;
 
 Cue::Cue() :
-    _compMode(ADD),
-    _decayMode(IMMEDIATE)
+    m_compMode(ADD),
+    m_decayMode(IMMEDIATE)
 {
-    _type = CUE;
+    m_type = CUE;
     // Add this to list of cues the model knows about.
-    Q_ASSERT(Cue::_dfModel);
-    Cue::_dfModel->addCue(this);
+    Q_ASSERT(Cue::m_dfModel);
+    Cue::m_dfModel->addCue(this);
     // TODO should add to cuesheet here rather than through GraphWidget::addNode
 }
 
 Cue::~Cue()
 {
-    Cue::_dfModel->removeCue(this);
+    Cue::m_dfModel->removeCue(this);
     // This is removed from node inventory in Node dtor.
 }
 
@@ -29,14 +29,14 @@ void Cue::writeToJSONObj(QJsonObject &json) const
 {
     // Override for serialization
     Node::writeToJSONObj(json);
-    json["compMode"] = _compMode;
-    json["decaymode"] = _decayMode;
+    json["compMode"] = m_compMode;
+    json["decaymode"] = m_decayMode;
 }
 
 void Cue::readFromJSONObj(const QJsonObject &json)
 {
     // Override for serialization
     Node::readFromJSONObj(json);
-    _compMode = compMode_t(qRound(json["compMode"].toDouble()));
-    _decayMode = decayMode_t(qRound(json["decayMode"].toDouble()));
+    m_compMode = compMode_t(qRound(json["compMode"].toDouble()));
+    m_decayMode = decayMode_t(qRound(json["decayMode"].toDouble()));
 }

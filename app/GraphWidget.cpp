@@ -401,7 +401,7 @@ void GraphWidget::addNode(Node *node, QJsonObject* json)
         nodeItem->rePos(center);
 
         // Moves the node so it isn't right on top of one that's already displayed.
-        nodeItem->avoidCollisions();
+        nodeItem->findEmptySpaceInGraph();
         getCurrentScene()->clearSelection();
         nodeItem->setSelected(true);
         getCurrentView()->view()->ensureVisible(nodeItem);

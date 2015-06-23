@@ -6,11 +6,10 @@
 
 GroupNodeItem::GroupNodeItem(QGraphicsItem *parent) :
     QGraphicsItemGroup(parent),
-    _minimized(false)
+    m_minimized(false)
 {
-    Q_UNUSED(_minimized);
+    Q_UNUSED(m_minimized);
     // TODO add title bar object
-
     // TODO add minimize checkbox
 }
 
@@ -47,14 +46,11 @@ void GroupNodeItem::paint(QPainter *painter,
     bbox += QMarginsF(0,30,0,0); // hardw   for name
     painter->drawRect(bbox);
     painter->restore();
-
-    // don't need or want this:
-//    QGraphicsItemGroup::paint(painter, option, widget);
 }
 
 void GroupNodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-    // Used for updating any attached connectors.
+    // Update any attached connectors:
     foreach (QGraphicsItem *item, childItems()) {
         NodeItem *ni = dynamic_cast<NodeItem *>(item);
         if (ni) {

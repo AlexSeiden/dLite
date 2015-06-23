@@ -20,11 +20,9 @@ QString formatToString(const QAudioFormat &format);
 
 qreal nyquistFrequency(const QAudioFormat &format);
 
-// Scale PCM value to [-1.0, 1.0]
-qreal pcmToReal(qint16 pcm);
+qreal pcmToReal(qint16 pcm);        // Scale PCM value to [-1.0, 1.0]
 
-// Scale real value in [-1.0, 1.0] to PCM
-qint16 realToPcm(qreal real);
+qint16 realToPcm(qreal real);       // Scale real value in [-1.0, 1.0] to PCM
 
 // Check whether the audio format is PCM
 bool isPCM(const QAudioFormat &format);

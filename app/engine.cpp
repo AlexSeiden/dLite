@@ -358,7 +358,7 @@ void Engine::setFormat(const QAudioFormat &format)
 {
     const bool changed = (format != m_format);
     m_format = format;
-    m_spectrumBufferLength = SpectrumLengthSamples *
+    m_spectrumBufferLength = SPECTRUM_LENGTH_SAMPLES *
                             (m_format.sampleSize() / 8) * m_format.channelCount();
     if (changed)
         emit formatChanged(m_format);

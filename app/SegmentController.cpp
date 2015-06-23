@@ -36,8 +36,8 @@ void SegmentController::loadFile()
 
 void SegmentController::loadFile(QString filename)
 {
-    _segmentation._segments.clear();
-    _segmentation._segmentIndices.clear();
+    _segmentation.m_segments.clear();
+    _segmentation.m_segmentIndices.clear();
 
     QSet<int> segmentSet;
 
@@ -82,18 +82,18 @@ void SegmentController::loadFile(QString filename)
         variant.remove(QChar('"'));
         seg.segmentVariant = variant;
 
-        _segmentation._segments << seg;
+        _segmentation.m_segments << seg;
     }
     filestream.close();
 
     // Calculate total duration from last segment start & duration
-    _segmentation._duration =   _segmentation._segments.last().startTime +
-                                _segmentation._segments.last().duration;
+    _segmentation.m_duration =   _segmentation.m_segments.last().startTime +
+                                _segmentation.m_segments.last().duration;
 
     // Find all indices used by the segmenter.
-    _segmentation._segmentIndices = segmentSet.values();
-    qSort(_segmentation._segmentIndices);
-    _segmentation._nSegments = _segmentation._segmentIndices.count();
+    _segmentation.m_segmentIndices = segmentSet.values();
+    qSort(_segmentation.m_segmentIndices);
+    _segmentation.m_nSegments = _segmentation.m_segmentIndices.count();
 }
 
 
@@ -117,8 +117,8 @@ Start, segment, "segment"
 */
 void SegmentController::loadFileQM(QString filename)
 {
-    _segmentation._segments.clear();
-    _segmentation._segmentIndices.clear();
+    _segmentation.m_segments.clear();
+    _segmentation.m_segmentIndices.clear();
 
     QSet<int> segmentIndexSet;
     QSet<QString> segmentStringSet;
@@ -160,35 +160,35 @@ void SegmentController::loadFileQM(QString filename)
         seg.segmentVariant = variant;
         segmentStringSet << variant;
 
-        _segmentation._segments << seg;
+        _segmentation.m_segments << seg;
     }
     filestream.close();
 
 
     // Calculate total duration from last segment start & duration
-    _segmentation._duration =    Cupid::Singleton()->getEngine()->bufferLengthMS();
+    _segmentation.m_duration =    Cupid::Singleton()->getEngine()->bufferLengthMS();
 
     // Calculate durations:
 
-    QList<Segment>::iterator seg = _segmentation._segments.begin();
-    QList<Segment>::iterator end = _segmentation._segments.end();
+    QList<Segment>::iterator seg = _segmentation.m_segments.begin();
+    QList<Segment>::iterator end = _segmentation.m_segments.end();
     for (; seg < (end-1); ++seg) {
         seg->duration = (seg+1)->startTime - seg->startTime;
     }
-    seg->duration = _segmentation._duration - seg->startTime;
+    seg->duration = _segmentation.m_duration - seg->startTime;
 
     // Find all indices used by the segmenter.
     // (Presumably, will be all integers from 1-|segmentSet|, but you
     // can never be too careful about these things.)
-    _segmentation._segmentIndices = segmentIndexSet.values();
-    qSort(_segmentation._segmentIndices);
-    _segmentation._nSegments = _segmentation._segmentIndices.count();
+    _segmentation.m_segmentIndices = segmentIndexSet.values();
+    qSort(_segmentation.m_segmentIndices);
+    _segmentation.m_nSegments = _segmentation.m_segmentIndices.count();
 }
 
 // Given a time, finds the segment inside the song that we are currently in.
 int SegmentController::findSegment(int msecs)
 {
-    foreach (Segment seg, _segmentation._segments) {
+    foreach (Segment seg, _segmentation.m_segments) {
         if (seg.startTime <= msecs && (seg.startTime + seg.duration) >= msecs)
             return seg.segmentIndex;
     }

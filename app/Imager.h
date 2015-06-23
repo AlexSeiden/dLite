@@ -12,15 +12,16 @@ class Imager : public Cue
 public:
     Imager();
 
-    void evaluate();
-    void operator() (void);
+    void    evaluate();
+    void    operator() (void);
     virtual Imager* clone();
 
 protected:
     virtual void    draw();
     virtual void    fire();
-    QImage  *_image;
+    QImage* m_image;
 };
+
 
 // ------------------------------------------------------------------------------
 // Circle
@@ -34,6 +35,7 @@ public:
 protected:
     void    draw();
 };
+
 
 // ------------------------------------------------------------------------------
 // Box

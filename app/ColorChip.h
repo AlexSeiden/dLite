@@ -19,7 +19,7 @@ public slots:
     void setButtonColor(const QColor color);
 
 private:
-    QColor  _color;
+    QColor  m_color;
 };
 
 #endif // COLORCHIP_H

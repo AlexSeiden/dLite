@@ -12,27 +12,25 @@
 // ------------------------------------------------------------------------------
 //  Node
 
-QList<Node*> Node::_allNodes;
+QList<Node*> Node::m_allNodes;
 
 Node::Node() :
-    _name(QString()),
-    _type(UNDEFINED),
-    _frameLastEvaluated(-1),
-    _uuid(QUuid::createUuid()),
-    _nodeItem(nullptr)
+    m_name(QString()),
+    m_type(UNDEFINED),
+    m_frameLastEvaluated(-1),
+    m_uuid(QUuid::createUuid()),
+    m_nodeItem(nullptr)
 {
     // Style Hmmm, this might be a good place to use a weak ptr.
-    _allNodes.append(this);
+    m_allNodes.append(this);
 
     addParam<bool>("active", true, false, false);
-    // Could potentially be connectable,
-    // but would have to make sure
-    // that connection was evaluated
-    // prior to use.
+    // Could potentially be connectable, but we would have to make sure
+    // that connection was evaluated prior to use.
 }
 
 Node::~Node() {
-    _allNodes.removeAll(this);
+    m_allNodes.removeAll(this);
 }
 
 bool Node::isActive() const
@@ -50,21 +48,20 @@ void Node::setActive(bool status)
 void Node::cloneHelper(Node& lhs)
 {
     // Things that are simply copied
-    // (Although these first two are set from the regular ctor,
-    // and shouldn't change.)
-    lhs._type       = _type;
-    lhs._className  = _className;
+    // (Although the first two are set in the base ctor, and shouldn't change.)
+    lhs.m_type       = m_type;
+    lhs.m_className  = m_className;
 
     // Things that are modified
-    lhs._name     = Node::uniqueName(_name);
-    lhs._frameLastEvaluated = -1;
-    lhs._uuid     = QUuid::createUuid();
+    lhs.m_name     = Node::uniqueName(m_name);
+    lhs.m_frameLastEvaluated = -1;
+    lhs.m_uuid     = QUuid::createUuid();
 
     // Copy parameter values and connections.
-    // If connections are within a group that is being
-    // copied together, the caller (e.g. NodeFactory::duplicate)
-    // handles making the appropriate reconnections.
-    foreach (ParamBase* lhsParam, lhs._paramList) {
+    // If connections are within a group that is being copied together,
+    // the caller (e.g. NodeFactory::duplicate) handles making the appropriate
+    // reconnections.
+    foreach (ParamBase* lhsParam, lhs.m_paramList) {
         ParamBase* rhsParam = getParamByName(lhsParam->getName());
         lhsParam->copyValueAndConnection(rhsParam);
     }
@@ -92,7 +89,7 @@ void Node::loadFile(QString filename) {Q_UNUSED(filename)}
 
 bool Node::nameIsUnique(QString name)
 {
-    foreach (Node* node, _allNodes) {
+    foreach (Node* node, m_allNodes) {
         if (name == node->getName())
             return false;
     }
@@ -122,7 +119,7 @@ QString Node::uniqueName(QString name)
 
 Node::node_t Node::getType()
 {
-    return _type;
+    return m_type;
 }
 
 void Node::evalAllInputs()
@@ -142,10 +139,10 @@ bool Node::evaluatedThisFrame()
     on this frame, and therefore shouldn't be evaluted again.
     */
     int frame =  Cupid::getCurrentFrame();
-    if (frame == _frameLastEvaluated)
+    if (frame == m_frameLastEvaluated)
         return true;
 
-    _frameLastEvaluated = frame;
+    m_frameLastEvaluated = frame;
     return false;
 }
 
@@ -166,11 +163,11 @@ void Node::writeToJSONObj(QJsonObject &json) const
 
     json["name"] = getName();
     // by "classname", I mean the name used as used in the NodeFactory registry.
-    json["classname"] = _className;
-    json["uuid"] = _uuid.toString();
+    json["classname"] = m_className;
+    json["uuid"] = m_uuid.toString();
 
     QJsonArray paramJsonArray;
-    foreach (const ParamBase *param, _paramList) {
+    foreach (const ParamBase *param, m_paramList) {
          QJsonObject paramJ;
          param->writeToJSONObj(paramJ);
          paramJsonArray.append(paramJ);
@@ -181,14 +178,13 @@ void Node::writeToJSONObj(QJsonObject &json) const
     Cupid::Singleton()->getGraphWidget()->writeNodeUiToJSONObj(this, json);
 }
 
-// getParamByName()
 ParamBase *Node::getParamByName(QString paramname)
 {
 /* Utility function that's used when reading a file from disk,
  * and when matching parameters during duplication.
  */
-    if (_paramDict.contains(paramname))
-        return _paramDict[paramname];
+    if (m_paramDict.contains(paramname))
+        return m_paramDict[paramname];
     return nullptr;
     // ErrorHandling
 }

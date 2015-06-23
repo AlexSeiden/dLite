@@ -1,6 +1,6 @@
+#include <QDebug>
 #include "RandomNode.h"
 #include "NodeFactory.h"
-#include <QDebug>
 
 // ------------------------------------------------------------------------------
 //  RandomFloat
@@ -8,7 +8,7 @@
 RandomFloat::RandomFloat()
 {
     setName("RandomFloat");
-    _type = FLOAT;
+    m_type = FLOAT;
 
     // Declare params.
     addParam<float>("out", 0.0, true);
@@ -70,7 +70,7 @@ RandomFloat* RandomFloat::clone()
 RandomInt::RandomInt()
 {
     setName(QString("RandomInt%1").arg(nodeCount()));
-    _type = INT;
+    m_type = INT;
 
     // Declare params.
     addParam<float>("out", 0.0, true);
@@ -136,7 +136,7 @@ RandomInt* RandomInt::clone()
 SequenceInt::SequenceInt()
 {
     setName(QString("SequenceInt%1").arg(nodeCount()));
-    _type = INT;
+    m_type = INT;
 
     // Declare params.
     addParam<int>("out", 0, true);
@@ -204,7 +204,7 @@ SequenceInt* SequenceInt::clone()
 IntToFloat::IntToFloat()
 {
     setName(QString("IntToFloat%1").arg(nodeCount()));
-    _type = INT;
+    m_type = INT;
 
     // Declare params.
     addParam<float>("out", 0., true);
@@ -236,6 +236,7 @@ IntToFloat* IntToFloat::clone()
     cloneHelper(*lhs);
     return lhs;
 }
+
 static Registrar<RandomFloat>   registrar1("RandomFloat",   Node::FLOAT);
 static Registrar<RandomInt>     registrar2("RandomInt",     Node::INT);
 static Registrar<SequenceInt>   registrar3("SequenceInt",   Node::INT);

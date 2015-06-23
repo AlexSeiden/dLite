@@ -25,7 +25,7 @@ public:
     void setHasLights(int x, int y, bool status);
 
     void paintEvent(QPaintEvent *event);
-    // We need these when implementing path & region selection
+    // We need these when for path & region selection
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);

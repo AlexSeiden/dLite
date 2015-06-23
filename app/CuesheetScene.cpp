@@ -9,8 +9,8 @@
 
 CuesheetScene::CuesheetScene(QObject *parent) :
     QGraphicsScene(parent),
-    _line(nullptr),
-    _isConnecting(false)
+    m_line(nullptr),
+    m_isConnecting(false)
 {
 }
 
@@ -18,19 +18,19 @@ CuesheetScene::CuesheetScene(QObject *parent) :
 // Overrides
 void CuesheetScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    if (_isConnecting) {
-        startLine(mouseEvent, _startSocket);
+    if (m_isConnecting) {
+        startLine(mouseEvent, m_startSocket);
     }
     QGraphicsScene::mousePressEvent(mouseEvent);
 }
 
 void CuesheetScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    if (_isConnecting && _line) {
+    if (m_isConnecting && m_line) {
         // If we are in the middle of making a connection, update the
         // line position
-        QLineF newLine(_line->line().p1(), mouseEvent->scenePos());
-        _line->setLine(newLine);
+        QLineF newLine(m_line->line().p1(), mouseEvent->scenePos());
+        m_line->setLine(newLine);
         // need "update()" call here??
     } else {
         QGraphicsScene::mouseMoveEvent(mouseEvent);
@@ -44,16 +44,16 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
     // ErrorHandling:  If only one of "_isConnecting" and "_line" are true, then
     // we have some internal inconsistancy.
-    if (_isConnecting && _line) {
+    if (m_isConnecting && m_line) {
         // Find the QGraphicsItems that's underneath the release position.
         QList<QGraphicsItem *> endItems = items(mouseEvent->scenePos());
         QGraphicsItem *targetItem = findFirstReleventItem(endItems);
 
         // Delete the temporary line we've been dragging out,
         // because soon we'll replace it with the real connector.
-        removeItem(_line);
+        removeItem(m_line);
 //        delete _line;  XXX this seems to cause crashes--but is it now leaking mem?
-        _line = nullptr;
+        m_line = nullptr;
 
         if (targetItem) {
             // The target item could be a socket, param, or node.
@@ -66,12 +66,12 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 // been verified as being compatable:  i.e., one's an input, the
                 // other an output; they have the same type; etc.  This is done
                 // when findFirstReleventItem() calls isConnectableTo()
-                if (_startSocket->getParam()->isOutput()) {
-                    server = _startSocket;
+                if (m_startSocket->getParam()->isOutput()) {
+                    server = m_startSocket;
                     client = targetSocket;
                 } else {
                     server = targetSocket;
-                    client = _startSocket;
+                    client = m_startSocket;
                 }
 
                 // If this client already has a connection, we need to delete it's
@@ -90,7 +90,7 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         }
     }
 
-    _line = nullptr;
+    m_line = nullptr;
     setConnecting(false);
     setStartPoint(QPointF());
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
@@ -101,7 +101,7 @@ QGraphicsItem *CuesheetScene::findFirstReleventItem(QList<QGraphicsItem *> &endI
     QGraphicsItem *out = nullptr;
     foreach (out, endItems) {
         // Don't want to hit the line we're drawing
-        if (out == _line)
+        if (out == m_line)
             continue;
 
         // Ignore any connectors that we hit
@@ -109,7 +109,7 @@ QGraphicsItem *CuesheetScene::findFirstReleventItem(QList<QGraphicsItem *> &endI
             continue;
 
         // Can't connect to ourselves
-        if (out == dynamic_cast<QGraphicsItem *>(_startSocket))
+        if (out == dynamic_cast<QGraphicsItem *>(m_startSocket))
             // Return nullptr rather than continue, because we've actually
             // hit something--ourselves--that's invalid.  We could check to see
             // if there's a *valid* hit behind us, but that's probably more confusing
@@ -121,7 +121,7 @@ QGraphicsItem *CuesheetScene::findFirstReleventItem(QList<QGraphicsItem *> &endI
         if (! targetSocket)
             return nullptr;
 
-        if (! _startSocket->getParam()->isConnectableTo(targetSocket->getParam()))
+        if (! m_startSocket->getParam()->isConnectableTo(targetSocket->getParam()))
             // Same return logic as above
             return nullptr;
 
@@ -136,12 +136,12 @@ QGraphicsItem *CuesheetScene::findFirstReleventItem(QList<QGraphicsItem *> &endI
 
 void CuesheetScene::startLine(QGraphicsSceneMouseEvent *mouseEvent, SocketItem *srcItem) {
     setConnecting();
-    _startSocket = srcItem;
-    _startPoint = mouseEvent->scenePos();
-    _line = new QGraphicsLineItem(QLineF(_startPoint, _startPoint));
+    m_startSocket = srcItem;
+    m_startPoint = mouseEvent->scenePos();
+    m_line = new QGraphicsLineItem(QLineF(m_startPoint, m_startPoint));
     // TODO width property
-    _line->setPen(QPen(guisettings->m_connectorColor, 2));
-    addItem(_line);
+    m_line->setPen(QPen(guisettings->m_connectorColor, 2));
+    addItem(m_line);
 }
 
 // ------------------------------------------------------------------------------

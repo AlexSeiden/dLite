@@ -24,18 +24,18 @@ public:
 
     void        addCue(Cue *cue);
     void        removeCue(Cue *cue);
-    int         getNumCues() const    {return _cues.size();}
+    int         getNumCues() const    {return m_cues.size();}
     void        fireLight(int x, int y, Firing *f);
 
     bool        hasPixel(int x, int y);
     Lightcolor  getPixel(int x, int y);
     QColor      getQColor(int x, int y);
 
-    int         getXsize() const {return _xsize;}
-    int         getYsize() const {return _ysize;}
-    int         getFrame() const {return _frame;}
+    int         getXsize() const {return m_xsize;}
+    int         getYsize() const {return m_ysize;}
+    int         getFrame() const {return m_frame;}
 
-    void        setView(Dancefloorwidget *dfwidget) { _dfWidget = dfwidget;}
+    void        setView(Dancefloorwidget *dfwidget) { m_dfWidget = dfwidget;}
     void        printLayout();
 
 public slots:
@@ -45,22 +45,22 @@ public slots:
     void setHardwareStatus(bool status);
 
 protected:
-    int                 _xsize, _ysize;
-    std::vector<Light>  _lights;
-    std::vector<Cue *>  _cues;
+    int                 m_xsize, m_ysize;
+    std::vector<Light>  m_lights;
+    std::vector<Cue *>  m_cues;
 
-    int                 _frame;
-    QTime               _timeSinceLastUpdate;   // Used for monitoring responsiveness, not cueing.
+    int                 m_frame;
+    QTime               m_timeSinceLastUpdate;   // Used for monitoring responsiveness, not cueing.
 
-    Dancefloorwidget    *_dfWidget;
-    Device              _device;
+    Dancefloorwidget    *m_dfWidget;
+    Device              m_device;
 
 
 #ifdef INLINE
-    int _getIndex(int x, int y) {return xsize*y + x;}
+    int getIndex(int x, int y) {return m_xsize*y + x;}
 #else
     // This one has range checking
-    int _getIndex(int x, int y);
+    int getIndex(int x, int y);
 #endif
 };
 

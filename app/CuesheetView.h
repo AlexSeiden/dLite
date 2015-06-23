@@ -19,7 +19,7 @@ class GraphicsView : public QGraphicsView
 {
     Q_OBJECT
 public:
-    GraphicsView(CuesheetView *v) : QGraphicsView(), view(v) { }
+    GraphicsView(CuesheetView *v) : QGraphicsView(), m_view(v) { }
 
 protected:
 #ifndef QT_NO_WHEELEVENT
@@ -27,7 +27,7 @@ protected:
 #endif
 
 private:
-    CuesheetView *view;
+    CuesheetView*   m_view;
 };
 
 class CuesheetView : public QFrame
@@ -53,10 +53,10 @@ signals:
     void newCuesheet();
 
 private:
-    GraphicsView*   _graphicsView;
-    QToolButton*    _resetButton;
-    QToolButton*    _newcueButton;
-    QSlider*        _zoomSlider;
+    GraphicsView*   m_graphicsView;
+    QToolButton*    m_resetButton;
+    QToolButton*    m_newcueButton;
+    QSlider*        m_zoomSlider;
 };
 
 #endif // CUESHEETVIEW_H

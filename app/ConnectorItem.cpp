@@ -15,18 +15,18 @@
 ConnectorItem::ConnectorItem(SocketItem *serverSocket, SocketItem *clientSocket,
                              QGraphicsItem *parent) :
     QGraphicsObject(parent),
-    _serverSocket(serverSocket),
-    _clientSocket(clientSocket),
-    _path(nullptr)
+    m_serverSocket(serverSocket),
+    m_clientSocket(clientSocket),
+    m_path(nullptr)
 {
     setZValue(1000.0);  // TODO make connector z a pref?
     updatePath();
 
     setFlags(ItemIsSelectable);
 
-    CHECKED_CONNECT(_serverSocket->parentObject()->parentObject(),
+    CHECKED_CONNECT(m_serverSocket->parentObject()->parentObject(),
                     SIGNAL(nodeMovedEventSignal()), this, SLOT(gotMoved()));
-    CHECKED_CONNECT(_clientSocket->parentObject()->parentObject(),
+    CHECKED_CONNECT(m_clientSocket->parentObject()->parentObject(),
                     SIGNAL(nodeMovedEventSignal()), this, SLOT(gotMoved()));
 }
 
@@ -44,8 +44,8 @@ void ConnectorItem::gotMoved()
 
 QRectF ConnectorItem::boundingRect() const
 {
-    QPointF nStart = _serverSocket->socketPos();
-    QPointF nEnd = _clientSocket->socketPos();
+    QPointF nStart = m_serverSocket->socketPos();
+    QPointF nEnd = m_clientSocket->socketPos();
 
     // Compute two rects when dragging.  The first is the rect
     // that connects _pStart & _pEnd -- the PREVIOUS positions.
@@ -55,19 +55,19 @@ QRectF ConnectorItem::boundingRect() const
     // lack of a "prepareGeometryChange()"?
 
 
-    float leftprev = qMin(_pStart.x(), _pEnd.x()-100);
+    float leftprev = qMin(m_pStart.x(), m_pEnd.x()-100);
     float leftnext = qMin( nStart.x(),  nEnd.x()-100);
     float left     = qMin( leftprev,    leftnext);
 
-    float rightprev = qMax(_pStart.x()+100, _pEnd.x());
+    float rightprev = qMax(m_pStart.x()+100, m_pEnd.x());
     float rightnext = qMax( nStart.x()+100,  nEnd.x());
     float right     = qMax( rightprev,       rightnext);
 
-    float topprev = qMin(_pStart.y(), _pEnd.y());
+    float topprev = qMin(m_pStart.y(), m_pEnd.y());
     float topnext = qMin( nStart.y(),  nEnd.y());
     float top     = qMin( topprev,    topnext);
 
-    float bottomprev = qMax(_pStart.y(), _pEnd.y());
+    float bottomprev = qMax(m_pStart.y(), m_pEnd.y());
     float bottomnext = qMax( nStart.y(),  nEnd.y());
     float bottom     = qMax( bottomprev,  bottomnext);
 
@@ -81,26 +81,26 @@ QRectF ConnectorItem::boundingRect() const
 
 QPainterPath ConnectorItem::shape() const
 {
-    return(*_path);
+    return(*m_path);
 }
 
 void ConnectorItem::updatePath()
 {
     // Makes a new path when one of the ends has been moved.
 
-    _pStart = _serverSocket->socketPos();
-    _pEnd   = _clientSocket->socketPos();
+    m_pStart = m_serverSocket->socketPos();
+    m_pEnd   = m_clientSocket->socketPos();
 
-    qreal deltaX = fabs(_pEnd.x() - _pStart.x());
+    qreal deltaX = fabs(m_pEnd.x() - m_pStart.x());
     qreal tangent = .5 * deltaX; //hardw
 
     prepareGeometryChange();
-    if (_path)
-        delete _path;
+    if (m_path)
+        delete m_path;
 
-    _path = new QPainterPath();
-    _path->moveTo(_pStart);
-    _path->cubicTo(_pStart+QPointF(tangent,0.), _pEnd+QPointF(-tangent,0.), _pEnd);
+    m_path = new QPainterPath();
+    m_path->moveTo(m_pStart);
+    m_path->cubicTo(m_pStart+QPointF(tangent,0.), m_pEnd+QPointF(-tangent,0.), m_pEnd);
 }
 
 void ConnectorItem::paint(QPainter *painter,
@@ -116,12 +116,12 @@ void ConnectorItem::paint(QPainter *painter,
     else
         painter->setPen(guisettings->m_connectorPen);
 
-    painter->drawPath(*_path);
+    painter->drawPath(*m_path);
 
     // TODO set ellipse pen brush & size
     painter->setBrush(guisettings->m_connectorBrush);
-    painter->drawEllipse(_pStart, guisettings->m_connectorEndSize, guisettings->m_connectorEndSize);
-    painter->drawEllipse(_pEnd,   guisettings->m_connectorEndSize, guisettings->m_connectorEndSize);
+    painter->drawEllipse(m_pStart, guisettings->m_connectorEndSize, guisettings->m_connectorEndSize);
+    painter->drawEllipse(m_pEnd,   guisettings->m_connectorEndSize, guisettings->m_connectorEndSize);
 
     painter->restore();
 }

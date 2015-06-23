@@ -25,57 +25,57 @@ class ParamBase
 {
 public:
     ParamBase() :
-        _provider(nullptr),
-        _connectedParam(nullptr),
-        _isOutput(false),
-        _isConnectable(true),
-        _type(typeid(this)),
-        _uuid(QUuid::createUuid()),
-        _useminmax(false),
-        _minVal(0.),
-        _maxVal(1.)
+        m_provider(nullptr),
+        m_connectedParam(nullptr),
+        m_isOutput(false),
+        m_isConnectable(true),
+        m_type(typeid(this)),
+        m_uuid(QUuid::createUuid()),
+        m_useminmax(false),
+        m_minVal(0.),
+        m_maxVal(1.)
     { }
     virtual ~ParamBase() { }
 
-    QString     getName() const                {return _name;}
-    void        setName(QString name)          {_name = name;}
-    bool        isOutput() const               {return _isOutput;}
-    bool        isConnectable() const          {return _isConnectable;}
-    void        setOutput(bool status)         {_isOutput = status;}
-    void        setConnectable(bool status)    {_isConnectable = status;}
-    ParamBase*  connectedParam()               {return _connectedParam;}
-    QUuid&      getUuid()                      {return _uuid;}
+    QString     getName() const                {return m_name;}
+    void        setName(QString name)          {m_name = name;}
+    bool        isOutput() const               {return m_isOutput;}
+    bool        isConnectable() const          {return m_isConnectable;}
+    void        setOutput(bool status)         {m_isOutput = status;}
+    void        setConnectable(bool status)    {m_isConnectable = status;}
+    ParamBase*  connectedParam()               {return m_connectedParam;}
+    QUuid&      getUuid()                      {return m_uuid;}
 
     bool        isConnectableTo(ParamBase *otherParam);
     void        connectTo(ParamBase *server);
     void        copyValueAndConnection(ParamBase *rhs);
-    void        disconnect() {_connectedParam = nullptr; _provider = nullptr;}
+    void        disconnect() {m_connectedParam = nullptr; m_provider = nullptr;}
 
     // TODO range only works for floats & ints.
     void        setRange(bool userange, double min=0.0, double max=1.0, double step=1.0);
 
     virtual void eval() {
-        if (_provider)
-            _provider();
+        if (m_provider)
+            m_provider();
         // GROSS.  it evaluates it, but now it's stuck in the providers "output" variable.
     }
 
-    virtual const std::type_info & getType() {return _type;}
+    virtual const std::type_info & getType() {return m_type;}
 
     std::function<void()> getProvider();
 
     // This applies to input parameters only: it sets the provider "function"
     // that is excuted to compute the value of this parameter.
-    void setProvider(std::function<void()> provider) {_provider = provider;}
+    void setProvider(std::function<void()> provider) {m_provider = provider;}
 
     // Returns a pointer of the Node that this is a parameter for.
-    Node *  getParentNode() {return _parentNode;}
-    void    setParentNode(Node *parent) {_parentNode = parent;}
+    Node *  getParentNode() {return m_parentNode;}
+    void    setParentNode(Node *parent) {m_parentNode = parent;}
 
     // Valid only for input nodes
     Node *getServer() {
-        if (_connectedParam)
-            return _connectedParam->getParentNode();
+        if (m_connectedParam)
+            return m_connectedParam->getParentNode();
         return nullptr;
     }
 
@@ -101,20 +101,20 @@ public:
     QVariant    _qvOutput;
 
 protected:
-    std::function<void()>   _provider;
-    ParamBase *             _connectedParam;
-    Node *                  _parentNode;      // The node that this param is a part of.
+    std::function<void()>   m_provider;
+    ParamBase *             m_connectedParam;
+    Node *                  m_parentNode;      // The node that this param is a part of.
 
-    QString                 _name;
-    bool                    _isOutput;
-    bool                    _isConnectable;
-    const std::type_info &  _type;
-    /*const*/ QUuid         _uuid; // Can't be const bc of assignment during file read
+    QString                 m_name;
+    bool                    m_isOutput;
+    bool                    m_isConnectable;
+    const std::type_info &  m_type;
+    /*const*/ QUuid         m_uuid; // Can't be const bc of assignment during file read
 
     // GROSS ! only used for ranges on numeric types.  And then, when using int types,
     // the values are cast.
-    bool                    _useminmax;
-    float                   _minVal, _maxVal, _stepVal;
+    bool                    m_useminmax;
+    float                   m_minVal, m_maxVal, _stepVal;
 
     friend class NodeFactory;
 };
@@ -135,7 +135,7 @@ class Param : public ParamBase
 {
 public:
     Param(PARAMT value=PARAMT()) :
-        _value(value)
+        m_value(value)
         {}
 
     virtual ~Param() {}
@@ -143,23 +143,23 @@ public:
     virtual void getValue(PARAMT &value)  {
         // All values are returned by reference, even for fundamental types like ints and
         // floats. This is for generality with all types, such as Lightcolor & regions.
-        value = _value;
+        value = m_value;
     }
 
     virtual void eval() {
-        if (_provider) {
-            _provider();
-            _value = _connectedParam->_qvOutput.value<PARAMT>();
+        if (m_provider) {
+            m_provider();
+            m_value = m_connectedParam->_qvOutput.value<PARAMT>();
         }
     }
 
     // GROSS using qvOutput a lot when not needed.
-    void setValue(const PARAMT &value) {_value=value; _qvOutput.setValue(value);}
+    void setValue(const PARAMT &value) {m_value=value; _qvOutput.setValue(value);}
 
     // ??? do we need this?  Would it be better just to assign a _type field?
     virtual const std::type_info & getType() {return typeid(this);}
 
-    PARAMT _value;
+    PARAMT m_value;
 
     // Copy assignment operator
 #if 0

@@ -1,6 +1,7 @@
-#include "lightcolor.h"
 #include <QDebug>
 #include <QRgb>
+
+#include "lightcolor.h"
 
 // -----------------------------------------------------------------------------
 //  Lightcolor
@@ -13,13 +14,16 @@ Lightcolor::Lightcolor(int r, int g, int b) : m_r(r), m_g(g), m_b(b) { }
 
 Lightcolor::Lightcolor(int val) : m_r(val), m_g(val), m_b(val) { }
 
-Lightcolor::Lightcolor(double r, double g, double b) : m_r(r*255), m_g(g*255), m_b(b*255) { }
+Lightcolor::Lightcolor(double r, double g, double b) :
+    m_r(r*255), m_g(g*255), m_b(b*255) { }
 
 Lightcolor::Lightcolor(double val) : m_r(val*255), m_g(val*255), m_b(val*255) { }
 
-Lightcolor::Lightcolor(const QRgb &qrgb) : m_r(qRed(qrgb)), m_g(qGreen(qrgb)), m_b(qBlue(qrgb)) { }
+Lightcolor::Lightcolor(const QRgb &qrgb) :
+    m_r(qRed(qrgb)), m_g(qGreen(qrgb)), m_b(qBlue(qrgb)) { }
 
-Lightcolor::Lightcolor(const QColor &qc) : m_r(qc.red()), m_g(qc.green()), m_b(qc.blue()) { }
+Lightcolor::Lightcolor(const QColor &qc) :
+    m_r(qc.red()), m_g(qc.green()), m_b(qc.blue()) { }
 
 // Copy constructor
 Lightcolor::Lightcolor(const Lightcolor &rhs)
@@ -36,7 +40,6 @@ QColor Lightcolor::toQColor() {
 
     return QColor(r,g,b);
 }
-
 
 // Assignment operator
 Lightcolor& Lightcolor::operator=(const Lightcolor& rhs) // copy assignment
@@ -126,7 +129,7 @@ void Lightcolor::setRGB(unsigned char *rgb)
 // Light
 
 Light::Light() :
-    _lightID(0),
-    _value(Lightcolor())
+    m_lightID(0),
+    m_value(Lightcolor())
 { }
 

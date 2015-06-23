@@ -159,14 +159,14 @@ bool checkBeat(int thisSample, int lastSample, std::vector<int> beatvec)
 TriggerEvery::TriggerEvery()
 {
     setName("TriggerEvery");
-    _type = BEAT;
+    m_type = BEAT;
 
     addParam<bool>("out", true, true);
     addParam<int>("interval", 500);
 
     // Set refresh to current time, so when we make a new one in the middle
     // of playing, it won't have to catch up.
-    _nextRefresh = Cupid::getPlaybackPositionUSecs();
+    m_nextRefresh = Cupid::getPlaybackPositionUSecs();
 }
 
 void TriggerEvery::operator()()
@@ -180,11 +180,11 @@ void TriggerEvery::operator()()
 
     // XXX this breaks if we move the audio playhead back in time.
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
-    if (mSecs > _nextRefresh) {
+    if (mSecs > m_nextRefresh) {
        out = true;
        int interval;
        getValue("interval", interval);
-       _nextRefresh += interval;
+       m_nextRefresh += interval;
     }
 
     setValue("out", out);
@@ -204,7 +204,7 @@ TriggerEvery* TriggerEvery::clone()
 Multiply::Multiply()
 {
     setName("Multiply");
-    _type = BEAT;
+    m_type = BEAT;
 
     addParam<bool>("out", true, true);
     addParam<int>("multiple", 2, false, false);
@@ -212,7 +212,7 @@ Multiply::Multiply()
 
     // Set refresh to current time, so when we make a new one in the middle
     // of playing, it won't have to catch up.
-    _nextRefresh = Cupid::getPlaybackPositionUSecs() / 1000;
+    m_nextRefresh = Cupid::getPlaybackPositionUSecs() / 1000;
 }
 
 void Multiply::operator()()
@@ -236,18 +236,18 @@ void Multiply::operator()()
     // Input trigger
     if (input) {
         out = true;
-        if (_lastInputBeat != 0) {
+        if (m_lastInputBeat != 0) {
 
-            _delta = mSecs - _lastInputBeat;
-            _delta /= multiple;
-            _nextRefresh = mSecs + _delta;
-            _lastInputBeat = mSecs;
+            m_delta = mSecs - m_lastInputBeat;
+            m_delta /= multiple;
+            m_nextRefresh = mSecs + m_delta;
+            m_lastInputBeat = mSecs;
         }
         goto done;
     }
 
     // Interpolated trigger
-    if (mSecs > _nextRefresh) {
+    if (mSecs > m_nextRefresh) {
        out = true;
 
        // Find new refresh value
@@ -260,7 +260,7 @@ void Multiply::operator()()
        int delta = nextInputRefresh - _nextRefresh;
        delta /= multiple;
 #endif
-       _nextRefresh += _delta;
+       m_nextRefresh += m_delta;
     }
 
     done:
@@ -305,7 +305,7 @@ Multiply* Multiply::clone()
 NodeOnset::NodeOnset()
 {
     setName("NodeOnset");
-    _type = BEAT;
+    m_type = BEAT;
 
     addParam<bool>("out", true, true);
 
@@ -328,9 +328,9 @@ void NodeOnset::loadFile()
 
 void NodeOnset::loadFile(QString filename)
 {
-    _nextIndex = 0;
-    _nextRefresh = 0;
-    _onsets.clear();
+    m_nextIndex = 0;
+    m_nextRefresh = 0;
+    m_onsets.clear();
     // Onset files are csv.  Each line has the sample number of the next beat.
     std::ifstream filestream;
     filestream.open(filename.toStdString(), std::ios::in);
@@ -342,10 +342,10 @@ void NodeOnset::loadFile(QString filename)
     std::string line;
     while ( getline (filestream,line) ) {
         int value = std::atoi(line.c_str());        // ErrorHandling
-        _onsets.push_back(value);
+        m_onsets.push_back(value);
     }
     filestream.close();
-    convertSamplesToMS(_onsets);
+    convertSamplesToMS(m_onsets);
 }
 
 void NodeOnset::operator()()
@@ -356,8 +356,8 @@ void NodeOnset::operator()()
     evalAllInputs();
 
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
-    bool out = checkBeat(mSecs, _lastSample, _onsets);
-    _lastSample = mSecs;
+    bool out = checkBeat(mSecs, m_lastSample, m_onsets);
+    m_lastSample = mSecs;
 
     setValue("out", out);
 }
@@ -395,7 +395,7 @@ Our bar files have names like:
 NodeBar::NodeBar()
 {
     setName("NodeBar");
-    _type = BEAT;
+    m_type = BEAT;
 
     addParam<bool>("out", true, true);
     loadFile();  // ErrorHandling
@@ -415,9 +415,9 @@ void NodeBar::loadFile()
 
 void NodeBar::loadFile(QString filename)
 {
-    _nextIndex = 0;
-    _nextRefresh = 0;
-    _bars.clear();
+    m_nextIndex = 0;
+    m_nextRefresh = 0;
+    m_bars.clear();
 
     std::ifstream filestream;
     filestream.open(filename.toStdString(), std::ios::in);
@@ -432,10 +432,10 @@ void NodeBar::loadFile(QString filename)
         getline(ss, token, ',');
 
         int value = std::atoi(token.c_str());
-        _bars.push_back(value);
+        m_bars.push_back(value);
     }
     filestream.close();
-    convertSamplesToMS(_bars);
+    convertSamplesToMS(m_bars);
 }
 
 void NodeBar::operator()() {
@@ -449,9 +449,9 @@ void NodeBar::operator()() {
 
     // XXX this breaks if we move the audio playhead back in time.
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
-    if (mSecs > _nextRefresh) {
+    if (mSecs > m_nextRefresh) {
        out = true;
-       _nextRefresh = _bars[++_nextIndex];
+       m_nextRefresh = m_bars[++m_nextIndex];
     }
 
     setValue("out", out);
@@ -492,7 +492,7 @@ Our barbeat files have names like:
 NodeBarBeat::NodeBarBeat()
 {
     setName("NodeBarBeat");
-    _type = BEAT;
+    m_type = BEAT;
 
     addParam<bool>("Bar Trigger", true, true);
     addParam<bool>("Beat Trigger", true, true);
@@ -518,8 +518,8 @@ void NodeBarBeat::loadFile()
 
 void NodeBarBeat::loadFile(QString filename)
 {
-    _beats.clear();
-    _beatnumber.clear();
+    m_beats.clear();
+    m_beatnumber.clear();
 
     std::ifstream filestream;
     filestream.open(filename.toStdString(), std::ios::in);
@@ -536,18 +536,18 @@ void NodeBarBeat::loadFile(QString filename)
         std::string token;
         getline(ss, token, ',');
         int sampleTime = std::atoi(token.c_str());
-        _beats.push_back(sampleTime);
+        m_beats.push_back(sampleTime);
 
         getline(ss, token, ',');
         int beatNumber = std::atoi(token.c_str());
-        _beatnumber.push_back(beatNumber);
+        m_beatnumber.push_back(beatNumber);
 
         if (beatNumber == 1)
             barNumber++;
-        _barnumber.push_back(barNumber);
+        m_barnumber.push_back(barNumber);
     }
     filestream.close();
-    convertSamplesToMS(_beats);
+    convertSamplesToMS(m_beats);
 }
 
 void NodeBarBeat::operator()() {
@@ -562,32 +562,32 @@ void NodeBarBeat::operator()() {
 
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
 #if 1
-    int oldbi = _beatIndex;
-    _beatIndex = findBeatIndexForSample(mSecs, _beats, _beatIndex);
-    beatTrigger = checkBeatIndex(_beatIndex, _lastSample, _beats);
+    int oldbi = m_beatIndex;
+    m_beatIndex = findBeatIndexForSample(mSecs, m_beats, m_beatIndex);
+    beatTrigger = checkBeatIndex(m_beatIndex, m_lastSample, m_beats);
 
 //    qDebug() << _lastSample << mSecs << oldbi << _beatIndex << beatTrigger;
 
-    _lastSample = mSecs;
+    m_lastSample = mSecs;
 #else
     if ((mSecs - _lastSample)> 300) {
         beatTrigger = true;
         _lastSample = mSecs;
     }
 #endif
-    int nextbeat = _beatIndex + 1;
+    int nextbeat = m_beatIndex + 1;
     float beatFrac = 1.0;
-    if (nextbeat < _beats.size())
-        beatFrac = (float(mSecs) - _beats[_beatIndex])/(float(_beats[nextbeat]) - _beats[_beatIndex]);
+    if (nextbeat < m_beats.size())
+        beatFrac = (float(mSecs) - m_beats[m_beatIndex])/(float(m_beats[nextbeat]) - m_beats[m_beatIndex]);
 
-    int barStart = findStartOfBar(_beatIndex);
-    int nextBarStart = findStartOfNextBar(_beatIndex);
+    int barStart = findStartOfBar(m_beatIndex);
+    int nextBarStart = findStartOfNextBar(m_beatIndex);
     float barFrac = (float(mSecs) - barStart)/(float(nextBarStart) - barStart);
 
     setValue("Beat Trigger", beatTrigger);
-    setValue("Bar Number", _barnumber[_beatIndex]);
-    setValue("Beat Number", _beatnumber[_beatIndex]);
-    if (beatTrigger && _beatnumber[_beatIndex] == 1)
+    setValue("Bar Number", m_barnumber[m_beatIndex]);
+    setValue("Beat Number", m_beatnumber[m_beatIndex]);
+    if (beatTrigger && m_beatnumber[m_beatIndex] == 1)
         barTrigger = true;
     setValue("Bar Trigger", barTrigger);
     setValue("Beat Frac", beatFrac);
@@ -598,23 +598,23 @@ int NodeBarBeat::findStartOfBar(int beatindex)
 {
     int index = beatindex;
     while (index >=0) {
-       if (_beatnumber[index] == 1)
+       if (m_beatnumber[index] == 1)
             break;
        index--;
     }
-    return _beats[index];
+    return m_beats[index];
 }
 
 int NodeBarBeat::findStartOfNextBar(int beatindex)
 {
-    int barnumber = _barnumber[beatindex];
+    int barnumber = m_barnumber[beatindex];
     int index = beatindex;
-    while (index < _beats.size()) {
-       if (_barnumber[index] != barnumber)
+    while (index < m_beats.size()) {
+       if (m_barnumber[index] != barnumber)
             break;
        index++;
     }
-    return _beats[index];
+    return m_beats[index];
 }
 
 NodeBarBeat* NodeBarBeat::clone()
@@ -653,7 +653,7 @@ Here's a complete segmention file:
 Segmentino::Segmentino()
 {
     setName("Segmentino");
-    _type = BEAT;
+    m_type = BEAT;
 
     addParam<int>("Segment Index", true, true);
 

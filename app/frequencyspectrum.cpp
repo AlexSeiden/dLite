@@ -59,8 +59,8 @@ void FrequencySpectrum::printSpectrum()
     const FrequencySpectrum::const_iterator end = this->end();
     for ( int index=0; i != end; ++i, ++index) {
         const FrequencySpectrum::Element e = *i;
-        qDebug() << "index"<<index << "freq" <<e.frequency << "amp" <<e.amplitude
-                 << "phase" <<e.phase << "clipped" << e.clipped;
+        qDebug() << "index"<<index << "freq" <<e.m_frequency << "amp" <<e.m_amplitude
+                 << "phase" <<e.m_phase << "clipped" << e.m_clipped;
 
     }
 }

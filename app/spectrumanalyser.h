@@ -43,21 +43,21 @@ private:
     void calculateWindow();
 
 private:
-    FFTRealWrapper*                             m_fft;
-    const int                                   m_numSamples;
-    WindowFunction                              m_windowFunction;
+    FFTRealWrapper*         m_fft;
+    const int               m_numSamples;
+    WindowFunction          m_windowFunction;
 
     typedef FFTRealFixLenParam::DataType DataType;
-    QVector<DataType>                           m_window;
+    QVector<DataType>       m_window;
 
-    QVector<DataType>                           m_input;
-    QVector<DataType>                           m_output;
+    QVector<DataType>       m_input;
+    QVector<DataType>       m_output;
 
-    FrequencySpectrum                           m_spectrum;
+    FrequencySpectrum       m_spectrum;
 
 
 #ifdef SPECTRUM_ANALYSER_SEPARATE_THREAD
-    QThread*                                    m_thread;
+    QThread*                m_thread;
 #endif
 };
 
@@ -74,9 +74,7 @@ public:
     ~SpectrumAnalyser();
 
 public:
-    /*
-     * Set the windowing function which is applied before calculating the FFT
-     */
+     // Set the windowing function which is applied before calculating the FFT
     void setWindowFunction(WindowFunction type);
 
     /*
@@ -93,9 +91,7 @@ public:
      */
     void calculate(const QByteArray &buffer, const QAudioFormat &format);
 
-    /*
-     * Check whether the object is ready to perform another calculation
-     */
+     // Check whether the object is ready to perform another calculation
     bool isReady() const;
 
     /*
@@ -107,7 +103,6 @@ public:
 
 signals:
     void spectrumChanged(const FrequencySpectrum &spectrum);
-    void dogsFuckedPope(int nDogs);
 
 private slots:
     void calculationComplete(const FrequencySpectrum &spectrum);

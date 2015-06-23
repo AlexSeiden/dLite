@@ -1,5 +1,5 @@
-#include "Firing.h"
 #include <QDebug>
+#include "Firing.h"
 
 // -----------------------------------------------------------------------------
 // Firing
@@ -17,54 +17,54 @@ bool noDecay(Firing *f) {
 }
 
 bool exponentialDecay(Firing *f) {
-    f->_color *= .9;
-    f->_alpha *= .9;
-    if (f->_alpha < .01)
+    f->m_color *= .9;
+    f->m_alpha *= .9;
+    if (f->m_alpha < .01)
         return false;
     return true;
 }
 
 Firing::Firing() :
-    _color(),
-    _alpha(0.0),
-    _compMode(SET),
-    _decayfunction(exponentialDecay)
+    m_color(),
+    m_alpha(0.0),
+    m_compMode(SET),
+    m_decayfunction(exponentialDecay)
 { }
 
-Firing::Firing(Lightcolor color, double alpha, compMode_t compmode, decayfunc_t decayfunc, Cue *cue) :
-    _color(color),
-    _alpha(alpha),
-    _compMode(compmode),
-    _decayfunction(decayfunc),
-    _cue(cue)
+Firing::Firing(Lightcolor color, double alpha, compMode_t compmode,
+               decayfunc_t decayfunc, Cue *cue) :
+    m_color(color),
+    m_alpha(alpha),
+    m_compMode(compmode),
+    m_decayfunction(decayfunc),
+    m_cue(cue)
 { }
 
 void Firing::setDecayMode(decayMode_t dmode) // GROSS
 {
     if (dmode == IMMEDIATE)
-        _decayfunction = instantDecay;
+        m_decayfunction = instantDecay;
     else if (dmode == FOREVER)
-        _decayfunction = noDecay;
+        m_decayfunction = noDecay;
     else if (dmode == EXPONENTIAL)
-        _decayfunction = exponentialDecay;      // TODO allow setting decay params
+        m_decayfunction = exponentialDecay;      // TODO allow setting decay params
     else
         qDebug() << "setDecay called with bad arg " << dmode;
 }
 
 bool Firing::evaluate() {
     bool keep = true;
-    if (_decayfunction)
-        keep = _decayfunction(this);
+    if (m_decayfunction)
+        keep = m_decayfunction(this);
 
     return keep;
-    // When "keep" is false, this firing is removed from
-    // the list.
+    // When "keep" is false, this firing is removed from the list.
 }
 
 Lightcolor Firing::compOver(const Lightcolor &lightcolor) {
     Lightcolor out = lightcolor;
-    out *= (1.0 - _alpha);
-    out += _color;
+    out *= (1.0 - m_alpha);
+    out += m_color;
     // TODO compute new alpha
     return out;
 }
@@ -72,7 +72,7 @@ Lightcolor Firing::compOver(const Lightcolor &lightcolor) {
 
 Lightcolor Firing::compAdd(const Lightcolor &lightcolor) {
     Lightcolor out = lightcolor;
-    out += _color;
+    out += m_color;
     // TODO compute new alpha
     return out;
 }
@@ -80,7 +80,7 @@ Lightcolor Firing::compAdd(const Lightcolor &lightcolor) {
 Lightcolor Firing::compSet(const Lightcolor &lightcolor) {
     Q_UNUSED(lightcolor)
 
-    Lightcolor out = _color;
+    Lightcolor out = m_color;
     // TODO compute new alpha
     return out;
 }

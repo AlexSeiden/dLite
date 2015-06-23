@@ -41,9 +41,7 @@ struct CombinedHeader
 WavFile::WavFile(QObject *parent)
     : QFile(parent)
     , m_headerLength(0)
-{
-
-}
+{  }
 
 bool WavFile::open(const QString &fileName)
 {
@@ -59,14 +57,15 @@ const QAudioFormat &WavFile::fileFormat() const
 
 qint64 WavFile::headerLength() const
 {
-return m_headerLength;
+    return m_headerLength;
 }
 
 bool WavFile::readHeader()
 {
     seek(0);
     CombinedHeader header;
-    bool result = read(reinterpret_cast<char *>(&header), sizeof(CombinedHeader)) == sizeof(CombinedHeader);
+    bool result = read(reinterpret_cast<char *>(&header),
+                       sizeof(CombinedHeader)) == sizeof(CombinedHeader);
     if (result) {
         if ((memcmp(&header.riff.descriptor.id, "RIFF", 4) == 0
             || memcmp(&header.riff.descriptor.id, "RIFX", 4) == 0)

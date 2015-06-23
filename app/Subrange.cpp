@@ -3,10 +3,10 @@
 #include <QDebug>
 
 Subrange::Subrange() :
-    _freqMin(100.0),
-    _freqMax(400.0),
-    _ampMin(0.2),
-    _ampMax(0.6)
+    m_freqMin(100.0),
+    m_freqMax(400.0),
+    m_ampMin(0.2),
+    m_ampMax(0.6)
 {
     // Register this type so we can emit to spectrograph.
     // ??? is there any problem with this happening more than once?
@@ -23,11 +23,11 @@ Subrange::~Subrange() { }
  */
 double Subrange::amplitudeWithinWindow(double amp)
 {
-    if (amp < _ampMin)
+    if (amp < m_ampMin)
         return 0.0;
-    if (amp > _ampMax)
+    if (amp > m_ampMax)
         return 1.0;
-    return ((amp-_ampMin)/(_ampMax-_ampMin));
+    return ((amp-m_ampMin)/(m_ampMax-m_ampMin));
 }
 
 /*
@@ -36,9 +36,9 @@ double Subrange::amplitudeWithinWindow(double amp)
  */
 bool Subrange::isFrequencyWithinWindow(double freq)
 {
-    if (freq < _freqMin)
+    if (freq < m_freqMin)
         return false;
-    if (freq > _freqMax)
+    if (freq > m_freqMax)
         return false;
     return true;
 }

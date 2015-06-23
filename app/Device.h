@@ -25,24 +25,24 @@ public:
     void setlight(int controllerIndex, int lightIndex, unsigned char *rgb);
     void send();
     void setActive(bool status = true);
-    bool isActive() {return _isActive;}
+    bool isActive() {return m_isActive;}
     bool connect();
 
 private:
     void turnOn();
     void turnOff();
 
-    bool    _isActive;
-    static const int IPPort = 6038;
+    bool    m_isActive;
+    static const int IP_PORT = 6038;
 
-    struct sockaddr_in addr0, addr1;
-    int sockfd;
+    struct sockaddr_in m_addr0, m_addr1;
+    int m_sockfd;
 
     // Color Kinetics protocol header
-    static unsigned char header[21];
+    static unsigned char COLOR_KINETICS_HEADER[21];
 
-    unsigned char dmx0[DMX_LEN];
-    unsigned char dmx1[DMX_LEN];
+    unsigned char m_dmx0[DMX_LEN];
+    unsigned char m_dmx1[DMX_LEN];
 };
 
 #endif // DEVICE_H
