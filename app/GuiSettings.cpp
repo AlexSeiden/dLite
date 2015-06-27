@@ -35,11 +35,22 @@ void GuiSettings::loadStyleSheet()
     qApp->processEvents(QEventLoop::AllEvents, 1000);
 
     // Derived
-    guisettings->m_socketOutlinePen     = QPen(guisettings->m_socketOutlineColor, 2, Qt::SolidLine);
-    guisettings->m_connectorPen         = QPen(QBrush(guisettings->m_connectorColor), 2.0, Qt::SolidLine);
-    guisettings->m_connectorPenSelected = QPen(QColor(200,40,40), 4, Qt::SolidLine);
-    guisettings->m_connectorBrush       = QBrush(guisettings->m_connectorCenterColor);
-    guisettings->m_PIfont.setLetterSpacing(QFont::PercentageSpacing, guisettings->m_PIletterspacing);
+    guisettings->m_socketOutlinePen =
+            QPen(guisettings->m_socketOutlineColor,
+                 guisettings->m_socketOutlineWidth,
+                 Qt::SolidLine);
+    guisettings->m_connectorPen         =
+            QPen(QBrush(guisettings->m_connectorColor),
+                 guisettings->m_connectorWidth,
+                 Qt::SolidLine);
+    guisettings->m_connectorPenSelected =
+            QPen(guisettings->m_connectorSelectedColor,
+                 guisettings->m_connectorSelectedWidth,
+                 Qt::SolidLine);
+    guisettings->m_connectorBrush       =
+            QBrush(guisettings->m_connectorCenterColor);
+    guisettings->m_PIfont.setLetterSpacing(QFont::PercentageSpacing,
+                                           guisettings->m_PIletterspacing);
 
     this->repaint();
     qApp->processEvents();

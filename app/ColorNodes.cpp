@@ -175,6 +175,7 @@ Palette* Palette::clone()
 
     return lhs;
 }
+
 #if 0
 // TODO palatte serialization
 void Palette::writeToJSONObj(QJsonObject &json) const

@@ -3,20 +3,21 @@
 MainWidget::MainWidget(QWidget *parent)
     :   QMainWindow(parent)
     ,   m_engine(new Engine(this))
-    ,   m_transport(new Transport(this))
-    ,   m_spectrograph(new Spectrograph(this))
+    ,   m_transport(NULL)
+    ,   m_spectrograph(NULL)
     ,   m_settingsDialog(new SettingsDialog(m_engine->interval(), this))
     ,   m_dancefloor(NULL)
     ,   m_cueLibView(NULL)
     ,   m_filename()
 {
+    Cupid::Singleton()->setEngine(m_engine);
+
     guisettings = new GuiSettings();
     guisettings->loadStyleSheet();
+
     m_dancefloor = new Dancefloor();
-    Cupid::Singleton()->setEngine(m_engine);
     Cupid::Singleton()->setDancefloor(m_dancefloor);
-    Cupid::Singleton()->setSpectrograph(m_spectrograph);
-    Cupid::Singleton()->setTransport(m_transport);
+
     createUi();
     connectUi();
 
@@ -25,6 +26,7 @@ MainWidget::MainWidget(QWidget *parent)
 
     createMenus();
     updateMenuStates();
+
 }
 
 MainWidget::~MainWidget() { }
@@ -37,11 +39,6 @@ MainWidget::~MainWidget() { }
 void MainWidget::createUi()
 {
     setWindowTitle(tr("dLite"));
-
-    // These cause problems with the dock widgets
-//    setMinimumSize(500, 400);
-//    resize(600, 450);
-//    move(5,10);  // TODO restore from last saved
 
     // TODO move to settings/prefs  & allow setting this
     std::string layoutfile = std::string("/Users/alex/src/floorit/layout.csv");
@@ -58,16 +55,29 @@ void MainWidget::createUi()
     m_cueLibView = new CueLibView(NULL);
     m_cueLibView->show();
 
+    // Spectrograph
+    m_spectrograph_dw = new QDockWidget(tr("Spectrograph"), this);
+    m_spectrograph = new Spectrograph(this);
+    m_spectrograph_dw->setWidget(m_spectrograph);
+    m_spectrograph_dw->setFloating(true);
+    m_spectrograph_dw->move(1300, 500);
+    Cupid::Singleton()->setSpectrograph(m_spectrograph);
+
+    // Time & Segmentation display
+    m_transport_dw = new QDockWidget(tr("Transport"), this);
+    m_transport = new Transport(this);
+    m_transport_dw->setWidget(m_transport);
+    m_transport_dw->setFloating(true);
+    Cupid::Singleton()->setTransport(m_transport);
+
     m_graphWidget = new GraphWidget(NULL);
     m_graphWidget->show();
     Cupid::Singleton()->setGraphWidget(m_graphWidget);
     setCentralWidget(m_graphWidget);
 
-    // Spectrograph
-    QScopedPointer<QDockWidget> spectrograph_dw(new QDockWidget(tr("Spectrograph"), this));
-    spectrograph_dw->setWidget(m_spectrograph);
-    spectrograph_dw->setFloating(true);
-    spectrograph_dw.take();
+    setMinimumSize(700, 400);
+    resize(1500, 900);
+    move(5,10);  // TODO restore from last saved
 }
 
 void MainWidget::createMenus()
@@ -159,7 +169,8 @@ void MainWidget::createMenus()
 //    m_playPauseAct->setShortcut(Qt::Key_Space);
     m_playPauseAct->setShortcutContext(Qt::ApplicationShortcut);
     m_controlMenu->addAction(m_playPauseAct);
-    CHECKED_CONNECT(m_playPauseAct, SIGNAL(triggered()), m_engine, SLOT(togglePlayback()));
+    CHECKED_CONNECT(m_playPauseAct, SIGNAL(triggered()),
+                    m_engine, SLOT(togglePlayback()));
 
     m_rewindAct = new QAction(tr("Rewind"), this);
     m_rewindAct->setShortcut(QKeySequence("Ctrl+0"));
@@ -167,21 +178,48 @@ void MainWidget::createMenus()
     m_controlMenu->addAction(m_rewindAct);
     CHECKED_CONNECT(m_rewindAct, SIGNAL(triggered()), m_engine, SLOT(rewind()));
 
+    m_controlMenu->addSeparator();
+
+    m_useAllCuesAct = new QAction(tr("Use All Cues"), this);
+    m_useAllCuesAct->setCheckable(true);
+    m_controlMenu->addAction(m_useAllCuesAct);
+    CHECKED_CONNECT(m_useAllCuesAct, SIGNAL(toggled(bool)),
+                    m_dancefloor, SLOT(setUseAllCues(bool)));
+
+    m_autoSwitchCuesAct = new QAction(tr("Auto Switch Cues"), this);
+    m_autoSwitchCuesAct->setCheckable(true);
+    m_controlMenu->addAction(m_autoSwitchCuesAct);
+    CHECKED_CONNECT(m_autoSwitchCuesAct, SIGNAL(toggled(bool)),
+                    m_graphWidget, SLOT(setAutoSwitchCues(bool)));
+
     // ----------------------------------------
     // Window actions
     m_windowMenu = m_menuBar->addMenu(tr("Window"));
 
     m_showDancefloorwidget = new QAction(tr("Dance Floor"), this);
     m_windowMenu->addAction(m_showDancefloorwidget);
-    CHECKED_CONNECT(m_showDancefloorwidget, SIGNAL(triggered()), m_dancefloorwidget, SLOT(showAndRaise()));
+    CHECKED_CONNECT(m_showDancefloorwidget, SIGNAL(triggered()),
+                    m_dancefloorwidget, SLOT(showAndRaise()));
 
     m_showCueLibView = new QAction(tr("Node Library"), this);
     m_windowMenu->addAction(m_showCueLibView);
-    CHECKED_CONNECT(m_showCueLibView, SIGNAL(triggered()), m_cueLibView, SLOT(showAndRaise()));
+    CHECKED_CONNECT(m_showCueLibView, SIGNAL(triggered()),
+                    m_cueLibView, SLOT(showAndRaise()));
 
     m_showGraphWidget = new QAction(tr("Graph"), this);
     m_windowMenu->addAction(m_showGraphWidget);
-    CHECKED_CONNECT(m_showGraphWidget, SIGNAL(triggered()), m_graphWidget, SLOT(show()));
+    CHECKED_CONNECT(m_showGraphWidget, SIGNAL(triggered()),
+                    this, SLOT(showAndRaise()));
+
+    m_showSpectrograph = new QAction(tr("Spectrograph"), this);
+    m_windowMenu->addAction(m_showSpectrograph);
+    CHECKED_CONNECT(m_showSpectrograph, SIGNAL(triggered()),
+                    m_spectrograph_dw, SLOT(show()));
+
+    m_showTransport = new QAction(tr("Transport"), this);
+    m_windowMenu->addAction(m_showTransport);
+    CHECKED_CONNECT(m_showTransport, SIGNAL(triggered()),
+                    m_transport_dw, SLOT(show()));
 
     // TODO get cut & paste working
 #if 0
@@ -272,6 +310,12 @@ void MainWidget::save()
 void MainWidget::bufferLengthChanged(qint64 length)
 {
     m_transport->bufferLengthChanged(length);
+}
+
+void MainWidget::showAndRaise()
+{
+    show();
+    raise();
 }
 
 //-----------------------------------------------------------------------------

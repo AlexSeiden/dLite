@@ -16,7 +16,8 @@
 
 Dancefloor::Dancefloor(QObject *parent) :
     QObject(parent),
-    m_frame(0)
+    m_frame(0),
+    m_useAllCues(false)
 {
     // _timeSinceLastUpdate is tracked just to see how well the interface is really
     // responding.
@@ -223,18 +224,40 @@ void Dancefloor::evaluate()
     m_frame++;
 }
 
+void Dancefloor::setUseAllCues(bool status) {
+    m_useAllCues = status;
+}
+
+#if 0
+std::vector<Cue *> Dancefloor::getActiveCues() {
+    // TODO more sophisticated selection of what cues are active
+    if (m_useAllCues)
+        return m_cues;
+    else
+        // TODO this returns a QList<cue *> rather than a std::vector
+        return Cupid::Singleton()->getGraphWidget()->getCurrentCues();
+}
+
 void Dancefloor::evaluateAllCues() {
-    if (Cupid::Singleton()->getGraphWidget()->useAllCues())
+    std::vector<Cue *> activeCues = getActiveCues();
+
+    for (Cue *cue : activeCues)
+        cue->evaluate();
+}
+#else
+
+void Dancefloor::evaluateAllCues() {
+
+    if (m_useAllCues)
         for (Cue *cue : m_cues)
             cue->evaluate();
-    else {
-        // Only use cues on the active cuesheet
-        foreach (Cue *cue,
-                 Cupid::Singleton()->getGraphWidget()->getCurrentCues())
+    else
+        for (Cue *cue :  Cupid::Singleton()->getGraphWidget()->getCurrentCues())
             cue->evaluate();
-    }
-
 }
+
+
+#endif
 
 void Dancefloor::addCue(Cue *cue) {
     m_cues.push_back(cue);

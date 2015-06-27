@@ -43,7 +43,7 @@ void Transport::paintEvent(QPaintEvent * event)
     bar.setRight(rect().left());
     painter.fillRect(bar, guisettings->trans_barColor);
 
-    if (m_segmentation) {
+    if (m_segmentation && m_segmentation->m_segmentIndices.count()) {
         const int segheight = (rect().height()-2)/m_segmentation->m_segmentIndices.count();
         foreach (Segment seg, m_segmentation->m_segments) {
             int segwidth = rect().width()*seg.duration/m_totalDuration;

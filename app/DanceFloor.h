@@ -1,5 +1,5 @@
-#ifndef DANCEFLOORMODEL_H
-#define DANCEFLOORMODEL_H
+#ifndef DANCEFLOOR_H
+#define DANCEFLOOR_H
 
 #include <QObject>
 #include <QColor>
@@ -43,6 +43,7 @@ public slots:
     void evaluateAllCues();
     void sendToDevice();
     void setHardwareStatus(bool status);
+    void setUseAllCues(bool status);
 
 protected:
     int                 m_xsize, m_ysize;
@@ -55,6 +56,10 @@ protected:
     Dancefloorwidget    *m_dfWidget;
     Device              m_device;
 
+private:
+//    std::vector<Cue *>  getActiveCues();
+    bool                m_useAllCues;
+
 
 #ifdef INLINE
     int getIndex(int x, int y) {return m_xsize*y + x;}
@@ -64,4 +69,4 @@ protected:
 #endif
 };
 
-#endif // DANCEFLOORMODEL_H
+#endif // DANCEFLOOR_H

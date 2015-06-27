@@ -55,6 +55,7 @@ public slots:
     void showImportDialog();
     void showSettingsDialog();
     void updateMenuStates();
+    void showAndRaise();
 
 private:
     void createUi();
@@ -64,8 +65,12 @@ private:
 
 private:
     Engine*                 m_engine;
+
+    // UI components
     Transport*              m_transport;
+    QDockWidget*            m_transport_dw;
     Spectrograph*           m_spectrograph;
+    QDockWidget*            m_spectrograph_dw;
 
     // Menu items
     QMenuBar*               m_menuBar;
@@ -89,11 +94,15 @@ private:
     QAction*                m_pauseAct;
     QAction*                m_playPauseAct;
     QAction*                m_rewindAct;
+    QAction*                m_useAllCuesAct;
+    QAction*                m_autoSwitchCuesAct;
 
     QMenu*                  m_windowMenu;
     QAction*                m_showDancefloorwidget;
     QAction*                m_showCueLibView;
     QAction*                m_showGraphWidget;
+    QAction*                m_showSpectrograph;
+    QAction*                m_showTransport;
 
     // Dialogs
     SettingsDialog*         m_settingsDialog;

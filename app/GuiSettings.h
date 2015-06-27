@@ -41,11 +41,17 @@ class GuiSettings : public QWidget
     Q_PROPERTY(QColor    paramBorderColor       MEMBER m_paramBorderColor)
 
     Q_PROPERTY(QColor   socketFillColor         MEMBER m_socketFillColor)
-    Q_PROPERTY(QColor   socketOutlineColor      MEMBER m_socketOutlineColor )
-    Q_PROPERTY(int      socketWidth             MEMBER m_socketWidth)
+    Q_PROPERTY(QColor   socketOutlineColor      MEMBER m_socketOutlineColor)
+    Q_PROPERTY(qreal    socketOutlineWidth      MEMBER m_socketOutlineWidth)
+    Q_PROPERTY(qreal    socketWidth             MEMBER m_socketWidth)
+
     Q_PROPERTY(QColor   connectorColor          MEMBER m_connectorColor)
+    Q_PROPERTY(QColor   connectorSelectedColor  MEMBER m_connectorSelectedColor)
+    Q_PROPERTY(qreal    connectorWidth          MEMBER m_connectorWidth)
+    Q_PROPERTY(qreal    connectorSelectedWidth  MEMBER m_connectorSelectedWidth)
     Q_PROPERTY(QColor   connectorCenterColor    MEMBER m_connectorCenterColor)
     Q_PROPERTY(int      connectorEndSize        MEMBER m_connectorEndSize)
+
     Q_PROPERTY(int      zoomIconSize            MEMBER m_zoomIconSize)
 
     // Dance floor widget
@@ -121,12 +127,18 @@ public:
 
     QColor      m_socketFillColor;
     QColor      m_socketOutlineColor;
+    qreal       m_socketWidth;
+    qreal       m_socketOutlineWidth;
     QColor      m_outputParamFillColor;
-    int         m_socketWidth;
+
     QColor      m_connectorColor;
+    QColor      m_connectorSelectedColor;
+    qreal       m_connectorWidth;
+    qreal       m_connectorSelectedWidth;
     QColor      m_connectorCenterColor;
     int         m_connectorEndSize;
-    int         m_zoomIconSize;
+
+    int         m_zoomIconSize; // UNUSED TODO
     int         m_colorChipSize;
 
     // Derived

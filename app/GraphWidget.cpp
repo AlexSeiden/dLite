@@ -1,17 +1,8 @@
 #include <algorithm>    // For sort
-#include "GraphWidget.h"
-#include "NodeItem.h"
-#include "Node.h"
-#include "CuesheetScene.h"
-#include "CuesheetView.h"
-#include "GuiSettings.h"
-#include "utils.h"
 
 #include <QHBoxLayout>
 #include <QGraphicsObject>
 #include <QGraphicsProxyWidget>
-#include "SublevelNode.h"
-#include "SublevelNodeItem.h"
 #include <QPushButton>
 #include <QTabWidget>
 #include <QToolButton>
@@ -19,6 +10,15 @@
 #include <QStyleFactory>
 #include <QShortcut>
 
+#include "SublevelNode.h"
+#include "SublevelNodeItem.h"
+#include "GraphWidget.h"
+#include "NodeItem.h"
+#include "Node.h"
+#include "CuesheetScene.h"
+#include "CuesheetView.h"
+#include "GuiSettings.h"
+#include "utils.h"
 #include "GroupNodeItem.h"
 #include "Cue.h"
 #include "Cupid.h"
@@ -40,6 +40,7 @@ GraphWidget::GraphWidget(QWidget *parent) :
                     this, SLOT(showRenameTabDialog(int)));
     newCuesheet();
 
+#if 0
     m_newCueButton = new QToolButton;
     m_newCueButton->setText(tr("+"));
     m_newCueButton->setEnabled(true);
@@ -71,11 +72,11 @@ GraphWidget::GraphWidget(QWidget *parent) :
 //    vlayout->addWidget(_segmentButton);
     vlayout->addStretch();
 
+#endif
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
     layout->addWidget(m_tabwidget);
-    layout->addLayout(vlayout);
     setLayout(layout);
 
     connectUi();
@@ -101,74 +102,8 @@ void GraphWidget::connectUi()
 {
     CHECKED_CONNECT(Cupid::Singleton()->getEngine(), SIGNAL(newSong(QString)),
                     this, SLOT(newSong(QString)));
-    CHECKED_CONNECT(m_newCueButton, SIGNAL(clicked()), this, SLOT(newCuesheet()));
+//    CHECKED_CONNECT(m_newCueButton, SIGNAL(clicked()), this, SLOT(newCuesheet()));
 //    CHECKED_CONNECT(_segmentButton, SIGNAL(clicked()), this, SLOT(showSegmentController()));
-}
-
-void GraphWidget::createAppShortcuts()
-{
-    // ----------------------------------------
-    // Graph view shortcuts
-    // TODO move these to graph view!
-    m_frameAllShortcut = new QShortcut(Qt::Key_A, this);
-    m_frameAllShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_frameAllShortcut, SIGNAL(activated()), this, SLOT(frameAll()));
-
-    m_frameSelectedShortcut = new QShortcut(Qt::Key_F, this);
-    m_frameSelectedShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_frameSelectedShortcut, SIGNAL(activated()), this, SLOT(frameSelection()));
-
-    m_zoomOutShortcut = new QShortcut(Qt::Key_Minus, this);
-    m_zoomOutShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_zoomOutShortcut, SIGNAL(activated()), this, SLOT(zoomOut()));
-
-    m_zoomInShortcut = new QShortcut(Qt::Key_Equal, this);
-    m_zoomInShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_zoomInShortcut, SIGNAL(activated()), this, SLOT(zoomIn()));
-
-    m_zoomResetShortcut = new QShortcut(Qt::Key_BracketLeft, this);
-    m_zoomResetShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_zoomResetShortcut, SIGNAL(activated()), this, SLOT(zoomReset()));
-
-    m_layoutAllShortcut = new QShortcut(Qt::Key_L, this);
-    m_layoutAllShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_layoutAllShortcut, SIGNAL(activated()), this, SLOT(layoutAll()));
-
-    m_xAlignShortcut = new QShortcut(Qt::Key_X, this);
-    m_xAlignShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_xAlignShortcut, SIGNAL(activated()), this, SLOT(xAlign()));
-
-    m_yAlignShortcut = new QShortcut(Qt::Key_Y, this);
-    m_yAlignShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_yAlignShortcut, SIGNAL(activated()), this, SLOT(yAlign()));
-
-    m_xDistributeShortcut = new QShortcut(QKeySequence("Shift+X"), this);
-    m_xDistributeShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_xDistributeShortcut, SIGNAL(activated()), this, SLOT(xDistribute()));
-
-    m_yDistributeShortcut = new QShortcut(QKeySequence("Shift+Y"), this);
-    m_yDistributeShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_yDistributeShortcut, SIGNAL(activated()), this, SLOT(yDistribute()));
-
-    m_duplicateShortcut = new QShortcut(Qt::Key_D, this);
-    m_duplicateShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_duplicateShortcut, SIGNAL(activated()), this, SLOT(duplicate()));
-
-    m_groupShortcut = new QShortcut(Qt::Key_G, this);
-    m_groupShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_groupShortcut, SIGNAL(activated()), this, SLOT(group()));
-
-    m_ungroupShortcut = new QShortcut(Qt::Key_U, this);
-    m_ungroupShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_ungroupShortcut, SIGNAL(activated()), this, SLOT(ungroup()));
-
-    m_minimizeSelectedShortcut = new QShortcut(Qt::Key_M, this);
-    m_minimizeSelectedShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_minimizeSelectedShortcut, SIGNAL(activated()), this, SLOT(minimizeSelected()));
-
-    m_newTabShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_T), this);
-    m_newTabShortcut->setContext(Qt::ApplicationShortcut);
-    CHECKED_CONNECT(m_newTabShortcut, SIGNAL(activated()), this, SLOT(newCuesheet()));
 }
 
 // ------------------------------------------------------------------------------
@@ -246,6 +181,8 @@ void GraphWidget::showSegmentController()
 
 int GraphWidget::whatToActivate()
 {
+    // Allows automatic switching of cuesheets based on segmentation.
+    // Doesn't really work so great, primarily because segmentation is weak.
     int ms = Cupid::getPlaybackPositionUSecs()/1000;
     int segmentIndex = m_segmentController->findSegment(ms);
 //    int cuesheetIndex = _segmentIndexToCuesheetIndex[segmentIndex];
@@ -305,16 +242,15 @@ CuesheetView* GraphWidget::getCurrentView(int i)
     return csv;
 }
 
-bool GraphWidget::useAllCues()
-{
-    // When "_useAllCues" is false, only cues on the
-    // current cuesheet are active.
-    return m_useAllCues->isChecked();
+
+void GraphWidget::setAutoSwitchCues(bool status) {
+    m_autoSwitchCues = status;
 }
 
 bool GraphWidget::autoSwitchCues()
 {
-    return m_autoSwitchCues->isChecked();
+//    return m_autoSwitchCues->isChecked();
+    return m_autoSwitchCues;
 }
 
 void GraphWidget::setCuesheet(int index)
@@ -683,6 +619,8 @@ void GraphWidget::duplicate() {
 // Observer forwarding
 void GraphWidget::newSong(QString filename)
 {
+    // Updates song-based nodes (e.g. Segmentation, beats) when song changes
+
     Q_UNUSED(filename);
     // remember, filename passed into this is audio file,
     // and node loadFile(QString) methods expect the name of file they
@@ -700,8 +638,8 @@ void GraphWidget::newSong(QString filename)
 
 #include <QSignalMapper>
 
-// Create shortcuts for switching between tabs
 void GraphWidget::createShortcuts() {
+    // Create shortcuts for switching between tabs
     QSignalMapper *sm = new QSignalMapper(this);
     CHECKED_CONNECT(sm, SIGNAL(mapped(int)),
                     this, SLOT(setCuesheet(int)));
@@ -715,4 +653,74 @@ void GraphWidget::createShortcuts() {
     sm->setMapping(sc, 9);
     sc->setContext(Qt::ApplicationShortcut);
     CHECKED_CONNECT(sc, SIGNAL(activated()), sm, SLOT(map()));
+
+    // Framing
+    m_frameAllShortcut = new QShortcut(Qt::Key_A, this);
+    m_frameAllShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_frameAllShortcut, SIGNAL(activated()), this, SLOT(frameAll()));
+
+    m_frameSelectedShortcut = new QShortcut(Qt::Key_F, this);
+    m_frameSelectedShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_frameSelectedShortcut, SIGNAL(activated()), this, SLOT(frameSelection()));
+
+    // Zoom
+    m_zoomOutShortcut = new QShortcut(Qt::Key_Minus, this);
+    m_zoomOutShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_zoomOutShortcut, SIGNAL(activated()), this, SLOT(zoomOut()));
+
+    m_zoomInShortcut = new QShortcut(Qt::Key_Equal, this);
+    m_zoomInShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_zoomInShortcut, SIGNAL(activated()), this, SLOT(zoomIn()));
+
+    m_zoomResetShortcut = new QShortcut(Qt::Key_BracketLeft, this);
+    m_zoomResetShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_zoomResetShortcut, SIGNAL(activated()), this, SLOT(zoomReset()));
+
+    // Layout
+    m_layoutAllShortcut = new QShortcut(Qt::Key_L, this);
+    m_layoutAllShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_layoutAllShortcut, SIGNAL(activated()), this, SLOT(layoutAll()));
+
+    m_xAlignShortcut = new QShortcut(Qt::Key_X, this);
+    m_xAlignShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_xAlignShortcut, SIGNAL(activated()), this, SLOT(xAlign()));
+
+    m_yAlignShortcut = new QShortcut(Qt::Key_Y, this);
+    m_yAlignShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_yAlignShortcut, SIGNAL(activated()), this, SLOT(yAlign()));
+
+    m_xDistributeShortcut = new QShortcut(QKeySequence("Shift+X"), this);
+    m_xDistributeShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_xDistributeShortcut, SIGNAL(activated()), this, SLOT(xDistribute()));
+
+    m_yDistributeShortcut = new QShortcut(QKeySequence("Shift+Y"), this);
+    m_yDistributeShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_yDistributeShortcut, SIGNAL(activated()), this, SLOT(yDistribute()));
+
+    // Nodes & grouping
+    m_duplicateShortcut = new QShortcut(Qt::Key_D, this);
+    m_duplicateShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_duplicateShortcut, SIGNAL(activated()), this, SLOT(duplicate()));
+
+    m_groupShortcut = new QShortcut(Qt::Key_G, this);
+    m_groupShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_groupShortcut, SIGNAL(activated()), this, SLOT(group()));
+
+    m_ungroupShortcut = new QShortcut(Qt::Key_U, this);
+    m_ungroupShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_ungroupShortcut, SIGNAL(activated()), this, SLOT(ungroup()));
+
+    m_minimizeSelectedShortcut = new QShortcut(Qt::Key_M, this);
+    m_minimizeSelectedShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_minimizeSelectedShortcut, SIGNAL(activated()), this, SLOT(minimizeSelected()));
+
+    m_newTabShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_T), this);
+    m_newTabShortcut->setContext(Qt::ApplicationShortcut);
+    CHECKED_CONNECT(m_newTabShortcut, SIGNAL(activated()), this, SLOT(newCuesheet()));
+}
+
+void GraphWidget::showAndRaise()
+{
+    show();
+    raise();
 }

@@ -1,8 +1,7 @@
 #ifndef CUESHEETVIEW_H
 #define CUESHEETVIEW_H
 
-// The graph display widget, where Nodes & Cues are viewed &
-// connected.
+// The graph display widget, where Nodes & Cues are viewed & connected.
 
 #include <QFrame>
 #include <QGraphicsView>
@@ -45,7 +44,7 @@ public slots:
     void fitBbox(const QRectF& bbox);
 
 private slots:
-    void setSliderFromTransform();
+    void setZoomFromTransform();
     void resetView();
     void setupMatrix();
 
@@ -54,9 +53,7 @@ signals:
 
 private:
     GraphicsView*   m_graphicsView;
-    QToolButton*    m_resetButton;
-    QToolButton*    m_newcueButton;
-    QSlider*        m_zoomSlider;
+    int             m_zoom;
 };
 
 #endif // CUESHEETVIEW_H

@@ -7,6 +7,8 @@
 // ------------------------------------------------------------------------------
 // CueLibView
 // View that allows the user to create new nodes.
+// TODO turn this into a toolbar that's much more space efficient.
+// TODO be able to add group nodes etc. to this.
 
 CueLibView::CueLibView(QWidget *parent) :
     QWidget(parent)
@@ -15,6 +17,7 @@ CueLibView::CueLibView(QWidget *parent) :
     move(610, 10);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
+
 
 void CueLibView::createUi()
 {
@@ -34,9 +37,9 @@ void CueLibView::createUi()
     mainLayout->addWidget(createGroup("Regions", Node::REGION),1,3);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Cue Library"));
-    setWindowFlags( Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-
+    setWindowTitle(tr("Node Library"));
+//    setWindowFlags( Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+    setWindowFlags(Qt::Tool | Qt::CustomizeWindowHint);
     CHECKED_CONNECT(m_signalMapper, SIGNAL(mapped(QString)),
                     this, SIGNAL(newNodeRequest(QString)));
     // GROSS The newNodeRequest signal from here is monitored by mainwidget,

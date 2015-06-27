@@ -206,8 +206,6 @@ void NodeItem::minimize(int status)
 }
 
 // Utility
-//
-
 QList<NodeItem*> NodeItem::getUpstreamNodeItems()
 {
     // This could be optimized, but really isn't a big deal.
@@ -238,7 +236,6 @@ QList<ParamItem*> NodeItem::getChildParamItems()
 }
 
 // Serialization
-//
 void NodeItem::readFromJSONObj(const QJsonObject &json)
 {
     // ErrorHandling
@@ -268,6 +265,8 @@ void NodeItem::writeToJSONObj(QJsonObject &json) const
 
 //-----------------------------------------------------------------------------
 // ParamItem
+// ParamItems display the individual parameters of a node.
+
 ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
     QGraphicsObject(parent),
     m_param(param)
@@ -412,6 +411,7 @@ void ParamItem::setBoolValue(int val) {
 
 //-----------------------------------------------------------------------------
 // SocketItem
+// Sockets are the little squares/dots/whatever that connect nodes.
 
 SocketItem::SocketItem(ParamBase *param, QGraphicsObject *parent) :
     QGraphicsObject(parent),
@@ -436,9 +436,9 @@ void SocketItem::paint(QPainter *painter,
     // Draw connector socket
     painter->setBrush(guisettings->m_socketFillColor);
     painter->setPen(guisettings->m_socketOutlinePen);
-//    painter->drawEllipse(0, 0, guisettings->m_socketWidth, guisettings->m_socketWidth);
-    painter->drawRect(-guisettings->m_socketWidth/2, -guisettings->m_socketWidth/2,
-                      guisettings->m_socketWidth, guisettings->m_socketWidth);
+    painter->drawEllipse(QPointF(0.0, 0.0),
+                         guisettings->m_socketWidth,
+                         guisettings->m_socketWidth);
 
     painter->restore();
 }

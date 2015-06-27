@@ -34,14 +34,18 @@ GuiSettings {
 
     qproperty-socketFillColor:          rgb(255,20,80);
     qproperty-socketOutlineColor:       rgb(255,255,255);
-    qproperty-socketWidth:              16;
+    qproperty-socketWidth:              5.0;
+    qproperty-socketOutlineWidth:       1.0;
+
     qproperty-zoomIconSize:             16;
 
+    qproperty-connectorColor:           rgb(255,186,2);
+    qproperty-connectorSelectedColor:   rgb(255,40,40);
+    qproperty-connectorWidth:           2.0;
+    qproperty-connectorSelectedWidth:   4.0;
     /* This is the color of the ellipses at the end of the connector which you don't see right now */
     qproperty-connectorCenterColor:     rgb(2, 230, 255);
     qproperty-connectorEndSize:         5;
-
-    qproperty-connectorColor:           rgb(255,186,2);
 
     /*  Dancefloorwidget */
     qproperty-df_bgColor           : rgb(30,30,80);
@@ -125,6 +129,7 @@ QSpinBox, QDoubleSpinBox {
 /* ------------------------------------------------------------------------------ */
 QTabWidget::pane { /* The tab widget frame */
     border: 1px solid grey;
+    background-color: #333;
 }
 
 QTabWidget::tab-bar {
@@ -135,36 +140,36 @@ QTabBar {
     font-family: Futura;
     font-style: italic;
     font-size: 10px;
+    background-color: #306;
 }
-/* Style the tab using the tab sub-control. Note that
-    it reads QTabBar _not_ QTabWidget */
+
+/* Style the tab using the tab sub-control.
+   Note that it's QTabBar _not_ QTabWidget */
+
 QTabBar::tab {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                 stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
                                 stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
     border: 2px solid #C4C4C3;
     border-bottom-color: #C2C7CB; /* same as the pane color */
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    min-width: 8ex;
-    padding-top: 0px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    min-width: 15ex;
+    max-width: 35ex;
+    height: 15px;
+    padding-top: 2px;
     padding-bottom: 0px;
     padding-left: 4px;
     padding-right: 2px;
-    spacing: 4px;
-    margin-right: 8px;
+    spacing: 0px;
+    margin-right: 1px;
+    margin-left: 1px;
 }
 
 QTabBar::tab:selected, QTabBar::tab:hover {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                 stop: 0 #fafafa, stop: 0.4 #f4f4f4,
                                 stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
-}
-
-QTabBar::tab:selected {
-    border-color: green;
-    border-bottom: 1px;
-    margin-bottom: -2px;
 }
 
 QTabBar::tab:!selected {
@@ -176,6 +181,10 @@ QTabBar::tab:selected {
     /* expand/overlap to the left and right by 4px */
     margin-left: -4px;
     margin-right: -4px;
+    border-color: green;
+    border-bottom: 1px;
+    margin-bottom: 0px;
+    height: 22px;
 }
 
 QTabBar::tab:first:selected {
@@ -184,4 +193,8 @@ QTabBar::tab:first:selected {
 
 QTabBar::tab:last:selected {
     margin-right: 0; /* the last selected tab has nothing to overlap with on the right */
+}
+
+QMainWindow {
+    background-color: #522;
 }

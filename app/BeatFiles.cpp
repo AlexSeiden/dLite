@@ -18,6 +18,8 @@ IP: Grouping
 IP: multiple tabbed cue sheets
     save only current tab
 
+Node inspector instead of/in addition to params in graph view
+
 Node Types:
    color nodes:
         palette  -- improve
@@ -32,10 +34,15 @@ Node Types:
    Conversion nodes between float & int
    math nodes
    Paths
-    Use openGL for shading
-    Comp nodes
-    perlin noise
-    particle systems
+   Use openGL for shading
+   Comp nodes
+   perlin noise
+   particle systems
+
+song queue
+
+better color systems than HSV (see https://github.com/jrus/chromatist and
+    http://www.husl-colors.org)
 
 Mixer style fading
 

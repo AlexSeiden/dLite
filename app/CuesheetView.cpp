@@ -19,6 +19,7 @@ CuesheetView::CuesheetView(QWidget *parent)
     m_graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
     m_graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
+#if 0
 //    int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
     QSize iconSize(guisettings->m_zoomIconSize, guisettings->m_zoomIconSize);
 
@@ -45,10 +46,6 @@ CuesheetView::CuesheetView(QWidget *parent)
     m_resetButton->setText(tr("0"));
     m_resetButton->setEnabled(true);
 
-//    _newcueButton = new QToolButton;
-//    _newcueButton->setText(tr("+"));
-//    _newcueButton->setEnabled(true);
-
     // Zoom slider layout
     QVBoxLayout *zoomSliderLayout = new QVBoxLayout;
     zoomSliderLayout->addWidget(zoomInIcon);
@@ -56,7 +53,6 @@ CuesheetView::CuesheetView(QWidget *parent)
     zoomSliderLayout->addWidget(zoomOutIcon);
     zoomSliderLayout->addWidget(m_resetButton);
     zoomSliderLayout->setAlignment(m_zoomSlider, Qt::AlignRight);
-//    zoomSliderLayout->addWidget(_newcueButton);
 
     QGridLayout *topLayout = new QGridLayout;
     topLayout->addWidget(m_graphicsView, 1, 0);
@@ -69,7 +65,13 @@ CuesheetView::CuesheetView(QWidget *parent)
     connect(m_zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(setupMatrix()));
     connect(zoomInIcon, SIGNAL(clicked()), this, SLOT(zoomIn()));
     connect(zoomOutIcon, SIGNAL(clicked()), this, SLOT(zoomOut()));
+#endif
 
+    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->addWidget(m_graphicsView);
+    setLayout(layout);
+
+    zoomReset();
     setupMatrix();
 }
 
@@ -82,7 +84,7 @@ QGraphicsView *CuesheetView::view() const
 
 void CuesheetView::resetView()
 {
-    m_zoomSlider->setValue(500);
+    m_zoom = 500;
     setupMatrix();
     // TODO this doesn't work so great.
     m_graphicsView->ensureVisible(QRectF(0, 0, 0, 0));
@@ -92,53 +94,47 @@ void CuesheetView::fitBbox(const QRectF &bbox)
 {
 //    view()->fitInView(bbox, Qt::KeepAspectRatioByExpanding);
     view()->fitInView(bbox, Qt::KeepAspectRatio);
-    setSliderFromTransform();
+    setZoomFromTransform();
 }
 
-void CuesheetView::setSliderFromTransform()
+void CuesheetView::setZoomFromTransform()
 {
     // Find scale from xform matrix:
     QTransform xform = m_graphicsView->transform();
     qreal scale = xform.m11();
     // m22 should be the same... could check....
 
-    // Compute the slider value from the xform matrix that exists:
-    int slider = 200 * log2(scale) + 700;
-
-    m_zoomSlider->setValue(slider);
-    return;
-
-    // Set the slider value, but not so much that it zooms in beyond "700",
-    // which is overkill.
-    if (slider<0 || slider>700) {
-        slider = clamp(0,700,slider);
-        m_zoomSlider->setValue(slider);
-        setupMatrix();
-    }
-    else
-        m_zoomSlider->setValue(slider);
+    // Compute the zoom value from the xform matrix that exists:
+    m_zoom = 200 * log2(scale) + 700;
+    m_zoom = clamp(0., 700., m_zoom);
+    setupMatrix();
 }
 
 void CuesheetView::setupMatrix()
 {
-    qreal scale = qPow(2., (m_zoomSlider->value() - 700.) / 200.);
+    qreal scale = qPow(2., (m_zoom - 700.) / 200.);
     m_graphicsView->setTransform(QTransform());
     m_graphicsView->scale(scale, scale);
 }
 
 void CuesheetView::zoomIn(int level)
 {
-    m_zoomSlider->setValue(m_zoomSlider->value() + level);
+    m_zoom += level;
+    m_zoom = clamp(0., 700., m_zoom);
+    setupMatrix();
 }
 
 void CuesheetView::zoomOut(int level)
 {
-    m_zoomSlider->setValue(m_zoomSlider->value() - level);
+    m_zoom -= level;
+    m_zoom = clamp(0., 700., m_zoom);
+    setupMatrix();
 }
 
 void CuesheetView::zoomReset()
 {
-    m_zoomSlider->setValue(700);
+    m_zoom = 700;
+    setupMatrix();
 }
 
 #ifndef QT_NO_WHEELEVENT

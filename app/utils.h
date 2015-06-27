@@ -32,14 +32,6 @@ bool isPCMS16LE(const QAudioFormat &format);
 
 double clamp(double min, double max, double val);
 
-// WTF Compile-time calculation of powers of two
-template<int N> class PowerOfTwo
-{ public: static const int Result = PowerOfTwo<N-1>::Result * 2; };
-
-template<> class PowerOfTwo<0>
-{ public: static const int Result = 1; };
-
-
 //-----------------------------------------------------------------------------
 // Debug output
 //-----------------------------------------------------------------------------
