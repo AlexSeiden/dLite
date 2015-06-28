@@ -40,39 +40,6 @@ GraphWidget::GraphWidget(QWidget *parent) :
                     this, SLOT(showRenameTabDialog(int)));
     newCuesheet();
 
-#if 0
-    m_newCueButton = new QToolButton;
-    m_newCueButton->setText(tr("+"));
-    m_newCueButton->setEnabled(true);
-
-    // TODO lots more
-    // e.g. compmodes, etc.
-    m_useAllCues = new QCheckBox;
-    m_useAllCues->setEnabled(true);
-    m_useAllCues->setToolTip("Use All Cues");
-    m_useAllCues->setChecked(true);
-
-    m_autoSwitchCues = new QCheckBox;
-    m_autoSwitchCues->setEnabled(true);
-    m_autoSwitchCues->setToolTip("Auto Switch Cues");
-    m_autoSwitchCues->setChecked(true);
-
-//    _segmentButton = new QToolButton;
-//    _segmentButton->setText(tr("S"));
-//    _segmentButton->setEnabled(true);
-    m_segmentController = nullptr;
-//    _segGui = nullptr;
-
-    QVBoxLayout *vlayout = new QVBoxLayout();
-    vlayout->setSpacing(0);
-    vlayout->setContentsMargins(0,0,0,0);
-    vlayout->addWidget(m_newCueButton);
-    vlayout->addWidget(m_useAllCues);
-    vlayout->addWidget(m_autoSwitchCues);
-//    vlayout->addWidget(_segmentButton);
-    vlayout->addStretch();
-
-#endif
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);

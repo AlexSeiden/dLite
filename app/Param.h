@@ -55,9 +55,9 @@ public:
     void        setRange(bool userange, double min=0.0, double max=1.0, double step=1.0);
 
     virtual void eval() {
+        // Evaluation leaves the result in the provider's "output" variable.
         if (m_provider)
             m_provider();
-        // GROSS.  it evaluates it, but now it's stuck in the providers "output" variable.
     }
 
     virtual const std::type_info & getType() {return m_type;}

@@ -5,7 +5,85 @@
 #include "utils.h"
 #include <QtWidgets>
 #include <QPainterPath>
-//#include "ParamView.h"
+
+static const int offset = 25;
+
+ConnectorStub::ConnectorStub(QGraphicsItem *parent, bool isOutput) :
+    QGraphicsObject(parent),
+    m_isOutput(isOutput),
+    m_path(nullptr)
+{
+    setZValue(100.0);
+    updatePath();
+}
+
+ConnectorStub::~ConnectorStub() { }
+
+void ConnectorStub::updatePath()
+{
+    // Makes a new path when one of the ends has been moved.
+
+    // hardw
+    QPointF p_end;
+
+    prepareGeometryChange();
+    if (m_path)
+        delete m_path;
+
+    m_path = new QPainterPath();
+    if (m_isOutput) {
+        p_end = m_p + QPointF(offset,0);
+    } else {
+        p_end = m_p - QPointF(offset,0);
+    }
+
+    m_path->moveTo(m_p);
+    m_path->lineTo(p_end);
+}
+
+void ConnectorStub::paint(QPainter *painter,
+           const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
+    painter->save();
+    painter->setBrush(Qt::NoBrush);
+#if 0
+    // TODO
+    if (parent()->isSelected())
+        painter->setPen(guisettings->m_connectorPenSelected);
+    else
+        painter->setPen(guisettings->m_connectorPen);
+#endif
+    painter->setPen(guisettings->m_connectorPen);
+    painter->drawPath(*m_path);
+
+    painter->restore();
+}
+
+void ConnectorStub::gotMoved()
+{
+    updatePath();
+    update();
+}
+
+QRectF ConnectorStub::boundingRect() const
+{
+    float left, right, top, bottom;
+    top = m_p.y() - 2;
+    bottom = m_p.y() + 2;
+    if (m_isOutput) {
+        left = m_p.x();
+        right = left + offset;
+    }
+    else {
+        right = m_p.x();
+        left = right - offset;
+    }
+    QRectF bbox(QPointF(left,top),QPointF(right, bottom));
+    return bbox;
+}
 
 //-----------------------------------------------------------------------------
 // ConnectorItem
@@ -17,9 +95,11 @@ ConnectorItem::ConnectorItem(SocketItem *serverSocket, SocketItem *clientSocket,
     QGraphicsObject(parent),
     m_serverSocket(serverSocket),
     m_clientSocket(clientSocket),
-    m_path(nullptr)
+    m_path(nullptr),
+    m_startStub(this, true),
+    m_endStub(this, false)
 {
-    setZValue(1000.0);  // TODO make connector z a pref?
+    setZValue(-100.0);  // TODO make connector z a pref?
     updatePath();
 
     setFlags(ItemIsSelectable);
@@ -51,7 +131,7 @@ QRectF ConnectorItem::boundingRect() const
     // that connects _pStart & _pEnd -- the PREVIOUS positions.
     // The second rect connects the NEW positions of the sockets--
     // nStart & nEnd. This matters when we are dragging quickly.
-    // Hey, do I still have to do this? or was the problem all along the
+    // TODO Hey, do I still have to do this? or was the problem all along the
     // lack of a "prepareGeometryChange()"?
 
 
@@ -73,7 +153,6 @@ QRectF ConnectorItem::boundingRect() const
 
     QRectF bbox(QPointF(left,top),QPointF(right, bottom));
 
-//    qDebug() << pos() << nStart << nEnd << bbox;
     qreal extra = guisettings->m_connectorEndSize + 5;
     bbox.adjust(-extra, -extra, extra, extra);
     return bbox;
@@ -84,23 +163,36 @@ QPainterPath ConnectorItem::shape() const
     return(*m_path);
 }
 
+
 void ConnectorItem::updatePath()
 {
     // Makes a new path when one of the ends has been moved.
 
     m_pStart = m_serverSocket->socketPos();
+    m_startStub.m_p = m_pStart;
     m_pEnd   = m_clientSocket->socketPos();
+    m_endStub.m_p = m_pEnd;
+
+    // hardw
+    m_pStart += QPointF(offset,0);
+    m_pEnd -= QPointF(offset,0);
 
     qreal deltaX = fabs(m_pEnd.x() - m_pStart.x());
     qreal tangent = .5 * deltaX; //hardw
 
     prepareGeometryChange();
+    // TODO do we always have to delete the path and allocate again?
+    // Can't we have a member path?
     if (m_path)
         delete m_path;
 
     m_path = new QPainterPath();
     m_path->moveTo(m_pStart);
     m_path->cubicTo(m_pStart+QPointF(tangent,0.), m_pEnd+QPointF(-tangent,0.), m_pEnd);
+
+    m_startStub.gotMoved();
+    m_endStub.gotMoved();
+
 }
 
 void ConnectorItem::paint(QPainter *painter,
@@ -118,15 +210,18 @@ void ConnectorItem::paint(QPainter *painter,
 
     painter->drawPath(*m_path);
 
+#if 0
     // TODO set ellipse pen brush & size
     painter->setBrush(guisettings->m_connectorBrush);
     painter->drawEllipse(m_pStart, guisettings->m_connectorEndSize, guisettings->m_connectorEndSize);
     painter->drawEllipse(m_pEnd,   guisettings->m_connectorEndSize, guisettings->m_connectorEndSize);
+#endif
 
     painter->restore();
 }
 
 
+// TODO
 #if 0
 #include <math.h>
 static const double Pi = 3.14159265358979323846264338327950288419717;

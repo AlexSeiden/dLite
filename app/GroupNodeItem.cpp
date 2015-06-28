@@ -38,12 +38,12 @@ void GroupNodeItem::paint(QPainter *painter,
         selectedPen = QPen(guisettings->m_NNselectedColor);
         selectedPen.setWidth(penWidth);
     } else {
-        selectedPen = QPen(Qt::black);                          // HARDW
+        selectedPen = QPen(Qt::black);                          // hardw
         selectedPen.setWidth(guisettings->m_NNselectedWidth);
     }
     painter->setPen(selectedPen);
     QRectF bbox = QGraphicsItemGroup::boundingRect();
-    bbox += QMarginsF(0,30,0,0); // hardw   for name
+    bbox += QMarginsF(0,30,0,0); // add space for name
     painter->drawRect(bbox);
     painter->restore();
 }

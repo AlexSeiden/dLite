@@ -39,5 +39,4 @@ HEADERS += \
     $$PWD/RenameTabDialog.h \
     $$PWD/MyDoubleSpinBox.h
 
-FORMS += \
-    $$PWD/mainwindow.ui
+FORMS +=

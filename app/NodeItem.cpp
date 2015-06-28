@@ -18,6 +18,7 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     m_minimized(false)
 {
     node->setNodeItem(this);
+    setZValue(-100.);
 
     m_margins = QMarginsF(9,5,9,5);
     setFlags(ItemIsSelectable | ItemIsMovable  | ItemSendsScenePositionChanges);
@@ -271,6 +272,7 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
     QGraphicsObject(parent),
     m_param(param)
 {
+    setZValue(-90.);
     int yOffset = guisettings->m_PIheight/2;
 
     this->setObjectName(tr("ack"));
@@ -416,7 +418,9 @@ void ParamItem::setBoolValue(int val) {
 SocketItem::SocketItem(ParamBase *param, QGraphicsObject *parent) :
     QGraphicsObject(parent),
     m_param(param)
-{ }
+{
+    setZValue(-80.);
+}
 
 QRectF SocketItem::boundingRect() const {
     QRectF out = QRectF(-guisettings->m_socketWidth/2, -guisettings->m_socketWidth/2,
@@ -454,11 +458,9 @@ QPointF SocketItem::socketPos()
 {
     // Like scene pos, except when minimized.
     if (isVisible()) {      // XXX does this consider parent hidden status?
-//        qDebug() << "yes visible";
         return scenePos();
     }
 
-//    qDebug() << "no, invisible";
     QPointF nodePos = parentItem()->parentItem()->scenePos();
     QPointF out = scenePos();
     out.setY(nodePos.y() + guisettings->m_PIheight/2);

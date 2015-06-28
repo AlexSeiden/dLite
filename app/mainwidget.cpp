@@ -53,6 +53,7 @@ void MainWidget::createUi()
     m_dancefloorwidget->show();
 
     m_cueLibView = new CueLibView(NULL);
+    m_cueLibView->move(1500, 700);
     m_cueLibView->show();
 
     // Spectrograph
@@ -60,7 +61,7 @@ void MainWidget::createUi()
     m_spectrograph = new Spectrograph(this);
     m_spectrograph_dw->setWidget(m_spectrograph);
     m_spectrograph_dw->setFloating(true);
-    m_spectrograph_dw->move(1300, 500);
+    m_spectrograph_dw->move(1300, 540);
     Cupid::Singleton()->setSpectrograph(m_spectrograph);
 
     // Time & Segmentation display
@@ -68,6 +69,7 @@ void MainWidget::createUi()
     m_transport = new Transport(this);
     m_transport_dw->setWidget(m_transport);
     m_transport_dw->setFloating(true);
+    m_transport_dw->move(1300, 500);
     Cupid::Singleton()->setTransport(m_transport);
 
     m_graphWidget = new GraphWidget(NULL);

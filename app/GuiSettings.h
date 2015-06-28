@@ -52,8 +52,6 @@ class GuiSettings : public QWidget
     Q_PROPERTY(QColor   connectorCenterColor    MEMBER m_connectorCenterColor)
     Q_PROPERTY(int      connectorEndSize        MEMBER m_connectorEndSize)
 
-    Q_PROPERTY(int      zoomIconSize            MEMBER m_zoomIconSize)
-
     // Dance floor widget
     Q_PROPERTY(QColor  df_cellSepColor          MEMBER df_cellSepColor)
     Q_PROPERTY(QColor  df_bgColor               MEMBER df_bgColor)

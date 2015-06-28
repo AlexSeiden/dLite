@@ -37,8 +37,6 @@ GuiSettings {
     qproperty-socketWidth:              5.0;
     qproperty-socketOutlineWidth:       1.0;
 
-    qproperty-zoomIconSize:             16;
-
     qproperty-connectorColor:           rgb(255,186,2);
     qproperty-connectorSelectedColor:   rgb(255,40,40);
     qproperty-connectorWidth:           2.0;
@@ -91,6 +89,7 @@ GuiSettings {
 /* ------------------------------------------------------------------------------ */
 CuesheetView QGraphicsView {
     background-color: rgb(40, 40, 40);
+    margin: 0px;
 }
 
 /* ------------------------------------------------------------------------------ */
