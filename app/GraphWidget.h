@@ -104,12 +104,6 @@ private:
     QShortcut*          m_minimizeSelectedShortcut;
     QShortcut*          m_newTabShortcut;
 
-#if 0
-    QToolButton *       m_newCueButton;
-    QCheckBox *         m_useAllCues;
-    QCheckBox *         m_autoSwitchCues;
-    QToolButton *       m_segmentButton;
-#endif
     bool                m_autoSwitchCues;
     QTabWidget *        m_tabwidget;
     SegmentController * m_segmentController;

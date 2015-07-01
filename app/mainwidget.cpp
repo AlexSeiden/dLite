@@ -52,9 +52,12 @@ void MainWidget::createUi()
     Cupid::Singleton()->setDancefloorwidget(m_dancefloorwidget);
     m_dancefloorwidget->show();
 
+    QDockWidget *m_cueLibView_dw = new QDockWidget(tr("Node Lib"), this);
     m_cueLibView = new CueLibView(NULL);
-    m_cueLibView->move(1500, 700);
-    m_cueLibView->show();
+    m_cueLibView_dw->setWidget(m_cueLibView);
+    m_cueLibView_dw->setFloating(true);
+//    m_cueLibView->move(1500, 700);
+//    m_cueLibView->show();
 
     // Spectrograph
     m_spectrograph_dw = new QDockWidget(tr("Spectrograph"), this);
@@ -335,7 +338,6 @@ void MainWidget::newNodeRequest(QString name)
     if (newNode)
         // Would "correct MVC" mean that the graphWidget should figure this out
         // on its own, by talking to the "model"?
-        // This is also GROSS
         m_graphWidget->addNode(newNode);
     else {
         qDebug() << "Unknown newNodeRequest for " << name;

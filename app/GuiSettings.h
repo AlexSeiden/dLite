@@ -136,7 +136,6 @@ public:
     QColor      m_connectorCenterColor;
     int         m_connectorEndSize;
 
-    int         m_zoomIconSize; // UNUSED TODO
     int         m_colorChipSize;
 
     // Derived

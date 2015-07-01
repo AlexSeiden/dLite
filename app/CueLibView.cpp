@@ -23,18 +23,18 @@ void CueLibView::createUi()
 {
     m_signalMapper = new QSignalMapper(this);
 
-    QGridLayout *mainLayout = new QGridLayout;
-    mainLayout->setMargin(2);
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->setMargin(0);
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(2,2,2,2);
+    mainLayout->setContentsMargins(0,0,0,0);
 
-    mainLayout->addWidget(createGroup("Cues", Node::CUE),0,0);
-    mainLayout->addWidget(createGroup("Ints", Node::INT),0,1);
-    mainLayout->addWidget(createGroup("Floats", Node::FLOAT),0,2);
-    mainLayout->addWidget(createGroup("Colors", Node::COLOR),1,0);
-    mainLayout->addWidget(createGroup("Beats", Node::BEAT),1,1);
-    mainLayout->addWidget(createGroup("Paths", Node::POSITION),1,2);
-    mainLayout->addWidget(createGroup("Regions", Node::REGION),1,3);
+    mainLayout->addWidget(createGroup("Cues", Node::CUE));
+    mainLayout->addWidget(createGroup("Ints", Node::INT));
+    mainLayout->addWidget(createGroup("Floats", Node::FLOAT));
+    mainLayout->addWidget(createGroup("Colors", Node::COLOR));
+    mainLayout->addWidget(createGroup("Beats", Node::BEAT));
+    mainLayout->addWidget(createGroup("Paths", Node::POSITION));
+    mainLayout->addWidget(createGroup("Regions", Node::REGION));
     setLayout(mainLayout);
 
     setWindowTitle(tr("Node Library"));
@@ -52,8 +52,9 @@ QGroupBox *CueLibView::createGroup(QString typeName, Node::node_t nodeType)
     QGroupBox *groupBox = new QGroupBox(typeName);
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
-    layout->setMargin(2);
-    layout->setContentsMargins(2,2,2,2);
+    layout->setContentsMargins(0,0,0,0);
+    layout->setMargin(0);
+    layout->setAlignment(Qt::AlignLeft);
 
     QStringList allNodenames = NodeFactory::Singleton()->getNodesOfType(nodeType);
 
@@ -61,14 +62,15 @@ QGroupBox *CueLibView::createGroup(QString typeName, Node::node_t nodeType)
         addButtonToUi(layout, nodename);
     }
 
-    layout->addStretch();
+//    layout->addStretch();
     groupBox->setLayout(layout);
     return groupBox;
 }
 
 // Convienence function
 void CueLibView::addButtonToUi(QLayout *layout, QString buttonName) {
-    QPushButton *butt = new QPushButton(buttonName);
+    QToolButton *butt = new QToolButton(this);
+    butt->setText(buttonName);
     m_buttons.push_back(butt);
     layout->addWidget(butt);
     m_signalMapper->setMapping(butt, buttonName);
@@ -80,3 +82,5 @@ void CueLibView::showAndRaise()
     show();
     raise();
 }
+
+// ------------------------------------------------------------------------------

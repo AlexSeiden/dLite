@@ -197,3 +197,49 @@ QTabBar::tab:last:selected {
 QMainWindow {
     background-color: #522;
 }
+
+/* ------------------------------------------------------------------------------ */
+
+QGroupBox {
+    background-color: #933;
+    border: 1px solid #00F;
+    border-radius: 3px;
+    margin-top: 14px; /* leave space at the top for the title */
+    margin-bottom: 2px;
+    margin-right: 2px;
+    margin-left: 2px;
+    padding-top: 6px;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-bottom: 2px;
+    spacing: 2px;
+    font-family: Futura;
+    font-size: 12px;
+    font-style: italic;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 8px;
+    bottom: -2px;
+    margin-top: 4px;
+    margin-bottom: 22px;
+    padding: 0px;
+    background-color: #E0E0E0;
+}
+
+
+/* ------------------------------------------------------------------------------ */
+
+QToolButton {
+    border: 1px solid #0F0;
+    border-radius: 2px;
+    background-color: #CCC;
+    margin: 1px;
+    text-align: right;
+    min-width: 70px;
+    padding: 0px;
+    font-family: Futura;
+    font-size: 10px;
+}
