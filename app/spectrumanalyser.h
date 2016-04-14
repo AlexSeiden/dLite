@@ -61,7 +61,7 @@ private:
 #endif
 };
 
-/**
+/*
  * Class which performs frequency spectrum analysis on a window of
  * audio samples, provided to it by the Engine.
  */
@@ -78,16 +78,12 @@ public:
     void setWindowFunction(WindowFunction type);
 
     /*
-     * Calculate a frequency spectrum
-     *
-     * \param buffer       Audio data
-     * \param format       Format of audio data
+     * Calculate frequency spectrum
+     *      buffer       Audio data
+     *      format       Format of audio data
      *
      * Frequency spectrum is calculated asynchronously.  The result is returned
      * via the spectrumChanged signal.
-     *
-     * An ongoing calculation can be cancelled by calling cancelCalculation().
-     *
      */
     void calculate(const QByteArray &buffer, const QAudioFormat &format);
 
@@ -96,7 +92,6 @@ public:
 
     /*
      * Cancel an ongoing calculation
-     *
      * Note that cancelling is asynchronous.
      */
     void cancelCalculation();

@@ -6,7 +6,6 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     app.setApplicationName("dLite");
-//    app.setStyleSheet("QLineEdit { background-color: yellow }");
     app.setStyle(QStyleFactory::create("Fusion"));
 
     MainWidget mainwidget;

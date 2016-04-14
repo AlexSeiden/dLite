@@ -22,7 +22,7 @@ Cue::Cue() :
 Cue::~Cue()
 {
     Cue::m_dfModel->removeCue(this);
-    // This is removed from node inventory in Node dtor.
+    // This is removed from node inventory via Node dtor.
 }
 
 void Cue::writeToJSONObj(QJsonObject &json) const

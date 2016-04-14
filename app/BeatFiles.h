@@ -57,7 +57,7 @@ public:
     virtual NodeOnset* clone();
 
     // TODO for random access:
-//     bool     checkBeat(int thisSample, int lastSample);
+    // bool     checkBeat(int thisSample, int lastSample);
 
     void    loadFile();
     void    loadFile(QString filename);

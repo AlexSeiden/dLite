@@ -32,9 +32,9 @@ protected:
 
     // Having this be static means we don't have to set it for every cue,
     // but obviously limits us to one dfmodel.  This probably isn't an issue;
-    // But having to init every cue with the dfmodel would have made the
-    // instatiation code in CueLibView.cpp and/or Node.cpp more complicated,
-    // since it would require passing an argument around.
+    // and having to init every cue with the dfmodel would have made the
+    // instatiation code in CueLibView.cpp and/or Node.cpp more complicated.
+    // And right now, I only have one dance floor at a time. :-)
     static Dancefloor *m_dfModel;
 };
 

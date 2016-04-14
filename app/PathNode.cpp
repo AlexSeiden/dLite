@@ -44,22 +44,19 @@ PathNode* PathNode::clone()
 void PathNode::beenSelected()
 {
     // Tells the path editor to display the current subrange.
-//    TODO emit iveBeenSelected(this);
-    // Do we need the notion of currently selected nodes for editors of various kinds?
+    // Handled implicitly now, but might be better to be explicit, e.g.:
+    // emit iveBeenSelected(this);
+    // I should build an better encapsulation of currently selected nodes
+    // that use special editors.
     // e.g.
-    //  a current sublevelnode for the spectrograph,
-    //  a current path editor or region editor for the dance floor
+    //  the current sublevelnode for the spectrograph,
+    //  the current path editor or region editor for the dance floor
     qDebug() << "path been selected";
 }
 
 void PathNode::beenDeselected()
 {
-    // Tells the path editor to display the current subrange.
-//    TODO emit iveBeenSelected(this);
-    // Do we need the notion of currently selected nodes for editors of various kinds?
-    // e.g.
-    //  a current sublevelnode for the spectrograph,
-    //  a current path editor or region editor for the dance floor
+    // See notes above.
     qDebug() << "path been deselected";
 }
 

@@ -42,3 +42,5 @@ EXAMPLE_FILES = bwins/fftreal.def eabi/fftreal.def readme.txt license.txt
 target.path = $$[QT_INSTALL_EXAMPLES]/multimedia/spectrum
 INSTALLS += target
 
+QMAKE_MAC_SDK = macosx10.11
+

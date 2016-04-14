@@ -27,8 +27,8 @@ void GroupNodeItem::paint(QPainter *painter,
 {
     Q_UNUSED(widget)
     painter->save();
-    painter->setBrush(QBrush(QColor(200,200,200,100))); // HARDW
-    QPen selectedPen;
+    painter->setBrush(QBrush(QColor(200,200,200,100)));     // hardw
+    qPen selectedPen;
 
     if (isSelected()) {
         // Draw bright red rect around selected node.
@@ -38,7 +38,7 @@ void GroupNodeItem::paint(QPainter *painter,
         selectedPen = QPen(guisettings->m_NNselectedColor);
         selectedPen.setWidth(penWidth);
     } else {
-        selectedPen = QPen(Qt::black);                          // hardw
+        selectedPen = QPen(Qt::black);                      // hardw
         selectedPen.setWidth(guisettings->m_NNselectedWidth);
     }
     painter->setPen(selectedPen);

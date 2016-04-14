@@ -70,14 +70,11 @@ bool Engine::loadSong(const QString &fileName)
     qint64 bytesToRead = m_wavFileHandle->size() - m_wavFileHandle->headerLength();
     m_buffer.resize(bytesToRead);
     int bytesRead = m_wavFileHandle->read(m_buffer.data(), bytesToRead);
-//    Q_UNUSED(bytesRead);
-    // ErrorHandling
 
     m_wavFileHandle->close();
     m_qbuf.setBuffer(&m_buffer);
     m_qbuf.open(QIODevice::ReadOnly);
     m_qbuf.seek(0);
-//    m_audioOutput->setBufferSize(bytesRead);
     qDebug() << bytesToRead << bytesRead << m_qbuf.size() << m_audioOutput->bufferSize();
     emit bufferLengthChanged(bufferLength());
     emit newSong(fileName);
@@ -88,7 +85,6 @@ bool Engine::loadSong(const QString &fileName)
 qint64 Engine::bufferLength() const
 {
     // Return buffer length in bytes
-//    return m_wavFileHandle ? m_wavFileHandle->size() : -1;
     return m_qbuf.buffer().size();
 }
 
@@ -182,8 +178,6 @@ void Engine::timerNotify()
 
         m_dfModel->evaluate();
 
-        // TODO move elsewhere?  perhaps it's own timer loop?
-        // Although, it wants to be on a timer synced with audio playback...
         // TA-DA !
         // ==============================
     }
@@ -351,7 +345,7 @@ void Engine::setFormat(const QAudioFormat &format)
 
 /*
  * Sets interval at which spectrum is updated.
- * TODO:  this is also the interval at which the whole floor is
+ * NOTE:  this is also the interval at which the whole floor is
  * updated, and the two should probably be decoupled.
  */
 void Engine::setUpdateInterval(int val)

@@ -1,13 +1,96 @@
+IP: Grouping
+    save & restore
+    display names
+    rename
+    group-aware duplicate
 
-* Pre-xform entire file
+IP: multiple tabbed cue sheets
+    save only current tab
 
-* save ffts
+Node inspector instead of/in addition to params in graph view
 
-* Center fft window about playback position, rather than looking backwards
+Node Types:
+   color nodes:
+        palette  -- improve
+        spline
+   beats!
+        other segmenters
+        IP: breakdown viewer & editor
+        multiply & divide beats (double/half)
+        offsets
+        bar float output
+   region sequence
+   Conversion nodes between float & int
+   math nodes
+   Paths
+   Use openGL for shading
+   Comp nodes
+   perlin noise
+   particle systems
 
-* provide offsets for fft window
+song queue
 
-* allow changing fft window size
+better color systems than HSV (see https://github.com/jrus/chromatist and
+    http://www.husl-colors.org)
 
-* use fftw???
+Mixer style fading
+
+Fader
+
+Compositing modes
+Firing decay modes
+
+playback controller
+    multiple queued songs
+    Load dlite file from dir with wave
+
+Export/bake
+
+IP:  more Shape rendering with QPainter
+
+global hotkeys:
+  frame all / frame selected  (Still a little funky)
+
+compmode & decaymode pups on cuewidgets
+
+put spectrograph options back in somewhere.
+
+Drawing:
+    LOD
+        Turn off level meters when small
+        longer tangents when small
+    drop shadow
+    nicer active-mode control widget
+    Grid BG option in graph view
+    nicer colors
+    color-coded paramitems
+    color-coded connectors
+    param-view transparent bg
+    arrows on connectors
+    be able to scroll even when current scene is entirely visible.
+
+
+
+"_dirty" bit
+
+Cleaning:
+    Remnants of original spectrum audio recording stuff in bufferlength and
+    windowchanged things
+    Clean up object model & separation-of-concerns,
+        esp wrt CuesheetView/Scene/GraphWidget
+    Get rid of Lightcolor and use QColor
+
+Bugs:
+    XXX moving playhead back in time breaks beat nodes. (as well as new song)
+    editor widgets should give up focus when enter is hit
+    AudioNotify drop
+    Potential UUID collisions; should only store UUIDs during
+        serialization and deserialization
+
+FFTs
+    Center fft window about playback position, rather than looking backwards
+    provide offsets for fft window
+    allow changing fft window size
+    Pre-xform entire file?
+    use fftw???
 

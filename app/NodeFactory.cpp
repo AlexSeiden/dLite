@@ -58,9 +58,8 @@ NodeFactory * NodeFactory::Singleton() {
     // we don't want/need a bunch of separate factories or registries!
     //
     // We need to implement it this way--rather than just using a single
-    // instance of NodeFactory--
-    // so that we get the right order of initialization, and the Registrar
-    // won't be trying to access an uninitialized factory.
+    // instance of NodeFactory--so that we get the right order of initialization,
+    // and the Registrar won't be trying to access an uninitialized factory.
     static NodeFactory factory;
     return &factory;
 }
@@ -80,8 +79,9 @@ void NodeFactory::duplicateNodes(QList<Node*>* dupeThese, QRectF bbox)
         nodeMapping[orignode] = newnode;
     }
 
-    // connections that are internal to the network should be made to
-    // the new nodes.
+    // Connections between the nodes being duplicated need to point to the
+    // duplicates, and not the original ones. Connections outside the subnet
+    // being duplicated are unchanged.
     QList<ParamBase*> haveInternalConnections;
     QList<ParamBase*> haveExternalConnections;
     foreach (Node* newNode, nodeMapping.values()) {

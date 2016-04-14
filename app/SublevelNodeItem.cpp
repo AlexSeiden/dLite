@@ -59,7 +59,8 @@ SublevelNodeItem::SublevelNodeItem(Node *node, QGraphicsItem *parent) :
 {
     m_sublevelNode = dynamic_cast<SublevelNode *>(node);
     m_rangeMeter = new RangeMeter();
-    CHECKED_CONNECT(m_sublevelNode, SIGNAL(levelChanged(qreal)), m_rangeMeter, SLOT(levelChanged(qreal)));
+    CHECKED_CONNECT(m_sublevelNode, SIGNAL(levelChanged(qreal)),
+                    m_rangeMeter, SLOT(levelChanged(qreal)));
     QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
     proxy->setWidget(m_rangeMeter);
     proxy->setPos(0, (m_node->getParams().size()+1)*guisettings->m_PIheight);
@@ -73,7 +74,8 @@ QRectF SublevelNodeItem::boundingRect() const
     if (isMinimized())
         bbox =  QRectF(0,0,guisettings->m_NNWidth, guisettings->m_PIheight);
     else
-        bbox =  QRectF(0,0,guisettings->m_NNWidth, guisettings->m_PIheight*nRows + guisettings->sl_barHeight);
+        bbox =  QRectF(0,0,guisettings->m_NNWidth,
+                       guisettings->m_PIheight*nRows + guisettings->sl_barHeight);
     return bbox.marginsAdded(m_margins);
 }
 

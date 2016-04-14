@@ -17,9 +17,6 @@ DotCue::DotCue()
     addParam<Lightcolor>("color", Lightcolor(255,255,255));
 }
 
-// Is this actually called?  I don't think so, but I guess since Node is
-// pure virtual and operator() must be defined so that the class is concrete,
-// this is here...
 void DotCue::operator()() {
     evaluate();
 }

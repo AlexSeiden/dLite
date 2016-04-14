@@ -87,7 +87,7 @@ void BriteColor::setRandomEngine()
 
 // This is called whenever a parameter gets edited, so
 // that the random number engine can be reset.
-// XXX if these are connections, this is going to break, since
+// XXX If these are connections, this is going to break, since
 // this doesn't get called when a connection value updates,
 // just when a manual edit happens to the widget.
 void BriteColor::paramHasBeenEdited()

@@ -33,12 +33,10 @@ void CueLibView::createUi()
     mainLayout->addWidget(createGroup("Floats", Node::FLOAT));
     mainLayout->addWidget(createGroup("Colors", Node::COLOR));
     mainLayout->addWidget(createGroup("Beats", Node::BEAT));
-//    mainLayout->addWidget(createGroup("Paths", Node::POSITION));
     mainLayout->addWidget(createGroup("Regions", Node::REGION));
     setLayout(mainLayout);
 
     setObjectName(tr("NodeLib"));
-//    setWindowFlags( Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
     setWindowFlags(Qt::Tool | Qt::CustomizeWindowHint);
     CHECKED_CONNECT(m_signalMapper, SIGNAL(mapped(QString)),
                     this, SIGNAL(newNodeRequest(QString)));

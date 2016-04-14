@@ -27,11 +27,9 @@ void CuesheetScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 void CuesheetScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if (m_isConnecting && m_line) {
-        // If we are in the middle of making a connection, update the
-        // line position
+        // When making a connection, update the line position
         QLineF newLine(m_line->line().p1(), mouseEvent->scenePos());
         m_line->setLine(newLine);
-        // need "update()" call here??
     } else {
         QGraphicsScene::mouseMoveEvent(mouseEvent);
     }
@@ -52,7 +50,6 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         // Delete the temporary line we've been dragging out,
         // because soon we'll replace it with the real connector.
         removeItem(m_line);
-//        delete _line;  XXX this seems to cause crashes--but is it now leaking mem?
         m_line = nullptr;
 
         if (targetItem) {
@@ -139,7 +136,7 @@ void CuesheetScene::startLine(QGraphicsSceneMouseEvent *mouseEvent, SocketItem *
     m_startSocket = srcItem;
     m_startPoint = mouseEvent->scenePos();
     m_line = new QGraphicsLineItem(QLineF(m_startPoint, m_startPoint));
-    // TODO width property
+    // TODO make width a style property
     m_line->setPen(QPen(guisettings->m_connectorColor, 2));
     addItem(m_line);
 }
@@ -167,21 +164,12 @@ SocketItem *CuesheetScene::getSocket(QGraphicsItem *item)
         return paramItem->getSocket();
     }
 
-#if 0
-    // TODO That didn't work either.  Pehaps it's a node--look for it's output connection:
-    NodeItem *node;
-    node = dynamic_cast<NodeItem *>(item);
-    if (node) {
-        return node->getOutputSocket();
-    }
-#endif
-
-    // Fuck it, must be something we can't connect to anyway.
+    // Must be something we can't connect to anyway.
     qWarning() <<Q_FUNC_INFO<< "can't connect to type: " << typeid(item).name() << " of item " << item;
     return nullptr;
 }
 
-// The following are super inefficient from an algorithmic point of view,
+// The following are super inefficient from an algorithmic complexity point of view,
 // but in practical terms it shouldn't be a problem.  If it is, we'll
 // optimize then.
 SocketItem *CuesheetScene::getSocketForParam(const ParamBase *param)

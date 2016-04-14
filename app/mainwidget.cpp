@@ -229,7 +229,7 @@ void MainWidget::createMenus()
     CHECKED_CONNECT(m_showTransport, SIGNAL(triggered()),
                     m_transport_dw, SLOT(show()));
 
-    // TODO get cut & paste working
+    // TODO get cut & paste working properly for any arbitrary node selection.
 #if 0
     CHECKED_CONNECT(m_cutAct, SIGNAL(triggered()), m_graphWidget, SLOT(cut()));
     CHECKED_CONNECT(m_copyAct, SIGNAL(triggered()), m_graphWidget, SLOT(copy()));

@@ -43,7 +43,7 @@ private:
     QMap<ParamBase *, QUuid>                    m_connectionsToMake;
     QMap<QUuid, QUuid>                          m_groupsToMake;
 
-    bool            m_dirty;     // TODO set this, and maybe move it to static node
+    bool            m_dirty;
 };
 
 

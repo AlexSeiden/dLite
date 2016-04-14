@@ -43,7 +43,7 @@ void Imager::fire()
 {
     for (int y=0; y<m_image->height(); ++y)
         for (int x=0; x<m_image->width(); ++x) {
-            // TODO XXX $$$ this is super-inefficient
+            // This can be optimized...
             Firing *firing = new Firing;
             Lightcolor color(m_image->pixel(x,y));
             float alpha;

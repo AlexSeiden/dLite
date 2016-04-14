@@ -174,9 +174,12 @@ void Dancefloor::evaluate()
 
         // For every firing, apply the decay & composite.
 #if 0
-        Lightcolor lightColor(light->_value);  // start with what was in buffer.
+        // start with what was in buffer.
+        // Should add this as a cue option.
+        Lightcolor lightColor(light->_value);
 #else
-        Lightcolor lightColor(0,0,0);  // start with black
+        // start with black
+        Lightcolor lightColor(0,0,0);
 #endif
         // This starts with the oldest firing;
         // Right now, firings are added to the back of the vector
@@ -228,24 +231,6 @@ void Dancefloor::setUseAllCues(bool status) {
     m_useAllCues = status;
 }
 
-#if 0
-std::vector<Cue *> Dancefloor::getActiveCues() {
-    // TODO more sophisticated selection of what cues are active
-    if (m_useAllCues)
-        return m_cues;
-    else
-        // TODO this returns a QList<cue *> rather than a std::vector
-        return Cupid::Singleton()->getGraphWidget()->getCurrentCues();
-}
-
-void Dancefloor::evaluateAllCues() {
-    std::vector<Cue *> activeCues = getActiveCues();
-
-    for (Cue *cue : activeCues)
-        cue->evaluate();
-}
-#else
-
 void Dancefloor::evaluateAllCues() {
 
     if (m_useAllCues)
@@ -255,9 +240,6 @@ void Dancefloor::evaluateAllCues() {
         for (Cue *cue :  Cupid::Singleton()->getGraphWidget()->getCurrentCues())
             cue->evaluate();
 }
-
-
-#endif
 
 void Dancefloor::addCue(Cue *cue) {
     m_cues.push_back(cue);

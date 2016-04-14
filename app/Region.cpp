@@ -15,7 +15,7 @@ bool Region::hasCell(QPoint p)
 void Region::setCell(QPoint p, bool status)
 {
     // $$$ inefficient, although really not that bad because _cells is
-    // a QList<QPoint>.  Could easily  be made QSet<> TODO
+    // a QList<QPoint>.  Could easily be made QSet<> TODO
     _cells.removeAll(p);
     if (status)
         _cells.append(p);

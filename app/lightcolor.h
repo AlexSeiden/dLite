@@ -40,7 +40,6 @@ public:
     Lightcolor  & operator*=(double scalar);
 
     const Lightcolor  operator*(double rhs);
-//    const Lightcolor  operator*(const Lightcolor &rhs);
     const Lightcolor  operator+(const Lightcolor &rhs);
 
     void    setRGB(unsigned char *rgb);

@@ -161,22 +161,6 @@ public:
 
     PARAMT m_value;
 
-    // Copy assignment operator
-#if 0
-    Param<PARAMT>& operator=(Param<PARAMT> &rhs) {
-        this->_connectedParam = rhs._connectedParam;
-        this->_value = rhs._value;
-        return *this;
-    }
-#elif 0
-    void getValueAndConnections(const Param<PARAMT>& rhs)
-    {
-        _connectedParam = rhs._connectedParam;
-        _value = rhs._value;
-    }
-
-#endif
-
     virtual void readFromJSONObj(const QJsonObject &json);
     virtual void writeToJSONObj(QJsonObject &json) const;
 

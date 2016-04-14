@@ -22,8 +22,6 @@ ConnectorStub::~ConnectorStub() { }
 void ConnectorStub::updatePath()
 {
     // Makes a new path when one of the ends has been moved.
-
-    // hardw
     QPointF p_end;
 
     prepareGeometryChange();
@@ -49,13 +47,6 @@ void ConnectorStub::paint(QPainter *painter,
 
     painter->save();
     painter->setBrush(Qt::NoBrush);
-#if 0
-    // TODO
-    if (parent()->isSelected())
-        painter->setPen(guisettings->m_connectorPenSelected);
-    else
-        painter->setPen(guisettings->m_connectorPen);
-#endif
     painter->setPen(guisettings->m_connectorPen);
     painter->drawPath(*m_path);
 
@@ -131,9 +122,7 @@ QRectF ConnectorItem::boundingRect() const
     // that connects _pStart & _pEnd -- the PREVIOUS positions.
     // The second rect connects the NEW positions of the sockets--
     // nStart & nEnd. This matters when we are dragging quickly.
-    // TODO Hey, do I still have to do this? or was the problem all along the
-    // lack of a "prepareGeometryChange()"?
-
+    // TODO Can this be merged into "prepareGeometryChange()"?
 
     float leftprev = qMin(m_pStart.x(), m_pEnd.x()-100);
     float leftnext = qMin( nStart.x(),  nEnd.x()-100);
@@ -173,12 +162,11 @@ void ConnectorItem::updatePath()
     m_pEnd   = m_clientSocket->socketPos();
     m_endStub.m_p = m_pEnd;
 
-    // hardw
     m_pStart += QPointF(offset,0);
     m_pEnd -= QPointF(offset,0);
 
     qreal deltaX = fabs(m_pEnd.x() - m_pStart.x());
-    qreal tangent = .5 * deltaX; //hardw
+    qreal tangent = .5 * deltaX;
 
     prepareGeometryChange();
     // TODO do we always have to delete the path and allocate again?
@@ -209,14 +197,6 @@ void ConnectorItem::paint(QPainter *painter,
         painter->setPen(guisettings->m_connectorPen);
 
     painter->drawPath(*m_path);
-
-#if 0
-    // TODO set ellipse pen brush & size
-    painter->setBrush(guisettings->m_connectorBrush);
-    painter->drawEllipse(m_pStart, guisettings->m_connectorEndSize, guisettings->m_connectorEndSize);
-    painter->drawEllipse(m_pEnd,   guisettings->m_connectorEndSize, guisettings->m_connectorEndSize);
-#endif
-
     painter->restore();
 }
 
@@ -224,7 +204,7 @@ void ConnectorItem::paint(QPainter *painter,
 // TODO
 #if 0
 #include <math.h>
-static const double Pi = 3.14159265358979323846264338327950288419717;
+static const double Pi = 3.141592653589793238;
 static double TwoPi = 2.0 * Pi;
 
 // Cribbed from "elastic nodes" example

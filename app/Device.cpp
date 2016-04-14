@@ -44,8 +44,7 @@ Device::setlight(int controllerIndex, int lightIndex, unsigned char *rgb) {
 // Network stuff
 
 bool Device::connect() {
-    // These were presumeably set with QuickPlayPro or some other tool by Don,
-    // or are the default values, or something...
+    // These were set in the hardware with QuickPlayPro
     //      IPAddrs = ('10.0.1.21', '10.0.1.22',)
     //      tropic-ck1 IP '10.0.1.21'
     //      tropic-ck2 IP '10.0.1.22'

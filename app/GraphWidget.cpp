@@ -55,7 +55,6 @@ GraphWidget::GraphWidget(QWidget *parent) :
     m_renameTabDialog = new RenameTabDialog(this);
 
     // GROSS this doesn't really belong here in GraphWidget
-    // GROSS this duplicates code below.
     m_segmentController = new SegmentController;
     CHECKED_CONNECT(this, SIGNAL(segmentationChanged(SongSegmentation*)),
                     Cupid::Singleton()->getTransport(), SLOT(segmentsChanged(SongSegmentation*)));
@@ -69,8 +68,6 @@ void GraphWidget::connectUi()
 {
     CHECKED_CONNECT(Cupid::Singleton()->getEngine(), SIGNAL(newSong(QString)),
                     this, SLOT(newSong(QString)));
-//    CHECKED_CONNECT(m_newCueButton, SIGNAL(clicked()), this, SLOT(newCuesheet()));
-//    CHECKED_CONNECT(_segmentButton, SIGNAL(clicked()), this, SLOT(showSegmentController()));
 }
 
 // ------------------------------------------------------------------------------
@@ -115,8 +112,8 @@ void GraphWidget::deleteCuesheet(int index)
     QWidget *widget = m_tabwidget->widget(index);
     CuesheetView *csv = getCurrentView(index);
     CuesheetScene *css = getCurrentScene(index);
-    // If deleting the last widget, first create a new one,
-    // because we have to have at least one widget
+    // If deleting the last tab widget, first create a new one,
+    // because we have to have at least one tab.
     if (m_tabwidget->count() == 1) {
         newCuesheet();
     }
@@ -343,7 +340,6 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         update();
         break;
     default:
-//        qDebug() << Q_FUNC_INFO << "keypress " << event->key() << " ; text()" << event->text();
         event->setAccepted(false);
         QWidget::keyPressEvent(event);
     }
@@ -410,7 +406,7 @@ void GraphWidget::frameAll()
 }
 
 // Automatically layout all nodes.
-// TODO layout selection
+// TODO layout only selected nodes.
 void GraphWidget::layoutAll()
 {
     // Start with Cues, which will be the root of the dag:

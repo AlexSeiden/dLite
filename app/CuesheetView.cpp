@@ -14,7 +14,6 @@ CuesheetView::CuesheetView(QWidget *parent)
     m_graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
     m_graphicsView->setInteractive(true);
 
-    // ??? Not sure about these flags...they came from the example stuff
     m_graphicsView->setOptimizationFlags(QGraphicsView::DontSavePainterState);
     m_graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
     m_graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -30,7 +29,7 @@ CuesheetView::CuesheetView(QWidget *parent)
 QGraphicsView *CuesheetView::view() const
 {
     // This is only here to help implement zooming with wheel events.
-    // LATER make pinch-to-zoom work.
+    // TODO make pinch-to-zoom work.
     return static_cast<QGraphicsView *>(m_graphicsView);
 }
 
@@ -38,13 +37,11 @@ void CuesheetView::resetView()
 {
     m_zoom = 500;
     setupMatrix();
-    // TODO this doesn't work so great.
     m_graphicsView->ensureVisible(QRectF(0, 0, 0, 0));
 }
 
 void CuesheetView::fitBbox(const QRectF &bbox)
 {
-//    view()->fitInView(bbox, Qt::KeepAspectRatioByExpanding);
     view()->fitInView(bbox, Qt::KeepAspectRatio);
     setZoomFromTransform();
 }
@@ -54,7 +51,7 @@ void CuesheetView::setZoomFromTransform()
     // Find scale from xform matrix:
     QTransform xform = m_graphicsView->transform();
     qreal scale = xform.m11();
-    // m22 should be the same... could check....
+    // m22 should be the same as m11, since we don't want to scale anamorphically!
 
     // Compute the zoom value from the xform matrix that exists:
     m_zoom = 200 * log2(scale) + 700;
@@ -93,7 +90,7 @@ void CuesheetView::zoomReset()
 void GraphicsView::wheelEvent(QWheelEvent *e)
 {
     // This is only here to help implement zooming with wheel events.
-    // LATER pinch-to-zoom work.
+    // TODO make pinch-to-zoom work.
     if (e->modifiers() & Qt::ControlModifier) {
         if (e->delta() > 0)
             m_view->zoomIn(6);

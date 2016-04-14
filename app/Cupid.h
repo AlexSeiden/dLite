@@ -12,7 +12,8 @@ class Transport;
 
 // Cupid
 //      How things get hooked together.
-//      A fancy way of doing global variables.  GROSS
+//      You could call it an "observer pattern", but that's really
+//      just a fancy way to say "global variables."
 class Cupid : public QObject
 {
     Q_OBJECT

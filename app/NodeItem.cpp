@@ -1,3 +1,4 @@
+// NodeItem.cpp
 // Classes for drawing the graph view representation of all the nodes.
 
 #include <QtWidgets>
@@ -28,8 +29,8 @@ NodeItem::NodeItem(Node *node, QGraphicsItem *parent) :
     nameEdit->setText(m_node->getName());
     QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
     proxy->setWidget(nameEdit);
-    proxy->setPos(guisettings->m_socketWidth + guisettings->m_paramTextOffset, 2);  // Hardw
-    proxy->resize(guisettings->m_NNWidth*.75, (guisettings->m_PIheight -2)* .75);  // Hardw
+    proxy->setPos(guisettings->m_socketWidth + guisettings->m_paramTextOffset, 2);  // Hardwired
+    proxy->resize(guisettings->m_NNWidth*.75, (guisettings->m_PIheight -2)* .75);   // Hardwired
     CHECKED_CONNECT(nameEdit, SIGNAL(textChanged(QString)), this, SLOT(nameEdit(QString)));
 
     // Minimize checkbox
@@ -90,8 +91,8 @@ void NodeItem::paint(QPainter *painter,
     Q_UNUSED(widget);
     painter->save();
 
-    //painter->setBrush(dragOver ? color.light(130) : GuiColors::nodeBGColor);
     // TODO hover highlighting
+    //painter->setBrush(dragOver ? color.light(130) : GuiColors::nodeBGColor);
     painter->setBrush(guisettings->m_NNBGColor);
 
     QBrush b = painter->brush();
@@ -138,7 +139,6 @@ void NodeItem::paint(QPainter *painter,
 QVariant    NodeItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if (change == ItemScenePositionHasChanged) {
-//        qDebug() << "NodeItem itemchange" << _node->getName();
         emit nodeMovedEventSignal();
     }
     return QGraphicsItem::itemChange(change, value);
@@ -296,13 +296,6 @@ ParamItem::ParamItem(ParamBase *param, QGraphicsObject *parent) :
         int yshift =  extra/2;
         int xshift = guisettings->m_socketWidth + guisettings->m_paramTextOffset + guisettings->m_paramEditorOffset;
         proxy->setPos(xshift, yshift);
-
-#if 0
-        // XXX this is broken; for some reason, it's setting the value on other connections
-        // as well.
-        if (param->connectedParam())    //TODO update this when connections happen
-            parItem->setEnabled(false);
-#endif
     }
 }
 
@@ -326,7 +319,7 @@ void ParamItem::paint(QPainter *painter,
     else
         painter->setBrush(guisettings->m_PIbgcolor);
 
-    QRect rr(2,0,guisettings->m_NNWidth-4,guisettings->m_PIheight); //hardw
+    QRect rr(2,0,guisettings->m_NNWidth-4,guisettings->m_PIheight);
 
     // Draw rectangle
     painter->setPen(QPen(guisettings->m_paramBorderColor,

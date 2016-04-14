@@ -7,99 +7,6 @@
 #include "Cupid.h"
 #include "NodeFactory.h"
 
-// TODO master todo here (because it's the first src file.)
-/*
-IP: Grouping
-    save & restore
-    display names
-    rename
-    group-aware duplicate
-
-IP: multiple tabbed cue sheets
-    save only current tab
-
-Node inspector instead of/in addition to params in graph view
-
-Node Types:
-   color nodes:
-        palette  -- improve
-        spline
-   beats!
-        other segmenters
-        IP: breakdown viewer & editor
-        multiply & divide beats (double/half)
-        offsets
-        bar float output
-   region sequence
-   Conversion nodes between float & int
-   math nodes
-   Paths
-   Use openGL for shading
-   Comp nodes
-   perlin noise
-   particle systems
-
-song queue
-
-better color systems than HSV (see https://github.com/jrus/chromatist and
-    http://www.husl-colors.org)
-
-Mixer style fading
-
-Fader
-
-Compositing modes
-Firing decay modes
-
-playback controller
-    multiple queued songs
-    Load dlite file from dir with wave
-
-Export/bake
-
-IP:  more Shape rendering with QPainter
-
-global hotkeys:
-  frame all / frame selected  (Still a little funky)
-
-compmode & decaymode pups on cuewidgets
-
-put spectrograph options back in somewhere.
-
-Drawing:
-    LOD
-        Turn off level meters when small
-        longer tangents when small
-    drop shadow
-    nicer active-mode control widget
-    Grid BG option in graph view
-    nicer colors
-    color-coded paramitems
-    color-coded connectors
-    param-view transparent bg
-    arrows on connectors
-    be able to scroll even when current scene is entirely visible.
-
-
-
-"_dirty" bit
-
-Cleaning:
-    Remnants of original spectrum audio recording stuff in bufferlength and
-    windowchanged things
-    Clean up object model & separation-of-concerns,
-        esp wrt CuesheetView/Scene/GraphWidget
-    Get rid of Lightcolor and use QColor
-
-Bugs:
-    XXX moving playhead back in time breaks beat nodes. (as well as new song)
-    editor widgets should give up focus when enter is hit
-    AudioNotify drop
-    Potential UUID collisions; should only store UUIDs during
-        serialization and deserialization
-
-*/
-
 // ------------------------------------------------------------------------------
 //  BeatFiles
 //
@@ -110,24 +17,12 @@ Bugs:
 //  utils
 int findBeatIndexForSample(int thisSample, std::vector<int> beatvec)
 {
-#if 1
     int i=0;
     for (i=1; i<beatvec.size(); ++i) {
         if (beatvec[i]>thisSample)
             break;
     }
     return i-1;
-#else
-    // Use binary search to find the index of the closest beat
-    // before thisSample.  Return -1 if thisSample is before all beats.
-    std::vector<int>::iterator start = beats.begin();
-    std::vector<int>::iterator finish = beats.end();
-    int index = -1;
-    while (start < finish) {
-        if ((*start) < thisSample)
-            break;
-    }
-#endif
 }
 
 int findBeatIndexForSample(int thisSample, std::vector<int> beatvec, int suggestedIndex)
@@ -258,15 +153,6 @@ void Multiply::operator()()
        out = true;
 
        // Find new refresh value
-#if 0
-       ParamBase* inputParam = _input.connectedParam();
-       if (! inputParam) goto done;
-       Node* inputNode = inputParam->getParentNode();
-       if (! inputNode) goto done;
-       int nextInputRefresh = inputNode->_nextRefresh; // XXX this is private, and not available on most nodes.
-       int delta = nextInputRefresh - _nextRefresh;
-       delta /= multiple;
-#endif
        m_nextRefresh += m_delta;
     }
 
