@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QGroupBox>
 #include <QLayout>
-#include <QToolButton>
+#include <QPushButton>
 #include <QLabel>
 #include <QSignalMapper>
 
@@ -31,7 +31,7 @@ private:
     QGroupBox*  createGroup(QString typeName, Node::node_t nodeType);
     void        addButtonToUi(QLayout *layout, QString buttonName);
 
-    QList<QToolButton *>    m_buttons;
+    QList<QPushButton *>    m_buttons;
     QSignalMapper*          m_signalMapper;
 };
 

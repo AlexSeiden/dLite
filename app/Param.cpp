@@ -134,7 +134,7 @@ void ParamBase::connectTo(ParamBase *server)
 }
 
 // Copy Value
-// XXX  GROSS -- There's got to be a better way to do this.
+// Style -- There's got to be a better way to do this.
 void ParamBase::copyValueAndConnection(ParamBase *rhs)
 {
     m_connectedParam = rhs->m_connectedParam;
@@ -324,7 +324,7 @@ template <> void Param<Lightcolor>::readFromJSONObj(const QJsonObject &json)
 template <> void Param<Region>::readFromJSONObj(const QJsonObject &json)
 {
     ParamBase::readFromJSONObj(json);
-    // XXX Node override handling this now.
+    // NUKEMEMAYBE Node override handling this now.
 }
 
 
@@ -332,7 +332,7 @@ template <> void Param<Region>::readFromJSONObj(const QJsonObject &json)
 // Editor widgetry
 //      Although we partly break the separation between "model" and "view" here
 //      (Since editors are clearly part of the view, and the params themselves
-//      could be view-agnostic), it makes the code more cohesive,  rather
+//      could be view-agnostic), it makes the code more cohesive, rather
 //      than implementing the editors in another class.
 QWidget* ParamBase::getEditorWidget(QObject *sendValueChangesHere)
 {
@@ -355,18 +355,13 @@ template <> QWidget* Param<float>::getEditorWidget(QObject* sendValueChangesHere
     float val = 0.0;
     getValue(val);
     editorWidget->setValue(val);
-    //CHECKED_CONNECT(editorWidget, SIGNAL(valueChanged(double)), sendValueChangesHere, SLOT(setValue(double)));
-    // TODO vet connection
-    editorWidget->connect(editorWidget, SIGNAL(valueChanged(double)),
-                          sendValueChangesHere, SLOT(setValue(double)));
+    // Vet connection.  Can't used CHECKED_CONNECT from template.
+    bool result = editorWidget->connect(editorWidget, SIGNAL(valueChanged(double)),
+                                        sendValueChangesHere, SLOT(setValue(double)));
+    if (!result)
+        qDebug() << "Could not connect editor widget to param slot";
 
     editorWidget->setFixedSize(60,22); // hardw
-    // can't do this bc clearFocus is not a slot.
-//    editorWidget->connect(editorWidget, SIGNAL(editingFinished()),
-//                          editorWidget, SLOT(clearFocus()));
-
-    // was trying to get centered widget...
-//    editorWidget->move(0, -editorWidget->rect().bottom());
     editorWidget->setFocusPolicy(Qt::ClickFocus);
     return editorWidget;
 }
@@ -374,18 +369,18 @@ template <> QWidget* Param<float>::getEditorWidget(QObject* sendValueChangesHere
 template <> QWidget* Param<int>::getEditorWidget(QObject* sendValueChangesHere)
 {
     QSpinBox *editorWidget = new QSpinBox;
-//    editorWidget->installEventFilter(eventFilter);
     if (m_useminmax) {    // TODO finish this
         editorWidget->setRange(m_minVal, m_maxVal);
         editorWidget->setSingleStep(_stepVal);
     }
-//    editorWidget->setButtonSymbols(QAbstractSpinBox::NoButtons);
 
     int val = 0;
     getValue(val);
     editorWidget->setValue(val);
-    editorWidget->connect(editorWidget, SIGNAL(valueChanged(int)),
+    bool result = editorWidget->connect(editorWidget, SIGNAL(valueChanged(int)),
                           sendValueChangesHere, SLOT(setValue(int)));
+   if (!result)
+        qDebug() << "Could not connect editor widget to param slot";
 
     editorWidget->setFixedSize(60,22); // hardw
     return editorWidget;
@@ -401,7 +396,6 @@ template <> QWidget* Param<bool>::getEditorWidget(QObject* sendValueChangesHere)
                           sendValueChangesHere, SLOT(setBoolValue(int)));
     editorWidget->move(0, -editorWidget->rect().bottom());
     editorWidget->setContentsMargins(0,0,0,0);
-//    editorWidget->setAutoFillBackground(false);  // doesn't work
     return editorWidget;
 }
 

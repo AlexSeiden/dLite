@@ -35,7 +35,7 @@ void RegionCue::evaluate()
     getValue("color", color);
     getValue("alpha", alpha);
     Region region;
-    getValue("region", region); // XXX how heavy is this????
+    getValue("region", region); // ??? how heavy is this-could optimize?`
 
     // "Fire" the light with the correct parameters
     foreach (QPoint p, region.getCells()) {

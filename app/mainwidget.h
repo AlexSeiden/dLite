@@ -43,7 +43,7 @@ public slots:
                          const FrequencySpectrum &spectrum);
     void save();
 
-    // XXX is this needed?  only for new songs--which should be a separate slot
+    // Style: is this needed?  only for new songs--which should be a separate slot
     void bufferLengthChanged(qint64 length);
 
     // Style: This is more of a "model" or "controller" issue than a view/widget one.
@@ -67,6 +67,11 @@ private:
     Engine*                 m_engine;
 
     // UI components
+    GraphWidget *           m_graphWidget;
+    Dancefloor *            m_dancefloor;
+    Dancefloorwidget *      m_dancefloorwidget;
+    CueLibView *            m_cueLibView;
+    QDockWidget*            m_cueLibView_dw;
     Transport*              m_transport;
     QDockWidget*            m_transport_dw;
     Spectrograph*           m_spectrograph;
@@ -106,10 +111,6 @@ private:
 
     // Dialogs
     SettingsDialog*         m_settingsDialog;
-    Dancefloor *            m_dancefloor;
-    Dancefloorwidget *      m_dancefloorwidget;
-    CueLibView *            m_cueLibView;
-    GraphWidget *           m_graphWidget;
 
     QString                 m_filename;
 };

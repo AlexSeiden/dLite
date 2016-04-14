@@ -93,7 +93,8 @@ void RandomInt::setRandomEngine()
     getValue("min", min);
     getValue("max", max);
     // TODO re-run this when distributions change.
-    // XXX if these are connections, this is going to break.
+    // XXX if these are connections, this is going to break, but they
+    // probably shouldn't be connectable.
     _distribution = new std::uniform_int_distribution<int>(min, max);
 }
 

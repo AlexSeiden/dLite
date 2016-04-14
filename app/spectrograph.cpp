@@ -62,6 +62,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
     Q_UNUSED(event)
 
     QPainter painter(this);
+    painter.save();
     painter.fillRect(rect(), guisettings->sg_bg);
 
     const int numBars = m_bars.count();
@@ -164,6 +165,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
 
         painter.drawRect(subwin);
     }
+    painter.restore();
 }
 
 // -----------------------------------------------------------------------------
@@ -384,13 +386,13 @@ void Spectrograph::printSpectrum() {
 void Spectrograph::submeterSelected(SublevelNode *chosen)
 {
     m_selectedSublevels.insert(chosen);
-    update();  // XXX Can optimize
+    update();
 }
 
 void Spectrograph::submeterDeselected(SublevelNode *chosen)
 {
     m_selectedSublevels.remove(chosen);
-    update();  // XXX Can optimize
+    update();
 }
 
 bool Spectrograph::showSubrange()

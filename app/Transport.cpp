@@ -35,7 +35,7 @@ void Transport::paintEvent(QPaintEvent * event)
     painter.fillRect(rect(), guisettings->trans_bgColor);
 
     if (! m_bufferLength) return;
-
+    painter.save();
 
     QRect bar = rect();
     const qreal play = qreal(m_playPosition) / m_bufferLength;
@@ -61,7 +61,7 @@ void Transport::paintEvent(QPaintEvent * event)
     // Play head
     QRect playHead(bar.left(), 0, guisettings->trans_playheadWidth, rect().height());
     painter.fillRect(playHead, guisettings->trans_playheadColor);
-
+    painter.restore();
 }
 
 void Transport::bufferLengthChanged(qint64 bufferSize)

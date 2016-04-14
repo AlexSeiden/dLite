@@ -215,18 +215,12 @@ void Engine::audioStateChanged(QAudio::State state)
                 return;
             }
         }
-
-        // XXX workaround attempt for bug that causes audioNotify signals to stop
-        // getting sent, even though music keeps playing and nothing else seems wrong.
-        //CHECKED_CONNECT(m_audioOutput, SIGNAL(notify()), this, SLOT(audioNotify()));
-
         setState(state);
     }
 }
 
 void Engine::spectrumChanged(const FrequencySpectrum &spectrum)
 {
-//    ENGINE_DEBUG << "Engine::spectrumChanged" << "pos" << m_spectrumPosition;
     // NOTE:  position excluded; vestigial.
     emit spectrumChanged(0, m_spectrumBufferLength, spectrum);
 }
@@ -259,24 +253,15 @@ bool Engine::initialize()
 {
     bool result = false;
 
-    QAudioFormat format = m_format;
-
     if (selectFormat()) {
         resetAudioDevices();
         result = true;
         m_audioOutput = new QAudioOutput(m_format, this);
-//        m_audioOutput->setNotifyInterval(m_notifyIntervalMs);
     } else {
         if (m_wavFileHandle)
-            emit errorMessage(tr("Audio format not supported"), formatToString(m_format));
+            emit errorMessage(tr("Audio format not supported"),
+                              formatToString(m_format));
     }
-
-//    // (notify Interval may not be the same as set, if it's not supportable by device)
-//    if (m_notifyIntervalMs != m_audioOutput->notifyInterval()) {
-//        qDebug() << "Engine::initialize" << "requested notify interval" << m_notifyIntervalMs;
-//        qDebug() << "                  " << "actual    notify interval" << m_audioOutput->notifyInterval();
-//    }
-
     ENGINE_DEBUG << "Engine::initialize" << "format" << m_format;
 
     return result;
@@ -321,7 +306,7 @@ void Engine::setState(QAudio::State state)
     }
 }
 
-// XXX should we nuke this, and get play position 'live'?
+// ??? should we nuke this, and get play position 'live'?
 // or does the check-for-pos-changed save updates?
 void Engine::setPlayPosition(qint64 position, bool forceEmit)
 {

@@ -1,6 +1,15 @@
 /* dLite Qt stylesheet */
 
 
+/* ------------------------------------------------------------------------------ */
+
+QMainWindow {
+    background-color: #522;
+}
+
+/* ------------------------------------------------------------------------------ */
+/*  Custom properties */
+
 GuiSettings {
     qproperty-NNBGColor: rgb(150,150,255);
     qproperty-NNNameFont: "Helvetica Light,  -1,14,  0,25,  0,0,0,0,0";
@@ -8,12 +17,12 @@ GuiSettings {
     qproperty-NNselectedColor: rgb(255,100,100);
     qproperty-NNselectedWidth: 2;
     qproperty-NNselectedBorderRadius: 4;
-    qproperty-NNWidth: 200;
-    qproperty-NNSpacing: 30;
+    qproperty-NNWidth: 180;
+    qproperty-NNSpacing: 25;
 
     qproperty-PIbgcolor: rgb(50, 50, 55);
     qproperty-PIoutputbgcolor: rgb(100,100,100);
-    qproperty-PIheight: 26;
+    qproperty-PIheight: 20;
 
     /*
     Doc on fonts:
@@ -97,12 +106,12 @@ QLineEdit {
     border: 1px solid gray;
     padding: 2px 0px;
     margin-bottom: 0px;
-    margin-top: 3px;
+    margin-top: 1px;
     background: rgba(200,200,200, 128);
     selection-background-color: rgb(20,20,20);
-    max-height: 12px;
+    max-height: 8px;
     font-family: Courier;
-    font-size: 12px;
+    font-size: 10px;
 }
 
 /* ------------------------------------------------------------------------------ */
@@ -114,7 +123,7 @@ QCheckBox {
 
 /* ------------------------------------------------------------------------------ */
 QSpinBox, QDoubleSpinBox {
-    max-height: 14px;
+    max-height: 12px;
     font-size: 10px;
     margin: 0px;
     spacing: 0px;
@@ -126,6 +135,7 @@ QSpinBox, QDoubleSpinBox {
 }
 
 /* ------------------------------------------------------------------------------ */
+/* Tab widget stuff                                             */
 QTabWidget::pane { /* The tab widget frame */
     border: 1px solid grey;
     background-color: #333;
@@ -187,22 +197,22 @@ QTabBar::tab:selected {
 }
 
 QTabBar::tab:first:selected {
-    margin-left: 0; /* the first selected tab has nothing to overlap with on the left */
+    /* the first selected tab has nothing to overlap with on the left */
+    margin-left: 0;
 }
 
 QTabBar::tab:last:selected {
-    margin-right: 0; /* the last selected tab has nothing to overlap with on the right */
+    /* the last selected tab has nothing to overlap with on the right */
+    margin-right: 0;
 }
 
-QMainWindow {
-    background-color: #522;
-}
 
 /* ------------------------------------------------------------------------------ */
+/* For CueLib sections */
 
 QGroupBox {
     background-color: #933;
-    border: 1px solid #00F;
+    border: 1px solid #222;
     border-radius: 3px;
     margin-top: 14px; /* leave space at the top for the title */
     margin-bottom: 2px;
@@ -227,19 +237,35 @@ QGroupBox::title {
     margin-bottom: 22px;
     padding: 0px;
     background-color: #E0E0E0;
+    border-radius: 3px;
 }
 
 
 /* ------------------------------------------------------------------------------ */
+/* NodeLib */
+#NodeLib {
+    background-color: #933;
+}
 
-QToolButton {
-    border: 1px solid #0F0;
+
+/* ------------------------------------------------------------------------------ */
+/* New node buttons in NodeLib dockwidget */
+
+QPushButton#CueButt {
+    border: 2px outset #333;
     border-radius: 2px;
     background-color: #CCC;
     margin: 1px;
     text-align: right;
     min-width: 70px;
-    padding: 0px;
+    padding-right: 2px;
     font-family: Futura;
     font-size: 10px;
 }
+
+QPushButton:pressed#CueButt {
+    border: 3px inset #555;
+    background-color: #AAA;
+}
+
+

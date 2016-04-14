@@ -85,6 +85,7 @@ void Circle::draw()
     getValue("height", height);
 
     QPainter painter(m_image);
+    painter.save();
     painter.setRenderHint(QPainter::Antialiasing, true);
 
     painter.fillRect(m_image->rect(), Qt::black);
@@ -92,6 +93,7 @@ void Circle::draw()
     QPointF center(x, y);
     painter.drawEllipse(center, width, height);
 
+    painter.restore();
     painter.end();
 }
 
@@ -136,6 +138,7 @@ void Box::draw()
     getValue("antialiased", antialiased);
 
     QPainter painter(m_image);
+    painter.save();
     painter.setRenderHint(QPainter::Antialiasing, antialiased);
 
     painter.fillRect(m_image->rect(), Qt::black);
@@ -143,7 +146,6 @@ void Box::draw()
 
     QPointF topLeft(x, y);
     QRectF rr(0.0, 0.0, width, height);
-    painter.save();
     painter.translate(topLeft);
     painter.rotate(rotation);
     painter.fillRect(rr, color.toQColor());

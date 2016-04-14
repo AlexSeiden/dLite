@@ -20,9 +20,8 @@ Dancefloorwidget::Dancefloorwidget(QWidget *parent) :
     m_cellspace = guisettings->df_cellspace;
 
     setWindowTitle(tr("dLite floor"));
-//    setWindowFlags(Qt::Tool | Qt::WindowTitleHint  |
-    setWindowFlags(Qt::WindowTitleHint  |
-                   Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
+    setWindowFlags(Qt::Tool | Qt::WindowTitleHint  | Qt::WindowCloseButtonHint |
+                   Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint);
 }
 
 Dancefloorwidget::~Dancefloorwidget() { }
@@ -51,6 +50,7 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
     Q_UNUSED(event)
 
     QPainter painter(this);
+    painter.save();
     painter.fillRect(rect(), guisettings->df_bgColor);
 
     // Draw the outline
@@ -113,6 +113,7 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
             }
         }
     }
+    painter.restore();
 }
 
 #ifndef INLINE
@@ -143,14 +144,14 @@ void Dancefloorwidget::regionSelected(RegionNode *chosen)
 {
     m_selectedRegionNodes.insert(chosen);
     setRegionEdit();
-    update();  // XXX Can optimize
+    update();
 }
 
 void Dancefloorwidget::regionDeselected(RegionNode *chosen)
 {
     m_selectedRegionNodes.remove(chosen);
     setRegionEdit();
-    update();  // XXX Can optimize
+    update();
 }
 
 bool Dancefloorwidget::editingRegion()

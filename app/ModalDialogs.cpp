@@ -18,7 +18,7 @@ void MainWidget::showLoadSongDialog()
 
 void MainWidget::showSaveDialog()
 {
-    const QString dir = QDir::homePath(); // XXX better default path
+    const QString dir = QDir::homePath(); // TODO better default path
     m_filename = QFileDialog::getSaveFileName(this, tr("Save file"), dir);
     if (! m_filename.isEmpty()) {
         if (! m_filename.endsWith(".dlite"))
@@ -29,7 +29,7 @@ void MainWidget::showSaveDialog()
 
 void MainWidget::showOpenDialog()
 {
-    const QString dir = QDir::homePath(); // XXX better default path
+    const QString dir = QDir::homePath(); // TODO better default path
     const QString fileName = QFileDialog::getOpenFileName(this, tr("Open dLite file"), dir, "*.dLite");
     // TODO open multiple files
     if (! fileName.isEmpty() && ! fileName.isNull()) {
@@ -43,12 +43,15 @@ void MainWidget::showOpenDialog()
 
 void MainWidget::showImportDialog()
 {
-    const QString dir = QDir::homePath(); // XXX better default path
-    const QString fileName = QFileDialog::getOpenFileName(this, tr("Import dLite file"), dir, "*.dLite");
-    // TODO open multiple files
+    const QString dir = QDir::homePath(); // TODO better default path
+    const QString fileName =
+            QFileDialog::getOpenFileName(this, tr("Import dLite file"),
+                                         dir, "*.dLite");
+
+    // TODO allow user to open multiple files at the same time and have
+    // them loaded into separate cuesheets.
     if (! fileName.isEmpty() && ! fileName.isNull()) {
         NodeFactory::Singleton()->readFromFile(fileName, true);
-//        emit updateButtonStates();
         updateMenuStates();
     }
 }

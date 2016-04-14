@@ -13,7 +13,7 @@ ConnectorStub::ConnectorStub(QGraphicsItem *parent, bool isOutput) :
     m_isOutput(isOutput),
     m_path(nullptr)
 {
-    setZValue(100.0);
+    setZValue(1000.0);
     updatePath();
 }
 
@@ -99,7 +99,7 @@ ConnectorItem::ConnectorItem(SocketItem *serverSocket, SocketItem *clientSocket,
     m_startStub(this, true),
     m_endStub(this, false)
 {
-    setZValue(-100.0);  // TODO make connector z a pref?
+    setZValue(-1000.0);  // TODO make connector z a pref?
     updatePath();
 
     setFlags(ItemIsSelectable);

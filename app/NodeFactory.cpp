@@ -140,6 +140,7 @@ void NodeFactory::duplicateNodes(QList<Node*>* dupeThese, QRectF bbox)
 // -------------------
 // File writing
 
+// Saves all nodes to JSON file
 bool NodeFactory::saveToFile(QString filename)
 {
     QFile qfile(filename);
@@ -169,9 +170,7 @@ void NodeFactory::writeNodesToJSONObj(QJsonObject &json, QList<Node*>nodes) cons
     }
     json["nodes"] = nodeJsonArray;
 
-     // TODO write:
-     //     audioFilename
-     //     onset, beat, etc., files
+     // TODO save audioFilename; onset, beat, etc., files
 }
 
 void NodeFactory::writeCuesheetsToJSONObj(QJsonObject &json) const

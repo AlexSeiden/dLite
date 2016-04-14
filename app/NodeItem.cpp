@@ -88,7 +88,6 @@ void NodeItem::paint(QPainter *painter,
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
-
     painter->save();
 
     //painter->setBrush(dragOver ? color.light(130) : GuiColors::nodeBGColor);
@@ -317,9 +316,9 @@ void ParamItem::paint(QPainter *painter,
                       const QStyleOptionGraphicsItem *option,
                       QWidget *widget)
 {
-    painter->save();
     Q_UNUSED(widget);
     Q_UNUSED(option);
+    painter->save();
 
     // Set box for this param
     if (m_param->isOutput())
@@ -330,8 +329,10 @@ void ParamItem::paint(QPainter *painter,
     QRect rr(2,0,guisettings->m_NNWidth-4,guisettings->m_PIheight); //hardw
 
     // Draw rectangle
-    painter->setPen(QPen(guisettings->m_paramBorderColor, guisettings->m_paramBorderWidth));
-    painter->drawRoundedRect(rr, guisettings->m_paramBorderRadius, guisettings->m_paramBorderRadius);
+    painter->setPen(QPen(guisettings->m_paramBorderColor,
+                         guisettings->m_paramBorderWidth));
+    painter->drawRoundedRect(rr, guisettings->m_paramBorderRadius,
+                             guisettings->m_paramBorderRadius);
 
     // Draw name
     painter->setPen(guisettings->m_PIfontcolor);
@@ -443,7 +444,6 @@ void SocketItem::paint(QPainter *painter,
     painter->drawEllipse(QPointF(0.0, 0.0),
                          guisettings->m_socketWidth,
                          guisettings->m_socketWidth);
-
     painter->restore();
 }
 

@@ -24,6 +24,7 @@ void RangeMeter::paintEvent(QPaintEvent *event)
     Q_UNUSED(event)
 
     QPainter painter(this);
+    painter.save();
     painter.fillRect(rect(), guisettings->sl_bgColor);
 
     // Draw bar
@@ -39,6 +40,8 @@ void RangeMeter::paintEvent(QPaintEvent *event)
     pulseColor.setHsvF(0.0, 0.0, clampedLevel);
     painter.fillRect(squareRect, pulseColor);
     painter.drawRect(squareRect);
+
+    painter.restore();
 }
 
 void RangeMeter::levelChanged(qreal level)

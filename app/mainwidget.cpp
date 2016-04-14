@@ -3,11 +3,13 @@
 MainWidget::MainWidget(QWidget *parent)
     :   QMainWindow(parent)
     ,   m_engine(new Engine(this))
+    ,   m_graphWidget(NULL)
+    ,   m_dancefloor(NULL)
+    ,   m_dancefloorwidget(NULL)
+    ,   m_cueLibView(NULL)
     ,   m_transport(NULL)
     ,   m_spectrograph(NULL)
     ,   m_settingsDialog(new SettingsDialog(m_engine->interval(), this))
-    ,   m_dancefloor(NULL)
-    ,   m_cueLibView(NULL)
     ,   m_filename()
 {
     Cupid::Singleton()->setEngine(m_engine);
@@ -26,7 +28,6 @@ MainWidget::MainWidget(QWidget *parent)
 
     createMenus();
     updateMenuStates();
-
 }
 
 MainWidget::~MainWidget() { }
@@ -52,16 +53,15 @@ void MainWidget::createUi()
     Cupid::Singleton()->setDancefloorwidget(m_dancefloorwidget);
     m_dancefloorwidget->show();
 
-    QDockWidget *m_cueLibView_dw = new QDockWidget(tr("Node Lib"), this);
+    m_cueLibView_dw = new QDockWidget(this);
     m_cueLibView = new CueLibView(NULL);
     m_cueLibView_dw->setWidget(m_cueLibView);
-    m_cueLibView_dw->setFloating(true);
-//    m_cueLibView->move(1500, 700);
-//    m_cueLibView->show();
+    m_cueLibView_dw->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::LeftDockWidgetArea, m_cueLibView_dw);
 
     // Spectrograph
     m_spectrograph_dw = new QDockWidget(tr("Spectrograph"), this);
-    m_spectrograph = new Spectrograph(this);
+    m_spectrograph = new Spectrograph(NULL);
     m_spectrograph_dw->setWidget(m_spectrograph);
     m_spectrograph_dw->setFloating(true);
     m_spectrograph_dw->move(1300, 540);
@@ -69,7 +69,7 @@ void MainWidget::createUi()
 
     // Time & Segmentation display
     m_transport_dw = new QDockWidget(tr("Transport"), this);
-    m_transport = new Transport(this);
+    m_transport = new Transport(NULL);
     m_transport_dw->setWidget(m_transport);
     m_transport_dw->setFloating(true);
     m_transport_dw->move(1300, 500);
@@ -90,6 +90,7 @@ void MainWidget::createMenus()
     // Mac-style main menu bar
     m_menuBar = new QMenuBar(nullptr);
 
+    // ----------------------------------------
     // File actions
     m_fileMenu = m_menuBar->addMenu(tr("File"));
 
@@ -130,6 +131,7 @@ void MainWidget::createMenus()
     m_fileMenu->addAction(m_reloadStylesAct);
     CHECKED_CONNECT(m_reloadStylesAct, SIGNAL(triggered()), guisettings, SLOT(loadStyleSheet()));
 
+    // ----------------------------------------
     // Edit Actions
     m_editMenu = m_menuBar->addMenu(tr("Edit"));
 
@@ -157,6 +159,7 @@ void MainWidget::createMenus()
     m_editMenu->addAction(m_settingsAct);
     CHECKED_CONNECT(m_settingsAct, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
 
+    // ----------------------------------------
     // Control actions
     m_controlMenu = m_menuBar->addMenu(tr("Control"));
 
@@ -209,7 +212,7 @@ void MainWidget::createMenus()
     m_showCueLibView = new QAction(tr("Node Library"), this);
     m_windowMenu->addAction(m_showCueLibView);
     CHECKED_CONNECT(m_showCueLibView, SIGNAL(triggered()),
-                    m_cueLibView, SLOT(showAndRaise()));
+                    m_cueLibView_dw, SLOT(show()));
 
     m_showGraphWidget = new QAction(tr("Graph"), this);
     m_windowMenu->addAction(m_showGraphWidget);

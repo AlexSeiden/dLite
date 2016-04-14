@@ -28,16 +28,16 @@ void CueLibView::createUi()
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
 
-    mainLayout->addWidget(createGroup("Cues", Node::CUE));
+    mainLayout->addWidget(createGroup("Imagers", Node::CUE));
     mainLayout->addWidget(createGroup("Ints", Node::INT));
     mainLayout->addWidget(createGroup("Floats", Node::FLOAT));
     mainLayout->addWidget(createGroup("Colors", Node::COLOR));
     mainLayout->addWidget(createGroup("Beats", Node::BEAT));
-    mainLayout->addWidget(createGroup("Paths", Node::POSITION));
+//    mainLayout->addWidget(createGroup("Paths", Node::POSITION));
     mainLayout->addWidget(createGroup("Regions", Node::REGION));
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Node Library"));
+    setObjectName(tr("NodeLib"));
 //    setWindowFlags( Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
     setWindowFlags(Qt::Tool | Qt::CustomizeWindowHint);
     CHECKED_CONNECT(m_signalMapper, SIGNAL(mapped(QString)),
@@ -58,18 +58,17 @@ QGroupBox *CueLibView::createGroup(QString typeName, Node::node_t nodeType)
 
     QStringList allNodenames = NodeFactory::Singleton()->getNodesOfType(nodeType);
 
-    foreach (QString nodename, allNodenames) {
+    foreach (QString nodename, allNodenames)
         addButtonToUi(layout, nodename);
-    }
 
-//    layout->addStretch();
     groupBox->setLayout(layout);
     return groupBox;
 }
 
 // Convienence function
 void CueLibView::addButtonToUi(QLayout *layout, QString buttonName) {
-    QToolButton *butt = new QToolButton(this);
+    QPushButton *butt = new QPushButton(this);
+    butt->setObjectName("CueButt");
     butt->setText(buttonName);
     m_buttons.push_back(butt);
     layout->addWidget(butt);

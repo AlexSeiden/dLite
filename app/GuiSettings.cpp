@@ -9,19 +9,7 @@ GuiSettings *guisettings;
 GuiSettings::GuiSettings(QWidget *parent) :
     QWidget(parent)
 {
-    // XXX dunno why this crashes
-//    this->setObjectName(QString("guisettings"));
-//    loadStyleSheet()
-}
-
-// Utility function
-void setButtonColor(QToolButton *colorButton, const QColor &col){
-    if(col.isValid()) {
-        // I grabbed this bit of black magic code from StackOverflow...
-        // seems like the only way to set the color of the button.
-        QString qss = QString("background-color: %1").arg(col.name());
-        colorButton->setStyleSheet(qss);
-    }
+    this->setObjectName(QString("guisettings"));
 }
 
 void GuiSettings::loadStyleSheet()
@@ -49,9 +37,20 @@ void GuiSettings::loadStyleSheet()
                  Qt::SolidLine);
     guisettings->m_connectorBrush       =
             QBrush(guisettings->m_connectorCenterColor);
-    guisettings->m_PIfont.setLetterSpacing(QFont::PercentageSpacing,
-                                           guisettings->m_PIletterspacing);
 
-    this->repaint();
+    // XXX not sure why this is getting applied inconsistantly/incorrectly
+//    guisettings->m_PIfont.setLetterSpacing(QFont::PercentageSpacing,
+//                                           guisettings->m_PIletterspacing);
+
     qApp->processEvents();
+}
+
+// Utility function
+void setButtonColor(QToolButton *colorButton, const QColor &col){
+    if(col.isValid()) {
+        // I grabbed this bit of black magic code from StackOverflow...
+        // seems like the only way to set the color of the button.
+        QString qss = QString("background-color: %1").arg(col.name());
+        colorButton->setStyleSheet(qss);
+    }
 }

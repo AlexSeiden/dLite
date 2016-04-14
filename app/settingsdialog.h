@@ -18,7 +18,7 @@ QT_END_NAMESPACE
  * Dialog used to control global settings:
  *      the windowing function used by the spectum analyser
  *      the update interval for spectral analysis and dance floor
- *      whether to send info to the LED hardware  TODO: add separate update interval
+ *      whether to send info to the LED hardware.
  */
 class SettingsDialog : public QDialog
 {
