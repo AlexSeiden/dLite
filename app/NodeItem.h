@@ -39,8 +39,6 @@ public:
     QList<ParamItem*>   getChildParamItems();
     void                rePos(const QPointF &pos);
 
-    QList<ConnectionItem*>  getConnectionItems();       // NOTE this isn't implemented
-
     CuesheetScene* csScene() {return dynamic_cast<CuesheetScene*>(scene());}
 
     // Serialization

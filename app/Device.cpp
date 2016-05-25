@@ -121,7 +121,7 @@ Device::send() {
     if (! m_isActive)
         return;
 
-    //TODO test to see if we're sending too often
+    // TODO test to see if we're sending data faster than we need to refresh.
 
     ssize_t bytes_sent;
     // ErrorHandling: Handle undersends

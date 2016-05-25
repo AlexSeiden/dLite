@@ -40,14 +40,14 @@ Firing::Firing(Lightcolor color, double alpha, compMode_t compmode,
     m_cue(cue)
 { }
 
-void Firing::setDecayMode(decayMode_t dmode) // GROSS
+void Firing::setDecayMode(decayMode_t dmode)
 {
     if (dmode == IMMEDIATE)
         m_decayfunction = instantDecay;
     else if (dmode == FOREVER)
         m_decayfunction = noDecay;
     else if (dmode == EXPONENTIAL)
-        m_decayfunction = exponentialDecay;      // TODO allow setting decay params
+        m_decayfunction = exponentialDecay;
     else
         qDebug() << "setDecay called with bad arg " << dmode;
 }

@@ -25,7 +25,6 @@ Spectrograph::~Spectrograph() { }
 
 void Spectrograph::setParams(int numBars, qreal lowFreq, qreal highFreq)
 {
-    // TODO sensable defaults rather than asserts
     Q_ASSERT(numBars > 0);
     Q_ASSERT(highFreq > lowFreq);
     m_bars.resize(numBars);
@@ -41,22 +40,8 @@ void Spectrograph::setNumBars(int numBars)
     updateBars();
 }
 
-void Spectrograph::setFreqLo(int val)
-{
-    m_lowFreq = val; // Note implicit cast of int val to qreal m_lowFreq
-    // TODO verify lo<hi
-    updateBars();
-}
-
-void Spectrograph::setFreqHi(int val)
-{
-    m_highFreq = val; // Note implicit cast of int val to qreal m_highFreq
-    // TODO verify lo<hi
-    updateBars();
-}
 
 // -----------------------------------------------------------------------------
-// paintEvent
 void Spectrograph::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
@@ -247,6 +232,7 @@ void Spectrograph::spectrumChanged(const FrequencySpectrum &spectrum)
 // Math & shit
 
 // Given a frequency, returns the bar that covers it.
+// Amplitude is in log space.
 int Spectrograph::barIndexLog(qreal frequency) const
 {
     Q_ASSERT(frequency >= m_lowFreq && frequency < m_highFreq);
@@ -268,11 +254,11 @@ int Spectrograph::barIndexLog(qreal frequency) const
 }
 
 // Given the index of a bar, returns the range of frequencies it covers.
+// Amplitude is in log space.
 QPair<qreal, qreal> Spectrograph::barRangeLog(int index) const
 {
     Q_ASSERT(index >= 0 && index < m_bars.count());
 
-    // Note: it doesn't matter what base you use for the logarhythms
     const qreal log_min = log10(m_lowFreq);
     const qreal log_max = log10(m_highFreq);
     const qreal delta_log = log_max - log_min;
@@ -287,8 +273,6 @@ QPair<qreal, qreal> Spectrograph::barRangeLog(int index) const
 
 double Spectrograph::frac2freq(qreal frac) const
 {
-    // Note: oddly, it doesn't matter what base you use for the logarhythms
-    // TODO precompute these
     const qreal log_min = log10(m_lowFreq);
     const qreal log_max = log10(m_highFreq);
     const qreal delta_log = log_max - log_min;
@@ -334,12 +318,12 @@ void Spectrograph::updateBars()
     // init the vector of bars with empty bars
     m_bars.fill(Bar());
 
-    // loop over all frequencies in the spectrum, and set the value
+    // Loop over all frequencies in the spectrum, and set the value
     FrequencySpectrum::const_iterator i = m_spectrum.begin();
     const FrequencySpectrum::const_iterator end = m_spectrum.end();
     int barindex;
     int index = 0;
-    // TODO:  at least half the bars wasted--unused
+    // OPT:  at least half the bars wasted--unused
     // Also, could optimize since they are monotonicly increasing
 
     for ( ; i != end; ++i, ++index) {
@@ -378,7 +362,7 @@ void Spectrograph::updateBars()
 }
 
 void Spectrograph::printSpectrum() {
-    // print next time it's calculated.  then it'll be cleared.
+    // Print next time it's calculated.  Then it'll be cleared.
     // for debugging.
     m_printspectrum = true;
 }

@@ -133,7 +133,7 @@ private:
     // Interval in milliseconds between calls that update the spectrum, etc.
     int    				m_notifyIntervalMs;
 
-    //  Style : dfModel only needed to call evaluate.  Perhaps should use signals?
+    //  Style: dfModel only needed to call evaluate.  Perhaps should use signals?
     Dancefloor*         m_dfModel;
 
     QString             m_audiofilename;

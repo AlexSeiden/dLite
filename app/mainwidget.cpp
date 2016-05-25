@@ -174,7 +174,7 @@ void MainWidget::createMenus()
     m_playPauseAct = new QAction(tr("Toggle Play/Pause"), this);
     m_playPauseAct->setShortcut(QKeySequence("Ctrl+P"));
     // XXX not really sure why this broke somewhere in my refactors...
-//    m_playPauseAct->setShortcut(Qt::Key_Space);
+    // m_playPauseAct->setShortcut(Qt::Key_Space);
     m_playPauseAct->setShortcutContext(Qt::ApplicationShortcut);
     m_controlMenu->addAction(m_playPauseAct);
     CHECKED_CONNECT(m_playPauseAct, SIGNAL(triggered()),

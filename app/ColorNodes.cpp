@@ -98,7 +98,6 @@ void BriteColor::paramHasBeenEdited()
 void BriteColor::operator()()
 {
     // Boilerplate start of operator:
-    // TODO:  add start & end boilerplate to the generic
     if (evaluatedThisFrame())
         return;
     evalAllInputs();
@@ -110,13 +109,6 @@ void BriteColor::operator()()
         double sat = (*m_distSat)(*_randGenerator);
         double hue = (*m_distHue)(*_randGenerator);
         double val = (*m_distVal)(*_randGenerator);
-#if 0
-        // shouldn't be needed since the rand generators shouldn't be returning
-        // values outside this range
-        hue = clamp(0.0,1.0,hue);
-        sat = clamp(0.0,1.0,sat);
-        val = clamp(0.0,1.0,val);
-#endif
         out.setHsvF(hue,sat,val);
 
         // Since the param color type is "lightcolor", we need

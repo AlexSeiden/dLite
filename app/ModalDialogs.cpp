@@ -9,7 +9,7 @@ void MainWidget::showLoadSongDialog()
     const QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open WAV file"), dir, "*.wav");
     if (fileNames.count()) {
         reset();
-        m_engine->loadSong(fileNames.front()); // TODO open multiple files
+        m_engine->loadSong(fileNames.front());
         updateMenuStates();
         m_engine->startPlayback();
     }
@@ -17,7 +17,7 @@ void MainWidget::showLoadSongDialog()
 
 void MainWidget::showSaveDialog()
 {
-    const QString dir = QDir::homePath(); // TODO better default path
+    const QString dir = QDir::homePath();
     m_filename = QFileDialog::getSaveFileName(this, tr("Save file"), dir);
     if (! m_filename.isEmpty()) {
         if (! m_filename.endsWith(".dlite"))
@@ -28,7 +28,7 @@ void MainWidget::showSaveDialog()
 
 void MainWidget::showOpenDialog()
 {
-    const QString dir = QDir::homePath(); // TODO better default path
+    const QString dir = QDir::homePath();
     const QString fileName = QFileDialog::getOpenFileName(this, tr("Open dLite file"), dir, "*.dLite");
     // TODO open multiple files
     if (! fileName.isEmpty() && ! fileName.isNull()) {
@@ -41,7 +41,7 @@ void MainWidget::showOpenDialog()
 
 void MainWidget::showImportDialog()
 {
-    const QString dir = QDir::homePath(); // TODO better default path
+    const QString dir = QDir::homePath();
     const QString fileName =
             QFileDialog::getOpenFileName(this, tr("Import dLite file"),
                                          dir, "*.dLite");

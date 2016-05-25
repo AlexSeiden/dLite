@@ -78,7 +78,7 @@ QRectF NodeItem::boundingRect() const
         nRows = 1;
     else
         nRows = m_node->getParams().size() + 1;
-    QRectF bbox =  QRectF(0,0,guisettings->m_NNWidth + 2, // TODO replace 2 with shadow size
+    QRectF bbox =  QRectF(0,0,guisettings->m_NNWidth + 2,
                           guisettings->m_PIheight*nRows + 2);
     return bbox.marginsAdded(m_margins);
 }
@@ -194,7 +194,7 @@ void NodeItem::minimize(int status)
 {
     m_minimized = status;
     QList<ParamItem*> kiddos = getChildParamItems();
-    // TODO Hide all paramitems:
+    // Hide all paramitems:
     foreach (ParamItem *pi, kiddos) {
         if (m_minimized)
             pi->hide();

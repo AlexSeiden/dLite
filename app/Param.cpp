@@ -7,7 +7,7 @@
 #include "Region.h"
 #include "Node.h"
 
-// These view things are for the editor widget callback at the bottom
+// The view headers are included here for the editor widget callbacks below.
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QToolButton>
@@ -17,9 +17,9 @@
 #include "MyDoubleSpinBox.h"
 
 // These constants defined for convinience & speed when doing type checks.
-// ??? Are these still needed?  Would it be better just to have use an enum?
 const std::type_info & paramTypeFloat       = typeid(Param<float>);
-const std::type_info & paramTypeInt         = typeid(Param<int>); const std::type_info & paramTypeLightcolor  = typeid(Param<Lightcolor>);
+const std::type_info & paramTypeInt         = typeid(Param<int>);
+const std::type_info & paramTypeLightcolor  = typeid(Param<Lightcolor>);
 const std::type_info & paramTypeBool        = typeid(Param<bool>);
 const std::type_info & paramTypeRegion      = typeid(Param<Region>);
 
@@ -46,11 +46,9 @@ bool ParamBase::isConnectableTo(ParamBase *otherParam)
         return false;
 
     // LATER allow for automatic type promotion/conversion--
-    // e.g. convert "int" types to "floats",
-    //      "floats" to "colors"
-    // perhaps even "floats" to "ints" via trucation.
+    // e.g. convert "int" types to "floats", "floats" to "colors"
 
-    // Make this is an input param and the other is an output param
+    // Check that this is an input param and the other is an output param
     if (this->isOutput() == otherParam->isOutput())
         return false;
 
@@ -117,24 +115,9 @@ void ParamBase::connectTo(ParamBase *server)
         return;
     }
     }
-
-    qDebug() << "ERROR" << Q_FUNC_INFO;
-
-    qDebug() << "as per typeid(*this/server):";
-    qDebug() << "thisType    " << typeid(*this).name();
-    qDebug() << "serverType  " << typeid(*server).name() << endl;
-
-    qDebug() << "as per _type:";
-    qDebug() << "thisType    " << this->m_type.name();
-    qDebug() << "serverType  " << server->m_type.name() << endl;
-
-    qDebug() << "as per getType:";
-    qDebug() << "thisType    " << this->getType().name();
-    qDebug() << "serverType  " << server->getType().name() << endl;
 }
 
 // Copy Value
-// Style -- There's got to be a better way to do this.
 void ParamBase::copyValueAndConnection(ParamBase *rhs)
 {
     m_connectedParam = rhs->m_connectedParam;
@@ -180,34 +163,18 @@ void ParamBase::copyValueAndConnection(ParamBase *rhs)
     Param<Region> *s = dynamic_cast<Param<Region> *>(rhs);
     Param<Region> *c = dynamic_cast<Param<Region> *>(this);
     if (s && c) {
-        // XXX this probably isn't correct
+        // XXX this doesn't correctly copy the full region data.
         c->m_value = s->m_value;
         return;
     }
     }
 
-    // XXX this won't handle copying of spectral range node's subrange params.
-
-    // ErrorHandling
-
-    qDebug() << "ERROR" << Q_FUNC_INFO;
-
-    qDebug() << "as per typeid(*this/rhs):";
-    qDebug() << "thisType    " << typeid(*this).name();
-    qDebug() << "rhsType  " << typeid(*rhs).name() << endl;
-
-    qDebug() << "as per _type:";
-    qDebug() << "thisType    " << this->m_type.name();
-    qDebug() << "rhsType  " << rhs->m_type.name() << endl;
-
-    qDebug() << "as per getType:";
-    qDebug() << "thisType    " << this->getType().name();
-    qDebug() << "rhsType  " << rhs->getType().name() << endl;
+    // TODO: handle copying of spectral range node's subrange params.
 }
 
 // ------------------------------------------------------------------------------
 // setRange
-//      Sets min and max range used by numeric params.
+//      Sets min and max range used by gui for numeric params.
 void ParamBase::setRange(bool userange, double min, double max, double step)
 {
     m_useminmax = userange;
@@ -218,22 +185,17 @@ void ParamBase::setRange(bool userange, double min, double max, double step)
 
 // ------------------------------------------------------------------------------
 // Serialization
-//      (or "file i/o," as we called in the old days.)
+//      (or "file i/o," as we called it in the old days.)
 
+//
 // Writing (base class)
+//
 void ParamBase::writeToJSONObj(QJsonObject &json) const
 {
     json["name"] = m_name;
     json["uuid"] = m_uuid.toString();
     if (m_connectedParam)
         json["connectedTo"] = m_connectedParam->m_uuid.toString();
-#if 0
-    // These shouldn't change for a given parameter, and so for now
-    // we don't output them.
-    json["isOutput"] = _isOutput;
-    json["isConnectable"] = _isConnectable;
-//    json["type"] = _type; // TODO translate
-#endif
     // Values of params are written by the type-specialized versions below.
 }
 
@@ -280,10 +242,12 @@ template <> void Param<Region>::writeToJSONObj(QJsonObject &json) const
         return;
 }
 
+//
 // Reading (base class)
+//
 void ParamBase::readFromJSONObj(const QJsonObject &json)
 {
-    // ErrorHandling
+    // TODO: validate uuid & check for collisions.
     m_uuid = QUuid(json["uuid"].toString());
 }
 
@@ -324,7 +288,7 @@ template <> void Param<Lightcolor>::readFromJSONObj(const QJsonObject &json)
 template <> void Param<Region>::readFromJSONObj(const QJsonObject &json)
 {
     ParamBase::readFromJSONObj(json);
-    // NUKEMEMAYBE Node override handling this now.
+    // NOTE: Node override handling this now.
 }
 
 
@@ -332,7 +296,7 @@ template <> void Param<Region>::readFromJSONObj(const QJsonObject &json)
 // Editor widgetry
 //      Although we partly break the separation between "model" and "view" here
 //      (Since editors are clearly part of the view, and the params themselves
-//      could be view-agnostic), it makes the code more cohesive, rather
+//      should be view-agnostic), it makes the code more cohesive, rather
 //      than implementing the editors in another class.
 QWidget* ParamBase::getEditorWidget(QObject *sendValueChangesHere)
 {
@@ -355,7 +319,7 @@ template <> QWidget* Param<float>::getEditorWidget(QObject* sendValueChangesHere
     float val = 0.0;
     getValue(val);
     editorWidget->setValue(val);
-    // Vet connection.  Can't used CHECKED_CONNECT from template.
+    // Validate connection.  Can't used CHECKED_CONNECT from template.
     bool result = editorWidget->connect(editorWidget, SIGNAL(valueChanged(double)),
                                         sendValueChangesHere, SLOT(setValue(double)));
     if (!result)

@@ -15,7 +15,6 @@ SegmentController::SegmentController()
 }
 
 // Loads file from "Segmentino" output.
-// TODO code duped from BeatFiles.cpp
 void SegmentController::loadFile()
 {
     // Guess filename from audio file:

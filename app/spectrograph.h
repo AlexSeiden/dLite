@@ -37,8 +37,6 @@ public slots:
     void    reset();
     void    spectrumChanged(const FrequencySpectrum &spectrum);
     void    setNumBars(int numBars);
-    void    setFreqLo(int val);
-    void    setFreqHi(int val);
     void    printSpectrum();
     void    submeterSelected(SublevelNode *chosen);
     void    submeterDeselected(SublevelNode *chosen);

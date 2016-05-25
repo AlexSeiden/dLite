@@ -52,8 +52,8 @@ void Imager::fire()
 
             firing->m_color = color;
             firing->m_alpha = alpha;
-            firing->setDecayMode(m_decayMode);           // TODO
-            firing->setCompMode(m_compMode);             // TODO
+            firing->setDecayMode(m_decayMode);
+            firing->setCompMode(m_compMode);
             m_dfModel->fireLight(x, y, firing);
         }
 }

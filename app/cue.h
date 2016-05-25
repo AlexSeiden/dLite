@@ -27,8 +27,8 @@ public:
     void readFromJSONObj(const QJsonObject &json);
 
 protected:
-    compMode_t      m_compMode;      // TODO allow selection & implement compmodes
-    decayMode_t     m_decayMode;     // TODO allow selection of decaymodes
+    compMode_t      m_compMode;
+    decayMode_t     m_decayMode;
 
     // Having this be static means we don't have to set it for every cue,
     // but obviously limits us to one dfmodel.  This probably isn't an issue;

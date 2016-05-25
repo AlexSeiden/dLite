@@ -296,7 +296,7 @@ void GraphWidget::addNode(Node *node, QJsonObject* json)
     if (json)
         nodeItem->readFromJSONObj(*json);
     else {
-        // TODO better positioning.
+        // TODO nicer positioning.
         QPointF center = getCurrentView()->view()->mapToScene(getCurrentView()->view()->viewport()->rect().center());
         nodeItem->rePos(center);
 

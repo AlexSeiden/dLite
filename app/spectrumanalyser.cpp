@@ -99,18 +99,15 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
             imag = m_output[m_numSamples/2 + i];
 
         const qreal magnitude = sqrt(real*real + imag*imag);
-        // TODO Note that this is log here, but linear in the level meter
+        // TODO Note that this is log here, but linear in the level meter.
         qreal amplitude = SPECTRUM_ANALYSER_MULTIPLIER * log(magnitude);
-        // log(magnitude) can be < 0.
-        // XXX so why are we clamping amplitude to 0??
+        // ??? log(magnitude) can be < 0; do we care?
 
-        // Bound amplitude to [0.0, 1.0]
+        // Clamp amplitude to [0.0, 1.0]
         m_spectrum[i].m_clipped = (amplitude > 1.0);
         amplitude = qMax(qreal(0.0), amplitude);
-
         amplitude = qMin(qreal(1.0), amplitude);
         m_spectrum[i].m_amplitude = amplitude;
-
     }
 
     emit calculationComplete(m_spectrum);
