@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <iostream>
 #include <QDebug>
-#include "Device.h"
+#include "DanceFloorHardware.h"
 
 using namespace std;
 
 
-Device::Device(bool status) :
+DanceFloorHardware::DanceFloorHardware(bool status) :
     m_isActive(status)
 {
     // Init _dmx buffers to header, plus zeros.
@@ -23,11 +23,11 @@ Device::Device(bool status) :
         this->connect();
 }
 
-Device::~Device() { }
+DanceFloorHardware::~DanceFloorHardware() { }
 
 //  Set the rgb value on a individual light.
 void
-Device::setlight(int controllerIndex, int lightIndex, unsigned char *rgb) {
+DanceFloorHardware::setlight(int controllerIndex, int lightIndex, unsigned char *rgb) {
     unsigned char *p;
     if (controllerIndex == 0)
         p = this->m_dmx0;
@@ -43,7 +43,7 @@ Device::setlight(int controllerIndex, int lightIndex, unsigned char *rgb) {
 // ------------------------------------------------------------------------------
 // Network stuff
 
-bool Device::connect() {
+bool DanceFloorHardware::connect() {
     // These were set in the hardware with QuickPlayPro
     //      IPAddrs = ('10.0.1.21', '10.0.1.22',)
     //      tropic-ck1 IP '10.0.1.21'
@@ -87,7 +87,7 @@ bool Device::connect() {
     return true;
 }
 
-void Device::turnOff()
+void DanceFloorHardware::turnOff()
 {
     if (! m_isActive)
         return;
@@ -98,7 +98,7 @@ void Device::turnOff()
 }
 
 
-void Device::turnOn()
+void DanceFloorHardware::turnOn()
 {
     if (m_isActive)
         return;
@@ -108,7 +108,7 @@ void Device::turnOn()
 }
 
 
-void Device::setActive(bool status)
+void DanceFloorHardware::setActive(bool status)
 {
     if (status)
         turnOn();
@@ -117,11 +117,9 @@ void Device::setActive(bool status)
 }
 
 void
-Device::send() {
+DanceFloorHardware::send() {
     if (! m_isActive)
         return;
-
-    // TODO test to see if we're sending data faster than we need to refresh.
 
     ssize_t bytes_sent;
     // ErrorHandling: Handle undersends
@@ -141,7 +139,7 @@ Device::send() {
     }
 }
 
-unsigned char Device::COLOR_KINETICS_HEADER[21] = {
+unsigned char DanceFloorHardware::COLOR_KINETICS_HEADER[21] = {
         0x04, 0x01, 0xdc, 0x4a,
         0x01, 0x00, 0x01, 0x01,
         0x00, 0x00, 0x00, 0x00,

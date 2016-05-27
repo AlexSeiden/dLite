@@ -1,5 +1,5 @@
-#ifndef DEVICE_H
-#define DEVICE_H
+#ifndef DANCE_FLOOR_HARDWARE
+#define DANCE_FLOOR_HARDWARE
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,10 +17,10 @@
 // sizeof(header) + 512
 #define DMX_LEN 533
 
-class Device {
+class DanceFloorHardware {
 public:
-    Device(bool status=false);
-    ~Device();
+    DanceFloorHardware(bool status=false);
+    ~DanceFloorHardware();
 
     void setlight(int controllerIndex, int lightIndex, unsigned char *rgb);
     void send();
@@ -45,4 +45,4 @@ private:
     unsigned char m_dmx1[DMX_LEN];
 };
 
-#endif // DEVICE_H
+#endif // DANCE_FLOOR_HARDWARE

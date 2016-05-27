@@ -16,8 +16,6 @@ qint64 audioLength(const QAudioFormat &format, qint64 microSeconds);
 int samples2ms(int samples);
 int bytes2ms(int bytes);
 
-QString formatToString(const QAudioFormat &format);
-
 qreal nyquistFrequency(const QAudioFormat &format);
 
 qreal pcmToReal(qint16 pcm);        // Scale PCM value to [-1.0, 1.0]

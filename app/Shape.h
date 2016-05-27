@@ -4,17 +4,17 @@
 #include "Cue.h"
 
 // ------------------------------------------------------------------------------
-// Imager
+// Shape
 //      Abstract base class for Cues that use a Qt Painter for drawing.
 
-class Imager : public Cue
+class Shape : public Cue
 {
 public:
-    Imager();
+    Shape();
 
     void    evaluate();
     void    operator() (void);
-    virtual Imager* clone();
+    virtual Shape* clone();
 
 protected:
     virtual void    draw();
@@ -24,9 +24,8 @@ protected:
 
 
 // ------------------------------------------------------------------------------
-// Circle
 //      Draws a circle
-class Circle : public Imager
+class Circle : public Shape
 {
 public:
     Circle();
@@ -40,7 +39,7 @@ protected:
 // ------------------------------------------------------------------------------
 // Box
 //      Draws a rectangle
-class Box : public Imager
+class Box : public Shape
 {
 public:
     Box();

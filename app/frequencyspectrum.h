@@ -41,7 +41,6 @@ public:
 
 private:
     QVector<Element> m_elements;
-
 };
 
 Q_DECLARE_METATYPE(FrequencySpectrum)

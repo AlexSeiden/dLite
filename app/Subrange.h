@@ -5,9 +5,9 @@
 
 // -----------------------------------------------------------------------------
 // Subrange
-
 // Defines a rectangle in the spectrum display:
 // a minimum and maximum frequency and amplitude.
+
 class Subrange
 {
 public:

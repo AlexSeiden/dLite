@@ -9,8 +9,6 @@ Subrange::Subrange() :
     m_ampMax(0.6)
 {
     // Register this type so we can emit to spectrograph.
-    // ??? is there any problem with this happening more than once?
-    // I don't think so, because I see it in Qt example code.
     qRegisterMetaType<Subrange>("Subrange");
 }
 

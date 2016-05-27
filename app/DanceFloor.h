@@ -8,7 +8,7 @@
 #include "lightcolor.h"
 #include "Param.h"
 #include "Cue.h"
-#include "Device.h"
+#include "DanceFloorHardware.h"
 
 class Cue;
 class Dancefloorwidget;
@@ -54,7 +54,7 @@ protected:
     QTime               m_timeSinceLastUpdate;   // Used for monitoring responsiveness, not cueing.
 
     Dancefloorwidget    *m_dfWidget;
-    Device              m_device;
+    DanceFloorHardware   m_device;
 
 private:
 //    std::vector<Cue *>  getActiveCues();

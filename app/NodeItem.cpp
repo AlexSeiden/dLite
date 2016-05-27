@@ -104,7 +104,6 @@ void NodeItem::paint(QPainter *painter,
 
     //Draw dropshadow first
     QRectF shadowrect = bigrect;
-    // TODO make properties
     shadowrect.moveTopLeft(QPointF(2.,2.));
     painter->setBrush(QColor(0,0,0));
     painter->drawRoundedRect(shadowrect, guisettings->m_NNborderRadius, guisettings->m_NNborderRadius);

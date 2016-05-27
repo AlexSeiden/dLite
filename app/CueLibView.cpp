@@ -28,7 +28,7 @@ void CueLibView::createUi()
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
 
-    mainLayout->addWidget(createGroup("Imagers", Node::CUE));
+    mainLayout->addWidget(createGroup("Shapes", Node::CUE));
     mainLayout->addWidget(createGroup("Ints", Node::INT));
     mainLayout->addWidget(createGroup("Floats", Node::FLOAT));
     mainLayout->addWidget(createGroup("Colors", Node::COLOR));

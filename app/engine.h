@@ -53,7 +53,7 @@ public:
     qint64 getCurrentTime() const;  // Playback position in microseconds.
     QString getAudioFilename() const {return m_audiofilename;}
 
-    qint64 bufferLength() const;    // Length of the song in bytes.
+    qint64 bufferLengthBytes() const;    // Length of the song in bytes.
     qint64 bufferLengthMS() const;  // Length in milliseconds
 
     // Set window function applied to audio data before spectral analysis.
@@ -98,7 +98,7 @@ signals:
     void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
 
 private slots:
-    void timerNotify();
+    void updateDanceFloor();
     void audioStateChanged(QAudio::State state);
     void spectrumChanged(const FrequencySpectrum &spectrum);
 

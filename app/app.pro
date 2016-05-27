@@ -35,17 +35,17 @@ SOURCES  += \
     RandomNode.cpp \
     ColorNodes.cpp \
     Cupid.cpp \
-    Imager.cpp \
     DanceFloor.cpp \
     PathNode.cpp \
     RegionNode.cpp \
     Firing.cpp \
-    Device.cpp \
     Region.cpp \
     RegionCue.cpp \
     DotCue.cpp \
     SegmentController.cpp \
-    NodeFactory.cpp
+    NodeFactory.cpp \
+    DanceFloorHardware.cpp \
+    Shape.cpp
 
 HEADERS  += \
     engine.h \
@@ -64,18 +64,18 @@ HEADERS  += \
     RandomNode.h \
     ColorNodes.h \
     Cupid.h \
-    Imager.h \
     DanceFloor.h \
     PathNode.h \
     RegionNode.h \
     Firing.h \
-    Device.h \
     Region.h \
     RegionCue.h \
     DotCue.h \
     Remap.h \
     SegmentController.h \
-    NodeFactory.h
+    NodeFactory.h \
+    DanceFloorHardware.h \
+    Shape.h
 
 fftreal_dir = ../3rdparty/fftreal
 

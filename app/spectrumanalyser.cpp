@@ -65,7 +65,7 @@ void SpectrumAnalyserThread::calculateWindow()
 }
 
 void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
-                                               int inputFrequency,	// Samples rate of audio data
+                                               int sampleRate,
                                                int bytesPerSample)
 {
     Q_ASSERT(buffer.size() == m_numSamples * bytesPerSample);
@@ -91,7 +91,7 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
     // Analyze output to obtain amplitude for each frequency
     for (int i=2; i<=m_numSamples/2; ++i) {
         // Calculate frequency of this complex sample
-        m_spectrum[i].m_frequency = qreal(i * inputFrequency) / (m_numSamples);
+        m_spectrum[i].m_frequency = qreal(i * sampleRate) / (m_numSamples);
 
         const qreal real = m_output[i];
         qreal imag = 0.0;

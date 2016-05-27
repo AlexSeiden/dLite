@@ -1,12 +1,11 @@
-#include "Imager.h"
+#include "Shape.h"
 #include "DanceFloor.h"
 #include "Cupid.h"
 #include <QPainter>
 #include "NodeFactory.h"
 
 // ------------------------------------------------------------------------------
-// Imager base class
-Imager::Imager()
+Shape::Shape()
 {
     m_type = CUE;
     addParam<float>("alpha", 1.0);
@@ -17,20 +16,20 @@ Imager::Imager()
     m_image = new QImage(xsize, ysize, QImage::Format_ARGB32_Premultiplied);
 }
 
-void Imager::draw() { }
+void Shape::draw() { }
 
-void Imager::operator()() {
+void Shape::operator()() {
     evaluate();
 }
 
-Imager* Imager::clone()
+Shape* Shape::clone()
 {
-    Imager* lhs = new Imager;
+    Shape* lhs = new Shape;
     cloneHelper(*lhs);
     return lhs;
 }
 
-void Imager::evaluate()
+void Shape::evaluate()
 {
     if (!isActive()) return;
 
@@ -39,7 +38,7 @@ void Imager::evaluate()
     fire();
 }
 
-void Imager::fire()
+void Shape::fire()
 {
     for (int y=0; y<m_image->height(); ++y)
         for (int x=0; x<m_image->width(); ++x) {
@@ -59,9 +58,7 @@ void Imager::fire()
 }
 
 // ------------------------------------------------------------------------------
-// Circle
-Circle::Circle() :
-    Imager()
+Circle::Circle() : Shape()
 {
     setName(QString("CircleCue"));
 
@@ -107,8 +104,7 @@ Circle* Circle::clone()
 
 // ------------------------------------------------------------------------------
 // Box
-Box::Box() :
-    Imager()
+Box::Box() : Shape()
 {
     setName(QString("Box"));
 

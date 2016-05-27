@@ -4,7 +4,8 @@
 
 // ------------------------------------------------------------------------------
 //  Cue
-//  Abstract base class
+//  Abstract base class for all Cue types
+// (i.e. Nodes that write to the frame buffer)
 
 Dancefloor *Cue::m_dfModel = nullptr;
 

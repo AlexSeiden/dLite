@@ -1,3 +1,7 @@
+//
+//  Audio.cpp
+//  Handles main timing and audio playback.
+//  Calls the main dance floor update routine.
 #include <math.h>
 
 #include <QAudioOutput>
@@ -31,11 +35,11 @@ Engine::Engine(QObject *parent)
                     this,
                     SLOT(spectrumChanged(FrequencySpectrum)));
 
+    // Set the main timer
     m_timer->setInterval(m_notifyIntervalMs);
     m_timer->setTimerType(Qt::PreciseTimer);
     m_timer->start();
-    CHECKED_CONNECT(m_timer, SIGNAL(timeout()),
-                    this, SLOT(timerNotify()));
+    CHECKED_CONNECT(m_timer, SIGNAL(timeout()), this, SLOT(updateDanceFloor()));
 }
 
 Engine::~Engine() { }
@@ -45,20 +49,17 @@ Engine::~Engine() { }
 
 bool Engine::loadSong(const QString &fileName)
 {
-    // TODO cleanup any already loaded file.
-    ENGINE_DEBUG << fileName;
+    Q_ASSERT(!fileName.isEmpty());
     m_audiofilename = fileName;
     reset();
     bool result = false;
-    Q_ASSERT(!fileName.isEmpty());
 
     m_wavFileHandle = new WavFile(this);
     if (m_wavFileHandle->open(fileName)) {
         if (isPCMS16LE(m_wavFileHandle->fileFormat())) {
             result = initialize();
         } else {
-            emit errorMessage(tr("Audio format not supported"),
-                              formatToString(m_wavFileHandle->fileFormat()));
+            emit errorMessage(tr("Audio format not supported"), tr(""));
             return false;
         }
     } else {
@@ -76,13 +77,13 @@ bool Engine::loadSong(const QString &fileName)
     m_qbuf.open(QIODevice::ReadOnly);
     m_qbuf.seek(0);
     qDebug() << bytesToRead << bytesRead << m_qbuf.size() << m_audioOutput->bufferSize();
-    emit bufferLengthChanged(bufferLength());
+    emit bufferLengthChanged(bufferLengthBytes());
     emit newSong(fileName);
 
     return result;
 }
 
-qint64 Engine::bufferLength() const
+qint64 Engine::bufferLengthBytes() const
 {
     // Return buffer length in bytes
     return m_qbuf.buffer().size();
@@ -91,7 +92,7 @@ qint64 Engine::bufferLength() const
 qint64 Engine::bufferLengthMS() const
 {
     // Return buffer length in ms
-    return audioDuration(m_format, bufferLength());
+    return audioDuration(m_format, bufferLengthBytes());
 }
 
 void Engine::setWindowFunction(WindowFunction type)
@@ -112,9 +113,6 @@ void Engine::startPlayback()
         setPlayPosition(0, true);
         CHECKED_CONNECT(m_audioOutput, SIGNAL(stateChanged(QAudio::State)),
                         this, SLOT(audioStateChanged(QAudio::State)));
-//      There seems to be a bug that causes audioNotify signals get dropped.
-//        CHECKED_CONNECT(m_audioOutput, SIGNAL(notify()),
-//                        this, SLOT(audioNotify()));
         m_qbuf.seek(0);
         m_audioOutput->start(&m_qbuf);
     }
@@ -131,7 +129,7 @@ void Engine::movePlaybackHead(double positionfraction)
     // position == 0.0 means the beginning,
     // position == 1.0 means the end.
 
-    qint64 byteposition = positionfraction * bufferLength();
+    qint64 byteposition = positionfraction * bufferLengthBytes();
 
     // Round off to start of the channel 0.
     byteposition -= byteposition % (m_format.channelCount() * m_format.sampleSize());
@@ -161,8 +159,12 @@ void Engine::togglePlayback()
 //-----------------------------------------------------------------------------
 // Private slots
 
-void Engine::timerNotify()
+void Engine::updateDanceFloor()
 {
+    // Callback
+    // The tail that wags the dog!
+    // Updates the spectrum, then calls the dance floor to update all
+    // the pixels.
     if (QAudio::ActiveState == m_state) {
         const qint64 playPosition = m_qbuf.pos();
         const qint64 spectrumPosition = playPosition - m_spectrumBufferLength;
@@ -215,7 +217,6 @@ void Engine::audioStateChanged(QAudio::State state)
 
 void Engine::spectrumChanged(const FrequencySpectrum &spectrum)
 {
-    // NOTE:  position excluded; vestigial.
     emit spectrumChanged(0, m_spectrumBufferLength, spectrum);
 }
 
@@ -253,10 +254,8 @@ bool Engine::initialize()
         m_audioOutput = new QAudioOutput(m_format, this);
     } else {
         if (m_wavFileHandle)
-            emit errorMessage(tr("Audio format not supported"),
-                              formatToString(m_format));
+            emit errorMessage(tr("Audio format not supported"), tr(""));
     }
-    ENGINE_DEBUG << "Engine::initialize" << "format" << m_format;
 
     return result;
 }

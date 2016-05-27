@@ -2,10 +2,7 @@
 #include "utils.h"
 
 FrequencySpectrum::FrequencySpectrum(int numPoints)
-    :   m_elements(numPoints)
-{
-
-}
+    :   m_elements(numPoints) {  }
 
 void FrequencySpectrum::reset()
 {

@@ -85,7 +85,7 @@ void PathNode::readFromJSONObj(const QJsonObject &json)
         Position pos;
         pos.x = posJsonObject["x"].toInt();
         pos.y = posJsonObject["y"].toInt();
-        m_positions.push_back(pos);      // (Hopefully) this uses copy to push onto QList of positons.
+        m_positions.push_back(pos);
     }
 }
 
