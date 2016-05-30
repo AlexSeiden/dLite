@@ -1,9 +1,9 @@
 #ifndef DOTCUE_H
 #define DOTCUE_H
 
-#include "Cue.h"
+#include "RenderNode.h"
 
-class DotCue : public Cue
+class DotCue : public RenderNode
 {
 public:
     DotCue();

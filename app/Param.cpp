@@ -1,3 +1,9 @@
+// Param.cpp
+//
+//  All input and output parameters to a node are defined using these
+//  classes. The code here handles connectability, serialization,
+//  and interfaces with the related editor classes.
+
 #include <QDebug>
 #include <QJsonObject>
 #include <QJsonArray>

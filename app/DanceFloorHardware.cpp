@@ -53,8 +53,8 @@ bool DanceFloorHardware::connect() {
     //      socktyp is 2 SOCK_DGRAM
     //      protos are 6 and 17 -- IPPROTO_TCP and IPPROTO_UDP
 
-    this->m_sockfd = socket(PF_INET, SOCK_DGRAM, 0);
-    if (this->m_sockfd == -1) {
+    m_sockfd = socket(PF_INET, SOCK_DGRAM, 0);
+    if (m_sockfd == -1) {
         // ErrorHandling
         std::cerr << "WARNING socket error: " << errno
                   << " \t" << strerror(errno) << std::endl;
@@ -92,7 +92,8 @@ void DanceFloorHardware::turnOff()
     if (! m_isActive)
         return;
 
-    //  TODO close port
+    close(m_sockfd);
+    m_sockfd = -1;
     m_isActive = false;
     return;
 }

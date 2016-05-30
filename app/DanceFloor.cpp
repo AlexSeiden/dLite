@@ -1,3 +1,7 @@
+// Encapsulates the dance floor itself:
+// Imports the physical layout of the LED lamps, stores that.
+// Every frame,  evaluates all the cues, then composites each pixel which is
+// connected to an actual lamp, as per the layout.
 #include "DanceFloor.h"
 
 #include <QDebug>
@@ -10,9 +14,8 @@
 #include <QString>
 #include <QStringList>
 #include "dancefloorwidget.h"
-#include "Cupid.h"          // GROSS
-#include "GraphWidget.h"    // GROSS
-
+#include "Cupid.h"
+#include "GraphWidget.h"
 
 Dancefloor::Dancefloor(QObject *parent) :
     QObject(parent),
@@ -27,27 +30,21 @@ Dancefloor::Dancefloor(QObject *parent) :
 Dancefloor::~Dancefloor() { }
 
 // ------------------------------------------------------------------------------
-// Import and setup
-bool Dancefloor::ImportLayout(std::string &layoutCsvFile)
+bool Dancefloor::ImportLayout(const std::string &layoutCsvFile)
 {
-    // LATER add Foot-squares as well as lights
-
+    // TODO Import foot-squares from the layout file, as well as lights.
     std::string line;
     std::vector< std::string> lines;
     std::vector< std::vector <std::string> > cells;
 
-    // Read in all lines
-    std::ifstream myfile(layoutCsvFile);
-    if (! myfile.is_open())
-        // ErrorHandling
+    std::ifstream layoutIStream(layoutCsvFile);
+    if (! layoutIStream.is_open())
         return false;
 
-    while ( getline (myfile,line, '\r') ) {
+    while ( getline (layoutIStream,line, '\r') )
         lines.push_back(line);
-    }
-    myfile.close();
+    layoutIStream.close();
 
-    // OK, now we know the number of rows
     m_ysize = lines.size();
 
     // Break into individual cells
@@ -71,7 +68,8 @@ bool Dancefloor::ImportLayout(std::string &layoutCsvFile)
 
     m_xsize = rowSize;
 
-    // Alloc the Lights.  These store the pixel values, as well as the hardware
+    // Alloc the Lights.
+    // These store the pixel values, as well as the hardware
     // address of the particular LED.
     size_t arraySize = m_xsize*m_ysize;
     m_lights.resize(arraySize);
@@ -222,7 +220,7 @@ void Dancefloor::evaluate()
     // This keeps track of the current "frame" that's being evaluated.
     // It's used to make sure certain things are evaluated once--and only
     // once--per frame, as well as allowing triggers to reset correctly.
-    // Note that each frame will *not* take the exact same amount of time,
+    // Note that each "frame" will *not* take the exact same amount of time,
     // although they should in general be pretty close.
     m_frame++;
 }
@@ -232,20 +230,19 @@ void Dancefloor::setUseAllCues(bool status) {
 }
 
 void Dancefloor::evaluateAllCues() {
-
     if (m_useAllCues)
-        for (Cue *cue : m_cues)
+        for (RenderNode *cue : m_cues)
             cue->evaluate();
     else
-        for (Cue *cue :  Cupid::Singleton()->getGraphWidget()->getCurrentCues())
+        for (RenderNode *cue :  Cupid::Singleton()->getGraphWidget()->getCurrentCues())
             cue->evaluate();
 }
 
-void Dancefloor::addCue(Cue *cue) {
+void Dancefloor::addCue(RenderNode *cue) {
     m_cues.push_back(cue);
 }
 
-void Dancefloor::removeCue(Cue *cue) {
+void Dancefloor::removeCue(RenderNode *cue) {
     auto cueIter = m_cues.begin();
     while (cueIter != m_cues.end())  {
         // Remove firing from list if the event is over.
@@ -258,7 +255,6 @@ void Dancefloor::removeCue(Cue *cue) {
 
 void Dancefloor::sendToDevice()
 {
-    // GROSS should move this to inside device.
     for (auto light = m_lights.begin(); light != m_lights.end(); ++light) {
         if (light->m_lightID == 0)
             continue;

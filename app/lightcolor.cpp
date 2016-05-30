@@ -1,3 +1,10 @@
+//  The class representing a color anywhere in the system.
+//  I thought, "oh for sure I'll want my own color type cause
+//  doubtless I'll do lots of totally unique stuff with it."
+//  But it's really pretty boilerplate, and I could have used QtColor
+//  and saved some code bloat. Sometime when I'm bored I'll probably
+//  rip this out.
+
 #include <QDebug>
 #include <QRgb>
 
@@ -41,7 +48,6 @@ QColor Lightcolor::toQColor() {
     return QColor(r,g,b);
 }
 
-// Assignment operator
 Lightcolor& Lightcolor::operator=(const Lightcolor& rhs) // copy assignment
 {
     if (this != &rhs) { // self-assignment check expected
@@ -52,7 +58,6 @@ Lightcolor& Lightcolor::operator=(const Lightcolor& rhs) // copy assignment
     return *this;
 }
 
-// Arithmetic  operators
 Lightcolor & Lightcolor::operator*=(double scalar) {
     this->m_r *= scalar;
     this->m_g *= scalar;
@@ -115,6 +120,7 @@ void Lightcolor::setRGB(unsigned char *rgb)
     rgb[2] = clamp(m_b);
 }
 
+
 // -----------------------------------------------------------------------------
 // Light
 
@@ -122,4 +128,3 @@ Light::Light() :
     m_lightID(0),
     m_value(Lightcolor())
 { }
-

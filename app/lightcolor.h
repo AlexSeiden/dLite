@@ -6,7 +6,7 @@
 #include <QMetaType>
 
 // Forward declarations
-class Cue;
+class RenderNode;
 class Firing;
 
 enum compMode_t     {SET, ADD, OVER, UNDER};
@@ -56,8 +56,12 @@ const Lightcolor operator*(const Lightcolor& lhs, const Lightcolor& rhs);
 
 Q_DECLARE_METATYPE(Lightcolor)
 
+
 // -----------------------------------------------------------------------------
 // Light
+//  Encapsulates a single pixel on the dance floor.
+//  Contains a list of RenderNode firings to execute,
+//  and mapping to the physical controller index and lamp ID.
 
 class Light
 {

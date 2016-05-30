@@ -1,15 +1,15 @@
-#ifndef REMAP_H
-#define REMAP_H
+#ifndef REMAPPER_NODE_H
+#define REMAPPER_NODE_H
 #include "Node.h"
 
-class Remap : public Node
+class RemapperNode : public Node
 {
 public:
-    Remap();
+    RemapperNode();
 
     // Functor that provides closure over instance object,
     // and allows downstream clients to evaluate.
     void    operator() ();
-    virtual Remap* clone();
+    virtual RemapperNode* clone();
 };
-#endif // REMAP_H
+#endif // REMAPPER_NODE_H

@@ -5,6 +5,8 @@
 #include "NodeFactory.h"
 
 // ------------------------------------------------------------------------------
+// Shape
+// Abstract base class for shape rendering nodes.
 Shape::Shape()
 {
     m_type = CUE;

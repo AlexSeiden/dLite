@@ -1,7 +1,9 @@
-#include "Remap.h"
+// Remaps a float, kinda like the levels control in photoshop.
+
+#include "RemapperNode.h"
 #include "NodeFactory.h"
 
-Remap::Remap()
+RemapperNode::RemapperNode()
 {
     setName("Remap");
     m_type = FLOAT;
@@ -15,7 +17,7 @@ Remap::Remap()
     addParam<float>("input", 0.0);
 }
 
-void Remap::operator()()
+void RemapperNode::operator()()
 {
     // Boilerplate start-of-operator():
     if (evaluatedThisFrame())
@@ -46,11 +48,11 @@ void Remap::operator()()
     setValue("out", output);
 }
 
-Remap* Remap::clone()
+RemapperNode* RemapperNode::clone()
 {
-    Remap* lhs = new Remap();
+    RemapperNode* lhs = new RemapperNode();
     cloneHelper(*lhs);
     return lhs;
 }
 
-static Registrar<Remap>   registrar1("Remap", Node::FLOAT);
+static Registrar<RemapperNode>   registrar1("Remap", Node::FLOAT);

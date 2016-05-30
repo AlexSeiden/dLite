@@ -7,11 +7,11 @@
 
 class Dancefloor;
 
-class Cue : public Node
+class RenderNode : public Node
 {
 public:
-    Cue();
-    ~Cue();
+    RenderNode();
+    ~RenderNode();
 
     void            setCompMode(compMode_t mode)   {m_compMode = mode;}
     compMode_t      getCompMode()                  {return m_compMode;}
@@ -19,7 +19,7 @@ public:
     decayMode_t     getDecayMode()                 {return m_decayMode;}
 
     virtual void    evaluate() = 0;
-    virtual Cue*    clone() = 0;
+    virtual RenderNode*    clone() = 0;
 
     static void     setDancefloor(Dancefloor *dfmodel) {m_dfModel = dfmodel;}
 

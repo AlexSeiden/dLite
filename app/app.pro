@@ -18,7 +18,6 @@ TARGET = dLite
 QT       += multimedia widgets
 
 SOURCES  += \
-    Remap.cpp \
     main.cpp \
     engine.cpp \
     frequencyspectrum.cpp \
@@ -27,7 +26,6 @@ SOURCES  += \
     wavfile.cpp \
     lightcolor.cpp \
     Param.cpp \
-    Cue.cpp \
     BeatFiles.cpp \
     Node.cpp \
     SublevelNode.cpp \
@@ -37,7 +35,6 @@ SOURCES  += \
     Cupid.cpp \
     DanceFloor.cpp \
     PathNode.cpp \
-    RegionNode.cpp \
     Firing.cpp \
     Region.cpp \
     RegionCue.cpp \
@@ -45,7 +42,10 @@ SOURCES  += \
     SegmentController.cpp \
     NodeFactory.cpp \
     DanceFloorHardware.cpp \
-    Shape.cpp
+    Shape.cpp \
+    RegionNode.cpp \
+    RenderNode.cpp \
+    RemapperNode.cpp
 
 HEADERS  += \
     engine.h \
@@ -56,7 +56,6 @@ HEADERS  += \
     wavfile.h \
     lightcolor.h \
     Param.h \
-    Cue.h \
     BeatFiles.h \
     Node.h \
     SublevelNode.h \
@@ -71,11 +70,12 @@ HEADERS  += \
     Region.h \
     RegionCue.h \
     DotCue.h \
-    Remap.h \
     SegmentController.h \
     NodeFactory.h \
     DanceFloorHardware.h \
-    Shape.h
+    Shape.h \
+    RenderNode.h \
+    RemapperNode.h
 
 fftreal_dir = ../3rdparty/fftreal
 

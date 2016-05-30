@@ -35,7 +35,7 @@ public:
     void writeNodeUiToJSONObj(const Node *node, QJsonObject& json);
     void readNodeUiFromJSONObj(Node* node, const QJsonObject &json);
 
-    QList<Cue*>             getCurrentCues();
+    QList<RenderNode*>             getCurrentCues();
     QList<CuesheetScene*>   getCuesheets();
     CuesheetScene*          newCuesheet(QString name);
     bool                    autoSwitchCues();

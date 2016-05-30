@@ -1,3 +1,4 @@
+// Encapsulates an arbitrary region of the dance floor.
 #include "Region.h"
 #include <QJsonObject>
 #include <QJsonArray>

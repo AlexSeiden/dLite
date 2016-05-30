@@ -32,7 +32,7 @@ Firing::Firing() :
 { }
 
 Firing::Firing(Lightcolor color, double alpha, compMode_t compmode,
-               decayfunc_t decayfunc, Cue *cue) :
+               decayfunc_t decayfunc, RenderNode *cue) :
     m_color(color),
     m_alpha(alpha),
     m_compMode(compmode),

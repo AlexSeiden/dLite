@@ -1,3 +1,7 @@
+// ColorNodes.h
+//
+//  Nodes that alter or return color values.
+
 #include "ColorNodes.h"
 #include "NodeFactory.h"
 #include "utils.h"
@@ -199,7 +203,6 @@ void Palette::readFromJSONObj(const QJsonObject &json)
     }
 }
 #endif
-
 
 
 static Registrar<BriteColor>     registrar0("BriteColor", Node::COLOR);

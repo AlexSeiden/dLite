@@ -44,7 +44,7 @@ void MainWidget::createUi()
     // TODO move to settings/prefs  & allow setting this
     std::string layoutfile = std::string("/Users/alex/src/floorit/layout.csv");
     m_dancefloor->ImportLayout(layoutfile);
-    Cue::setDancefloor(m_dancefloor);
+    RenderNode::setDancefloor(m_dancefloor);
     m_engine->setDancefloormodel(m_dancefloor);
 
     m_dancefloorwidget = new Dancefloorwidget();

@@ -1,3 +1,6 @@
+// Node.cpp
+//  Abstract base class for all nodes in the evaluation graph.
+
 #include "Node.h"
 #include "utils.h"
 #include "Cupid.h"
@@ -8,6 +11,7 @@
 #include <QUuid>
 #include <QRegularExpression>
 #include "GraphWidget.h"        // GROSS. Makes this a leaky encapsulation.
+
 
 // ------------------------------------------------------------------------------
 //  Node

@@ -1,10 +1,10 @@
 #ifndef REGIONCUE_H
 #define REGIONCUE_H
 
-#include "Cue.h"
+#include "RenderNode.h"
 #include "Region.h"
 
-class RegionCue : public Cue
+class RegionCue : public RenderNode
 {
 public:
     RegionCue();

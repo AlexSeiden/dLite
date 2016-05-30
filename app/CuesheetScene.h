@@ -23,7 +23,7 @@ class QGraphicsLineItem;
 class QColor;
 QT_END_NAMESPACE
 
-class Cue;
+class RenderNode;
 
 class CuesheetScene : public QGraphicsScene
 {
@@ -43,8 +43,8 @@ public:
     void                selectTheseNodes(QList<Node*> selection);
     QString             getName() const {return m_name;}
     void                setName(QString name) {m_name = name;}
-    void                addCue(Cue *cue) {m_cues<<cue;}
-    QList<Cue*>         getCues() const {return m_cues;}
+    void                addCue(RenderNode *cue) {m_cues<<cue;}
+    QList<RenderNode*>         getCues() const {return m_cues;}
     QList<Node*>        getNodes() const;
     QRectF              getItemsBBox(QList<QGraphicsItem*> items) const;
 
@@ -77,7 +77,7 @@ private:
     QString             m_name;
 
     // GROSS business and view logic getting pretty sloppy here:
-    QList<Cue*>         m_cues;
+    QList<RenderNode*>         m_cues;
     QList<Node*>        m_nodes;
 };
 

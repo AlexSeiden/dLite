@@ -7,10 +7,10 @@
 #include <QTime>
 #include "lightcolor.h"
 #include "Param.h"
-#include "Cue.h"
+#include "RenderNode.h"
 #include "DanceFloorHardware.h"
 
-class Cue;
+class RenderNode;
 class Dancefloorwidget;
 
 class Dancefloor : public QObject
@@ -20,10 +20,10 @@ class Dancefloor : public QObject
 public:
     explicit Dancefloor(QObject *parent = 0);
     ~Dancefloor();
-    bool        ImportLayout(std::string & layoutCsvFile);
+    bool        ImportLayout(const std::string &layoutCsvFile);
 
-    void        addCue(Cue *cue);
-    void        removeCue(Cue *cue);
+    void        addCue(RenderNode *cue);
+    void        removeCue(RenderNode *cue);
     int         getNumCues() const    {return m_cues.size();}
     void        fireLight(int x, int y, Firing *f);
 
@@ -48,7 +48,7 @@ public slots:
 protected:
     int                 m_xsize, m_ysize;
     std::vector<Light>  m_lights;
-    std::vector<Cue *>  m_cues;
+    std::vector<RenderNode *>  m_cues;
 
     int                 m_frame;
     QTime               m_timeSinceLastUpdate;   // Used for monitoring responsiveness, not cueing.

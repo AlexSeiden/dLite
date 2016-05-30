@@ -20,7 +20,7 @@
 #include "GuiSettings.h"
 #include "utils.h"
 #include "GroupNodeItem.h"
-#include "Cue.h"
+#include "RenderNode.h"
 #include "Cupid.h"
 #include "SegmentController.h"
 #include "Transport.h"
@@ -169,7 +169,7 @@ void GraphWidget::showRenameTabDialog(int index)
     }
 }
 
-QList<Cue*> GraphWidget::getCurrentCues()
+QList<RenderNode*> GraphWidget::getCurrentCues()
 {
     // Returns all cues on the current tab
     return getCurrentScene()->getCues();
@@ -286,7 +286,7 @@ void GraphWidget::addNode(Node *node, QJsonObject* json)
 
     nodeItem->setParent(this);
 
-    Cue *cue = dynamic_cast<Cue*>(node);
+    RenderNode *cue = dynamic_cast<RenderNode*>(node);
     if (cue)
         getCurrentScene()->addCue(cue);
 

@@ -1,13 +1,13 @@
-#ifndef IMAGER_H
-#define IMAGER_H
+#ifndef SHAPE_NODE_H
+#define SHAPE_NODE_H
 #include <QImage>
-#include "Cue.h"
+#include "RenderNode.h"
 
 // ------------------------------------------------------------------------------
 // Shape
 //      Abstract base class for Cues that use a Qt Painter for drawing.
 
-class Shape : public Cue
+class Shape : public RenderNode
 {
 public:
     Shape();
@@ -24,6 +24,7 @@ protected:
 
 
 // ------------------------------------------------------------------------------
+//  Circle
 //      Draws a circle
 class Circle : public Shape
 {
@@ -49,4 +50,4 @@ protected:
     void    draw();
 };
 
-#endif // IMAGER_H
+#endif // SHAPE_NODE_H

@@ -454,10 +454,12 @@ void NodeBarBeat::operator()() {
     bool beatTrigger = false;
 
     qint64 mSecs =  Cupid::getPlaybackPositionUSecs() / 1000;
+
     m_beatIndex = findBeatIndexForSample(mSecs, m_beats, m_beatIndex);
     beatTrigger = checkBeatIndex(m_beatIndex, m_lastSample, m_beats);
 
     m_lastSample = mSecs;
+
     int nextbeat = m_beatIndex + 1;
     float beatFrac = 1.0;
     if (nextbeat < m_beats.size())
