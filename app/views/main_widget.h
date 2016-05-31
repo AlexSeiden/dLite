@@ -18,7 +18,7 @@
 #include "views/node_library.h"
 #include "views/graph_widget.h"
 #include "views/gui_settings.h"
-#include "views/Transport.h"
+#include "views/transport.h"
 #include "views/dance_floor_widget.h"
 #include "views/settings_dialog.h"
 #include "views/spectrograph.h"

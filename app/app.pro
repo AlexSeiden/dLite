@@ -51,9 +51,7 @@ SOURCES  += \
     views/cuesheet_view.cpp \
     views/group_node_item.cpp \
     views/node_item.cpp    \
-    views/SegmentController.cpp \
-    views/SublevelNodeItem.cpp \
-    views/Transport.cpp \
+    engine/segmentation.cpp \
     views/color_chip.cpp \
     views/connector_item.cpp \
     views/cuesheet_scene.cpp \
@@ -66,7 +64,9 @@ SOURCES  += \
     views/node_library.cpp \
     views/rename_tab_dialog.cpp \
     views/settings_dialog.cpp \
-    views/spectrograph.cpp
+    views/spectrograph.cpp \
+    views/transport.cpp \
+    views/sublevel_node_item.cpp
 
 
 HEADERS  += \
@@ -103,9 +103,7 @@ HEADERS  += \
     views/graph_widget.h       \
     views/group_node_item.h \
     views/node_item.h          \
-    views/SegmentController.h \
-    views/SublevelNodeItem.h \
-    views/Transport.h \
+    engine/segmentation.h \
     views/color_chip.h \
     views/cuesheet_scene.h     \
     views/dance_floor_widget.h  \
@@ -115,6 +113,8 @@ HEADERS  += \
     views/rename_tab_dialog.h \
     views/settings_dialog.h \
     views/spectrograph.h \
+    views/transport.h \
+    views/sublevel_node_item.h
 
 
 fftreal_dir = ../3rdparty/fftreal

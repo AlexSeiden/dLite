@@ -1,4 +1,4 @@
-#include "SegmentController.h"
+#include "engine/segmentation.h"
 #include "engine/dispatch.h"
 #include <QHBoxLayout>
 #include <QLabel>

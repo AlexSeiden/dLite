@@ -3,7 +3,7 @@
 #include <QDebug>
 
 #include "engine/utils.h"
-#include "views/Transport.h"
+#include "views/transport.h"
 #include "views/gui_settings.h"
 
 Transport::Transport(QWidget *parent)

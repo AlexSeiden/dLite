@@ -2,7 +2,7 @@
 #define TRANSPORT_H
 
 #include <QWidget>
-#include "views/SegmentController.h"
+#include "engine/segmentation.h"
 
 class Transport : public QWidget
 {

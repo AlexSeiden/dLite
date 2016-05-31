@@ -15,7 +15,7 @@
 
 #include "engine/dispatch.h"
 #include "engine/nodefactory.h"
-#include "views/SegmentController.h"
+#include "engine/segmentation.h"
 #include "engine/utils.h"
 #include "nodes/Node.h"
 #include "nodes/RenderNode.h"
@@ -27,8 +27,8 @@
 #include "views/gui_settings.h"
 #include "views/node_item.h"
 #include "views/rename_tab_dialog.h"
-#include "views/SublevelNodeItem.h"
-#include "views/Transport.h"
+#include "views/sublevel_node_item.h"
+#include "views/transport.h"
 
 GraphWidget::GraphWidget(QWidget *parent) :
     QWidget(parent)

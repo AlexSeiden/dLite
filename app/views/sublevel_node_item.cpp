@@ -1,6 +1,6 @@
 #include <QGraphicsProxyWidget>
 
-#include "views/SublevelNodeItem.h"
+#include "views/sublevel_node_item.h"
 #include "nodes/SublevelNode.h"
 #include "views/gui_settings.h"
 #include "engine/utils.h"
