@@ -39,8 +39,7 @@ public:
 
 public slots:
     void stateChanged(QAudio::State state);
-    void spectrumChanged(qint64 position, qint64 length,
-                         const FrequencySpectrum &spectrum);
+    void spectrumChanged(const FrequencySpectrum &spectrum);
     void save();
 
     // Style: is this needed?  only for new songs--which should be a separate slot
@@ -64,7 +63,7 @@ private:
     void reset();
 
 private:
-    Engine*                 m_engine;
+    AudioPlayback*                 m_engine;
 
     // UI components
     GraphWidget *           m_graphWidget;

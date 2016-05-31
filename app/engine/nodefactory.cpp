@@ -31,15 +31,12 @@ void NodeFactory::registerNodetype(
 // and instantiates an instance of that node.
 Node * NodeFactory::instatiateNode(QString classname, QUuid uuid)
 {
-    /* STYLE ? could be: std::shared_ptr<Node> NodeFactory::instatiateNode(QString name) */
-
     Node *instance = nullptr;
 
     // find name in the registry and call factory method.
     NodeInstatiator_t instancer = m_registry[classname.toStdString()];
     if (! instancer)
         return nullptr;
-        // ErrorHandling
 
     instance = instancer();
     // When instatiating from the CueLibrary, the uuid will be null,
@@ -47,14 +44,14 @@ Node * NodeFactory::instatiateNode(QString classname, QUuid uuid)
     // When we're reading in from a file, there will already be a uuid
     // which connections may refer to, and we need to assign it here.
     if (! uuid.isNull())
-        instance->m_uuid = uuid;  // GROSS this keeps uuid from being const.
-    instance->m_className = classname; // GROSS should get classname automatically in ctor
+        instance->m_uuid = uuid;
+    instance->m_className = classname;
 
     return instance;
 }
 
 NodeFactory * NodeFactory::Singleton() {
-    // First, the NodeFactory obviously needs to be a singleton, since
+    // The NodeFactory obviously needs to be a singleton, since
     // we don't want/need a bunch of separate factories or registries!
     //
     // We need to implement it this way--rather than just using a single
@@ -169,16 +166,13 @@ void NodeFactory::writeNodesToJSONObj(QJsonObject &json, QList<Node*>nodes) cons
          nodeJsonArray.append(nodeJson);
     }
     json["nodes"] = nodeJsonArray;
-
-     // TODO save audioFilename; onset, beat, etc., files
 }
 
 void NodeFactory::writeCuesheetsToJSONObj(QJsonObject &json) const
 {
     QJsonArray cuesheetJsonArray;
-    // GROSS cuesheetscene is view not business.  plus, we
-    // aren't letting it write itself.
-    foreach (const CuesheetScene *cuesheet, Dispatch::Singleton()->getGraphWidget()->getCuesheets()) {
+    foreach (const CuesheetScene *cuesheet,
+             Dispatch::Singleton()->getGraphWidget()->getCuesheets()) {
          QJsonObject cuesheetJson;
          cuesheetJson["name"] = cuesheet->getName();
          writeNodesToJSONObj(cuesheetJson, cuesheet->getNodes());
@@ -274,7 +268,6 @@ Node* NodeFactory::readNodeFromJSONObj(const QJsonObject &json)
         ParamBase *param = newnode->getParamByName(paramname);
 
         if (! param) {
-            // ErrorHandling
             qDebug() << Q_FUNC_INFO << QString("Node \"%1\" has no parameter \"%2\"").arg(classname, paramname);
             continue;
         }

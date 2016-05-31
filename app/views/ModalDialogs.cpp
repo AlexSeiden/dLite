@@ -30,7 +30,7 @@ void MainWidget::showOpenDialog()
 {
     const QString dir = QDir::homePath();
     const QString fileName = QFileDialog::getOpenFileName(this, tr("Open dLite file"), dir, "*.dLite");
-    // TODO open multiple files
+    // TODO allow multiple selection
     if (! fileName.isEmpty() && ! fileName.isNull()) {
         bool result = NodeFactory::Singleton()->readFromFile(fileName);
         if (result)

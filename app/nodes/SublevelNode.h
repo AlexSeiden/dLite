@@ -33,7 +33,7 @@ public:
 
 
 public slots:
-    void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
+    void spectrumChanged(const FrequencySpectrum &spectrum);
     void setSubrange(Subrange *range) {m_range = *range;}
 
 signals:

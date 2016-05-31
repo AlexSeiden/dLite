@@ -88,7 +88,7 @@ void Dancefloorwidget::paintEvent(QPaintEvent *event)
                 painter.restore();
             }
 
-            // GROSS: bars showing where plywood is; should get from layout file.
+            // TODO: bars showing where plywood is; should get from layout file.
             // Vertical bars
             int xstart= (y<9) ? 4 : 6;
             int xend= (y<9) ? 19 : 17;

@@ -16,7 +16,7 @@
 #include "engine/utils.h"
 #include "engine/dancefloor.h"
 
-Engine::Engine(QObject *parent)
+AudioPlayback::AudioPlayback(QObject *parent)
     :   QObject(parent)
     ,   m_state(QAudio::StoppedState)
     ,   m_wavFileHandle(0)
@@ -30,10 +30,17 @@ Engine::Engine(QObject *parent)
 {
     qRegisterMetaType<FrequencySpectrum>("FrequencySpectrum");
     qRegisterMetaType<WindowFunction>("WindowFunction");
+#if 0
     CHECKED_CONNECT(&m_spectrumAnalyser,
                     SIGNAL(spectrumChanged(FrequencySpectrum)),
                     this,
-                    SLOT(spectrumChanged(FrequencySpectrum)));
+                    SLOT(spectrumChangedRetransmit(FrequencySpectrum)));
+#else
+    CHECKED_CONNECT(&m_spectrumAnalyser,
+                    SIGNAL(spectrumChanged(FrequencySpectrum)),
+                    this,
+                    SIGNAL(spectrumChanged(FrequencySpectrum)));
+#endif
 
     // Set the main timer
     m_timer->setInterval(m_notifyIntervalMs);
@@ -42,12 +49,12 @@ Engine::Engine(QObject *parent)
     CHECKED_CONNECT(m_timer, SIGNAL(timeout()), this, SLOT(updateDanceFloor()));
 }
 
-Engine::~Engine() { }
+AudioPlayback::~AudioPlayback() { }
 
 //-----------------------------------------------------------------------------
 // Public functions
 
-bool Engine::loadSong(const QString &fileName)
+bool AudioPlayback::loadSong(const QString &fileName)
 {
     Q_ASSERT(!fileName.isEmpty());
     m_audiofilename = fileName;
@@ -83,19 +90,19 @@ bool Engine::loadSong(const QString &fileName)
     return result;
 }
 
-qint64 Engine::bufferLengthBytes() const
+qint64 AudioPlayback::bufferLengthBytes() const
 {
     // Return buffer length in bytes
     return m_qbuf.buffer().size();
 }
 
-qint64 Engine::bufferLengthMS() const
+qint64 AudioPlayback::bufferLengthMS() const
 {
     // Return buffer length in ms
     return audioDuration(m_format, bufferLengthBytes());
 }
 
-void Engine::setWindowFunction(WindowFunction type)
+void AudioPlayback::setWindowFunction(WindowFunction type)
 {
     m_spectrumAnalyser.setWindowFunction(type);
 }
@@ -103,13 +110,13 @@ void Engine::setWindowFunction(WindowFunction type)
 //-----------------------------------------------------------------------------
 // Public slots
 
-void Engine::startPlayback()
+void AudioPlayback::startPlayback()
 {
     if (QAudio::SuspendedState == m_state) {
         m_audioOutput->resume();
     } else {
         m_spectrumAnalyser.cancelCalculation();
-        spectrumChanged(0, 0, FrequencySpectrum());
+        spectrumChangedRetransmit(FrequencySpectrum());
         setPlayPosition(0, true);
         CHECKED_CONNECT(m_audioOutput, SIGNAL(stateChanged(QAudio::State)),
                         this, SLOT(audioStateChanged(QAudio::State)));
@@ -118,12 +125,12 @@ void Engine::startPlayback()
     }
 }
 
-void Engine::rewind()
+void AudioPlayback::rewind()
 {
     movePlaybackHead(0.0);
 }
 
-void Engine::movePlaybackHead(double positionfraction)
+void AudioPlayback::movePlaybackHead(double positionfraction)
 {
     // Sets playback position to somewhere in middle of recording.
     // position == 0.0 means the beginning,
@@ -139,14 +146,14 @@ void Engine::movePlaybackHead(double positionfraction)
     Q_ASSERT(result);
 }
 
-void Engine::suspend()
+void AudioPlayback::suspend()
 {
     if (QAudio::ActiveState == m_state || QAudio::IdleState == m_state) {
             m_audioOutput->suspend();
     }
 }
 
-void Engine::togglePlayback()
+void AudioPlayback::togglePlayback()
 {
     if (QAudio::ActiveState == m_state)
         m_audioOutput->suspend();
@@ -159,7 +166,7 @@ void Engine::togglePlayback()
 //-----------------------------------------------------------------------------
 // Private slots
 
-void Engine::updateDanceFloor()
+void AudioPlayback::updateDanceFloor()
 {
     // Callback
     // The tail that wags the dog!
@@ -185,7 +192,7 @@ void Engine::updateDanceFloor()
     }
 }
 
-void Engine::audioStateChanged(QAudio::State state)
+void AudioPlayback::audioStateChanged(QAudio::State state)
 {
     qDebug() << "Engine::audioStateChanged from " << m_state << " to " << state;
 
@@ -215,23 +222,23 @@ void Engine::audioStateChanged(QAudio::State state)
     }
 }
 
-void Engine::spectrumChanged(const FrequencySpectrum &spectrum)
+void AudioPlayback::spectrumChangedRetransmit(const FrequencySpectrum &spectrum)
 {
-    emit spectrumChanged(0, m_spectrumBufferLength, spectrum);
+    emit spectrumChanged(spectrum);
 }
 
 
 //-----------------------------------------------------------------------------
 // Private functions
 
-void Engine::resetAudioDevices()
+void AudioPlayback::resetAudioDevices()
 {
     delete m_audioOutput;
     m_audioOutput = 0;
     setPlayPosition(0);
 }
 
-void Engine::reset()
+void AudioPlayback::reset()
 {
     stopPlayback();
     setState(QAudio::StoppedState);
@@ -244,7 +251,7 @@ void Engine::reset()
     resetAudioDevices();
 }
 
-bool Engine::initialize()
+bool AudioPlayback::initialize()
 {
     bool result = false;
 
@@ -260,7 +267,7 @@ bool Engine::initialize()
     return result;
 }
 
-bool Engine::selectFormat()
+bool AudioPlayback::selectFormat()
 {
     bool foundSupportedFormat = false;
 
@@ -278,7 +285,7 @@ bool Engine::selectFormat()
     return foundSupportedFormat;
 }
 
-void Engine::stopPlayback()
+void AudioPlayback::stopPlayback()
 {
     if (m_audioOutput) {
         m_audioOutput->stop();
@@ -288,7 +295,7 @@ void Engine::stopPlayback()
     }
 }
 
-void Engine::setState(QAudio::State state)
+void AudioPlayback::setState(QAudio::State state)
 {
     const bool changed = (m_state != state);
     if (changed) {
@@ -299,9 +306,7 @@ void Engine::setState(QAudio::State state)
     }
 }
 
-// ??? should we nuke this, and get play position 'live'?
-// or does the check-for-pos-changed save updates?
-void Engine::setPlayPosition(qint64 position, bool forceEmit)
+void AudioPlayback::setPlayPosition(qint64 position, bool forceEmit)
 {
     const bool changed = (m_playPosition != position);
     m_playPosition = position;
@@ -309,7 +314,7 @@ void Engine::setPlayPosition(qint64 position, bool forceEmit)
         emit playPositionChanged(m_playPosition);
 }
 
-void Engine::calculateSpectrum(qint64 start, qint64 end)
+void AudioPlayback::calculateSpectrum(qint64 start, qint64 end)
 {
     // QThread::currentThread is marked 'for internal use only', but
     // we're only using it for debug output here, so it's probably OK :)
@@ -317,14 +322,13 @@ void Engine::calculateSpectrum(qint64 start, qint64 end)
                  << "spectrumAnalyser.isReady" << m_spectrumAnalyser.isReady();
 
     if (m_spectrumAnalyser.isReady()) {
-        // ??? are we sizing & clearing correctly???
-        // Must copy data into spectrum buffer because Hahn window will be applied.
-        // Note fromRawData uses implicit shared array.
+        // NOTE: We copy the data into spectrum buffer because Hahn window will
+        // be applied "in place." fromRawData() uses implicit shared array.
         m_spectrumBuffer = QByteArray::fromRawData(m_buffer.constData() + start,
                                                    m_spectrumBufferLength);
         qint64 len = end-start+1;
         if (len < m_spectrumBufferLength) {
-            // TODO make sure this reads correct shortened buffer
+            // TODO verify that this reads correct shortened buffer.
             ENGINE_DEBUG << Q_FUNC_INFO << "len" << len << "m_specbuflen" << m_spectrumBufferLength;
         }
         m_spectrumAnalyser.calculate(m_spectrumBuffer, m_format);
@@ -332,7 +336,7 @@ void Engine::calculateSpectrum(qint64 start, qint64 end)
 
 }
 
-void Engine::setFormat(const QAudioFormat &format)
+void AudioPlayback::setFormat(const QAudioFormat &format)
 {
     const bool changed = (format != m_format);
     m_format = format;
@@ -347,14 +351,14 @@ void Engine::setFormat(const QAudioFormat &format)
  * NOTE:  this is also the interval at which the whole floor is
  * updated, and the two should probably be decoupled.
  */
-void Engine::setUpdateInterval(int val)
+void AudioPlayback::setUpdateInterval(int val)
 {
     m_notifyIntervalMs = val;
     m_audioOutput->setNotifyInterval(m_notifyIntervalMs);
 }
 
 // return time in microseconds
-qint64 Engine::getCurrentTime() const
+qint64 AudioPlayback::getCurrentTime() const
 {
     qint64 positionInBytes = m_qbuf.pos();
     return audioDuration(m_format, positionInBytes);

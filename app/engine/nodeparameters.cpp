@@ -294,12 +294,12 @@ template <> void Param<Lightcolor>::readFromJSONObj(const QJsonObject &json)
 template <> void Param<Region>::readFromJSONObj(const QJsonObject &json)
 {
     ParamBase::readFromJSONObj(json);
-    // NOTE: Node override handling this now.
+    // NOTE: Node override will actually handle this.
 }
 
 
 // ------------------------------------------------------------------------------
-// Editor widgetry
+// NOTE: Editor widgetry
 //      Although we partly break the separation between "model" and "view" here
 //      (Since editors are clearly part of the view, and the params themselves
 //      should be view-agnostic), it makes the code more cohesive, rather
@@ -310,13 +310,12 @@ QWidget* ParamBase::getEditorWidget(QObject *sendValueChangesHere)
     return nullptr;
 }
 
-// TODO subclass Spin Boxes
-// and capture editingFinished signal to perform clearFocus()
+// TODO: capture editingFinished signal in spinbox subclass and clearFocus()
 
 template <> QWidget* Param<float>::getEditorWidget(QObject* sendValueChangesHere)
 {
     MyDoubleSpinBox *editorWidget = new MyDoubleSpinBox;
-    if (m_useminmax) {    // TODO finish this
+    if (m_useminmax) {
         editorWidget->setRange(m_minVal, m_maxVal);
         editorWidget->setSingleStep(_stepVal);
     }
@@ -325,7 +324,6 @@ template <> QWidget* Param<float>::getEditorWidget(QObject* sendValueChangesHere
     float val = 0.0;
     getValue(val);
     editorWidget->setValue(val);
-    // Validate connection.  Can't used CHECKED_CONNECT from template.
     bool result = editorWidget->connect(editorWidget, SIGNAL(valueChanged(double)),
                                         sendValueChangesHere, SLOT(setValue(double)));
     if (!result)
@@ -339,7 +337,7 @@ template <> QWidget* Param<float>::getEditorWidget(QObject* sendValueChangesHere
 template <> QWidget* Param<int>::getEditorWidget(QObject* sendValueChangesHere)
 {
     QSpinBox *editorWidget = new QSpinBox;
-    if (m_useminmax) {    // TODO finish this
+    if (m_useminmax) {
         editorWidget->setRange(m_minVal, m_maxVal);
         editorWidget->setSingleStep(_stepVal);
     }

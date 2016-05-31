@@ -16,9 +16,9 @@ SublevelNode::SublevelNode(QObject *parent) :
 
     // connect level to rangemeter widget for display
     CHECKED_CONNECT(Dispatch::Singleton()->getEngine(),
-                    SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
+                    SIGNAL(spectrumChanged(const FrequencySpectrum &)),
                     this,
-                    SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
+                    SLOT(spectrumChanged(const FrequencySpectrum &)));
 
     // Update the spectrograph with selections, so that
     // it can display selected window, and send changes
@@ -39,11 +39,8 @@ SublevelNode::~SublevelNode()
     emit sublevelDeselected(this);
 }
 
-void SublevelNode::spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum)
+void SublevelNode::spectrumChanged(const FrequencySpectrum &spectrum)
 {
-    Q_UNUSED(position)
-    Q_UNUSED(length)
-
     m_spectrum = spectrum;
     if (isActive()) {
         calculateLevel();

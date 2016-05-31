@@ -66,7 +66,6 @@ bool DanceFloorHardware::connect() {
     m_addr0.sin_port = htons(this->IP_PORT);
     int result = inet_pton(AF_INET, "10.0.1.21", &m_addr0.sin_addr);
     if (result != 1) {
-        // ErrorHandling
         std::cerr << "WARNING addr0 inet_pton result:" << result  << "\terror: "
                   << errno << " \t" << strerror(errno) << std::endl;
         std::cerr.flush();
@@ -77,7 +76,6 @@ bool DanceFloorHardware::connect() {
     m_addr1.sin_port = htons(this->IP_PORT);
     result = inet_pton(AF_INET, "10.0.1.22", &m_addr1.sin_addr);
     if (result != 1) {
-        // ErrorHandling
         std::cerr << "WARNING addr1 inet_pton result:" << result << "\terror: "
                   << errno << " \t" << strerror(errno) << std::endl;
         std::cerr.flush();

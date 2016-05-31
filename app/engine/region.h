@@ -7,7 +7,7 @@
 
 class QJsonObject;
 
-// Encapsulates an arbitrary list of cells.
+// Encapsulates an arbitrary list of cells, such as user-drawn shapes and patterns.
 
 class Region
 {
@@ -18,7 +18,7 @@ public:
     void setCell(QPoint p, bool status);
     void readFromJSONObj(const QJsonObject &json);
     void writeToJSONObj(QJsonObject &json) const;
-    QList<QPoint> getCells() {return _cells;}       // GROSS
+    const QList<QPoint> getCells() {return _cells;}
 
 private:
     // Stores a list of all points (in Dancefloor cell space)

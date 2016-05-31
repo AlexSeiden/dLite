@@ -1,6 +1,9 @@
 include(../dLite.pri)
 
-# mostly for std::function, and other C++11 features.  And RTTI.
+# mostly for std::function, and other C++11 features.
+# And RTTI, which (TODO) we can probably ditch since I'm only using
+# it for node types, and those can be identified without having
+# to add the RTTI overhead to everything.
 CONFIG  += c++11
 CONFIG  += rtti
 QMAKE_CXXFLAGS += -stdlib=libc++
@@ -31,6 +34,8 @@ SOURCES  += \
     engine/frequencyspectrum.cpp \
     engine/lightcolor.cpp \
     engine/main.cpp \
+    engine/spectrumanalyser.cpp \
+    engine/utils.cpp \
     nodes/BeatFiles.cpp \
     nodes/ColorNodes.cpp \
     nodes/DotCue.cpp \
@@ -43,8 +48,6 @@ SOURCES  += \
     nodes/RenderNode.cpp \
     nodes/Shape.cpp \
     nodes/SublevelNode.cpp \
-    engine/spectrumanalyser.cpp \
-    engine/utils.cpp \
     views/ColorChip.cpp \
     views/ConnectorItem.cpp \
     views/CueLibView.cpp \
@@ -79,6 +82,9 @@ HEADERS  += \
     engine/firing.h \
     engine/frequencyspectrum.h \
     engine/lightcolor.h \
+    engine/spectrum.h \
+    engine/spectrumanalyser.h \
+    engine/utils.h \
     nodes/BeatFiles.h \
     nodes/ColorNodes.h \
     nodes/DotCue.h \
@@ -91,9 +97,6 @@ HEADERS  += \
     nodes/RenderNode.h \
     nodes/Shape.h \
     nodes/SublevelNode.h \
-    engine/spectrum.h \
-    engine/spectrumanalyser.h \
-    engine/utils.h \
     views/ColorChip.h \
     views/ConnectorItem.h \
     views/CueLibView.h \
@@ -134,8 +137,8 @@ macx {
 target.path = ../install
 INSTALLS += target
 
-# Deployment
 
+# Deployment
 DESTDIR = ..$${spectrum_build_dir}
 macx {
         # Relocate fftreal.framework into spectrum.app bundle

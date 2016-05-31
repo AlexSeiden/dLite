@@ -180,10 +180,8 @@ void Node::writeToJSONObj(QJsonObject &json) const
 
 ParamBase *Node::getParamByName(QString paramname)
 {
-    /*
-    Utility function that's used when reading a file from disk,
-    and when matching parameters during duplication.
-    */
+    // Utility function that's used when reading a file from disk,
+    // and when matching parameters during duplication.
     if (m_paramDict.contains(paramname))
         return m_paramDict[paramname];
     return nullptr;

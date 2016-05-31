@@ -13,7 +13,7 @@ GroupNodeItem::GroupNodeItem(QGraphicsItem *parent) :
     // TODO add minimize checkbox
 }
 
-// TODO serialize
+// TODO serialize groups
 
 QRectF GroupNodeItem::boundingRect() const
 {

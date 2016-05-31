@@ -385,8 +385,8 @@ void ParamItem::textChanged(QString text)
         return;
     }
 
+    // This should only be called for ints and floats.
     Q_ASSERT(false);
-    // ErrorHandling
 }
 
 // Need to have this be a separate "setBoolFunction" with an int argument,

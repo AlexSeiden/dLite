@@ -269,7 +269,6 @@ void GraphWidget::addConnection(ParamBase* server, ParamBase* client)
        getCurrentScene()->connectSockets(serverSocket, clientSocket);
    }
    else {
-       // ErrorHandling
        qDebug() << Q_FUNC_INFO << "Could not connect server "
                 << server->getParentNode()->getName() << server->getName()
                 << "to client"
@@ -280,7 +279,6 @@ void GraphWidget::addConnection(ParamBase* server, ParamBase* client)
 void GraphWidget::addNode(Node *node, QJsonObject* json)
 {
     NodeItem *nodeItem;
-    // GROSS
     SublevelNode *sln = dynamic_cast<SublevelNode *>(node);
     if (sln)
         nodeItem = new SublevelNodeItem(node);
@@ -409,7 +407,6 @@ void GraphWidget::frameAll()
 }
 
 // Automatically layout all nodes.
-// TODO layout only selected nodes.
 void GraphWidget::layoutAll()
 {
     // Start with Cues, which will be the root of the dag:
@@ -423,6 +420,8 @@ void GraphWidget::layoutAll()
 
     // TODO orphan nodes (ones not connected) aren't handled.
 }
+
+// TODO layoutSelected()
 
 // Recursively layout a node and its connections.
 QPointF GraphWidget::positionNodeItem(NodeItem* ni, QPointF startPos)

@@ -28,14 +28,14 @@ QT_END_NAMESPACE
  * frequency spectrum.
  * It calls the Dancefloor when it's time to evaluate.
  */
-class Engine : public QObject
+class AudioPlayback : public QObject
 {
 
     Q_OBJECT
 
 public:
-    explicit Engine(QObject *parent = 0);
-    ~Engine();
+    explicit AudioPlayback(QObject *parent = 0);
+    ~AudioPlayback();
 
     QAudio::State state() const { return m_state; }
     int interval() {return m_notifyIntervalMs;}
@@ -95,12 +95,12 @@ signals:
     //  length   Length of window in byte
     //  spectrum Resulting frequency spectrum
     // TODO change this to only pass the spectrum
-    void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
+    void spectrumChanged(const FrequencySpectrum &spectrum);
 
 private slots:
     void updateDanceFloor();
     void audioStateChanged(QAudio::State state);
-    void spectrumChanged(const FrequencySpectrum &spectrum);
+    void spectrumChangedRetransmit(const FrequencySpectrum &spectrum);
 
 private:
     void resetAudioDevices();

@@ -142,7 +142,6 @@ protected:
         param->setParentNode(this);
         m_paramList << param;
         if (m_paramDict.contains(name)) {
-            //ErrorHandling
             qDebug() << Q_FUNC_INFO
                      << QString("adding parameter \"%1\" to node \"%2\" more than once").arg(name, m_name);
         }

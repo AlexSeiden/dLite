@@ -1,5 +1,7 @@
-#ifndef PARAM_H
-#define PARAM_H
+// Classes that encapsulate individual parameters on Nodes & Cues.
+
+#ifndef NODEPARAMETERS_H
+#define NODEPARAMETERS_H
 
 #include <QList>
 #include <QString>
@@ -9,7 +11,6 @@
 #include <typeinfo>
 #include "engine/lightcolor.h"
 
-// Classes that encapsulate individual parameters on Nodes & Cues.
 
 // ParamBase
 //      An abstract base class.
@@ -51,11 +52,9 @@ public:
     void        copyValueAndConnection(ParamBase *rhs);
     void        disconnect() {m_connectedParam = nullptr; m_provider = nullptr;}
 
-    // TODO range only works for floats & ints.
     void        setRange(bool userange, double min=0.0, double max=1.0, double step=1.0);
 
     virtual void eval() {
-        // Evaluation leaves the result in the provider's "output" variable.
         if (m_provider)
             m_provider();
     }
@@ -85,11 +84,6 @@ public:
     virtual void readFromJSONObj(const QJsonObject &json);
     virtual void writeToJSONObj(QJsonObject &json) const;
 
-
-    // Copy assignment operator
-//    virtual void getValueAndConnections(const ParamBase &rhs);
-//    virtual ParamBase  & operator=(const ParamBase &rhs) = 0;
-
     // Would it be useful to maintain a linked list of connections here?
     // Both for inputs and outputs?  Would that break modularity?
     //QList<ParamBase *>  getConnections();
@@ -97,7 +91,6 @@ public:
     //Node *getClients();
 
     // Any OUTPUT params need to stick their value in here.
-    // Kinda GROSS but easiest way to (AFAIK) to pass arbitrary datatypes.
     QVariant    _qvOutput;
 
 protected:
@@ -109,10 +102,9 @@ protected:
     bool                    m_isOutput;
     bool                    m_isConnectable;
     const std::type_info &  m_type;
-    /*const*/ QUuid         m_uuid; // Can't be const bc of assignment during file read
+    QUuid                   m_uuid;
 
-    // GROSS ! only used for ranges on numeric types.  And then, when using int types,
-    // the values are cast.
+    // Only used for ranges on numeric types.
     bool                    m_useminmax;
     float                   m_minVal, m_maxVal, _stepVal;
 
@@ -141,8 +133,9 @@ public:
     virtual ~Param() {}
 
     virtual void getValue(PARAMT &value)  {
-        // All values are returned by reference, even for fundamental types like ints and
-        // floats. This is for generality with all types, such as Lightcolor & regions.
+        // All parameter values are returned by reference, even for fundamental
+        // types like ints and floats. This is for generality with
+        // all types of nodes, such as Lightcolor & regions.
         value = m_value;
     }
 
@@ -153,7 +146,6 @@ public:
         }
     }
 
-    // GROSS using qvOutput a lot when not needed.
     void setValue(const PARAMT &value) {m_value=value; _qvOutput.setValue(value);}
 
     // ??? do we need this?  Would it be better just to assign a _type field?
@@ -174,4 +166,5 @@ extern const std::type_info & paramTypeInt;
 extern const std::type_info & paramTypeLightcolor;
 extern const std::type_info & paramTypeBool;
 extern const std::type_info & paramTypeRegion;
-#endif // PARAM_H
+
+#endif // NODEPARAMETERS_H

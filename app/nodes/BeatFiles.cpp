@@ -229,7 +229,7 @@ void NodeOnset::loadFile(QString filename)
     filestream.open(filename.toStdString(), std::ios::in);
     if (! filestream.is_open()) {
         qDebug() << "ERROR: could not find filename " << filename << Q_FUNC_INFO;
-        return; // ErrorHandling
+        return;
     }
 
     std::string line;
@@ -291,7 +291,7 @@ NodeBar::NodeBar()
     m_type = BEAT;
 
     addParam<bool>("out", true, true);
-    loadFile();  // ErrorHandling
+    loadFile();
 }
 
 void NodeBar::loadFile()
@@ -394,7 +394,7 @@ NodeBarBeat::NodeBarBeat()
     addParam<float>("Beat Frac", true, true);
     addParam<float>("Bar Frac", true, true);
 
-    loadFile();  // ErrorHandling
+    loadFile();
 }
 
 void NodeBarBeat::loadFile()
@@ -418,7 +418,7 @@ void NodeBarBeat::loadFile(QString filename)
     filestream.open(filename.toStdString(), std::ios::in);
     if (! filestream.is_open()) {
         qDebug() << "Can't open" << filename;
-        return; // ErrorHandling
+        return;
     }
 
     std::string line;
@@ -539,10 +539,8 @@ Segmentino::Segmentino()
 {
     setName("Segmentino");
     m_type = BEAT;
-
     addParam<int>("Segment Index", true, true);
-
-    loadFile();  // ErrorHandling
+    loadFile();
 }
 
 void Segmentino::loadFile()
@@ -598,7 +596,6 @@ int Segmentino::findSegment(int msecs)
         if ((*i).first > msecs)
             return (*(i-1)).second;
     }
-    // ErrorHandling
     return 0;
 }
 

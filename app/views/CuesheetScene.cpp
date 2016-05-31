@@ -81,7 +81,6 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
                 connectSockets(server, client);
                 // Make the actual connection between parameters.
-                // GROSS -- sholdn't this be handled in the model?
                 client->getParam()->connectTo(server->getParam());
             }
         }

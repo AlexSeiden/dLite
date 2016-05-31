@@ -14,7 +14,7 @@ class Firing
 public:
     Firing();
     Firing(Lightcolor color, double alpha, compMode_t compmode,
-           decayfunc_t decayfunc, RenderNode *cue=nullptr);
+           decayfunc_t decayfunc, float m_decayRate, RenderNode *cue=nullptr);
 
     bool        evaluate();
 
@@ -28,9 +28,10 @@ public:
     Lightcolor  m_color;
     float       m_alpha;
     compMode_t  m_compMode;
-    decayfunc_t m_decayfunction;
-    RenderNode *       m_cue;      // mainly used when the same cue wants to replace
-                            // a firing in the buffer, rather than add to it.
+    decayfunc_t m_decayFunction;
+    float       m_decayRate;    // Used for exponential decay.
+    RenderNode *m_renderNode;   // Used when the same cue wants to replace
+                                // a firing in the buffer, rather than add to it.
 };
 
 

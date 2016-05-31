@@ -73,8 +73,7 @@ void Spectrograph::paintEvent(QPaintEvent *event)
         painter.drawLine(line);
     }
 
-    if (numBars == 0)   // ErrorHandling Something is seriously wrong if numBars==0
-        return;
+    Q_ASSERT(numBars > 0);
 
     // Calculate width of bars and gaps
     const int widgetWidth = rect().width();

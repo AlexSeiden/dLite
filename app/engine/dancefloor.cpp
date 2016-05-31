@@ -82,7 +82,6 @@ bool Dancefloor::ImportLayout(const std::string &layoutCsvFile)
             if (cell.size() == 0 || cell.compare("X")==0)
                 m_lights[index].m_lightID = 0;
             else {
-                // GROSS
                 int lightID = std::atoi(cell.c_str());
                 m_lights[index].m_lightID = lightID;
                 int stringNum = lightID / 100 - 1;
@@ -173,7 +172,7 @@ void Dancefloor::evaluate()
         // For every firing, apply the decay & composite.
 #if 0
         // start with what was in buffer.
-        // Should add this as a cue option.
+        // TODO: Add this as a RenderNode option.
         Lightcolor lightColor(light->_value);
 #else
         // start with black
@@ -187,7 +186,7 @@ void Dancefloor::evaluate()
             bool keep = (*firing)->evaluate();
 
             // Comp it over the others
-            // TODO other comp modes
+            // TODO need UI to set comp modes.
             switch ((*firing)->m_compMode) {
             case OVER:
                 lightColor = (*firing)->compOver(lightColor);

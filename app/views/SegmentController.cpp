@@ -11,7 +11,7 @@
 
 SegmentController::SegmentController()
 {
-    loadFile();  // ErrorHandling
+    loadFile();
 }
 
 // Loads file from "Segmentino" output.
@@ -41,7 +41,7 @@ void SegmentController::loadFile(QString filename)
     if (! filestream.is_open())
         return; // ErrorHandling
 
-    // ErrorHandling: This assumes the startTimes are strictly increasing and
+    // XXX This assumes the startTimes are strictly increasing and
     // the durations add up.
     std::string line;
     while ( getline (filestream,line) ) {
@@ -123,7 +123,7 @@ void SegmentController::loadFileQM(QString filename)
     if (! filestream.is_open())
         return; // ErrorHandling
 
-    // ErrorHandling: This assumes the startTimes are strictly increasing and
+    // XXX This assumes the startTimes are strictly increasing and
     // the durations add up.
     std::string line;
     while ( getline (filestream,line) ) {
@@ -186,7 +186,6 @@ int SegmentController::findSegment(int msecs)
             return seg.segmentIndex;
     }
 
-    // ErrorHandling
     return 0;
 }
 

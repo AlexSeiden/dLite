@@ -19,8 +19,8 @@ protected:
     void        mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 
 private:
-    bool                m_minimized;     // TODO
-    QString             m_name;          // TODO
+    bool                m_minimized;
+    QString             m_name;
 };
 
 #endif // GROUPNODEITEM_H

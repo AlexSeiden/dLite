@@ -2,7 +2,7 @@
 
 MainWidget::MainWidget(QWidget *parent)
     :   QMainWindow(parent)
-    ,   m_engine(new Engine(this))
+    ,   m_engine(new AudioPlayback(this))
     ,   m_graphWidget(NULL)
     ,   m_dancefloor(NULL)
     ,   m_dancefloorwidget(NULL)
@@ -41,7 +41,8 @@ void MainWidget::createUi()
 {
     setWindowTitle(tr("dLite"));
 
-    // TODO move to settings/prefs  & allow setting this
+    // TODO Should set default layout in preferences.
+    // If I had more than one dance floor, that'd be really important!
     std::string layoutfile = std::string("/Users/alex/src/floorit/layout.csv");
     m_dancefloor->ImportLayout(layoutfile);
     RenderNode::setDancefloor(m_dancefloor);
@@ -49,7 +50,7 @@ void MainWidget::createUi()
 
     m_dancefloorwidget = new Dancefloorwidget();
     m_dancefloorwidget->setModel(m_dancefloor);
-    m_dancefloor->setView(m_dancefloorwidget);  // GROSS
+    m_dancefloor->setView(m_dancefloorwidget);
     Dispatch::Singleton()->setDancefloorwidget(m_dancefloorwidget);
     m_dancefloorwidget->show();
 
@@ -82,7 +83,7 @@ void MainWidget::createUi()
 
     setMinimumSize(700, 400);
     resize(1500, 900);
-    move(5,10);  // TODO restore from last saved
+    move(5,10);
 }
 
 void MainWidget::createMenus()
@@ -253,8 +254,8 @@ void MainWidget::connectUi()
     CHECKED_CONNECT(m_engine, SIGNAL(playPositionChanged(qint64)),
                     m_transport, SLOT(playPositionChanged(qint64)));
 
-    CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(qint64, qint64, const FrequencySpectrum &)),
-                    this, SLOT(spectrumChanged(qint64, qint64, const FrequencySpectrum &)));
+    CHECKED_CONNECT(m_engine, SIGNAL(spectrumChanged(const FrequencySpectrum &)),
+                    this, SLOT(spectrumChanged(const FrequencySpectrum &)));
 
     CHECKED_CONNECT(m_transport, SIGNAL(movePlaybackHead(double)),
                     m_engine, SLOT(movePlaybackHead(double)));
@@ -296,11 +297,8 @@ void MainWidget::stateChanged(QAudio::State state)
 
 // TODO decouple position & spectrum change
 // They are artificially coupled in engine.cpp
-void MainWidget::spectrumChanged(qint64 position, qint64 length,
-                                 const FrequencySpectrum &spectrum)
+void MainWidget::spectrumChanged(const FrequencySpectrum &spectrum)
 {
-    Q_UNUSED(position)
-    Q_UNUSED(length)
     // ??? Why is this a function call, instead of a signal?
     m_spectrograph->spectrumChanged(spectrum);
 }
@@ -327,21 +325,17 @@ void MainWidget::showAndRaise()
 //-----------------------------------------------------------------------------
 // New node slots
 //-----------------------------------------------------------------------------
-// GROSS : move this to Cupid?  Or Nodefactory? Or somewhere else?
+// TODO: This probably should be in Dispatch or Nodefactory
 void MainWidget::newNodeRequest(QString name)
 {
     // TODO generate this list from a single place, where all cues are listed,
-    // and the same place is used for the CueLib
-    // move to cuelibview.cpp
+    // and the same place is used for the CueLib. Move to cuelibview.cpp
     Node *newNode;
 
     newNode = NodeFactory::Singleton()->instatiateNode(name);
     if (newNode)
-        // Would "correct MVC" mean that the graphWidget should figure this out
-        // on its own, by talking to the "model"?
         m_graphWidget->addNode(newNode);
     else {
         qDebug() << "Unknown newNodeRequest for " << name;
-        // ErrorHandling
     }
 }

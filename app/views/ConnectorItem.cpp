@@ -90,7 +90,7 @@ ConnectorItem::ConnectorItem(SocketItem *serverSocket, SocketItem *clientSocket,
     m_startStub(this, true),
     m_endStub(this, false)
 {
-    setZValue(-1000.0);  // TODO make connector z a pref?
+    setZValue(-1000.0);  // TODO make z-ordering for connectors a preference?
     updatePath();
 
     setFlags(ItemIsSelectable);
