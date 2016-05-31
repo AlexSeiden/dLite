@@ -2,7 +2,7 @@
 #include <QPushButton>
 #include <QBoxLayout>
 
-#include "views/RenameTabDialog.h"
+#include "views/rename_tab_dialog.h"
 #include "engine/utils.h"
 
 RenameTabDialog::RenameTabDialog(QWidget *parent) :

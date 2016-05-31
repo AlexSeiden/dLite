@@ -1,4 +1,4 @@
-#include "views/GuiSettings.h"
+#include "views/gui_settings.h"
 #include <QToolButton>
 #include <QPen>
 #include <QFile>

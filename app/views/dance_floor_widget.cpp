@@ -1,4 +1,4 @@
-#include "views/dancefloorwidget.h"
+#include "views/dance_floor_widget.h"
 #include "engine/utils.h"
 #include <QDebug>
 #include <QMouseEvent>
@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QTimerEvent>
 #include <math.h>
-#include "views/GuiSettings.h"
+#include "views/gui_settings.h"
 #include "nodes/RegionNode.h"
 
 Dancefloorwidget::Dancefloorwidget(QWidget *parent) :

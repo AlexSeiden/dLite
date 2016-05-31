@@ -1,4 +1,4 @@
-#include "views/mainwidget.h"
+#include "views/main_widget.h"
 #include <QApplication>
 #include <QStyleFactory>
 

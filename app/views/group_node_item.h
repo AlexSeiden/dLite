@@ -1,5 +1,5 @@
-#ifndef GROUPNODEITEM_H
-#define GROUPNODEITEM_H
+#ifndef GROUP_NODE_ITEM_H
+#define GROUP_NODE_ITEM_H
 
 #include <QGraphicsItemGroup>
 
@@ -23,4 +23,4 @@ private:
     QString             m_name;
 };
 
-#endif // GROUPNODEITEM_H
+#endif // GROUP_NODE_ITEM_H

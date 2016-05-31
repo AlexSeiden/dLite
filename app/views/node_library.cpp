@@ -1,16 +1,17 @@
-#include <QtWidgets>
-
-#include "views/CueLibView.h"
-#include "engine/nodefactory.h"
-#include "engine/utils.h"
-
 // ------------------------------------------------------------------------------
-// CueLibView
-// View that allows the user to create new nodes.
+// node_library.cpp
+// Widget that allows the user to create new nodes.
+//
 // TODO turn this into a toolbar that's much more space efficient.
 // TODO be able to add group nodes etc. to this.
 
-CueLibView::CueLibView(QWidget *parent) :
+#include <QtWidgets>
+
+#include "views/node_library.h"
+#include "engine/nodefactory.h"
+#include "engine/utils.h"
+
+NodeLibrary::NodeLibrary(QWidget *parent) :
     QWidget(parent)
 {
     createUi();
@@ -19,7 +20,7 @@ CueLibView::CueLibView(QWidget *parent) :
 }
 
 
-void CueLibView::createUi()
+void NodeLibrary::createUi()
 {
     m_signalMapper = new QSignalMapper(this);
 
@@ -45,7 +46,7 @@ void CueLibView::createUi()
     // and partly by calling graphWidget->addNode()
 }
 
-QGroupBox *CueLibView::createGroup(QString typeName, Node::node_t nodeType)
+QGroupBox *NodeLibrary::createGroup(QString typeName, Node::node_t nodeType)
 {
     QGroupBox *groupBox = new QGroupBox(typeName);
     QVBoxLayout *layout = new QVBoxLayout;
@@ -64,7 +65,7 @@ QGroupBox *CueLibView::createGroup(QString typeName, Node::node_t nodeType)
 }
 
 // Convienence function
-void CueLibView::addButtonToUi(QLayout *layout, QString buttonName) {
+void NodeLibrary::addButtonToUi(QLayout *layout, QString buttonName) {
     QPushButton *butt = new QPushButton(this);
     butt->setObjectName("CueButt");
     butt->setText(buttonName);
@@ -74,7 +75,7 @@ void CueLibView::addButtonToUi(QLayout *layout, QString buttonName) {
     CHECKED_CONNECT(butt, SIGNAL(clicked()), m_signalMapper, SLOT(map()));
 }
 
-void CueLibView::showAndRaise()
+void NodeLibrary::showAndRaise()
 {
     show();
     raise();

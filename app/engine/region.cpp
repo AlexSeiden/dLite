@@ -15,8 +15,6 @@ bool Region::hasCell(QPoint p)
 // Sets the status of point p
 void Region::setCell(QPoint p, bool status)
 {
-    // $$$ inefficient, although really not that bad because _cells is
-    // a QList<QPoint>.  Could easily be made QSet<> TODO
     _cells.removeAll(p);
     if (status)
         _cells.append(p);
@@ -43,6 +41,5 @@ void Region::readFromJSONObj(const QJsonObject &json)
         int x = posJsonObject["x"].toInt();
         int y = posJsonObject["y"].toInt();
         _cells.push_back(QPoint(x,y));
-        // (Hopefully) this uses copy to push onto QList of cells.
     }
 }

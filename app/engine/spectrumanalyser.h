@@ -106,7 +106,6 @@ private:
     void calculateWindow();
 
 private:
-
     SpectrumAnalyserThread*    m_thread;
 
     enum State {
@@ -114,7 +113,6 @@ private:
         Busy,
         Cancelled
     };
-
     State              m_state;
 };
 

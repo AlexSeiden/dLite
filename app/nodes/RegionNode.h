@@ -4,7 +4,7 @@
 #include "nodes/Node.h"
 #include <QObject>
 #include <QPoint>
-#include "views/dancefloorwidget.h"   // For pixelquerydelegate_t
+#include "views/dance_floor_widget.h"   // For pixelquerydelegate_t
 #include "engine/region.h"
 
 // Nodes that interact with custom view widgets need to inherit from both

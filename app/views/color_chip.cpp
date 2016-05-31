@@ -1,6 +1,8 @@
-#include "ColorChip.h"
+// Custom editable color button. Wow!
+
+#include "color_chip.h"
 #include <QColorDialog>
-#include "views/GuiSettings.h"
+#include "views/gui_settings.h"
 
 ColorChip::ColorChip(QWidget *parent) :
     QToolButton(parent)

@@ -30,17 +30,10 @@ AudioPlayback::AudioPlayback(QObject *parent)
 {
     qRegisterMetaType<FrequencySpectrum>("FrequencySpectrum");
     qRegisterMetaType<WindowFunction>("WindowFunction");
-#if 0
-    CHECKED_CONNECT(&m_spectrumAnalyser,
-                    SIGNAL(spectrumChanged(FrequencySpectrum)),
-                    this,
-                    SLOT(spectrumChangedRetransmit(FrequencySpectrum)));
-#else
     CHECKED_CONNECT(&m_spectrumAnalyser,
                     SIGNAL(spectrumChanged(FrequencySpectrum)),
                     this,
                     SIGNAL(spectrumChanged(FrequencySpectrum)));
-#endif
 
     // Set the main timer
     m_timer->setInterval(m_notifyIntervalMs);
@@ -116,7 +109,7 @@ void AudioPlayback::startPlayback()
         m_audioOutput->resume();
     } else {
         m_spectrumAnalyser.cancelCalculation();
-        spectrumChangedRetransmit(FrequencySpectrum());
+        emit spectrumChanged(FrequencySpectrum());
         setPlayPosition(0, true);
         CHECKED_CONNECT(m_audioOutput, SIGNAL(stateChanged(QAudio::State)),
                         this, SLOT(audioStateChanged(QAudio::State)));
@@ -221,12 +214,6 @@ void AudioPlayback::audioStateChanged(QAudio::State state)
         setState(state);
     }
 }
-
-void AudioPlayback::spectrumChangedRetransmit(const FrequencySpectrum &spectrum)
-{
-    emit spectrumChanged(spectrum);
-}
-
 
 //-----------------------------------------------------------------------------
 // Private functions

@@ -5,7 +5,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <functional>
-#include "views/dancefloorwidget.h"
+#include "views/dance_floor_widget.h"
 
 // Like SublevelNode, Region node's outputs aren't based on Params,
 // but on a special editor.

@@ -1,6 +1,6 @@
 #ifndef SUBLEVELNODEITEM_H
 #define SUBLEVELNODEITEM_H
-#include "views/NodeItem.h"
+#include "views/node_item.h"
 #include <QWidget>
 #include <QPainter>
 

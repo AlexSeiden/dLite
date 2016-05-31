@@ -1,10 +1,10 @@
-#include "views/CuesheetScene.h"
-#include "views/NodeItem.h"
-#include "views/ConnectorItem.h"
-#include "views/GuiSettings.h"
+#include "views/cuesheet_scene.h"
+#include "views/node_item.h"
+#include "views/connector_item.h"
+#include "views/gui_settings.h"
 #include <QGraphicsSceneMouseEvent>
 #include <QDebug>
-#include "views/GroupNodeItem.h"
+#include "views/group_node_item.h"
 
 
 CuesheetScene::CuesheetScene(QObject *parent) :
@@ -40,8 +40,6 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
     // Finish a possible connection action:  verify if we have a valid connection,
     // and then wire things together if appropriate.  Either way, clean up.
 
-    // ErrorHandling:  If only one of "_isConnecting" and "_line" are true, then
-    // we have some internal inconsistancy.
     if (m_isConnecting && m_line) {
         // Find the QGraphicsItems that's underneath the release position.
         QList<QGraphicsItem *> endItems = items(mouseEvent->scenePos());
@@ -84,6 +82,11 @@ void CuesheetScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 client->getParam()->connectTo(server->getParam());
             }
         }
+    }
+    else if (m_isConnecting || m_line) {
+        // If only one of "m_isConnecting" and "m_line" are true, then
+        // we have some internal inconsistancy.
+        Q_ASSERT(false);
     }
 
     m_line = nullptr;

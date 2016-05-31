@@ -1,6 +1,6 @@
-#include "views/GroupNodeItem.h"
-#include "views/NodeItem.h"
-#include "views/GuiSettings.h"
+#include "views/group_node_item.h"
+#include "views/node_item.h"
+#include "views/gui_settings.h"
 #include <QPainter>
 #include <QStyleOption>
 

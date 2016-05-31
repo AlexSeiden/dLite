@@ -2,9 +2,9 @@
 
 #include "views/SublevelNodeItem.h"
 #include "nodes/SublevelNode.h"
-#include "views/GuiSettings.h"
+#include "views/gui_settings.h"
 #include "engine/utils.h"
-#include "views/CuesheetScene.h"
+#include "views/cuesheet_scene.h"
 
 // -----------------------------------------------------------------------------
 // RangeMeter

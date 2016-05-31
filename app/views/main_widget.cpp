@@ -1,4 +1,4 @@
-#include "views/mainwidget.h"
+#include "views/main_widget.h"
 
 MainWidget::MainWidget(QWidget *parent)
     :   QMainWindow(parent)
@@ -55,7 +55,7 @@ void MainWidget::createUi()
     m_dancefloorwidget->show();
 
     m_cueLibView_dw = new QDockWidget(this);
-    m_cueLibView = new CueLibView(NULL);
+    m_cueLibView = new NodeLibrary(NULL);
     m_cueLibView_dw->setWidget(m_cueLibView);
     m_cueLibView_dw->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     addDockWidget(Qt::LeftDockWidgetArea, m_cueLibView_dw);

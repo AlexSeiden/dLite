@@ -1,5 +1,5 @@
-#include "views/CuesheetView.h"
-#include "views/GuiSettings.h"
+#include "views/cuesheet_view.h"
+#include "views/gui_settings.h"
 #include <QtWidgets>
 #include "engine/utils.h"
 

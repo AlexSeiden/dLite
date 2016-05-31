@@ -13,9 +13,9 @@
 #include <vector>
 #include <QString>
 #include <QStringList>
-#include "views/dancefloorwidget.h"
+#include "views/dance_floor_widget.h"
 #include "engine/dispatch.h"
-#include "views/GraphWidget.h"
+#include "views/graph_widget.h"
 
 Dancefloor::Dancefloor(QObject *parent) :
     QObject(parent),

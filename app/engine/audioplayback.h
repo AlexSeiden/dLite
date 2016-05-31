@@ -80,27 +80,17 @@ signals:
     // Format of audio data has changed
     void formatChanged(const QAudioFormat &format);
 
-    // Length of buffer has changed.
-    // duration is in microseconds.
+    // Buffer duration is in microseconds.
     void bufferLengthChanged(qint64 duration);
 
     void newSong(QString songfile);
 
-    // Position of the audio output device has changed.
-    // \param position Position in bytes
     void playPositionChanged(qint64 position);
-
-    // Spectrum has changed.
-    //  position Position of start of window in bytes
-    //  length   Length of window in byte
-    //  spectrum Resulting frequency spectrum
-    // TODO change this to only pass the spectrum
     void spectrumChanged(const FrequencySpectrum &spectrum);
 
 private slots:
     void updateDanceFloor();
     void audioStateChanged(QAudio::State state);
-    void spectrumChangedRetransmit(const FrequencySpectrum &spectrum);
 
 private:
     void resetAudioDevices();

@@ -10,7 +10,7 @@
 #include <QJsonDocument>
 #include <QUuid>
 #include <QRegularExpression>
-#include "views/GraphWidget.h"
+#include "views/graph_widget.h"
 
 
 // ------------------------------------------------------------------------------

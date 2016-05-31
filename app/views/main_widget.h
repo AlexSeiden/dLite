@@ -1,5 +1,5 @@
-#ifndef MAINWIDGET_H
-#define MAINWIDGET_H
+#ifndef MAIN_WIDGET_H
+#define MAIN_WIDGET_H
 
 #include <QAudio>
 #include <QWidget>
@@ -15,12 +15,12 @@
 #include "engine/audioplayback.h"
 #include "engine/utils.h"
 #include "nodes/Node.h"
-#include "views/CueLibView.h"
-#include "views/GraphWidget.h"
-#include "views/GuiSettings.h"
+#include "views/node_library.h"
+#include "views/graph_widget.h"
+#include "views/gui_settings.h"
 #include "views/Transport.h"
-#include "views/dancefloorwidget.h"
-#include "views/settingsdialog.h"
+#include "views/dance_floor_widget.h"
+#include "views/settings_dialog.h"
 #include "views/spectrograph.h"
 
 class FrequencySpectrum;
@@ -69,7 +69,7 @@ private:
     GraphWidget *           m_graphWidget;
     Dancefloor *            m_dancefloor;
     Dancefloorwidget *      m_dancefloorwidget;
-    CueLibView *            m_cueLibView;
+    NodeLibrary *            m_cueLibView;
     QDockWidget*            m_cueLibView_dw;
     Transport*              m_transport;
     QDockWidget*            m_transport_dw;
@@ -114,4 +114,4 @@ private:
     QString                 m_filename;
 };
 
-#endif // MAINWIDGET_H
+#endif // MAIN_WIDGET_H

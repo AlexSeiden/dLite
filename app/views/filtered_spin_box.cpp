@@ -1,16 +1,17 @@
-#include "views/MyDoubleSpinBox.h"
-#include "engine/utils.h"
+// A standard Qt double spin box, with wheel events filtered.
 
+#include "views/filtered_spin_box.h"
+#include "engine/utils.h"
 #include <QEvent>
 
-MyDoubleSpinBox::MyDoubleSpinBox(QWidget *parent) :
+FilteredSpinBox::FilteredSpinBox(QWidget *parent) :
     QDoubleSpinBox(parent)
 {
     installEventFilter(this);
     CHECKED_CONNECT(this, SIGNAL(editingFinished()), this, SLOT(clearFocusSlot()));
 }
 
-bool MyDoubleSpinBox::eventFilter(QObject *obj, QEvent *event)
+bool FilteredSpinBox::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::Wheel) {
         return true;
@@ -20,7 +21,7 @@ bool MyDoubleSpinBox::eventFilter(QObject *obj, QEvent *event)
 }
 
 
-void MyDoubleSpinBox::clearFocusSlot()
+void FilteredSpinBox::clearFocusSlot()
 {
     clearFocus();
 }

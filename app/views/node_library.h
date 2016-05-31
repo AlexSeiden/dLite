@@ -1,5 +1,5 @@
-#ifndef CUELIBVIEW_H
-#define CUELIBVIEW_H
+#ifndef NODE_LIBRARY_H
+#define NODE_LIBRARY_H
 
 #include <QWidget>
 #include <QGroupBox>
@@ -13,11 +13,11 @@
 // The "Cue Library" view widget.
 // Displays all cues & nodes that can be instantiated.
 
-class CueLibView : public QWidget
+class NodeLibrary : public QWidget
 {
     Q_OBJECT
 public:
-    CueLibView(QWidget *parent = 0);
+    NodeLibrary(QWidget *parent = 0);
 
 public slots:
     void        showAndRaise();
@@ -35,4 +35,4 @@ private:
     QSignalMapper*          m_signalMapper;
 };
 
-#endif // CUELIBVIEW_H
+#endif // NODE_LIBRARY_H

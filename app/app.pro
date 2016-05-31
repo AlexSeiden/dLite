@@ -21,20 +21,20 @@ TARGET = dLite
 QT       += multimedia widgets
 
 SOURCES  += \
-    engine/dancefloor.cpp \
-    engine/dancefloorhardware.cpp \
-    engine/nodefactory.cpp \
-    engine/nodeparameters.cpp \
-    engine/region.cpp \
-    engine/subrange.cpp \
     engine/audiofile.cpp \
     engine/audioplayback.cpp \
+    engine/dancefloor.cpp \
+    engine/dancefloorhardware.cpp \
     engine/dispatch.cpp \
     engine/firing.cpp \
     engine/frequencyspectrum.cpp \
     engine/lightcolor.cpp \
     engine/main.cpp \
+    engine/nodefactory.cpp \
+    engine/nodeparameters.cpp \
+    engine/region.cpp \
     engine/spectrumanalyser.cpp \
+    engine/subrange.cpp \
     engine/utils.cpp \
     nodes/BeatFiles.cpp \
     nodes/ColorNodes.cpp \
@@ -48,42 +48,42 @@ SOURCES  += \
     nodes/RenderNode.cpp \
     nodes/Shape.cpp \
     nodes/SublevelNode.cpp \
-    views/ColorChip.cpp \
-    views/ConnectorItem.cpp \
-    views/CueLibView.cpp \
-    views/CuesheetScene.cpp \
-    views/CuesheetView.cpp \
-    views/GraphWidget.cpp \
-    views/GroupNodeItem.cpp \
-    views/GuiSettings.cpp \
-    views/ModalDialogs.cpp \
-    views/MyDoubleSpinBox.cpp \
-    views/NodeItem.cpp    \
-    views/RenameTabDialog.cpp \
+    views/cuesheet_view.cpp \
+    views/group_node_item.cpp \
+    views/node_item.cpp    \
     views/SegmentController.cpp \
     views/SublevelNodeItem.cpp \
     views/Transport.cpp \
-    views/dancefloorwidget.cpp \
-    views/mainwidget.cpp \
-    views/settingsdialog.cpp \
-    views/spectrograph.cpp \
+    views/color_chip.cpp \
+    views/connector_item.cpp \
+    views/cuesheet_scene.cpp \
+    views/dance_floor_widget.cpp \
+    views/filtered_spin_box.cpp \
+    views/graph_widget.cpp \
+    views/gui_settings.cpp \
+    views/main_widget.cpp \
+    views/modal_dialogs.cpp \
+    views/node_library.cpp \
+    views/rename_tab_dialog.cpp \
+    views/settings_dialog.cpp \
+    views/spectrograph.cpp
 
 
 HEADERS  += \
-    engine/dancefloor.h \
-    engine/dancefloorhardware.h \
-    engine/nodefactory.h \
-    engine/nodeparameters.h \
-    engine/region.h \
-    engine/subrange.h \
     engine/audiofile.h \
     engine/audioplayback.h \
+    engine/dancefloor.h \
+    engine/dancefloorhardware.h \
     engine/dispatch.h \
     engine/firing.h \
     engine/frequencyspectrum.h \
     engine/lightcolor.h \
+    engine/nodefactory.h \
+    engine/nodeparameters.h \
+    engine/region.h \
     engine/spectrum.h \
     engine/spectrumanalyser.h \
+    engine/subrange.h \
     engine/utils.h \
     nodes/BeatFiles.h \
     nodes/ColorNodes.h \
@@ -97,23 +97,23 @@ HEADERS  += \
     nodes/RenderNode.h \
     nodes/Shape.h \
     nodes/SublevelNode.h \
-    views/ColorChip.h \
-    views/ConnectorItem.h \
-    views/CueLibView.h \
-    views/CuesheetScene.h     \
-    views/CuesheetView.h \
-    views/GraphWidget.h       \
-    views/GroupNodeItem.h \
-    views/GuiSettings.h \
-    views/MyDoubleSpinBox.h \
-    views/NodeItem.h          \
-    views/RenameTabDialog.h \
+    views/connector_item.h \
+    views/node_library.h \
+    views/cuesheet_view.h \
+    views/graph_widget.h       \
+    views/group_node_item.h \
+    views/node_item.h          \
     views/SegmentController.h \
     views/SublevelNodeItem.h \
     views/Transport.h \
-    views/dancefloorwidget.h  \
-    views/mainwidget.h \
-    views/settingsdialog.h \
+    views/color_chip.h \
+    views/cuesheet_scene.h     \
+    views/dance_floor_widget.h  \
+    views/filtered_spin_box.h \
+    views/gui_settings.h \
+    views/main_widget.h \
+    views/rename_tab_dialog.h \
+    views/settings_dialog.h \
     views/spectrograph.h \
 
 

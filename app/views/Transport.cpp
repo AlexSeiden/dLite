@@ -4,7 +4,7 @@
 
 #include "engine/utils.h"
 #include "views/Transport.h"
-#include "views/GuiSettings.h"
+#include "views/gui_settings.h"
 
 Transport::Transport(QWidget *parent)
     :   QWidget(parent)

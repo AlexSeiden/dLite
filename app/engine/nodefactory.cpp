@@ -1,6 +1,6 @@
 #include "engine/nodefactory.h"
-#include "views/GraphWidget.h"
-#include "views/CuesheetScene.h"
+#include "views/graph_widget.h"
+#include "views/cuesheet_scene.h"
 #include "engine/dispatch.h"
 #include <QJsonArray>
 #include <QJsonDocument>

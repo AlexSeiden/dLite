@@ -1,7 +1,7 @@
-#include "views/ConnectorItem.h"
-#include "views/NodeItem.h"
-#include "views/CuesheetScene.h"
-#include "views/GuiSettings.h"
+#include "views/connector_item.h"
+#include "views/node_item.h"
+#include "views/cuesheet_scene.h"
+#include "views/gui_settings.h"
 #include "engine/utils.h"
 #include <QtWidgets>
 #include <QPainterPath>

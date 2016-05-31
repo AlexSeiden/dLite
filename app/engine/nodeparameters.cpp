@@ -1,4 +1,4 @@
-// engine/nodeparamers.cpp
+// engine/node_parameters.cpp
 //
 //  All input and output parameters to a node are defined using these
 //  classes. The code here handles connectability, serialization,
@@ -10,7 +10,7 @@
 
 #include "engine/nodeparameters.h"
 #include "engine/lightcolor.h"
-#include "Region.h"
+#include "engine/region.h"
 #include "nodes/Node.h"
 
 // The view headers are included here for the editor widget callbacks below.
@@ -19,8 +19,8 @@
 #include <QToolButton>
 #include <QEvent>
 #include "engine/utils.h"
-#include "views/ColorChip.h"
-#include "views/MyDoubleSpinBox.h"
+#include "views/color_chip.h"
+#include "views/filtered_spin_box.h"
 
 // These constants defined for convinience & speed when doing type checks.
 const std::type_info & paramTypeFloat       = typeid(Param<float>);
@@ -314,7 +314,7 @@ QWidget* ParamBase::getEditorWidget(QObject *sendValueChangesHere)
 
 template <> QWidget* Param<float>::getEditorWidget(QObject* sendValueChangesHere)
 {
-    MyDoubleSpinBox *editorWidget = new MyDoubleSpinBox;
+    FilteredSpinBox *editorWidget = new FilteredSpinBox;
     if (m_useminmax) {
         editorWidget->setRange(m_minVal, m_maxVal);
         editorWidget->setSingleStep(_stepVal);

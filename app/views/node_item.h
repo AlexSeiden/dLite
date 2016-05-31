@@ -3,7 +3,7 @@
 
 #include "engine/nodeparameters.h"
 #include "nodes/Node.h"
-#include "CuesheetScene.h"
+#include "views/cuesheet_scene.h"
 #include <QGraphicsItem>
 #include <QGraphicsObject>
 #include <QList>

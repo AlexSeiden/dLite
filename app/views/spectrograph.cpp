@@ -6,7 +6,7 @@
 #include <QTimerEvent>
 
 #include "views/spectrograph.h"
-#include "views/GuiSettings.h"
+#include "views/gui_settings.h"
 
 Spectrograph::Spectrograph(QWidget *parent)
     :   QWidget(parent)
