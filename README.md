@@ -2,7 +2,8 @@
 Software to drive a programmable LED dance floor
 
 I built this for my son's 8th birthday. :-)
-![alt text](https://github.com/AlexSeiden/dLite/tree/master/app/images "Lewy's Dark Party!")
+
+![alt text](https://github.com/AlexSeiden/dLite/blob/master/app/images/Lewy_dLite.jpg "Lewy's Party!")
 
 
 ## Overview
