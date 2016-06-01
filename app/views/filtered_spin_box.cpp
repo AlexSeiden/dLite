@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 // A standard Qt double spin box, with wheel events filtered.
 
 #include "views/filtered_spin_box.h"

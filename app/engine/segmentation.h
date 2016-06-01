@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 #ifndef SEGMENTCONTROLLER_H
 #define SEGMENTCONTROLLER_H
 

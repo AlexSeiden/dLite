@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #include "views/cuesheet_scene.h"
 #include "views/node_item.h"
 #include "views/connector_item.h"

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 #ifndef FIRING_H
 #define FIRING_H
 

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 #ifndef AUDIOPLAYBACK_H
 #define AUDIOPLAYBACK_H
 

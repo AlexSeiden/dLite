@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 // Encapsulates an arbitrary region of the dance floor.
 #include "Region.h"
 #include <QJsonObject>

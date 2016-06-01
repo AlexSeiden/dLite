@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 // Code for interfacing with the Color Kinetics hardware.
 
 #include <stdio.h>

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 #include <QDebug>
 #include "engine/firing.h"
 

@@ -59,7 +59,7 @@ SOURCES  += \
     views/filtered_spin_box.cpp \
     views/graph_widget.cpp \
     views/gui_settings.cpp \
-    views/main_widget.cpp \
+    views/main_window.cpp \
     views/modal_dialogs.cpp \
     views/node_library.cpp \
     views/rename_tab_dialog.cpp \
@@ -109,7 +109,7 @@ HEADERS  += \
     views/dance_floor_widget.h  \
     views/filtered_spin_box.h \
     views/gui_settings.h \
-    views/main_widget.h \
+    views/main_window.h \
     views/rename_tab_dialog.h \
     views/settings_dialog.h \
     views/spectrograph.h \

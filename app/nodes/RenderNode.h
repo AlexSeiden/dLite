@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden
+//
 #ifndef RENDERNODE_H
 #define RENDERNODE_H
 

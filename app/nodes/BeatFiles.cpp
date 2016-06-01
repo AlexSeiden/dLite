@@ -1,3 +1,12 @@
+// Copyright (c) Alex Seiden 2014-2016
+//
+// ------------------------------------------------------------------------------
+//  BeatFiles
+//
+//      Nodes that read precomputed beat and bar info, and generate triggers
+//      based on that.
+
+// ------------------------------------------------------------------------------
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -7,13 +16,6 @@
 #include "engine/dispatch.h"
 #include "engine/nodefactory.h"
 
-// ------------------------------------------------------------------------------
-//  BeatFiles
-//
-//      Nodes that read precomputed beat and bar info, and generate triggers
-//      based on that.
-
-// ------------------------------------------------------------------------------
 //  utils
 int findBeatIndexForSample(int thisSample, std::vector<int> beatvec)
 {

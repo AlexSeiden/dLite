@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 // Classes that encapsulate individual parameters on Nodes & Cues.
 
 #ifndef NODEPARAMETERS_H

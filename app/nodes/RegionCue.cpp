@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden
+//
 #include "RegionCue.h"
 #include "engine/nodefactory.h"
 #include "engine/dancefloor.h"

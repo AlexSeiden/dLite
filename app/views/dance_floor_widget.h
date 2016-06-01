@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #ifndef DANCEFLOORWIDGET_H
 #define DANCEFLOORWIDGET_H
 

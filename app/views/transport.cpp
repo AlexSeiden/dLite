@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #include <QPainter>
 #include <QMouseEvent>
 #include <QDebug>

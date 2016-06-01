@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 // NodeItem.cpp
 // Classes for drawing the graph view representation of all the nodes.
 

@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #include "views/dance_floor_widget.h"
 #include "engine/utils.h"
 #include <QDebug>

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden
+//
 #ifndef REMAPPER_NODE_H
 #define REMAPPER_NODE_H
 #include "nodes/Node.h"

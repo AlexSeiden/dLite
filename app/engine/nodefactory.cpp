@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 #include "engine/nodefactory.h"
 #include "views/graph_widget.h"
 #include "views/cuesheet_scene.h"

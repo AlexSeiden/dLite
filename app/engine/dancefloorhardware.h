@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 #ifndef DANCE_FLOOR_HARDWARE
 #define DANCE_FLOOR_HARDWARE
 

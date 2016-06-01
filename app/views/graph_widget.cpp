@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 // The main node graph drawing area.
 // Shows all the nodes, allows them to be edited & connected,
 // switches between cuesheets.

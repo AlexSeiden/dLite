@@ -1,3 +1,5 @@
+// Copyright (c) Alex Seiden 2014-2016
+//
 //  Nodes that alter or return color values.
 
 #include "nodes/ColorNodes.h"

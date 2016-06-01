@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden
+//
 #include "nodes/Shape.h"
 #include "engine/dancefloor.h"
 #include "engine/dispatch.h"

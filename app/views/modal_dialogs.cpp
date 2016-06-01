@@ -1,4 +1,6 @@
-#include "views/main_widget.h"
+// Copyright (c) 2014-2016 Alex Seiden
+//
+#include "views/main_window.h"
 #include "engine/dispatch.h"
 #include <QFileDialog>
 

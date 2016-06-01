@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #include <QGraphicsProxyWidget>
 
 #include "views/sublevel_node_item.h"

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden
+//
 #include "nodes/PathNode.h"
 #include "engine/utils.h"
 #include "engine/dispatch.h"

@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 // ------------------------------------------------------------------------------
 // node_library.cpp
 // Widget that allows the user to create new nodes.

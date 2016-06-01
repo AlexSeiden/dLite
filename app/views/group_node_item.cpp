@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #include "views/group_node_item.h"
 #include "views/node_item.h"
 #include "views/gui_settings.h"

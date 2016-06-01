@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 #ifndef DISPATCH_H
 #define DISPATCH_H
 

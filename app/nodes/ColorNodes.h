@@ -1,3 +1,5 @@
+// Copyright (c) Alex Seiden 2014-2016
+//
 #ifndef COLORNODES_H
 #define COLORNODES_H
 #include <random>

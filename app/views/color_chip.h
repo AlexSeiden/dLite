@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #ifndef COLORCHIP_H
 #define COLORCHIP_H
 

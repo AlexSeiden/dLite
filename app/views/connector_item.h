@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #ifndef CONNECTORITEM_H
 #define CONNECTORITEM_H
 #include <QGraphicsObject>

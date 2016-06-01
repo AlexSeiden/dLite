@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #ifndef FILTERED_SPIN_BOX_H
 #define FILTERED_SPIN_BOX_H
 

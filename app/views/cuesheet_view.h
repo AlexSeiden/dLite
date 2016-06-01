@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #ifndef CUESHEETVIEW_H
 #define CUESHEETVIEW_H
 

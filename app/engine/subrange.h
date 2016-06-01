@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 #ifndef SUBRANGE_H
 #define SUBRANGE_H
 #include <QRectF>

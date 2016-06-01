@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden
+//
 // Remaps a float, kinda like the levels control in photoshop.
 
 #include "nodes/RemapperNode.h"

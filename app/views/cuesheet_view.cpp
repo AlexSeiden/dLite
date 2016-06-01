@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #include "views/cuesheet_view.h"
 #include "views/gui_settings.h"
 #include <QtWidgets>

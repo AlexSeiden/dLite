@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #ifndef NODE_LIBRARY_H
 #define NODE_LIBRARY_H
 

@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #ifndef GUISETTINGS_H
 #define GUISETTINGS_H
 

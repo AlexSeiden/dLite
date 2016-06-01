@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 // Encapsulates the dance floor itself:
 // Imports the physical layout of the LED lamps, stores that.
 // Every frame,  evaluates all the cues, then composites each pixel which is

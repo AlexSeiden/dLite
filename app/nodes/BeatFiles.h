@@ -1,3 +1,5 @@
+// Copyright (c) Alex Seiden 2014-2016
+//
 #ifndef BEATFILES_H
 #define BEATFILES_H
 

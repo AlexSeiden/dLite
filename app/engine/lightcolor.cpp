@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 //  The class representing a color anywhere in the system.
 //  I thought, "oh for sure I'll want my own color type cause
 //  doubtless I'll do lots of totally unique stuff with it."

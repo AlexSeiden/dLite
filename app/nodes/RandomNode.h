@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden
+//
 #ifndef RANDOMNODE_H
 #define RANDOMNODE_H
 #include "nodes/Node.h"

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden
+//
 #ifndef REGIONNODE_H
 #define REGIONNODE_H
 

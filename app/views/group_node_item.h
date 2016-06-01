@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #ifndef GROUP_NODE_ITEM_H
 #define GROUP_NODE_ITEM_H
 

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden
+//
 #include "nodes/RegionNode.h"
 #include "engine/nodefactory.h"
 #include "engine/utils.h"

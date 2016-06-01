@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 //
 //  Audio.cpp
 //  Handles main timing and audio playback.

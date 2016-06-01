@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 #ifndef NODEFACTORY_H
 #define NODEFACTORY_H
 #include "nodes/Node.h"

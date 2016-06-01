@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden 
+//
 // engine/node_parameters.cpp
 //
 //  All input and output parameters to a node are defined using these

@@ -95,7 +95,7 @@ GUI widgets & the like.
 
 | File                    | Notes    
 | ----------------------- | ---------
-| main_widget.cpp         | The central window, where other tool windows can be docked.
+| main_window.cpp         | The central window, where other tool windows can be docked.
 | dance_floor_widget.cpp  | Draws the on-screen representation of the dance floor. Used both in playback, and for editing nodes like regions and paths.
 | graph_widget.cpp        | Where the user lays out and connects the nodes to form the Cue DAG that renders the patterns.
 | node_item.cpp           | Draws nodes in the graph, using the Qt QGraphicsView framework.

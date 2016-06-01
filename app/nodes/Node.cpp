@@ -1,3 +1,5 @@
+// Copyright (c) Alex Seiden 2014-2016
+//
 // Node.cpp
 //  Abstract base class for all nodes in the evaluation graph.
 

@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #ifndef MAIN_WIDGET_H
 #define MAIN_WIDGET_H
 

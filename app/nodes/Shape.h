@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 Alex Seiden
+//
 #ifndef SHAPE_NODE_H
 #define SHAPE_NODE_H
 #include <QImage>

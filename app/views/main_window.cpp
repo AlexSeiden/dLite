@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #include "views/main_widget.h"
 
 MainWidget::MainWidget(QWidget *parent)
@@ -295,11 +297,8 @@ void MainWidget::stateChanged(QAudio::State state)
     }
 }
 
-// TODO decouple position & spectrum change
-// They are artificially coupled in engine.cpp
 void MainWidget::spectrumChanged(const FrequencySpectrum &spectrum)
 {
-    // ??? Why is this a function call, instead of a signal?
     m_spectrograph->spectrumChanged(spectrum);
 }
 

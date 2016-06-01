@@ -1,3 +1,5 @@
+// Copyright (c) Alex Seiden 2014-2016
+//
 #include "DotCue.h"
 #include "engine/dancefloor.h"
 #include <QDebug>

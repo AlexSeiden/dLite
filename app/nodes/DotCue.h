@@ -1,3 +1,5 @@
+// Copyright (c) Alex Seiden 2014-2016
+//
 #ifndef DOTCUE_H
 #define DOTCUE_H
 

@@ -1,3 +1,5 @@
+// Copyright (c) 2014-2016 Alex Seiden
+//
 #ifndef SUBLEVELNODEITEM_H
 #define SUBLEVELNODEITEM_H
 #include "views/node_item.h"
