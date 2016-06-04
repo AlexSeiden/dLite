@@ -25,8 +25,7 @@ dLite is written in C++, with the Qt framework. The GUI is entirely in Qt;
 I’ve used some of the other Qt classes (such as their container classes) where
 it makes things easier.
 
-The software interfaces to the physical LEDs through a UDP socket 
-control of the physical lights is through a UDP socket.
+The software interfaces to the physical LEDs through a UDP socket.
 
 FFTs are provided by the fftreal library, contained in the 3rdparty/fftreal
 subdir. The FFT runs in a separate thread.
